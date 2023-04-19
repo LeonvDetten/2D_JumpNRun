@@ -60,9 +60,6 @@ player = Player(player_spawn_x, player_spawn_y, 40, 60)
 world = World(my_game.level, block_size, my_colors.GREEN, player)
 player.setWorld(world)
 
-
-
-
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:

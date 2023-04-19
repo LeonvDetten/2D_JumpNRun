@@ -29,7 +29,7 @@ class World:
             pygame.draw.rect(screen, self.platform_color, pygame.Rect(block.x-self.player.getCamOffset(), block.y, block.width, block.height), 0)
 
     def main(self, screen):
-        self.check_player_collision_sideblock(self.player.playerPos) 
+        #self.check_player_collision_sideblock(self.player.playerPos) 
         screen.blit(bg_img, position)
         self.update(screen) #evt nicht in Loop wegen Performance
 
@@ -46,11 +46,13 @@ class World:
                 
         return return_y
     
-    def check_player_collision_sideblock(self, player_rect):                  # Fucnktion zu blockierung der steurung nach links wenn Block dort ist
+    def check_player_collision_sideblock(self, player_rect):                  
         for block in self.platforms:
-            if block.colliderect(player_rect) and block.y == (self.player.playerPos.y - 1):             
-                self.player.speed_x = 0
-                print("block.y:" , block.y)
-                print("player_rect.y:" , player_rect.y-1)
+            if block.colliderect(player_rect) and block.y == (self.player.playerPos.y - 1):     #geht nicht für Sprünge: Intervall machen block_oberkante>player>block_unterkante       
+                if block.x > player_rect.x:
+                    return -1
+                elif block.x < player_rect.x:
+                    return -2
+        return 1        
         
         
