@@ -46,15 +46,16 @@ class Player(pygame.sprite.Sprite):
 
     def movement(self):
         key_state = pygame.key.get_pressed()
+        key_down_event_list = pygame.event.get(KEYDOWN)
+        if len(key_down_event_list)==0:
+            self.speed_x = 0
+        if key_state[K_d] and self.world.check_player_collision_sideblock(self.playerPos) != -1:
+            self.speed_x = 10
+        if key_state[K_a] and self.world.check_player_collision_sideblock(self.playerPos) != -2:
+            if self.playerPos.x > 0:
+                self.speed_x = -10 
         if key_state[K_SPACE] or key_state[K_w]:
             self.jump(self.jump_speed)
-        if key_state[K_d]:
-            self.speed_x = 10
-            #self.playerPos.x += 10
-        if key_state[K_a]:
-            if self.playerPos.x > 0:
-                self.speed_x = -10
-                #self.playerPos.x -= 10 
         self.playerPos.x = self.playerPos.x + self.speed_x
         self.base.x = self.playerPos.x         
         self.rect.x = self.playerPos.x - self.getCamOffset()  
