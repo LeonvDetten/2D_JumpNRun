@@ -3,11 +3,11 @@ import sys
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide"
 import pygame
 from loguru import logger
+import time
 
 from world import *
+from player import *
 
-pygame.init()
-logger.add("game.log")
 
 class MyGame:
     __WINDOWWIDTH = 1520
@@ -25,7 +25,7 @@ class MyGame:
              "                                            ",
              "                                            ",
              "                                            ",
-             "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"]
+             "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"]
 
     def __init__(self):
         logger.info("Created game object")
@@ -42,12 +42,24 @@ class Color():
         GREEN = (0, 255, 0)
         BLUE = (0, 0, 255)
 
+pygame.init()
+logger.add("game.log")
+
+player_spawn_x = 120
+player_spawn_y = 100
 
 my_game = MyGame()
 my_game.create_window()
+
 my_colors = Color()
 
-world = World(my_game.level, 60, my_colors.GREEN)
+clock = pygame.time.Clock()
+
+player = Player(player_spawn_x, player_spawn_y, 40, 60)
+world = World(my_game.level, 60, my_colors.GREEN, player)
+player.setWorld(world)
+
+
 
 
 while True:
@@ -57,4 +69,6 @@ while True:
             sys.exit()
 
     world.main(my_game.screen)
+    player.main(my_game.screen)
     pygame.display.update()
+    clock.tick(30)
