@@ -22,9 +22,9 @@ class MyGame:
              "                                           ",
              "                                            ",
              "                                                 ",
-             "                                            ",
-             "                                            ",
-             "                                            ",
+             "                 BBB                           ",
+             "          BBB            BBB                      ",
+             "     BBBBB                         BBBBBBB              ",
              "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"]
 
     def __init__(self):
@@ -47,6 +47,7 @@ logger.add("game.log")
 
 player_spawn_x = 120
 player_spawn_y = 100
+block_size = 60
 
 my_game = MyGame()
 my_game.create_window()
@@ -56,7 +57,7 @@ my_colors = Color()
 clock = pygame.time.Clock()
 
 player = Player(player_spawn_x, player_spawn_y, 40, 60)
-world = World(my_game.level, 60, my_colors.GREEN, player)
+world = World(my_game.level, block_size, my_colors.GREEN, player)
 player.setWorld(world)
 
 

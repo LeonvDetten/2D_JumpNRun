@@ -17,6 +17,7 @@ class Player(pygame.sprite.Sprite):
         self.player_plain = pygame.sprite.RenderPlain(self)
     
         self.speed_y = 0
+        self.speed_x = 0
         self.leben = 99
         self.jump_speed = -16
         self.gravity = 1
@@ -48,10 +49,13 @@ class Player(pygame.sprite.Sprite):
         if key_state[K_SPACE] or key_state[K_w]:
             self.jump(self.jump_speed)
         if key_state[K_d]:
-            self.playerPos.x += 10
+            self.speed_x = 10
+            #self.playerPos.x += 10
         if key_state[K_a]:
             if self.playerPos.x > 0:
-                self.playerPos.x -= 10 
+                self.speed_x = -10
+                #self.playerPos.x -= 10 
+        self.playerPos.x = self.playerPos.x + self.speed_x
         self.base.x = self.playerPos.x         
         self.rect.x = self.playerPos.x - self.getCamOffset()  
 
