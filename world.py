@@ -29,30 +29,29 @@ class World:
             pygame.draw.rect(screen, self.platform_color, pygame.Rect(block.x-self.player.getCamOffset(), block.y, block.width, block.height), 0)
 
     def main(self, screen):
-        #self.check_player_collision_sideblock(self.player.playerPos) 
+        self.check_player_collision_bottomblock(self.player.playerPos)
         screen.blit(bg_img, position)
-        self.update(screen) #evt nicht in Loop wegen Performance
+        self.update(screen) 
 
     def collided_get_y(self, player_rect):                          
         return_y = -1
         for block in self.platforms:
             if block.colliderect(player_rect):
-                return_y = block.y - block.height + 1
-                # if block.y < player_rect.y-1:
-                #     print("Block seite!")
-                #     print("block.y:" , block.y)
-                #     print("player_rect.y:" , player_rect.y-1)
-                #     #print("block.y + block.height:" , block.y + block.height)
-                
+                return_y = block.y - block.height + 1                
         return return_y
     
-    def check_player_collision_sideblock(self, player_rect):                  
+    def check_player_collision_sideblock(self, player_rect):                  #Unschöne Funktion, aber funktioniert
         for block in self.platforms:
-            if block.colliderect(player_rect) and block.y == (self.player.playerPos.y - 1):     #geht nicht für Sprünge: Intervall machen block_oberkante>player>block_unterkante       
+            if block.colliderect(player_rect) and block.y < player_rect.y < block.y + block.height: 
                 if block.x > player_rect.x:
                     return -1
                 elif block.x < player_rect.x:
                     return -2
-        return 1        
-        
+        return 1   
+
+    def check_player_collision_bottomblock(self, player_rect): 
+        for block in self.platforms:
+            if block.colliderect(player_rect) and self.player.speed_y < 0 and block.y + (block.height/2) < player_rect.y:
+                self.player.speed_y = 0
+                player_rect.y = block.y + block.height
         
