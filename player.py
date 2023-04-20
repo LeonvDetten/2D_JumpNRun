@@ -19,7 +19,7 @@ class Player(pygame.sprite.Sprite):
         self.speed_y = 0
         self.speed_x = 0
         self.leben = 99
-        self.jump_speed = -10
+        self.jump_speed = -12
         self.gravity = 1
 
     def getCamOffset(self):

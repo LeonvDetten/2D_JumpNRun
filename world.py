@@ -6,6 +6,9 @@ bg_img = pygame.image.load('img/background_img/bg.jpg')
 bg_img = pygame.transform.scale(bg_img, (1520, 800))
 position = (0, 0)
 
+block_img = pygame.image.load('img/ground/spaceground.png')
+block_img = pygame.transform.scale(block_img, (60, 60))
+
 class World:
     def __init__(self, level, block_size, platform_color, player):
         self.level = level
@@ -26,7 +29,7 @@ class World:
 
     def update(self,screen):
         for block in self.platforms:
-            pygame.draw.rect(screen, self.platform_color, pygame.Rect(block.x-self.player.getCamOffset(), block.y, block.width, block.height), 0)
+            screen.blit(block_img, (block.x-self.player.getCamOffset(), block.y))
 
     def main(self, screen):
         self.check_player_collision_bottomblock(self.player.playerPos)
