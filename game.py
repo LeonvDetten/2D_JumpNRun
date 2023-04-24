@@ -3,11 +3,9 @@ import sys
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide"
 import pygame
 from loguru import logger
-import time
 
 from world import *
 from player import *
-
 
 class MyGame:
     __WINDOWWIDTH = 1520
@@ -70,3 +68,5 @@ while True:
     player.main(my_game.screen)
     pygame.display.update()
     clock.tick(30)
+
+    #TODOS in Functions als Comments schreiben (bsp.jumpleft jump right anstatt jump allgemein, Kanten Fixen (an die Wand springen und oben auf dem Block landen), Durch Block buggen wenn er blockietrt und man Springt)
