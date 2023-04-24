@@ -1,5 +1,6 @@
 import pygame
 from pygame import *
+from loguru import logger
 
 player_img = 'img/player_img/2_entity_000_IDLE_000.png'
 
@@ -40,6 +41,8 @@ class Player(pygame.sprite.Sprite):
         self.base = pygame.Rect(start_x, start_y + height, width, 2)        #Ground under Player
         self.player_plain = pygame.sprite.RenderPlain(self)
 
+        logger.info("Created player object")
+
     def getCamOffset(self):
         return self.playerPos.x - 300                                          #Player in the middle of the screen
 
@@ -65,12 +68,12 @@ class Player(pygame.sprite.Sprite):
 
     def move_y(self):
         collided_y = self.world.collided_get_y(self.base)
-        if self.speed_y < 0 or collided_y <= 0:             
+        if self.speed_y < 0 or collided_y <= 0 or (self.world.check_player_collision_sideblock(self.playerPos) != 1 and self.playerPos.y < 720):             #< statt <=
             self.playerPos.y = self.playerPos.y + self.speed_y    
             self.speed_y = self.speed_y + self.gravity
         if self.speed_y >= 0 and collided_y > 0 and self.world.check_player_collision_sideblock(self.playerPos) == 1:                                
             self.playerPos.y = collided_y
-            self.speed_y = 0   
+            self.speed_y = 0        
         self.base.y = self.playerPos.y + self.playerPos.height                                                                    
         self.rect.y = self.playerPos.y
 

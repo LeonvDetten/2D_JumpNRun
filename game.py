@@ -32,6 +32,7 @@ class MyGame:
     def create_window(self):
         self.screen = pygame.display.set_mode((self.__WINDOWWIDTH, self.__WINDOWHEIGHT))
         pygame.display.set_caption("2D Game")
+        logger.info("Created window with size: " + str(self.__WINDOWWIDTH) + "x" + str(self.__WINDOWHEIGHT))
 
 class Color():
         WHITE = (255, 255, 255)

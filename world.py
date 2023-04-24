@@ -9,7 +9,7 @@ position = (0, 0)
 block_img = pygame.image.load('img/ground/spaceground.png')
 block_img = pygame.transform.scale(block_img, (60, 60))
 
-class World:
+class World:                                                                    #Konstruktor aus Buch (Buch angeben)
     def __init__(self, level, block_size, platform_color, player):
         self.level = level
         self.block_size = block_size
@@ -45,7 +45,8 @@ class World:
     
     def check_player_collision_sideblock(self, player_rect):                  #Unschöne Funktion, aber funktioniert
         for block in self.platforms:
-            if block.colliderect(player_rect) and block.y < player_rect.y < block.y + block.height: 
+            if block.colliderect(player_rect) and block.y < (player_rect.y + (player_rect.height/2)) < block.y + block.height: 
+                print("block.y: " + str(block.y) + " player_rect.y(new): " + str(player_rect.y + (player_rect.height/2)) + " block.y + block.height: " + str(block.y + block.height) +"    " + str(self.player.speed_y))
                 if block.x > player_rect.x:
                     return -1
                 elif block.x < player_rect.x:
