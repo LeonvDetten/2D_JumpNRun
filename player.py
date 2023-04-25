@@ -2,29 +2,20 @@ import pygame
 from pygame import *
 from loguru import logger
 
-player_img = 'img/player_img/2_entity_000_IDLE_000.png'
-
 class Player(pygame.sprite.Sprite):
 
     def __init__(self, start_x, start_y, width, height):
         pygame.sprite.Sprite.__init__(self)
-
+       
+        self.width = width
+        self.height = height
+        
         self.idleSprites = []
-        for i in range(7):
-            self.idleSprites.append(pygame.transform.scale(pygame.image.load('img/player_img/2_entity_000_IDLE_00' + str(i) + '.png'), (width, height)))
-
         self.runRightSprites = []
-        for i in range(7):
-            self.runRightSprites.append(pygame.transform.scale(pygame.image.load('img/player_img/2_entity_000_RUN_00' + str(i) + '.png'), (width, height)))
-        
         self.runLeftSprites = []
-        for i in range(7):
-            self.runLeftSprites.append(pygame.transform.flip(pygame.transform.scale(pygame.image.load('img/player_img/2_entity_000_RUN_00' + str(i) + '.png'), (width, height)),True, False))
-        
         self.jumpSprites = []
-        for i in range(7):
-            self.jumpSprites.append(pygame.transform.scale(pygame.image.load('img/player_img/2_entity_000_JUMP_00' + str(i) + '.png'), (width, height)))
-
+        self.loadSprites()
+    
         self.currentSprite = 0
         self.spriteLoopSpeed = 0.3
         self.image = self.idleSprites[self.currentSprite]
@@ -45,6 +36,24 @@ class Player(pygame.sprite.Sprite):
 
         logger.info("Created player object")
 
+    def loadSprites(self): 
+        for i in range(7):
+            player_img = pygame.image.load('img/player_img/2_entity_000_IDLE_00' + str(i) + '.png')
+            player_img_cropped = player_img.subsurface(pygame.Rect(200, 250, 825, 850))
+            self.idleSprites.append(pygame.transform.scale(player_img_cropped, (self.width, self.height)))
+        for i in range(7):
+            player_img = pygame.image.load('img/player_img/2_entity_000_RUN_00' + str(i) + '.png')
+            player_img_cropped = player_img.subsurface(pygame.Rect(200, 250, 825, 850))
+            self.runRightSprites.append(pygame.transform.scale(player_img_cropped, (self.width, self.height)))
+        for i in range(7):
+            player_img = pygame.image.load('img/player_img/2_entity_000_RUN_00' + str(i) + '.png')
+            player_img_cropped = player_img.subsurface(pygame.Rect(200, 250, 825, 850))
+            self.runLeftSprites.append(pygame.transform.flip(pygame.transform.scale(player_img_cropped, (self.width, self.height)),True, False))
+        for i in range(7):
+            player_img = pygame.image.load('img/player_img/2_entity_000_JUMP_00' + str(i) + '.png')
+            player_img_cropped = player_img.subsurface(pygame.Rect(200, 250, 825, 850))
+            self.jumpSprites.append(pygame.transform.scale(player_img_cropped, (self.width, self.height)))
+
     def getCamOffset(self):
         return self.playerPos.x - 300                                          #Player in the middle of the screen
 
@@ -59,7 +68,7 @@ class Player(pygame.sprite.Sprite):
 
     def animation(self, screen):
         if self.currentAnimation == "idle":
-            self.image = self.idleSprites[int(self.currentSprite)]
+            self.image = self.idleSprites[int(self.currentSprite)] #self.image = pygame.transform.scale(pygame.image.load('img/player_img/test_idle.png'), (40, 60))
         if self.currentAnimation == "runRight":
             self.image = self.runRightSprites[int(self.currentSprite)]    
         if self.currentAnimation == "runLeft":
@@ -74,10 +83,10 @@ class Player(pygame.sprite.Sprite):
             self.playerPos.y = self.playerPos.y + self.speed_y    
             self.speed_y = self.speed_y + self.gravity
         if self.speed_y >= 0 and collided_y > 0 :#and self.world.check_player_collision_sideblock(self.playerPos) == 1:                                
-            self.playerPos.y = collided_y + 5                                                                                                                #+5 damit der Player nicht über Block schwebt
+            self.playerPos.y = collided_y                                                                                                          #+5 damit der Player nicht über Block schwebt
             self.speed_y = 0        
         self.base.y = self.playerPos.y + self.playerPos.height                                                                    
-        self.rect.y = self.playerPos.y
+        self.rect.y = self.playerPos.y 
 
     def movement(self):
         """Handles the movement of the player

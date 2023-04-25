@@ -6,9 +6,6 @@ bg_img = pygame.image.load('img/background_img/bg.jpg')
 bg_img = pygame.transform.scale(bg_img, (1520, 800))
 position = (0, 0)
 
-block_img = pygame.image.load('img/ground/spaceground.png')
-block_img = pygame.transform.scale(block_img, (60, 60))
-
 class World:                                                                    #Konstruktor aus Buch (Buch angeben)
     def __init__(self, level, block_size, platform_color, player):
         self.level = level
@@ -18,6 +15,9 @@ class World:                                                                    
         self.platforms = []
         self.posn_x = 0
         self.posn_y = 0
+
+        self.block_img = pygame.image.load('img/ground/spaceground.png')
+        self.block_img = pygame.transform.scale(self.block_img, (block_size, block_size))
 
         for line in self.level:
             self.posn_x = 0
@@ -29,7 +29,7 @@ class World:                                                                    
 
     def update(self,screen):
         for block in self.platforms:
-            screen.blit(block_img, (block.x-self.player.getCamOffset(), block.y))
+            screen.blit(self.block_img, (block.x-self.player.getCamOffset(), block.y))
 
     def main(self, screen):
         self.check_player_collision_bottomblock(self.player.playerPos)
@@ -40,12 +40,13 @@ class World:                                                                    
         return_y = -1
         for block in self.platforms:
             if block.colliderect(player_rect):
-                return_y = block.y - block.height + 1                
+                return_y = block.y - block.height #+ 1                
         return return_y
     
     def check_player_collision_sideblock(self, player_rect):                  #Unschöne Funktion, aber funktioniert
         for block in self.platforms:
             if block.colliderect(player_rect) and block.y < (player_rect.y + (player_rect.height/2)) < block.y + block.height: 
+                print("block.y: " + str(block.y) + " player_rect.y: " + str(player_rect.y + (player_rect.height/2)) + " player_rect.height: " + str(block.y + block.height))
                 if block.x > player_rect.x:
                     return -1
                 elif block.x < player_rect.x:
