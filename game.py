@@ -11,17 +11,17 @@ class MyGame:
     __WINDOWWIDTH = 1520
     __WINDOWHEIGHT = 800
     level = [
-             "                                       ",
+             "              BB                         ",
              "                                         ",
-             "                                         ",
-             "                                       ",
-             "                                         ",
-             "                                            ",
-             "                                           ",
-             "                                            ",
-             "                                                 ",
-             "                 BBB                           ",
-             "          BBB            BBB                      ",
+             "    B           BBB                          ",
+             "                                                  B",
+             "                              BBBBBBBBBBBBBBBB           ",
+             "                          BBBB                  ",
+             " B                   BBBBB                       ",
+             "                  BBBB                          ",
+             "               BBBB                                 ",
+             "            BBB    BBB                           ",
+             "         BBBB            BBB                      ",
              "     BBBBB                         BBBBBBB              ",
              "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"]
 
@@ -70,4 +70,4 @@ while True:
     pygame.display.update()
     clock.tick(30)
 
-    #TODOS in Functions als Comments schreiben (bsp.jumpleft jump right anstatt jump allgemein, Kanten Fixen (an die Wand springen und oben auf dem Block landen), Durch Block buggen wenn er blockietrt und man Springt)
+    #TODOS in Functions als Comments schreiben (bsp.jumpleft jump right anstatt jump allgemein, Kanten Fixen (an die Wand springen und oben auf dem Block landen), Durch Block buggen wenn er blockietrt und man Springt, collisionsfeinheiten(links von Block abstand zwischen Block und Spieler))
