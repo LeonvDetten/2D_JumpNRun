@@ -22,7 +22,7 @@ class MyGame:
              "               BBBB                                 ",
              "            BBB    BBB                           ",
              "         BBBB            BBB                      ",
-             " BB                                  BBBBBBB              ",
+             " BB    B                     B      BBBBBBB              ",
              "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"]
 
     def __init__(self):
