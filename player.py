@@ -82,7 +82,7 @@ class Player(pygame.sprite.Sprite):
         if self.speed_y < 0 or collided_y < 0 or (self.world.check_player_collision_sideblock(self.playerPos) != 1 and self.playerPos.y < 600):            
             self.playerPos.y = self.playerPos.y + self.speed_y    
             self.speed_y = self.speed_y + self.gravity
-        if self.speed_y >= 0 and collided_y > 0 :#and self.world.check_player_collision_sideblock(self.playerPos) == 1:                                
+        elif self.speed_y >= 0 and collided_y > 0 :#and self.world.check_player_collision_sideblock(self.playerPos) == 1:                   ELIF STATT IF?!?                            
             self.playerPos.y = collided_y                                                                                                          #+5 damit der Player nicht über Block schwebt
             self.speed_y = 0        
         self.base.y = self.playerPos.y + self.playerPos.height                                                                    
