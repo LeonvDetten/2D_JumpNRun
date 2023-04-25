@@ -45,8 +45,8 @@ class World:                                                                    
     
     def check_player_collision_sideblock(self, player_rect):                  #Unschöne Funktion, aber funktioniert
         for block in self.platforms:
-            if block.colliderect(player_rect) and block.y < (player_rect.y + (player_rect.height/2)) < block.y + block.height: 
-                print("block.y: " + str(block.y) + " player_rect.y: " + str(player_rect.y + (player_rect.height/2)) + " player_rect.height: " + str(block.y + block.height))
+            print("block.y: " + str(block.y) + " player_rect.y: " + str(player_rect.y + (player_rect.height)) + " block.height: " + str(block.y + block.height))
+            if block.colliderect(player_rect) and block.y < (player_rect.y + player_rect.height -1) and (player_rect.y + player_rect.height -1) < block.y + block.height: 
                 if block.x > player_rect.x:
                     return -1
                 elif block.x < player_rect.x:
