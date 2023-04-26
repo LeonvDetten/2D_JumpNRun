@@ -16,7 +16,7 @@ class World:                                                                    
         self.posn_x = 0
         self.posn_y = 0
 
-        self.block_img = pygame.image.load('img/ground/spaceground.png')
+        self.block_img = pygame.image.load('img/ground_img/spaceground.png')
         self.block_img = pygame.transform.scale(self.block_img, (block_size, block_size))
 
         for line in self.level:

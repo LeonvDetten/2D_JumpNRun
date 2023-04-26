@@ -2,6 +2,8 @@ import pygame
 from pygame import *
 from loguru import logger
 
+from object import *
+
 class Player(pygame.sprite.Sprite):
 
     def __init__(self, start_x, start_y, width, height):
@@ -27,6 +29,7 @@ class Player(pygame.sprite.Sprite):
         self.movement_speed = 8
         self.gravity = 1
         self.latest_shot = 0
+        self.shootAnimationTime = 1000
         #self.leben = 99
 
         self.playerPos = pygame.Rect(start_x, start_y, width, height)
@@ -35,6 +38,8 @@ class Player(pygame.sprite.Sprite):
         self.rect.y = start_y
         self.base = pygame.Rect(start_x, start_y + height, width, 2)        #Ground under Player
         self.player_plain = pygame.sprite.RenderPlain(self)
+
+        self.bulletGroup = pygame.sprite.Group()
 
         logger.info("Created player object")
 
@@ -71,6 +76,7 @@ class Player(pygame.sprite.Sprite):
         self.movement()                                                                                                
         self.move_y()
         self.animation(screen)
+        pygame.sprite.Group.draw(self.bulletGroup, screen)
             
 
     def animation(self, screen):
@@ -91,8 +97,8 @@ class Player(pygame.sprite.Sprite):
         if self.speed_y < 0 or collided_y < 0 or (self.world.check_player_collision_sideblock(self.playerPos) != 1 and self.playerPos.y < 600):            
             self.playerPos.y = self.playerPos.y + self.speed_y    
             self.speed_y = self.speed_y + self.gravity
-        if self.speed_y >= 0 and collided_y > 0 :#and self.world.check_player_collision_sideblock(self.playerPos) == 1:                  Wenn ELIF Dann in Zeile drüber:       (self.world.check_player_collision_sideblock(self.playerPos) != 1 and self.playerPos.y < 600) and BERÜHRE KEINEN ANDEREN BLOCK IN EBENE UNTER dem Block der Seitlich kollidiert               
-            self.playerPos.y = collided_y                                                                                                          #+5 damit der Player nicht über Block schwebt
+        if self.speed_y >= 0 and collided_y > 0 :#and self.world.check_player_collision_sideblock(self.playerPos) == 1:                  
+            self.playerPos.y = collided_y                                              
             self.speed_y = 0        
         self.base.y = self.playerPos.y + self.playerPos.height                                                                    
         self.rect.y = self.playerPos.y 
@@ -105,7 +111,7 @@ class Player(pygame.sprite.Sprite):
         key_down_event_list = pygame.event.get(KEYDOWN)
         if len(key_down_event_list)==0:
             self.speed_x = 0   
-            if self.latest_shot + 1000 < pygame.time.get_ticks(): 
+            if self.latest_shot + self.shootAnimationTime < pygame.time.get_ticks(): 
                 if self.world.collided_get_y(self.base) >= 0:      
                     self.currentAnimation = "idle"
                 else:
@@ -120,7 +126,7 @@ class Player(pygame.sprite.Sprite):
         if key_state[K_w]:
             self.jump(self.jump_speed)
             self.currentAnimation = "jump"
-        if key_state[K_SPACE]:
+        if key_state[K_SPACE] and self.latest_shot + self.shootAnimationTime < pygame.time.get_ticks():
             self.shoot()
             self.currentAnimation = "shoot"
         self.currentSprite += self.spriteLoopSpeed           #aus Vid (angeben in Docstring)
@@ -137,8 +143,9 @@ class Player(pygame.sprite.Sprite):
 
     def shoot(self):
         self.currentSprite = 3
-        self.latest_shot = pygame.time.get_ticks()
-        print(self.latest_shot)      
+        self.bulletGroup.add(Bullet(self.rect.x + self.width, self.rect.y + (self.height/2), 10, 5, 1))
+        self.latest_shot = pygame.time.get_ticks()     
+        print(self.bulletGroup) 
                           
           
     
