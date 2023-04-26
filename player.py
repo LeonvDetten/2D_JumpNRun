@@ -96,7 +96,7 @@ class Player(pygame.sprite.Sprite):
             self.playerPos.y += self.speed_y    
             self.speed_y += self.world.gravity
         if self.speed_y >= 0 and collided_y > 0 :#and self.world.check_player_collision_sideblock(self.playerPos) == 1:                  
-            self.playerPos.y = collided_y                                              
+            self.playerPos.y = collided_y - self.height                                            
             self.speed_y = 0        
         self.base.y = self.playerPos.y + self.height                                                                    
         self.rect.y = self.playerPos.y 

@@ -30,7 +30,7 @@ class World:                                                                    
                 if block == 'B':
                     self.platforms.append(pygame.Rect(self.posn_x, self.posn_y, block_size, block_size))
                 if block =="E":
-                    self.enemyGroup.add(Enemy(self, self.posn_x, self.posn_y, 60, 60, 1))
+                    self.enemyGroup.add(Enemy(self, self.posn_x, self.posn_y, 40, 40, 1))
                 self.posn_x = self.posn_x + block_size
             self.posn_y = self.posn_y + block_size    
 
@@ -47,7 +47,7 @@ class World:                                                                    
         return_y = -1
         for block in self.platforms:
             if block.colliderect(objct_rect):
-                return_y = block.y - block.height #+ 1                
+                return_y = block.y               
         return return_y
     
     def check_player_collision_sideblock(self, player_rect):                  #Unschöne Funktion, aber funktioniert
