@@ -14,6 +14,7 @@ class Player(pygame.sprite.Sprite):
         self.runRightSprites = []
         self.runLeftSprites = []
         self.jumpSprites = []
+        self.shootSprites = []
         self.loadSprites()
     
         self.currentSprite = 0
@@ -25,6 +26,7 @@ class Player(pygame.sprite.Sprite):
         self.jump_speed = -11
         self.movement_speed = 8
         self.gravity = 1
+        self.latest_shot = 0
         #self.leben = 99
 
         self.playerPos = pygame.Rect(start_x, start_y, width, height)
@@ -53,6 +55,11 @@ class Player(pygame.sprite.Sprite):
             player_img = pygame.image.load('img/player_img/2_entity_000_JUMP_00' + str(i) + '.png')
             player_img_cropped = player_img.subsurface(pygame.Rect(200, 250, 825, 850))
             self.jumpSprites.append(pygame.transform.scale(player_img_cropped, (self.width, self.height)))
+        for i in range(7):
+            player_img = pygame.image.load('img/player_img/2_entity_000_ATTACK_00' + str(i) + '.png')
+            player_img_cropped = player_img.subsurface(pygame.Rect(200, 250, 825, 850))
+            self.shootSprites.append(pygame.transform.scale(player_img_cropped, (self.width, self.height)))    
+
 
     def getCamOffset(self):
         return self.playerPos.x - 300                                          #Player in the middle of the screen
@@ -75,6 +82,8 @@ class Player(pygame.sprite.Sprite):
             self.image = self.runLeftSprites[int(self.currentSprite)]
         if self.currentAnimation == "jump":
             self.image = self.jumpSprites[int(self.currentSprite)]   
+        if self.currentAnimation == "shoot":
+            self.image = self.shootSprites[int(self.currentSprite)]
         self.player_plain.draw(screen)
 
     def move_y(self):
@@ -95,11 +104,12 @@ class Player(pygame.sprite.Sprite):
         key_state = pygame.key.get_pressed()
         key_down_event_list = pygame.event.get(KEYDOWN)
         if len(key_down_event_list)==0:
-            self.speed_x = 0    
-            if self.world.collided_get_y(self.base) >= 0:      
-                self.currentAnimation = "idle"
-            else:
-                self.currentAnimation = "jump"
+            self.speed_x = 0   
+            if self.latest_shot + 1000 < pygame.time.get_ticks(): 
+                if self.world.collided_get_y(self.base) >= 0:      
+                    self.currentAnimation = "idle"
+                else:
+                    self.currentAnimation = "jump"
         if key_state[K_d] and self.world.check_player_collision_sideblock(self.playerPos) != -1:
             self.speed_x = self.movement_speed
             self.currentAnimation = "runRight"
@@ -107,9 +117,12 @@ class Player(pygame.sprite.Sprite):
             if self.playerPos.x > 0:
                 self.speed_x = self.movement_speed * -1 
                 self.currentAnimation = "runLeft"
-        if key_state[K_SPACE] or key_state[K_w]:
+        if key_state[K_w]:
             self.jump(self.jump_speed)
             self.currentAnimation = "jump"
+        if key_state[K_SPACE]:
+            self.shoot()
+            self.currentAnimation = "shoot"
         self.currentSprite += self.spriteLoopSpeed           #aus Vid (angeben in Docstring)
         if self.currentSprite >= len(self.idleSprites):
                 self.currentSprite = 0
@@ -120,7 +133,13 @@ class Player(pygame.sprite.Sprite):
     def jump(self, speed):
         if self.world.collided_get_y(self.base)>0 and self.speed_y == 0: 
             self.currentSprite = 0
-            self.speed_y = speed      
+            self.speed_y = speed    
+
+    def shoot(self):
+        self.currentSprite = 3
+        self.latest_shot = pygame.time.get_ticks()
+        print(self.latest_shot)      
+                          
           
     
         

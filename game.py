@@ -65,9 +65,11 @@ while True:
             pygame.quit()
             sys.exit()
 
+    start_time= pygame.time.get_ticks()
     world.main(my_game.screen)
     player.main(my_game.screen)
     pygame.display.update()
     clock.tick(30)
 
+    logger.info("Time: " + str(pygame.time.get_ticks() - start_time) + "ms")
     #TODOS in Functions als Comments schreiben (bsp.jumpleft jump right anstatt jump allgemein, Kanten Fixen (an die Wand springen und oben auf dem Block landen), Durch Block buggen wenn er blockietrt und man Springt, collisionsfeinheiten(links von Block abstand zwischen Block und Spieler))

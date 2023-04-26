@@ -1,3 +1,0 @@
-#Starting the game 
-
-start()
