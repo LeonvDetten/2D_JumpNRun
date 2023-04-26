@@ -15,7 +15,7 @@ class MyGame:
              "                                         ",
              "    B           BBB                          ",
              "                                                  B",
-             "                              BBBBBBBBBBBBBBBB           ",
+             "    E                          BBBBBBBBBBBBBBBB           ",
              "                          BBBB                  ",
              " B                   BBBBB                       ",
              "                  BBBB                          ",
@@ -23,7 +23,7 @@ class MyGame:
              "            BBB    BBB                           ",
              "         BBBB            BBB                      ",
              " BB    B                     B      BBBBBBB              ",
-             "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"]
+             "BBBBBBBBBBBBBBBBBBB"]
 
     def __init__(self):
         logger.info("Created game object")
@@ -68,6 +68,12 @@ while True:
     start_time= pygame.time.get_ticks()
     world.main(my_game.screen)
     player.main(my_game.screen)
+    for bullet in (player.bulletGroup):
+            bullet.update()
+    for enemy in (world.enemyGroup):
+            enemy.update()
+    pygame.sprite.Group.draw(player.bulletGroup, my_game.screen)    
+    pygame.sprite.Group.draw(world.enemyGroup, my_game.screen)
     pygame.display.update()
     clock.tick(30)
 

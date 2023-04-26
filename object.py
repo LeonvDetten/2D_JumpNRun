@@ -16,5 +16,9 @@ class Bullet(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = start_x
         self.rect.y = start_y
-
+        
         logger.info("Created bullet object")
+
+    def update(self):
+        self.rect.x += self.direction * self.speed
+        

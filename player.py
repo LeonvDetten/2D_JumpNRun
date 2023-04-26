@@ -27,9 +27,9 @@ class Player(pygame.sprite.Sprite):
         self.speed_x = 0
         self.jump_speed = -11
         self.movement_speed = 8
-        self.gravity = 1
         self.latest_shot = 0
         self.shootAnimationTime = 1000
+        self.direction = 1
         #self.leben = 99
 
         self.playerPos = pygame.Rect(start_x, start_y, width, height)
@@ -44,24 +44,24 @@ class Player(pygame.sprite.Sprite):
         logger.info("Created player object")
 
     def loadSprites(self): 
-        for i in range(7):
-            player_img = pygame.image.load('img/player_img/2_entity_000_IDLE_00' + str(i) + '.png')
+        for image in range(7):
+            player_img = pygame.image.load('img/player_img/2_entity_000_IDLE_00' + str(image) + '.png')
             player_img_cropped = player_img.subsurface(pygame.Rect(200, 250, 825, 850))
             self.idleSprites.append(pygame.transform.scale(player_img_cropped, (self.width, self.height)))
-        for i in range(7):
-            player_img = pygame.image.load('img/player_img/2_entity_000_RUN_00' + str(i) + '.png')
+        for image in range(7):
+            player_img = pygame.image.load('img/player_img/2_entity_000_RUN_00' + str(image) + '.png')
             player_img_cropped = player_img.subsurface(pygame.Rect(200, 250, 825, 850))
             self.runRightSprites.append(pygame.transform.scale(player_img_cropped, (self.width, self.height)))
-        for i in range(7):
-            player_img = pygame.image.load('img/player_img/2_entity_000_RUN_00' + str(i) + '.png')
+        for image in range(7):
+            player_img = pygame.image.load('img/player_img/2_entity_000_RUN_00' + str(image) + '.png')
             player_img_cropped = player_img.subsurface(pygame.Rect(200, 250, 825, 850))
             self.runLeftSprites.append(pygame.transform.flip(pygame.transform.scale(player_img_cropped, (self.width, self.height)),True, False))
-        for i in range(7):
-            player_img = pygame.image.load('img/player_img/2_entity_000_JUMP_00' + str(i) + '.png')
+        for image in range(7):
+            player_img = pygame.image.load('img/player_img/2_entity_000_JUMP_00' + str(image) + '.png')
             player_img_cropped = player_img.subsurface(pygame.Rect(200, 250, 825, 850))
             self.jumpSprites.append(pygame.transform.scale(player_img_cropped, (self.width, self.height)))
-        for i in range(7):
-            player_img = pygame.image.load('img/player_img/2_entity_000_ATTACK_00' + str(i) + '.png')
+        for image in range(7):
+            player_img = pygame.image.load('img/player_img/2_entity_000_ATTACK_00' + str(image) + '.png')
             player_img_cropped = player_img.subsurface(pygame.Rect(200, 250, 825, 850))
             self.shootSprites.append(pygame.transform.scale(player_img_cropped, (self.width, self.height)))    
 
@@ -75,9 +75,7 @@ class Player(pygame.sprite.Sprite):
     def main(self, screen):
         self.movement()                                                                                                
         self.move_y()
-        self.animation(screen)
-        pygame.sprite.Group.draw(self.bulletGroup, screen)
-            
+        self.animation(screen)         
 
     def animation(self, screen):
         if self.currentAnimation == "idle":
@@ -95,12 +93,12 @@ class Player(pygame.sprite.Sprite):
     def move_y(self):
         collided_y = self.world.collided_get_y(self.base)
         if self.speed_y < 0 or collided_y < 0 or (self.world.check_player_collision_sideblock(self.playerPos) != 1 and self.playerPos.y < 600):            
-            self.playerPos.y = self.playerPos.y + self.speed_y    
-            self.speed_y = self.speed_y + self.gravity
+            self.playerPos.y += self.speed_y    
+            self.speed_y += self.world.gravity
         if self.speed_y >= 0 and collided_y > 0 :#and self.world.check_player_collision_sideblock(self.playerPos) == 1:                  
             self.playerPos.y = collided_y                                              
             self.speed_y = 0        
-        self.base.y = self.playerPos.y + self.playerPos.height                                                                    
+        self.base.y = self.playerPos.y + self.height                                                                    
         self.rect.y = self.playerPos.y 
 
     def movement(self):
@@ -112,27 +110,32 @@ class Player(pygame.sprite.Sprite):
         if len(key_down_event_list)==0:
             self.speed_x = 0   
             if self.latest_shot + self.shootAnimationTime < pygame.time.get_ticks(): 
-                if self.world.collided_get_y(self.base) >= 0:      
+                if self.world.collided_get_y(self.base) >= 0:  
+                    # if self.direction == -1:                          BENÖTIGT FÜR ANIMATION IDLE LEFT und SHOOT LEFT
+                    #     self.currentAnimation = "runLeft"
                     self.currentAnimation = "idle"
                 else:
                     self.currentAnimation = "jump"
         if key_state[K_d] and self.world.check_player_collision_sideblock(self.playerPos) != -1:
             self.speed_x = self.movement_speed
+            self.direction = 1
             self.currentAnimation = "runRight"
         if key_state[K_a] and self.world.check_player_collision_sideblock(self.playerPos) != -2:
             if self.playerPos.x > 0:
                 self.speed_x = self.movement_speed * -1 
+                self.direction = -1
                 self.currentAnimation = "runLeft"
+                
         if key_state[K_w]:
             self.jump(self.jump_speed)
             self.currentAnimation = "jump"
-        if key_state[K_SPACE] and self.latest_shot + self.shootAnimationTime < pygame.time.get_ticks():
+        if (key_state[K_SPACE] or key_state[K_RETURN]) and self.latest_shot + self.shootAnimationTime < pygame.time.get_ticks():
             self.shoot()
             self.currentAnimation = "shoot"
         self.currentSprite += self.spriteLoopSpeed           #aus Vid (angeben in Docstring)
         if self.currentSprite >= len(self.idleSprites):
                 self.currentSprite = 0
-        self.playerPos.x = self.playerPos.x + self.speed_x
+        self.playerPos.x += self.speed_x
         self.base.x = self.playerPos.x         
         self.rect.x = self.playerPos.x - self.getCamOffset()  
 
@@ -143,9 +146,9 @@ class Player(pygame.sprite.Sprite):
 
     def shoot(self):
         self.currentSprite = 3
-        self.bulletGroup.add(Bullet(self.rect.x + self.width, self.rect.y + (self.height/2), 10, 5, 1))
+        self.bulletGroup.add(Bullet(self.rect.x + (0.8*self.width), self.rect.y + (self.height*0.45), 10, 5, self.direction))
         self.latest_shot = pygame.time.get_ticks()     
-        print(self.bulletGroup) 
+    
                           
           
     
