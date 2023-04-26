@@ -19,11 +19,11 @@ class MyGame:
              "                          BBBB                  ",
              " B                   BBBBB                       ",
              "                  BBBB                          ",
-             "               BBBB                                 ",
+             "    EEE           BBBB                                 ",
              "            BBB    BBB                           ",
              "         BBBB            BBB                      ",
              " BB    B                     B      BBBBBBB              ",
-             "BBBBBBBBBBBBBBBBBBB"]
+             "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"]
 
     def __init__(self):
         logger.info("Created game object")
