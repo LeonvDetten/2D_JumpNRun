@@ -11,18 +11,18 @@ class MyGame:
     __WINDOWWIDTH = 1520
     __WINDOWHEIGHT = 800
     level = [
-             "              BB                         ",
+             "              BB           E              ",
              "                                         ",
              "    B           BBB                          ",
-             "                                                  B",
+             "                       EEEEE                           B",
              "    E                          BBBBBBBBBBBBBBBB           ",
              "                          BBBB                  ",
              " B                   BBBBB                       ",
              "                  BBBB                          ",
-             "    EEE           BBBB                                 ",
-             "            BBB    BBB                           ",
-             "         BBBB            BBB                      ",
-             " BB    B                     B      BBBBBBB              ",
+             "    EEE           BBBB            E                     ",
+             "            BBB    BBB                       E    ",
+             "         BBBB            BBB    E                  ",
+             " BB                         B      BBBBBBB              ",
              "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"]
 
     def __init__(self):
