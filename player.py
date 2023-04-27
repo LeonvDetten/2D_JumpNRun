@@ -16,7 +16,8 @@ class Player(pygame.sprite.Sprite):
         self.idleLeftSprites = []
         self.runRightSprites = []
         self.runLeftSprites = []
-        self.jumpSprites = []
+        self.jumpRightSprites = []
+        self.jumpLeftSprites = []
         self.shootRightSprites = []
         self.shootLeftSprites = []
         self.loadSprites()
@@ -65,7 +66,11 @@ class Player(pygame.sprite.Sprite):
         for image in range(7):
             player_img = pygame.image.load('img/player_img/2_entity_000_JUMP_00' + str(image) + '.png')
             player_img_cropped = player_img.subsurface(pygame.Rect(200, 250, 825, 850))
-            self.jumpSprites.append(pygame.transform.scale(player_img_cropped, (self.width, self.height)))
+            self.jumpRightSprites.append(pygame.transform.scale(player_img_cropped, (self.width, self.height)))
+        for image in range(7):
+            player_img = pygame.image.load('img/player_img/2_entity_000_JUMP_00' + str(image) + '.png')
+            player_img_cropped = player_img.subsurface(pygame.Rect(200, 250, 825, 850))
+            self.jumpLeftSprites.append(pygame.transform.flip(pygame.transform.scale(player_img_cropped, (self.width, self.height)),True, False))    
         for image in range(7):
             player_img = pygame.image.load('img/player_img/2_entity_000_ATTACK_00' + str(image) + '.png')
             player_img_cropped = player_img.subsurface(pygame.Rect(200, 250, 825, 850))
@@ -96,8 +101,10 @@ class Player(pygame.sprite.Sprite):
             self.image = self.runRightSprites[int(self.currentSprite)]    
         if self.currentAnimation == "runLeft":
             self.image = self.runLeftSprites[int(self.currentSprite)]
-        if self.currentAnimation == "jump":
-            self.image = self.jumpSprites[int(self.currentSprite)]   
+        if self.currentAnimation == "jumpRight":
+            self.image = self.jumpRightSprites[int(self.currentSprite)]  
+        if self.currentAnimation == "jumpLeft":
+            self.image = self.jumpLeftSprites[int(self.currentSprite)]
         if self.currentAnimation == "shootRight":
             self.image = self.shootRightSprites[int(self.currentSprite)]
         if self.currentAnimation == "shootLeft":
@@ -125,11 +132,15 @@ class Player(pygame.sprite.Sprite):
             self.speed_x = 0   
             if self.latest_shot + self.shootAnimationTime < pygame.time.get_ticks(): 
                 if self.world.collided_get_y(self.base, self.height) >= 0:  
-                    # if self.direction == -1:                          BENÖTIGT FÜR ANIMATION IDLE LEFT und SHOOT LEFT
-                    #     self.currentAnimation = "runLeft"
-                    self.currentAnimation = "idleRight"
+                    if self.direction == -1:                          
+                        self.currentAnimation = "idleLeft"
+                    else:
+                        self.currentAnimation = "idleRight"
                 else:
-                    self.currentAnimation = "jump"
+                    if self.direction == -1:
+                        self.currentAnimation = "jumpLeft"
+                    else:
+                        self.currentAnimation = "jumpRight"
         if key_state[K_d] and self.world.check_player_collision_sideblock(self.playerPos) != -1:
             self.speed_x = self.movement_speed
             self.direction = 1
@@ -141,10 +152,8 @@ class Player(pygame.sprite.Sprite):
                 self.currentAnimation = "runLeft"
         if key_state[K_w]:
             self.jump(self.jump_speed)
-            self.currentAnimation = "jump"
         if (key_state[K_SPACE] or key_state[K_RETURN]) and self.latest_shot + self.shootAnimationTime < pygame.time.get_ticks():
             self.shoot()
-            self.currentAnimation = "shootRight"
         self.currentSprite += self.spriteLoopSpeed           #aus Vid (angeben in Docstring)
         if self.currentSprite >= len(self.idleRightSprites):
                 self.currentSprite = 0
@@ -154,11 +163,19 @@ class Player(pygame.sprite.Sprite):
 
     def jump(self, speed):
         if self.world.collided_get_y(self.base, self.height)>0 and self.speed_y == 0: 
+            if self.direction == -1:                          
+                self.currentAnimation = "jumpLeft"
+            else:
+                self.currentAnimation = "jumpRight"
             self.currentSprite = 0
             self.speed_y = speed    
 
     def shoot(self):
         self.currentSprite = 3
+        if self.direction == -1:
+            self.currentAnimation = "shootLeft"
+        else:
+            self.currentAnimation = "shootRight"    
         self.bulletGroup.add(Bullet(self.rect.x + (0.8*self.width), self.rect.y + (self.height*0.45), 10, 5, self.direction))
         self.latest_shot = pygame.time.get_ticks()     
     
