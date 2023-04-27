@@ -43,6 +43,10 @@ class Enemy(pygame.sprite.Sprite):
             self.runLeftSprites.append(pygame.transform.scale(enemy, (self.width, self.height)))    
 
     def movement(self):
+        if self.world.check_object_collision_sideblock(self.enemyPos) == -1:
+            self.direction = -1
+        elif self.world.check_object_collision_sideblock(self.enemyPos) == -2:
+            self.direction = 1    
         self.enemyPos.x += (self.direction * self.speed_x)  
         self.base.x = self.enemyPos.x
         self.rect.x = self.enemyPos.x - self.world.player.getCamOffset() 

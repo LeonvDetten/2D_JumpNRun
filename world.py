@@ -50,7 +50,7 @@ class World:                                                                    
                 return_y = block.y - objekt_height           
         return return_y
     
-    def check_player_collision_sideblock(self, object_rect):                  #Unschöne Funktion, aber funktioniert
+    def check_object_collision_sideblock(self, object_rect):                  #Unschöne Funktion, aber funktioniert
         for block in self.platforms:
             #print("block.y: " + str(block.y) + " object_rect.y: " + str(object_rect.y + (object_rect.height)) + " block.height: " + str(block.y + block.height))
             if block.colliderect(object_rect) and block.y < (object_rect.y + object_rect.height -1): #and (object_rect.y + object_rect.height -1) < block.y + block.height: 

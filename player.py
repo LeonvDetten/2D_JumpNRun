@@ -28,7 +28,7 @@ class Player(pygame.sprite.Sprite):
         self.currentAnimation = "idle"
         self.speed_y = 0
         self.speed_x = 0
-        self.jump_speed = -11
+        self.jump_speed = -10
         self.movement_speed = 8
         self.latest_shot = 0
         self.shootAnimationTime = 1000
@@ -113,10 +113,10 @@ class Player(pygame.sprite.Sprite):
 
     def move_y(self):
         collided_y = self.world.collided_get_y(self.base, self.height)
-        if self.speed_y < 0 or collided_y < 0 or (self.world.check_player_collision_sideblock(self.playerPos) != 1 and self.playerPos.y < 600):            
+        if self.speed_y < 0 or collided_y < 0 or (self.world.check_object_collision_sideblock(self.playerPos) != 1 and self.playerPos.y < 600):            
             self.playerPos.y += self.speed_y    
             self.speed_y += self.world.gravity
-        if self.speed_y >= 0 and collided_y > 0 :#and self.world.check_player_collision_sideblock(self.playerPos) == 1:                  
+        if self.speed_y >= 0 and collided_y > 0 :#and self.world.check_object_collision_sideblock(self.playerPos) == 1:                  
             self.playerPos.y = collided_y                                             
             self.speed_y = 0        
         self.base.y = self.playerPos.y + self.height                                                                    
@@ -141,11 +141,11 @@ class Player(pygame.sprite.Sprite):
                         self.currentAnimation = "jumpLeft"
                     else:
                         self.currentAnimation = "jumpRight"
-        if key_state[K_d] and self.world.check_player_collision_sideblock(self.playerPos) != -1:
+        if key_state[K_d] and self.world.check_object_collision_sideblock(self.playerPos) != -1:
             self.speed_x = self.movement_speed
             self.direction = 1
             self.currentAnimation = "runRight"
-        if key_state[K_a] and self.world.check_player_collision_sideblock(self.playerPos) != -2:
+        if key_state[K_a] and self.world.check_object_collision_sideblock(self.playerPos) != -2:
             if self.playerPos.x > 0:
                 self.speed_x = self.movement_speed * -1 
                 self.direction = -1
@@ -176,7 +176,7 @@ class Player(pygame.sprite.Sprite):
             self.currentAnimation = "shootLeft"
         else:
             self.currentAnimation = "shootRight"    
-        self.bulletGroup.add(Bullet(self.rect.x + (0.8*self.width), self.rect.y + (self.height*0.45), 10, 5, self.direction))
+        self.bulletGroup.add(Bullet(self.playerPos.x + (0.8*self.width), self.playerPos.y + (self.height*0.45), 10, 5, self.direction, self.world))
         self.latest_shot = pygame.time.get_ticks()     
     
                           
