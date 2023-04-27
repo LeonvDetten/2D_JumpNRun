@@ -47,6 +47,7 @@ class Player(pygame.sprite.Sprite):
         logger.info("Created player object")
 
     def loadSprites(self): 
+        start_time= pygame.time.get_ticks()
         for image in range(7):
             player_img = pygame.image.load('img/player_img/2_entity_000_IDLE_00' + str(image) + '.png')
             player_img_cropped = player_img.subsurface(pygame.Rect(200, 250, 825, 850))
@@ -79,7 +80,7 @@ class Player(pygame.sprite.Sprite):
             player_img = pygame.image.load('img/player_img/2_entity_000_ATTACK_00' + str(image) + '.png')
             player_img_cropped = player_img.subsurface(pygame.Rect(200, 250, 825, 850))
             self.shootLeftSprites.append(pygame.transform.flip(pygame.transform.scale(player_img_cropped, (self.width, self.height)),True, False))     
-
+        logger.info("Loaded player sprites in " + str(pygame.time.get_ticks() - start_time) + "ms")
 
     def getCamOffset(self):
         return self.playerPos.x - 300                                          #Player in the middle of the screen
