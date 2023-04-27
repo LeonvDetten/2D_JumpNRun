@@ -43,26 +43,26 @@ class World:                                                                    
         screen.blit(bg_img, position)
         self.update(screen) 
 
-    def collided_get_y(self, objct_rect):                          
+    def collided_get_y(self, objct_rect, objekt_height):                          
         return_y = -1
         for block in self.platforms:
             if block.colliderect(objct_rect):
-                return_y = block.y               
+                return_y = block.y - objekt_height           
         return return_y
     
-    def check_player_collision_sideblock(self, player_rect):                  #Unschöne Funktion, aber funktioniert
+    def check_player_collision_sideblock(self, object_rect):                  #Unschöne Funktion, aber funktioniert
         for block in self.platforms:
-            #print("block.y: " + str(block.y) + " player_rect.y: " + str(player_rect.y + (player_rect.height)) + " block.height: " + str(block.y + block.height))
-            if block.colliderect(player_rect) and block.y < (player_rect.y + player_rect.height -1): #and (player_rect.y + player_rect.height -1) < block.y + block.height: 
-                if block.x > player_rect.x:
+            #print("block.y: " + str(block.y) + " object_rect.y: " + str(object_rect.y + (object_rect.height)) + " block.height: " + str(block.y + block.height))
+            if block.colliderect(object_rect) and block.y < (object_rect.y + object_rect.height -1): #and (object_rect.y + object_rect.height -1) < block.y + block.height: 
+                if block.x > object_rect.x:
                     return -1
-                elif block.x < player_rect.x:
+                elif block.x < object_rect.x:
                     return -2
         return 1   
 
-    def check_player_collision_bottomblock(self, player_rect): 
+    def check_player_collision_bottomblock(self, object_rect): 
         for block in self.platforms:
-            if block.colliderect(player_rect) and self.player.speed_y < 0 and block.y + (block.height/2) < player_rect.y:
+            if block.colliderect(object_rect) and self.player.speed_y < 0 and block.y + (block.height/2) < object_rect.y:
                 self.player.speed_y = 0
-                player_rect.y = block.y + block.height
+                object_rect.y = block.y + block.height
         

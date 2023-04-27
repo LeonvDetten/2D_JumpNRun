@@ -58,12 +58,12 @@ class Enemy(pygame.sprite.Sprite):
             self.currentSprite = 0      
 
     def move_y(self):
-        collided_y = self.world.collided_get_y(self.base)
+        collided_y = self.world.collided_get_y(self.base, self.height)
         if self.speed_y < 0 or collided_y < 0:            
             self.enemyPos.y += self.speed_y    
             self.speed_y += self.world.gravity
         if self.speed_y >= 0 and collided_y > 0:                 
-            self.enemyPos.y = collided_y - self.height                                          
+            self.enemyPos.y = collided_y                                         
             self.speed_y = 0
         self.base.y = self.enemyPos.y + self.height                                                                    
         self.rect.y = self.enemyPos.y

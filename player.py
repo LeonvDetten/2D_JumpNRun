@@ -105,12 +105,12 @@ class Player(pygame.sprite.Sprite):
         self.player_plain.draw(screen)
 
     def move_y(self):
-        collided_y = self.world.collided_get_y(self.base)
+        collided_y = self.world.collided_get_y(self.base, self.height)
         if self.speed_y < 0 or collided_y < 0 or (self.world.check_player_collision_sideblock(self.playerPos) != 1 and self.playerPos.y < 600):            
             self.playerPos.y += self.speed_y    
             self.speed_y += self.world.gravity
         if self.speed_y >= 0 and collided_y > 0 :#and self.world.check_player_collision_sideblock(self.playerPos) == 1:                  
-            self.playerPos.y = collided_y - self.height                                            
+            self.playerPos.y = collided_y                                             
             self.speed_y = 0        
         self.base.y = self.playerPos.y + self.height                                                                    
         self.rect.y = self.playerPos.y 
@@ -124,7 +124,7 @@ class Player(pygame.sprite.Sprite):
         if len(key_down_event_list)==0:
             self.speed_x = 0   
             if self.latest_shot + self.shootAnimationTime < pygame.time.get_ticks(): 
-                if self.world.collided_get_y(self.base) >= 0:  
+                if self.world.collided_get_y(self.base, self.height) >= 0:  
                     # if self.direction == -1:                          BENÖTIGT FÜR ANIMATION IDLE LEFT und SHOOT LEFT
                     #     self.currentAnimation = "runLeft"
                     self.currentAnimation = "idleRight"
@@ -153,7 +153,7 @@ class Player(pygame.sprite.Sprite):
         self.rect.x = self.playerPos.x - self.getCamOffset()  
 
     def jump(self, speed):
-        if self.world.collided_get_y(self.base)>0 and self.speed_y == 0: 
+        if self.world.collided_get_y(self.base, self.height)>0 and self.speed_y == 0: 
             self.currentSprite = 0
             self.speed_y = speed    
 
