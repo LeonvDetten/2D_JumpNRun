@@ -14,15 +14,15 @@ class MyGame:
              "              BB           E              ",
              "                                         ",
              "    B           BBB                          ",
-             "                       EEEEE                           B",
-             "    E                          BBBBBBBBBBBBBBBB           ",
+             "                                                  B",
+             "                              BBBBBBBBBBBBBBBB           ",
              "                          BBBB                  ",
              " B                   BBBBB                       ",
              "                  BBBB                          ",
-             "    EEE           BBBB            E                     ",
-             "            BBB    BBB                       E    ",
-             "         BBBB            BBB    E                  ",
-             " BB                         B      BBBBBBB              ",
+             "              BBBB                                 ",
+             "            BBB    BBB                           ",
+             "    E     BBBB            BBB                      ",
+             " BB   B  E   E                 B      BBBBBBB              ",
              "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"]
 
     def __init__(self):

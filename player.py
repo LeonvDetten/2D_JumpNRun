@@ -1,6 +1,7 @@
 import pygame
 from pygame import *
 from loguru import logger
+import sys
 
 from object import *
 
@@ -91,6 +92,7 @@ class Player(pygame.sprite.Sprite):
     def main(self, screen):
         self.movement()                                                                                                
         self.move_y()
+        self.check_enemy_collision()
         self.animation(screen)         
 
     def animation(self, screen):
@@ -151,9 +153,9 @@ class Player(pygame.sprite.Sprite):
                 self.speed_x = self.movement_speed * -1 
                 self.direction = -1
                 self.currentAnimation = "runLeft"
-        if key_state[K_w]:
+        if key_state[K_w] or key_state[K_SPACE]:
             self.jump(self.jump_speed)
-        if (key_state[K_SPACE] or key_state[K_RETURN]) and self.latest_shot + self.shootAnimationTime < pygame.time.get_ticks():
+        if key_state[K_RETURN] and self.latest_shot + self.shootAnimationTime < pygame.time.get_ticks():
             self.shoot()
         self.currentSprite += self.spriteLoopSpeed           #aus Vid (angeben in Docstring)
         if self.currentSprite >= len(self.idleRightSprites):
@@ -180,6 +182,15 @@ class Player(pygame.sprite.Sprite):
         self.bulletGroup.add(Bullet(self.playerPos.x + (0.8*self.width), self.playerPos.y + (self.height*0.45), 10, 5, self.direction, self.world))
         self.latest_shot = pygame.time.get_ticks()     
     
+    def check_enemy_collision(self):
+        for enemy in self.world.enemyGroup:
+            if enemy.enemyPos.colliderect(self.playerPos) and self.speed_y >0:
+                self.speed_y = -5
+                enemy.kill()
+                logger.info("Enemy killed with jump")
+            elif enemy.enemyPos.colliderect(self.playerPos):
+                pygame.quit()
+                sys.exit()
                           
           
     

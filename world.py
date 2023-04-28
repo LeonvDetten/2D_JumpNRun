@@ -65,4 +65,10 @@ class World:                                                                    
             if block.colliderect(object_rect) and self.player.speed_y < 0 and block.y + (block.height/2) < object_rect.y:
                 self.player.speed_y = 0
                 object_rect.y = block.y + block.height
+
+    
+                
+                
+
+        
         
