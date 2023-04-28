@@ -72,6 +72,7 @@ while True:
             bullet.update()
     for enemy in (world.enemyGroup):
             enemy.update()
+    pygame.sprite.groupcollide(player.bulletGroup, world.enemyGroup, True, True)        
     pygame.sprite.Group.draw(player.bulletGroup, my_game.screen)    
     pygame.sprite.Group.draw(world.enemyGroup, my_game.screen)
     pygame.display.update()

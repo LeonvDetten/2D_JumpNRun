@@ -27,9 +27,9 @@ class Bullet(pygame.sprite.Sprite):
         
         
     def collision(self):
-        if pygame.sprite.spritecollide(self, self.world.enemyGroup, True) or self.world.check_object_collision_sideblock(self.bulletPos) != 1:
+        if self.world.check_object_collision_sideblock(self.bulletPos) != 1:
             self.kill()
-            logger.info("Bullet collided with enemy or block. Got destroyed")
+            logger.info("Bullet collided with block. Got destroyed")
     
     def movement(self):
         self.bulletPos.x += self.direction * self.speed
