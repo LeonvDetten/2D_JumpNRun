@@ -13,20 +13,30 @@ class Player(pygame.sprite.Sprite):
         self.width = width
         self.height = height
         
-        self.idleRightSprites = []
-        self.idleLeftSprites = []
-        self.runRightSprites = []
-        self.runLeftSprites = []
-        self.jumpRightSprites = []
-        self.jumpLeftSprites = []
-        self.shootRightSprites = []
-        self.shootLeftSprites = []
+        self.sprites = {
+            "IDLE": {
+                "right": [],
+                "left": []
+            },
+            "RUN": {
+                "right": [],
+                "left": []
+            },
+            "JUMP": {
+                "right": [],
+                "left": []
+            },
+            "ATTACK": {
+                "right": [],
+                "left": []
+            }
+        }
         self.loadSprites()
     
         self.currentSprite = 0
         self.spriteLoopSpeed = 0.3
-        self.image = self.idleRightSprites[self.currentSprite]
-        self.currentAnimation = "idle"
+        self.image = self.sprites['IDLE']['right'][self.currentSprite]
+        self.currentAnimation = "idleRight"
         self.speed_y = 0
         self.speed_x = 0
         self.jump_speed = -10
@@ -49,38 +59,14 @@ class Player(pygame.sprite.Sprite):
 
     def loadSprites(self): 
         start_time= pygame.time.get_ticks()
-        for image in range(7):
-            player_img = pygame.image.load('img/player_img/2_entity_000_IDLE_00' + str(image) + '.png')
-            player_img_cropped = player_img.subsurface(pygame.Rect(200, 250, 825, 850))
-            self.idleRightSprites.append(pygame.transform.scale(player_img_cropped, (self.width, self.height)))
-        for image in range(7):
-            player_img = pygame.image.load('img/player_img/2_entity_000_IDLE_00' + str(image) + '.png')
-            player_img_cropped = player_img.subsurface(pygame.Rect(200, 250, 825, 850))
-            self.idleLeftSprites.append(pygame.transform.flip(pygame.transform.scale(player_img_cropped, (self.width, self.height)),True, False))    
-        for image in range(7):
-            player_img = pygame.image.load('img/player_img/2_entity_000_RUN_00' + str(image) + '.png')
-            player_img_cropped = player_img.subsurface(pygame.Rect(200, 250, 825, 850))
-            self.runRightSprites.append(pygame.transform.scale(player_img_cropped, (self.width, self.height)))
-        for image in range(7):
-            player_img = pygame.image.load('img/player_img/2_entity_000_RUN_00' + str(image) + '.png')
-            player_img_cropped = player_img.subsurface(pygame.Rect(200, 250, 825, 850))
-            self.runLeftSprites.append(pygame.transform.flip(pygame.transform.scale(player_img_cropped, (self.width, self.height)),True, False))
-        for image in range(7):
-            player_img = pygame.image.load('img/player_img/2_entity_000_JUMP_00' + str(image) + '.png')
-            player_img_cropped = player_img.subsurface(pygame.Rect(200, 250, 825, 850))
-            self.jumpRightSprites.append(pygame.transform.scale(player_img_cropped, (self.width, self.height)))
-        for image in range(7):
-            player_img = pygame.image.load('img/player_img/2_entity_000_JUMP_00' + str(image) + '.png')
-            player_img_cropped = player_img.subsurface(pygame.Rect(200, 250, 825, 850))
-            self.jumpLeftSprites.append(pygame.transform.flip(pygame.transform.scale(player_img_cropped, (self.width, self.height)),True, False))    
-        for image in range(7):
-            player_img = pygame.image.load('img/player_img/2_entity_000_ATTACK_00' + str(image) + '.png')
-            player_img_cropped = player_img.subsurface(pygame.Rect(200, 250, 825, 850))
-            self.shootRightSprites.append(pygame.transform.scale(player_img_cropped, (self.width, self.height)))   
-        for image in range(7):
-            player_img = pygame.image.load('img/player_img/2_entity_000_ATTACK_00' + str(image) + '.png')
-            player_img_cropped = player_img.subsurface(pygame.Rect(200, 250, 825, 850))
-            self.shootLeftSprites.append(pygame.transform.flip(pygame.transform.scale(player_img_cropped, (self.width, self.height)),True, False))     
+        animation_states = ["IDLE", "RUN", "JUMP", "ATTACK"]
+        for state in animation_states:
+            for image in range(7):
+                player_img = pygame.image.load(f'img/player_img/2_entity_000_{state}_00{str(image)}.png')
+                player_img_cropped = player_img.subsurface(pygame.Rect(200, 250, 825, 850))
+                self.sprites[state]["right"].append(pygame.transform.scale(player_img_cropped, (self.width, self.height)))
+                self.sprites[state]["left"].append(pygame.transform.flip(pygame.transform.scale(player_img_cropped, (self.width, self.height)),True, False))
+
         logger.info("Loaded player sprites in " + str(pygame.time.get_ticks() - start_time) + "ms")
 
     def getCamOffset(self):
@@ -97,21 +83,21 @@ class Player(pygame.sprite.Sprite):
 
     def animation(self, screen):
         if self.currentAnimation == "idleRight":
-            self.image = self.idleRightSprites[int(self.currentSprite)] 
+            self.image = self.sprites['IDLE']['right'][int(self.currentSprite)] 
         if self.currentAnimation == "idleLeft":
-            self.image = self.idleLeftSprites[int(self.currentSprite)]
+            self.image = self.sprites['IDLE']['left'][int(self.currentSprite)]
         if self.currentAnimation == "runRight":
-            self.image = self.runRightSprites[int(self.currentSprite)]    
+            self.image = self.sprites['RUN']['right'][int(self.currentSprite)]    
         if self.currentAnimation == "runLeft":
-            self.image = self.runLeftSprites[int(self.currentSprite)]
+            self.image = self.sprites['RUN']['left'][int(self.currentSprite)]
         if self.currentAnimation == "jumpRight":
-            self.image = self.jumpRightSprites[int(self.currentSprite)]  
+            self.image = self.sprites['JUMP']['right'][int(self.currentSprite)]  
         if self.currentAnimation == "jumpLeft":
-            self.image = self.jumpLeftSprites[int(self.currentSprite)]
+            self.image = self.sprites['JUMP']['left'][int(self.currentSprite)]
         if self.currentAnimation == "shootRight":
-            self.image = self.shootRightSprites[int(self.currentSprite)]
+            self.image = self.sprites['ATTACK']['right'][int(self.currentSprite)]
         if self.currentAnimation == "shootLeft":
-            self.image = self.shootLeftSprites[int(self.currentSprite)]
+            self.image = self.sprites['ATTACK']['left'][int(self.currentSprite)]
         self.player_plain.draw(screen)
 
     def move_y(self):
@@ -158,7 +144,7 @@ class Player(pygame.sprite.Sprite):
         if key_state[K_RETURN] and self.latest_shot + self.shootAnimationTime < pygame.time.get_ticks():
             self.shoot()
         self.currentSprite += self.spriteLoopSpeed           #aus Vid (angeben in Docstring)
-        if self.currentSprite >= len(self.idleRightSprites):
+        if self.currentSprite >= len(self.sprites['IDLE']['right']):
                 self.currentSprite = 0
         self.playerPos.x += self.speed_x
         self.base.x = self.playerPos.x         
