@@ -71,6 +71,9 @@ class Player(pygame.sprite.Sprite):
 
     def getCamOffset(self):
         return self.playerPos.x - 300                                          #Player in the middle of the screen
+    
+    def getCurrentChunk(self):
+        return int(self.playerPos.x / (20*60))                                    #*60 because of block size
 
     def setWorld(self, world):
         self.world = world
@@ -169,7 +172,7 @@ class Player(pygame.sprite.Sprite):
         self.latest_shot = pygame.time.get_ticks()     
     
     def check_enemy_collision(self):
-        for enemy in self.world.enemyGroup:
+        for enemy in self.world.tempEnemyGroup:
             if enemy.enemyPos.colliderect(self.playerPos) and self.speed_y >0:
                 self.speed_y = -5
                 enemy.kill()

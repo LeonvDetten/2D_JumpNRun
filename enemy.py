@@ -4,7 +4,7 @@ from loguru import logger
 
 class Enemy(pygame.sprite.Sprite):
 
-    def __init__(self, world, start_x, start_y, width, height, direction):
+    def __init__(self, world, start_x, start_y,startChunk, width, height, direction):
         pygame.sprite.Sprite.__init__(self)
 
         self.world = world
@@ -26,6 +26,8 @@ class Enemy(pygame.sprite.Sprite):
         self.rect.x = start_x
         self.rect.y = start_y
         self.base = pygame.Rect(start_x, start_y + height, width, 2)
+
+        self.currentChunk = startChunk
         
         logger.info("Created enemy object")
 
@@ -33,6 +35,7 @@ class Enemy(pygame.sprite.Sprite):
         self.movement()
         self.animation()
         self.move_y()
+        self.updateChunk()
 
     def loadSprites(self):
         for image in range(3):
@@ -71,3 +74,6 @@ class Enemy(pygame.sprite.Sprite):
             self.speed_y = 0
         self.base.y = self.enemyPos.y + self.height                                                                    
         self.rect.y = self.enemyPos.y
+
+    def updateChunk(self):
+        self.currentChunk = int(self.enemyPos.x / (20*60)) 

@@ -12,10 +12,10 @@ class MyGame:
     __WINDOWHEIGHT = 800
     level = [
              "              BB           E              ",
-             "                                         ",
+             "                               EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE                  ",
              "    B           BBB                          ",
-             "           E                                        B",
-             "                              BBBBBBBBBBBBBBBB           ",
+             "           E                                                                  B                                                                                     B",
+             "                              BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB           ",
              "                          BBBB                  ",
              " B                   BBBBB                       ",
              "                  BBBB                          ",
@@ -71,10 +71,13 @@ while True:
     for bullet in (player.bulletGroup):
             bullet.update()
     for enemy in (world.enemyGroup):
-            enemy.update()
-    pygame.sprite.groupcollide(player.bulletGroup, world.enemyGroup, True, True)        
-    pygame.sprite.Group.draw(player.bulletGroup, my_game.screen)    
-    pygame.sprite.Group.draw(world.enemyGroup, my_game.screen)
+            if  player.getCurrentChunk() -1 <= enemy.currentChunk <= player.getCurrentChunk() + 1:
+                enemy.update()
+                world.tempEnemyGroup.add(enemy)
+    pygame.sprite.groupcollide(player.bulletGroup, world.tempEnemyGroup, True, True)         
+    pygame.sprite.Group.draw(world.tempEnemyGroup, my_game.screen)
+    world.tempEnemyGroup.empty()
+    pygame.sprite.Group.draw(player.bulletGroup, my_game.screen)   
     pygame.display.update()
     clock.tick(30)
 
