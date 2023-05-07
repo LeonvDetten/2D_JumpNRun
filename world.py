@@ -36,7 +36,8 @@ class World:                                                                    
 
     def update(self,screen):
         for block in self.platforms:
-            screen.blit(self.block_img, (block.x-self.player.getCamOffset(), block.y))
+            if block.x - self.player.getCamOffset() < 1520 and block.x - self.player.getCamOffset() > -40:
+                screen.blit(self.block_img, (block.x-self.player.getCamOffset(), block.y))
 
     def main(self, screen):
         self.check_player_collision_bottomblock(self.player.playerPos)

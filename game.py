@@ -14,7 +14,7 @@ class MyGame:
              "              BB           E              ",
              "                                         ",
              "    B           BBB                          ",
-             "                                                  B",
+             "           E                                        B",
              "                              BBBBBBBBBBBBBBBB           ",
              "                          BBBB                  ",
              " B                   BBBBB                       ",
