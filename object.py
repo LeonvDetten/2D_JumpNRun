@@ -24,12 +24,18 @@ class Bullet(pygame.sprite.Sprite):
     def update(self):
         self.collision() 
         self.movement()   
+        self.checkFlightDistance()
         
         
     def collision(self):
         if self.world.check_object_collision_sideblock(self.bulletPos) != 1:
             self.kill()
             logger.info("Bullet collided with block. Got destroyed")
+
+    def checkFlightDistance(self):
+        if self.bulletPos.x > self.world.player.playerPos.x + 1220 or self.bulletPos.x < self.world.player.playerPos.x - 1000:
+            self.kill()
+            logger.info("Bullet flew to long. Got destroyed")        
     
     def movement(self):
         self.bulletPos.x += self.direction * self.speed

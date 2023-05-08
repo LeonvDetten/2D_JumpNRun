@@ -2,6 +2,7 @@ import pygame
 from pygame import *
 from loguru import logger
 
+
 class Enemy(pygame.sprite.Sprite):
 
     def __init__(self, world, start_x, start_y,startChunk, width, height, direction):
@@ -36,6 +37,7 @@ class Enemy(pygame.sprite.Sprite):
         self.animation()
         self.move_y()
         self.updateChunk()
+        self.checkEnemyFallOutOfMap()
 
     def loadSprites(self):
         for image in range(3):
@@ -77,3 +79,8 @@ class Enemy(pygame.sprite.Sprite):
 
     def updateChunk(self):
         self.currentChunk = int(self.enemyPos.x / (20*60)) 
+
+    def checkEnemyFallOutOfMap(self):
+        if self.enemyPos.y > 1000:
+            self.kill()
+            logger.info("Enemy fell out of map. Got destroyed")

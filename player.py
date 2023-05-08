@@ -5,6 +5,7 @@ import sys
 
 from object import *
 
+
 class Player(pygame.sprite.Sprite):
 
     def __init__(self, start_x, start_y, width, height):
@@ -114,7 +115,7 @@ class Player(pygame.sprite.Sprite):
         self.base.y = self.playerPos.y + self.height                                                                    
         self.rect.y = self.playerPos.y 
 
-    def movement(self):
+    def movement(self): #loggin einbauen
         """Handles the movement of the player
         MOVEMENT BASIERT AUF BUCH ... BUCH ANGEBEN 
         """
@@ -153,7 +154,7 @@ class Player(pygame.sprite.Sprite):
         self.base.x = self.playerPos.x         
         self.rect.x = self.playerPos.x - self.getCamOffset()  
 
-    def jump(self, speed):
+    def jump(self, speed):      #loggin einbauen
         if self.world.collided_get_y(self.base, self.height)>0 and self.speed_y == 0: 
             if self.direction == -1:                          
                 self.currentAnimation = "jumpLeft"
