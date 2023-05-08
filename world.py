@@ -8,7 +8,11 @@ bg_img = pygame.image.load('img/background_img/bg.jpg')
 bg_img = pygame.transform.scale(bg_img, (1520, 800))
 position = (0, 0)
 
-class World:                                                                    #Konstruktor aus Buch (Buch angeben)
+class World:
+    """
+        DUMMY TEST 
+    """
+                                                                        #Konstruktor aus Buch (Buch angeben)
     def __init__(self, level, block_size, platform_color, player):
         self.level = level
         self.block_size = block_size
@@ -29,7 +33,7 @@ class World:                                                                    
 
         self.offset = 20
         
-        for line in self.level:
+        for line in self.level:#auslagern
             self.posn_x = 0
             self.blockCount = 0
             self.chunk = 0

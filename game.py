@@ -12,12 +12,12 @@ class MyGame:
     __WINDOWHEIGHT = 800
     level = [
              "              BB           E              ",
-             "                               EEEEEEEE                  ",
+             "                                                 ",
              "    B           BBB                          ",
-             "           E                                                                  B                         E                                                            B",
-             "                              BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB   BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB           ",
-             "                          BBBB                                                        E  ",
-             " B                   BBBBB                       ",   
+             "           E                        B   B   B   B            B  B   B    B     B                                          B                         E                                                            B",
+             "                              BBBBBBBBBBBBBBBBBBB   B          BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB   BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB           ",
+             "                          BBBB                           B                             E  ",
+             " B                   BBBBB                       ",        
              "                  BBBB                                                        E  ",
              "              BBBB                                 ",
              "            BBB    BBB                           ",
@@ -35,11 +35,11 @@ class MyGame:
         logger.info("Created window with size: " + str(self.__WINDOWWIDTH) + "x" + str(self.__WINDOWHEIGHT))
 
 class Color():
-        WHITE = (255, 255, 255)
-        BLACK = (0, 0, 0)
-        RED = (255, 0, 0)
-        GREEN = (0, 255, 0)
-        BLUE = (0, 0, 255)
+    WHITE = (255, 255, 255)
+    BLACK = (0, 0, 0)
+    RED = (255, 0, 0)
+    GREEN = (0, 255, 0)
+    BLUE = (0, 0, 255)
 
 pygame.init()
 logger.add("game.log")
@@ -71,15 +71,21 @@ while True:
     for bullet in (player.bulletGroup):
             bullet.update()
     world.tempEnemyGroup.empty()
-    for enemy in (world.enemyGroup):
-            if  player.getCurrentChunk() -1 <= enemy.currentChunk <= player.getCurrentChunk() + 1:
-                enemy.update()
-                world.tempEnemyGroup.add(enemy)
+    for enemy in world.enemyGroup:
+        if player.getCurrentChunk() -1 <= enemy.currentChunk <= player.getCurrentChunk() + 1:
+            enemy.update()
+            world.tempEnemyGroup.add(enemy)
     pygame.sprite.groupcollide(player.bulletGroup, world.tempEnemyGroup, True, True)         
     pygame.sprite.Group.draw(world.tempEnemyGroup, my_game.screen)
     pygame.sprite.Group.draw(player.bulletGroup, my_game.screen)   
     pygame.display.update()
     clock.tick(30)
 
-    logger.info("Time for Iteration: " + str(pygame.time.get_ticks() - start_time) + "ms")
-    #TODOS in Functions als Comments schreiben (bsp.jumpleft jump right anstatt jump allgemein, Kanten Fixen (an die Wand springen und oben auf dem Block landen), Durch Block buggen wenn er blockietrt und man Springt, collisionsfeinheiten(links von Block abstand zwischen Block und Spieler))
+    logger.info("Time for Iteration: " + str(pygame.time.get_ticks() - start_time) + "ms")  #Mit Modulo 1000 stichprobenaertig loggen
+    #TODOS in Functions als Comments schreiben (Kanten Fixen (an die Wand springen und oben auf dem Block landen), Nach Schuss folgende animation nicht durchlaufen lassen, wenn Eingabe nur kurz gedrückt)
+
+    #Was soll ich alles loggen (Performance, Keyboard Interaktion, alles?(Wenn Gegner stirbt)) alles lieber zu viel als zu wendig 
+    #Wann Abgabe nach Pitch noch Veränderung vornehmen? eine Woche nach Klausuren 
+
+    #Startmenu einabauen
+    #Alte Bilder, die durch neue Bilder überlagert werden löschen sonst verwendet Pygame viel Speicher

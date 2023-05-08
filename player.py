@@ -7,34 +7,19 @@ from object import *
 
 
 class Player(pygame.sprite.Sprite):
+    currentSprite = 0
+    
 
     def __init__(self, start_x, start_y, width, height):
         pygame.sprite.Sprite.__init__(self)
        
         self.width = width
         self.height = height
-        
-        self.sprites = {
-            "IDLE": {
-                "right": [],
-                "left": []
-            },
-            "RUN": {
-                "right": [],
-                "left": []
-            },
-            "JUMP": {
-                "right": [],
-                "left": []
-            },
-            "ATTACK": {
-                "right": [],
-                "left": []
-            }
-        }
+
+        self.__create_sprite_container()
         self.loadSprites()
     
-        self.currentSprite = 0
+        #self.currentSprite = 0
         self.spriteLoopSpeed = 0.3
         self.image = self.sprites['IDLE']['right'][self.currentSprite]
         self.currentAnimation = "idleRight"
@@ -57,6 +42,15 @@ class Player(pygame.sprite.Sprite):
         self.bulletGroup = pygame.sprite.Group()
 
         logger.info("Created player object")
+
+
+
+    def __create_sprite_container(self):
+        self.sprites = {}
+        sprite_array = ["IDLE", "RUN", "JUMP", "ATTACK"]
+        for sprite in sprite_array:
+            self.sprites[sprite] = { "right": [], "left": [] }
+
 
     def loadSprites(self): 
         start_time= pygame.time.get_ticks()
@@ -85,24 +79,30 @@ class Player(pygame.sprite.Sprite):
         self.check_enemy_collision()
         self.animation(screen)         
 
-    def animation(self, screen):
-        if self.currentAnimation == "idleRight":
-            self.image = self.sprites['IDLE']['right'][int(self.currentSprite)] 
-        if self.currentAnimation == "idleLeft":
-            self.image = self.sprites['IDLE']['left'][int(self.currentSprite)]
-        if self.currentAnimation == "runRight":
-            self.image = self.sprites['RUN']['right'][int(self.currentSprite)]    
-        if self.currentAnimation == "runLeft":
-            self.image = self.sprites['RUN']['left'][int(self.currentSprite)]
-        if self.currentAnimation == "jumpRight":
-            self.image = self.sprites['JUMP']['right'][int(self.currentSprite)]  
-        if self.currentAnimation == "jumpLeft":
-            self.image = self.sprites['JUMP']['left'][int(self.currentSprite)]
-        if self.currentAnimation == "shootRight":
-            self.image = self.sprites['ATTACK']['right'][int(self.currentSprite)]
-        if self.currentAnimation == "shootLeft":
-            self.image = self.sprites['ATTACK']['left'][int(self.currentSprite)]
+    def animation(self, screen): # idle_right - split("_") --> [0][-1] -->  ["idle"][right]
+        
+        animation_tag = self.currentAnimation.split("_")
+        self.image = self.sprites[animation_tag[0]][animation_tag[1]][int(self.currentSprite)]
         self.player_plain.draw(screen)
+
+        # if self.currentAnimation == "idleRight":
+        #     self.image = self.sprites['IDLE']['right'][int(self.currentSprite)] 
+        # if self.currentAnimation == "idleLeft":
+        #     self.image = self.sprites['IDLE']['left'][int(self.currentSprite)]
+        # if self.currentAnimation == "runRight":
+        #     self.image = self.sprites['RUN']['right'][int(self.currentSprite)]    
+        # if self.currentAnimation == "runLeft":
+        #     self.image = self.sprites['RUN']['left'][int(self.currentSprite)]
+        # if self.currentAnimation == "jumpRight":
+        #     self.image = self.sprites['JUMP']['right'][int(self.currentSprite)]  
+        # if self.currentAnimation == "jumpLeft":
+        #     self.image = self.sprites['JUMP']['left'][int(self.currentSprite)]
+        # if self.currentAnimation == "shootRight":
+        #     self.image = self.sprites['ATTACK']['right'][int(self.currentSprite)]
+        # if self.currentAnimation == "shootLeft":
+        #     self.image = self.sprites['ATTACK']['left'][int(self.currentSprite)]
+        # self.player_plain.draw(screen)
+
 
     def move_y(self):
         collided_y = self.world.collided_get_y(self.base, self.height)
@@ -126,27 +126,32 @@ class Player(pygame.sprite.Sprite):
             if self.latest_shot + self.shootAnimationTime < pygame.time.get_ticks(): 
                 if self.world.collided_get_y(self.base, self.height) >= 0:  
                     if self.direction == -1:                          
-                        self.currentAnimation = "idleLeft"
+                        self.currentAnimation = "IDLE_left"
                     else:
-                        self.currentAnimation = "idleRight"
+                        self.currentAnimation = "IDLE_right"
                 else:
                     if self.direction == -1:
-                        self.currentAnimation = "jumpLeft"
+                        self.currentAnimation = "JUMP_left"
                     else:
-                        self.currentAnimation = "jumpRight"
+                        self.currentAnimation = "JUMP_right"
+
         if key_state[K_d] and self.world.check_object_collision_sideblock(self.playerPos) != -1:
             self.speed_x = self.movement_speed
             self.direction = 1
-            self.currentAnimation = "runRight"
+            self.currentAnimation = "RUN_right"
+
         if key_state[K_a] and self.world.check_object_collision_sideblock(self.playerPos) != -2:
             if self.playerPos.x > 0:
                 self.speed_x = self.movement_speed * -1 
                 self.direction = -1
-                self.currentAnimation = "runLeft"
+                self.currentAnimation = "RUN_left"
+
         if key_state[K_w] or key_state[K_SPACE]:
             self.jump(self.jump_speed)
+
         if key_state[K_RETURN] and self.latest_shot + self.shootAnimationTime < pygame.time.get_ticks():
             self.shoot()
+
         self.currentSprite += self.spriteLoopSpeed           #aus Vid (angeben in Docstring)
         if self.currentSprite >= len(self.sprites['IDLE']['right']):
                 self.currentSprite = 0
@@ -157,21 +162,25 @@ class Player(pygame.sprite.Sprite):
     def jump(self, speed):      #loggin einbauen
         if self.world.collided_get_y(self.base, self.height)>0 and self.speed_y == 0: 
             if self.direction == -1:                          
-                self.currentAnimation = "jumpLeft"
+                self.currentAnimation = "JUMP_left"
             else:
-                self.currentAnimation = "jumpRight"
+                self.currentAnimation = "JUMP_right"
             self.currentSprite = 0
             self.speed_y = speed    
+
+
 
     def shoot(self):
         self.currentSprite = 3
         if self.direction == -1:
-            self.currentAnimation = "shootLeft"
+            self.currentAnimation = "ATTACK_left"
         else:
-            self.currentAnimation = "shootRight"    
+            self.currentAnimation = "ATTACK_right"    
         self.bulletGroup.add(Bullet(self.playerPos.x + (0.8*self.width), self.playerPos.y + (self.height*0.45), 10, 5, self.direction, self.world))
         self.latest_shot = pygame.time.get_ticks()     
-    
+
+
+
     def check_enemy_collision(self):
         for enemy in self.world.tempEnemyGroup:
             if enemy.enemyPos.colliderect(self.playerPos) and self.speed_y >0:
