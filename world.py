@@ -57,6 +57,7 @@ class World:
     def update(self,screen):
         self.tempPlatforms = []                  
         for i in range(-1, 2):
+            if self.player.getCurrentChunk() + i >= 0 and self.player.getCurrentChunk() + i < len(self.platforms):
                 self.tempPlatforms.extend(self.platforms[self.player.getCurrentChunk() + i])
         for block in self.tempPlatforms:
             screen.blit(self.block_img, (block.x-self.player.getCamOffset(), block.y))

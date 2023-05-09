@@ -11,19 +11,19 @@ class MyGame:
     __WINDOWWIDTH = 1520
     __WINDOWHEIGHT = 800
     level = [
-             "              BB           E              ",
-             "                                                 ",
-             "    B           BBB                          ",
-             "           E                        B   B   B   B            B  B   B    B     B                                          B                         E                                                            B",
-             "                              BBBBBBBBBBBBBBBBBBB   B          BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB   BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB           ",
-             "                          BBBB                           B                             E  ",
-             " B                   BBBBB                       ",        
-             "                  BBBB                                                        E  ",
-             "              BBBB                                 ",
-             "            BBB    BBB                           ",
-             "         BBBB            BBB                      ",
-             " BB   B  E   E                 B      BBBBBBB              ",
-             "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"]
+             "                                                                                 B                                                          ",                                                       
+             "                                                                                 B                         B                                ",
+             "                                                                                 B                     B        B                           ",             
+             "                                                                    B   BEEEEEB  B                 B         E                              ",
+             "                                       BBBB   B   B   B   B      B      BBBBBBB  B          BBBB                                            ",
+             "                                 BBBB                         B      B                   B        E                                         ",
+             "                               B                                                 B   B   B                                                  ", 
+             "                          BBBB                                                B        E                                                    ",
+             "                    BBBB                                                                                                                    ",
+             "               BBB                                                                           B                                              ",                                                               
+             "         BBBB                                                                                                                               ",                                         
+             "     B                                                                                       B   B                                          ",  
+             "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"]
 
     def __init__(self):
         logger.info("Created game object")
@@ -65,7 +65,7 @@ while True:
             pygame.quit()
             sys.exit()
 
-    start_time= pygame.time.get_ticks()
+    #start_time= pygame.time.get_ticks()
     world.main(my_game.screen)
     player.main(my_game.screen)
     for bullet in (player.bulletGroup):
@@ -81,7 +81,7 @@ while True:
     pygame.display.update()
     clock.tick(30)
 
-    logger.info("Time for Iteration: " + str(pygame.time.get_ticks() - start_time) + "ms")  #Mit Modulo 1000 stichprobenaertig loggen
+    #logger.info("Time for Iteration: " + str(pygame.time.get_ticks() - start_time) + "ms")  #Mit Modulo 1000 stichprobenaertig loggen
     #TODOS in Functions als Comments schreiben (Kanten Fixen (an die Wand springen und oben auf dem Block landen), Nach Schuss folgende animation nicht durchlaufen lassen, wenn Eingabe nur kurz gedrückt)
 
     #Was soll ich alles loggen (Performance, Keyboard Interaktion, alles?(Wenn Gegner stirbt)) alles lieber zu viel als zu wendig 
