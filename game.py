@@ -24,7 +24,7 @@ class MyGame:
              "         BBBB                                                                                                                               ",                                         
              "     B                                                                                       B   B                                          ",  
              "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"]
-
+#test
     def __init__(self):
         logger.info("Created game object")
         
