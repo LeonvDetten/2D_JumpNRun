@@ -4,7 +4,7 @@ from loguru import logger
 
 class Bullet(pygame.sprite.Sprite):
 
-    speed = 20
+    __speed = 20
 
     def __init__(self, start_x, start_y, width, height, direction, world):
         pygame.sprite.Sprite.__init__(self)
@@ -22,6 +22,7 @@ class Bullet(pygame.sprite.Sprite):
         
         logger.info("Created bullet object")
 
+
     def update(self):
         self.collision() 
         self.movement()   
@@ -33,11 +34,13 @@ class Bullet(pygame.sprite.Sprite):
             self.kill()
             logger.info("Bullet collided with block. Got destroyed")
 
+
     def checkFlightDistance(self):
         if self.bulletPos.x > self.world.player.playerPos.x + 1220 or self.bulletPos.x < self.world.player.playerPos.x - 1000:
             self.kill()
             logger.info("Bullet flew to long. Got destroyed")        
     
+    
     def movement(self):
-        self.bulletPos.x += self.direction * self.speed
+        self.bulletPos.x += self.direction * self.__speed
         self.rect.x = self.bulletPos.x - self.world.player.getCamOffset() 

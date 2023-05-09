@@ -8,26 +8,17 @@ from world import *
 from player import *
 
 
-class Color():
-    WHITE = (255, 255, 255)
-    BLACK = (0, 0, 0)
-    RED = (255, 0, 0)
-    GREEN = (0, 255, 0)
-    BLUE = (0, 0, 255)
-
-
-
 class MyGame:
     __WINDOWWIDTH = 1520
     __WINDOWHEIGHT = 800
     level = [
-             "                                                                                 B                                                          ",                                                       
+             "         EEEEEEEEEEEE                                                                        B                                                          ",                                                       
              "                                                                                 B                         B                                ",
              "                                                                                 B                     B        B                           ",             
              "                                                                    B   BEEEEEB  B                 B         E                              ",
              "                                       BBBB   B   B   B   B      B      BBBBBBB  B          BBBB                                            ",
              "                                 BBBB                         B      B                   B        E                                         ",
-             "              E                 B                                                 B   B   B                                                  ", 
+             "    E          E                 B                                                 B   B   B                                                  ", 
              "                          BBBB                                                B        E                                                    ",
              "                    BBBB                                                                                                                    ",
              "               BBB                                                                           B                                              ",                                                               
@@ -56,12 +47,10 @@ block_size = 60
 my_game = MyGame()
 my_game.create_window()
 
-my_colors = Color()
-
 clock = pygame.time.Clock()
 
 player = Player(player_spawn_x, player_spawn_y, 40, 60)
-world = World(my_game.level, block_size, my_colors.GREEN, player)
+world = World(my_game.level, block_size, player)
 player.setWorld(world)
 
 
@@ -78,7 +67,7 @@ while True:
             bullet.update()
     world.tempEnemyGroup.empty()
     for enemy in world.enemyGroup:
-        if player.getCurrentChunk() -1 <= enemy.currentChunk <= player.getCurrentChunk() + 1:
+        if player.getCurrentChunk() -1 <= enemy.getCurrentChunk() <= player.getCurrentChunk() + 1:
             enemy.update()
             world.tempEnemyGroup.add(enemy)
     pygame.sprite.groupcollide(player.bulletGroup, world.tempEnemyGroup, True, True)         
