@@ -166,7 +166,7 @@ class Player(pygame.sprite.Sprite):
 
 
     def check_enemy_collision(self):
-        for enemy in self.world.tempEnemyGroup:
+        for enemy in self.world.chunkEnemyGroup:
             if enemy.enemyPos.colliderect(self.playerPos) and self.speed_y >0:
                 self.speed_y = -5
                 enemy.kill()

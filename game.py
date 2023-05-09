@@ -65,13 +65,13 @@ while True:
     player.main(my_game.screen)
     for bullet in (player.bulletGroup):
             bullet.update()
-    world.tempEnemyGroup.empty()
+    world.chunkEnemyGroup.empty()
     for enemy in world.enemyGroup:
         if player.getCurrentChunk() -1 <= enemy.getCurrentChunk() <= player.getCurrentChunk() + 1:
             enemy.update()
-            world.tempEnemyGroup.add(enemy)
-    pygame.sprite.groupcollide(player.bulletGroup, world.tempEnemyGroup, True, True)         
-    pygame.sprite.Group.draw(world.tempEnemyGroup, my_game.screen)
+            world.chunkEnemyGroup.add(enemy)
+    pygame.sprite.groupcollide(player.bulletGroup, world.chunkEnemyGroup, True, True)         
+    pygame.sprite.Group.draw(world.chunkEnemyGroup, my_game.screen)
     pygame.sprite.Group.draw(player.bulletGroup, my_game.screen)   
     pygame.display.update()
     clock.tick(30)

@@ -22,10 +22,10 @@ class World:
         self.__block_size = block_size
         self.player = player
         self.__platforms = [[]]
-        self.__tempPlatforms = []
+        self.__chunkPlatforms = []
 
         self.enemyGroup = pygame.sprite.Group()
-        self.tempEnemyGroup = pygame.sprite.Group()
+        self.chunkEnemyGroup = pygame.sprite.Group()
 
         self.block_img = pygame.image.load('img/ground_img/spaceground.png')
         self.block_img = pygame.transform.scale(self.block_img, (block_size, block_size))
@@ -58,11 +58,11 @@ class World:
 
 
     def update(self,screen):
-        self.__tempPlatforms = []                  
+        self.__chunkPlatforms = []                  
         for i in range(-1, 2):
             if self.player.getCurrentChunk() + i >= 0 and self.player.getCurrentChunk() + i < len(self.__platforms):
-                self.__tempPlatforms.extend(self.__platforms[self.player.getCurrentChunk() + i])
-        for block in self.__tempPlatforms:
+                self.__chunkPlatforms.extend(self.__platforms[self.player.getCurrentChunk() + i])
+        for block in self.__chunkPlatforms:
             screen.blit(self.block_img, (block.x-self.player.getCamOffset(), block.y))
 
 
@@ -74,14 +74,14 @@ class World:
 
     def collided_get_y(self, objct_rect, objekt_height):                          
         return_y = -1
-        for block in self.__tempPlatforms:
+        for block in self.__chunkPlatforms:
             if block.colliderect(objct_rect):
                 return_y = block.y - objekt_height           
         return return_y
     
 
     def check_object_collision_sideblock(self, object_rect):                  #Unschöne Funktion, aber funktioniert
-        for block in self.__tempPlatforms:                                    
+        for block in self.__chunkPlatforms:                                    
             #print("block.y: " + str(block.y) + " object_rect.y: " + str(object_rect.y + (object_rect.height)) + " block.height: " + str(block.y + block.height))
             if block.colliderect(object_rect) and block.y < (object_rect.y + object_rect.height -1): #and (object_rect.y + object_rect.height -1) < block.y + block.height: 
                 if block.x > object_rect.x:
@@ -92,7 +92,7 @@ class World:
 
 
     def check_player_collision_bottomblock(self, object_rect):
-        for block in self.__tempPlatforms:
+        for block in self.__chunkPlatforms:
             if block.colliderect(object_rect) and self.player.speed_y < 0 and block.y + (block.height/2) < object_rect.y:
                 self.player.speed_y = 0
                 object_rect.y = block.y + block.height
