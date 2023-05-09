@@ -5,6 +5,11 @@ from loguru import logger
 
 class Enemy(pygame.sprite.Sprite):
 
+    speed_x = 5
+    speed_y = 0
+    spriteLoopSpeed = 0.3
+
+
     def __init__(self, world, start_x, start_y,startChunk, width, height, direction):
         pygame.sprite.Sprite.__init__(self)
 
@@ -12,9 +17,6 @@ class Enemy(pygame.sprite.Sprite):
         self.width = width
         self.height = height
         self.direction = direction
-        self.speed_x = 5
-        self.speed_y = 0
-        self.spriteLoopSpeed = 0.3
 
         self.currentSprite = 0
         self.runRightSprites = []

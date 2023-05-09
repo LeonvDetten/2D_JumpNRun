@@ -7,6 +7,16 @@ from loguru import logger
 from world import *
 from player import *
 
+
+class Color():
+    WHITE = (255, 255, 255)
+    BLACK = (0, 0, 0)
+    RED = (255, 0, 0)
+    GREEN = (0, 255, 0)
+    BLUE = (0, 0, 255)
+
+
+
 class MyGame:
     __WINDOWWIDTH = 1520
     __WINDOWHEIGHT = 800
@@ -17,13 +27,14 @@ class MyGame:
              "                                                                    B   BEEEEEB  B                 B         E                              ",
              "                                       BBBB   B   B   B   B      B      BBBBBBB  B          BBBB                                            ",
              "                                 BBBB                         B      B                   B        E                                         ",
-             "                               B                                                 B   B   B                                                  ", 
+             "              E                 B                                                 B   B   B                                                  ", 
              "                          BBBB                                                B        E                                                    ",
              "                    BBBB                                                                                                                    ",
              "               BBB                                                                           B                                              ",                                                               
              "         BBBB                                                                                                                               ",                                         
              "     B                                                                                       B   B                                          ",  
              "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"]
+
 
     def __init__(self):
         logger.info("Created game object")
@@ -34,12 +45,6 @@ class MyGame:
         pygame.display.set_caption("2D Game")
         logger.info("Created window with size: " + str(self.__WINDOWWIDTH) + "x" + str(self.__WINDOWHEIGHT))
 
-class Color():
-    WHITE = (255, 255, 255)
-    BLACK = (0, 0, 0)
-    RED = (255, 0, 0)
-    GREEN = (0, 255, 0)
-    BLUE = (0, 0, 255)
 
 pygame.init()
 logger.add("game.log")
@@ -58,6 +63,7 @@ clock = pygame.time.Clock()
 player = Player(player_spawn_x, player_spawn_y, 40, 60)
 world = World(my_game.level, block_size, my_colors.GREEN, player)
 player.setWorld(world)
+
 
 while True:
     for event in pygame.event.get():

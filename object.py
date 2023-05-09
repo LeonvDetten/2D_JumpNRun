@@ -4,6 +4,8 @@ from loguru import logger
 
 class Bullet(pygame.sprite.Sprite):
 
+    speed = 20
+
     def __init__(self, start_x, start_y, width, height, direction, world):
         pygame.sprite.Sprite.__init__(self)
 
@@ -11,7 +13,6 @@ class Bullet(pygame.sprite.Sprite):
         self.height = height
         self.direction = direction
         self.world = world
-        self.speed = 20
 
         self.image = pygame.transform.scale(pygame.image.load("img/bullet_img/bullet.png"), (width, height))
         self.bulletPos = pygame.Rect(start_x, start_y, width, height)
