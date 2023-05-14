@@ -10,13 +10,13 @@ class Enemy(pygame.sprite.Sprite):
     __spriteLoopSpeed = 0.3
 
 
-    def __init__(self, world, start_x, start_y,startChunk, __width, __height, __direction):
+    def __init__(self, world, start_x, start_y,startChunk, width, height, direction):
         pygame.sprite.Sprite.__init__(self)
 
         self.world = world
-        self.__width = __width
-        self.__height = __height
-        self.__direction = __direction
+        self.__width = width
+        self.__height = height
+        self.__direction = direction
 
         self.__currentChunk = startChunk
 
@@ -25,12 +25,12 @@ class Enemy(pygame.sprite.Sprite):
         self.runLeftSprites = []
         self.loadSprites()
 
-        self.enemyPos = pygame.Rect(start_x, start_y, __width, __height)
+        self.enemyPos = pygame.Rect(start_x, start_y, width, height)
         self.image = self.runRightSprites[self.__currentSprite]
         self.rect = self.image.get_rect()
         self.rect.x = start_x
         self.rect.y = start_y
-        self.base = pygame.Rect(start_x, start_y + __height, __width, 2)
+        self.base = pygame.Rect(start_x, start_y + height, width, 2)
         
         logger.info("Created enemy object")
 

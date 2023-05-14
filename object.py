@@ -9,9 +9,7 @@ class Bullet(pygame.sprite.Sprite):
     def __init__(self, start_x, start_y, width, height, direction, world):
         pygame.sprite.Sprite.__init__(self)
 
-        self.width = width
-        self.height = height
-        self.direction = direction
+        self.__direction = direction
         self.world = world
 
         self.image = pygame.transform.scale(pygame.image.load("img/bullet_img/bullet.png"), (width, height))
@@ -42,5 +40,5 @@ class Bullet(pygame.sprite.Sprite):
     
     
     def movement(self):
-        self.bulletPos.x += self.direction * self.__speed
+        self.bulletPos.x += self.__direction * self.__speed
         self.rect.x = self.bulletPos.x - self.world.player.getCamOffset() 

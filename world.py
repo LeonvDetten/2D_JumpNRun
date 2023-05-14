@@ -37,21 +37,21 @@ class World:
         pos_y = 0
         for line in self.__level:#auslagern
             pos_x = 0
-            self.blockCount = 0
-            self.chunk = 0
+            blockCount = 0
+            chunk = 0
             for block in line:
-                self.blockCount += 1
+                blockCount += 1
                 #print(self.blockCount)
-                if self.blockCount > self.__chunkOffset:
-                    self.chunk += 1
-                    self.blockCount = 0
-                    if len(self.__platforms) <= self.chunk:
+                if blockCount > self.__chunkOffset:
+                    chunk += 1
+                    blockCount = 0
+                    if len(self.__platforms) <= chunk:
                         self.__platforms.append([])
                 if block == 'B':
-                    #print(self.chunk)
-                    self.__platforms[self.chunk].append(pygame.Rect(pos_x, pos_y, self.__block_size, self.__block_size))
+                    #print(chunk)
+                    self.__platforms[chunk].append(pygame.Rect(pos_x, pos_y, self.__block_size, self.__block_size))
                 if block =="E":
-                    self.enemyGroup.add(Enemy(self, pos_x, pos_y, self.chunk, 40, 40, 1))
+                    self.enemyGroup.add(Enemy(self, pos_x, pos_y, chunk, 40, 40, 1))
                 pos_x = pos_x + self.__block_size
             pos_y = pos_y + self.__block_size  
         #print(self.__platforms)
