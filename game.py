@@ -12,19 +12,19 @@ class MyGame:
     __WINDOWWIDTH = 1520
     __WINDOWHEIGHT = 800
     level = [
-             "         EEEEEEEEEEEE                                                                        B                                                          ",                                                       
-             "                                                                                 B                         B                                ",
-             "                                                                                 B                     B        B                           ",             
-             "                                                                    B   BEEEEEB  B                 B         E                              ",
-             "                                       BBBB   B   B   B   B      B      BBBBBBB  B          BBBB                                            ",
-             "                                 BBBB                         B      B                   B        E                                         ",
-             "    E          E                 B                                                 B   B   B                                                  ", 
-             "                          BBBB                                                B        E                                                    ",
-             "                    BBBB                                                                                                                    ",
-             "               BBB                                                                           B                                              ",                                                               
-             "         BBBB                                                                                                                               ",                                         
-             "     B                                                                                       B   B                                          ",  
-             "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"]
+             "         E E E E E E E E E E E E                                                                                                                                                 E E E E B                                                                                                                                     ",                                                       
+             "                                                                                 B                                                                                                BBBBBBBB                                                                                                                    ",
+             "                                                                                 B                     B   B   B  BB   B   B   B   BBB   B   B   B  B                                                        BB BB                                                                                                                        ",             
+             "                                                                    B   BE E EB  B                 B         E       B                                                                                     BB        BB BB                                    BB BB                                                                              ",
+             "                                       BBBB   B   B   B   B      B      BBBBBBB  B          BBBB                BBBBB                                    B                                              BB                  BB BB                      BB BB                                          ",
+             "                                 BBBB                         B      B                   B        E           B                                                               BBBBB                  BB                                         BB BB                                                                                                                                                                                                                                                                           ",         
+             "    E          E                 B                                                  B   B   B               B                                               B              BB       BB           BB                                      BB BB                                                                                                 ", 
+             "                          BBBB                                                B  B      E                 B                                                            BB                    BB                                    BB BB                                                                                                  ",
+             "                    BBBB                                                                                B                                                          BB                   BBB                                                                                                                                          ",
+             "               BBB                                                                           B        B                                                         B                                                                                                                                                                                                                  ",                                                               
+             "         BBBB                                                                                       B                                                                                                                                                                                                                                                                           ",                                         
+             "     B                                                                                       B   B                                                                                                                                                                       BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB                                                                                                          ",  
+             "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"]
 
 
     def __init__(self):
@@ -40,8 +40,8 @@ class MyGame:
 pygame.init()
 logger.add("game.log")
 
-player_spawn_x = 120
-player_spawn_y = 100
+player_spawn_x = 8900 #120
+player_spawn_y = 50
 block_size = 60
 
 my_game = MyGame()
@@ -60,7 +60,7 @@ while True:
             pygame.quit()
             sys.exit()
 
-    #start_time= pygame.time.get_ticks()
+    #start_time= pygame.time.get_ticks()wd
     world.main(my_game.screen)
     player.main(my_game.screen)
     for bullet in (player.bulletGroup):
@@ -79,8 +79,10 @@ while True:
     #logger.info("Time for Iteration: " + str(pygame.time.get_ticks() - start_time) + "ms")  #Mit Modulo 1000 stichprobenaertig loggen
     #TODOS in Functions als Comments schreiben (Kanten Fixen (an die Wand springen und oben auf dem Block landen), Nach Schuss folgende animation nicht durchlaufen lassen, wenn Eingabe nur kurz gedrückt)
 
-    #Was soll ich alles loggen (Performance, Keyboard Interaktion, alles?(Wenn Gegner stirbt)) alles lieber zu viel als zu wendig 
+    #Was soll ich alles loggen (Performance, Keyboard Interaktion, alles?(Wenn Gegner stirbt)) alles lieber zu viel als zu wenig 
     #Wann Abgabe nach Pitch noch Veränderung vornehmen? eine Woche nach Klausuren 
 
     #Startmenu einabauen
     #Alte Bilder, die durch neue Bilder überlagert werden löschen sonst verwendet Pygame viel Speicher
+    #Punkte System einbauen
+    #Bestzeiten messen und persitnent speichern
