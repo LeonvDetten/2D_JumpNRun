@@ -1,3 +1,23 @@
+"""PIRATE GAME
+
+    Module name: 
+            world.py
+
+    Doc:
+            This module contains the world class.
+            Mainly responsible for the world generation and collision detection.
+
+    Classes:
+            World
+
+        author: Leon von Detten
+        date: 19.04.2023
+        version: 1.0.0
+        license: free
+
+"""
+
+
 import os
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide"
 import pygame
@@ -32,6 +52,8 @@ class World:
 
         self.initializeWorld()
 
+    ### numpy vectorized operations (.where) for collision detection
+    ### https://stackoverflow.com/questions/29640685/vectorized-2d-collision-detection-in-numpy
 
     def initializeWorld(self):
         pos_y = 0
@@ -50,7 +72,7 @@ class World:
                 if block == 'B':
                     #print(chunk)
                     self.__platforms[chunk].append(pygame.Rect(pos_x, pos_y, self.__block_size, self.__block_size))
-                if block =="E":
+                if block == "E":
                     self.enemyGroup.add(Enemy(self, pos_x, pos_y, chunk, 40, 40, 1))
                 pos_x = pos_x + self.__block_size
             pos_y = pos_y + self.__block_size  

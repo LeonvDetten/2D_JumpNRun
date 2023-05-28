@@ -1,3 +1,24 @@
+"""PIRATE GAME
+
+    Module name: 
+            player.py
+
+    Doc:
+            This module contains the player class. 
+            Responsible for player movement, animations and shooting.
+
+    Classes:
+            pygame.sprite.Sprite(builtins.object)
+            Player
+
+        author: Leon von Detten
+        date: 19.04.2023
+        version: 1.0.0
+        license: free
+
+"""
+
+
 import pygame
 from pygame import *
 from loguru import logger
@@ -167,14 +188,15 @@ class Player(pygame.sprite.Sprite):
 
     def check_enemy_collision(self):
         for enemy in self.world.chunkEnemyGroup:
-            if enemy.enemyPos.colliderect(self.playerPos) and self.speed_y >0:
-                self.speed_y = -5
-                enemy.kill()
-                logger.info("Enemy killed with jump")
-            elif enemy.enemyPos.colliderect(self.playerPos):
-                logger.info("Player killed by enemy")
-                pygame.quit()
-                sys.exit()
+            if enemy.enemyPos.colliderect(self.playerPos):
+                if self.speed_y > 0:
+                    self.speed_y = -5
+                    enemy.kill()
+                    logger.info("Enemy killed with jump")
+                else:
+                    logger.info("Player killed by enemy")
+                    pygame.quit()
+                    sys.exit()
                           
           
     

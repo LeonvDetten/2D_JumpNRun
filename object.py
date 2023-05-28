@@ -1,3 +1,24 @@
+"""PIRATE GAME
+
+    Module name: 
+            object.py
+
+    Doc:
+            This module contains the bullet class.
+            Responsible for bullet movement and collision detection.
+
+    Classes:
+            pygame.sprite.Sprite(builtins.object)
+            Bullet
+
+        author: Leon von Detten
+        date: 19.04.2023
+        version: 1.0.0
+        license: free
+
+"""
+
+
 import pygame
 from pygame import *
 from loguru import logger

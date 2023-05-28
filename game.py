@@ -1,3 +1,25 @@
+"""PIRATE GAME
+    This is a 2D game where the player has to fight against enemies and jump through the world.
+
+    Module name: 
+            game.py
+
+    Doc:
+            This module contains the game class.
+            Responsible for the game logic (game loop) and screen generation. 
+
+    Classes:
+            MyGame
+
+        author: Leon von Detten
+        date: 19.04.2023
+        version: 1.0.0
+        license: free
+
+"""
+
+
+
 import os
 import sys
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide"
@@ -19,11 +41,11 @@ class MyGame:
              "                                       BBBB   B   B   B   B      B      BBBBBBB  B          BBBB                BBBBB                                    B                                              BB                  BB BB                      BB BB                                          ",
              "                                 BBBB                         B      B                   B        E           B                                                               BBBBB                  BB                                         BB BB                                                                                                                                                                                                                                                                           ",         
              "    E          E                 B                                                  B   B   B               B                                               B              BB       BB           BB                                      BB BB                                                                                                 ", 
-             "                          BBBB                                                B  B      E                 B                                                            BB                    BB                                    BB BB                                                                                                  ",
-             "                    BBBB                                                                                B                                                          BB                   BBB                                                                                                                                          ",
-             "               BBB                                                                           B        B                                                         B                                                                                                                                                                                                                  ",                                                               
-             "         BBBB                                                                                       B                                                                                                                                                                                                                                                                           ",                                         
-             "     B                                                                                       B   B                                                                                                                                                                       BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB                                                                                                          ",  
+             "                          BBBB                  E                              B  B      E                 B                                                            BB                    BB                                    BB BB                                                                                                  ",
+             "                    BBBB            EEE                                                                    B                                                          BB                   BBB                                                                                                                                          ",
+             "               BBB                                               E                            B        B                                                         B                                                                                                                                                                                                                  ",                                                               
+             "         BBBB                            K  C                                                           B                                                                                                                                                                                                                                                                           ",                                         
+             "     B                              BBB         B                                                B   B                                                                                                                                                                       BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB                                                                                                          ",  
              "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"]
 
 
@@ -40,7 +62,7 @@ class MyGame:
 pygame.init()
 logger.add("game.log")
 
-player_spawn_x = 8900 #120
+player_spawn_x = 120
 player_spawn_y = 50
 block_size = 60
 
@@ -85,4 +107,4 @@ while True:
     #Startmenu einabauen
     #Alte Bilder, die durch neue Bilder überlagert werden löschen sonst verwendet Pygame viel Speicher
     #Punkte System einbauen
-    #Bestzeiten messen und persitnent speichern
+    #Bestzeiten messen und persitnent speichernw

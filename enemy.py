@@ -1,3 +1,24 @@
+"""PIRATE GAME
+
+    Module name: 
+            enemy.py
+
+    Doc:
+            This module contains the enemy class.
+            Responsible for enemy movement and animations.
+
+    Classes:
+            pygame.sprite.Sprite(builtins.object)
+            Enemy
+
+        author: Leon von Detten
+        date: 19.04.2023
+        version: 1.0.0
+        license: free
+
+"""
+
+
 import pygame
 from pygame import *
 from loguru import logger
