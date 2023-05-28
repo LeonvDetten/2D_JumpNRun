@@ -23,7 +23,24 @@ import pygame
 from pygame import *
 from loguru import logger
 
-class Bullet(pygame.sprite.Sprite):
+class Bullet(pygame.sprite.Sprite):#
+    """Bullet:
+        * create and instantiate bullet object
+        * handle bullet movement
+        * handle bullet/world collision 
+
+    Args:
+        pygame.sprite.Sprite (class): simple base class for visible game objects from pygame
+
+    Returns:
+        none
+
+    Tests:
+        * Can be initialized
+        * Can be moved
+        * Bullet gets destroyed when colliding with block or flying to far
+
+    """
 
     __speed = 20
 

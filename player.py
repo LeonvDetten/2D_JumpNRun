@@ -28,6 +28,22 @@ from object import *
 
 
 class Player(pygame.sprite.Sprite):
+    """Player:
+        * create and instantiate player object
+        * load sprites
+        * handle player movement
+
+    Args:
+        pygame.sprite.Sprite (class): simple base class for visible game objects from pygame
+
+    Returns:
+        none
+
+    Tests:
+        * Can be initialized
+        * Can be moved
+
+    """
 
     __currentSprite = 0
     __shootAnimationTime = 1000
@@ -65,6 +81,19 @@ class Player(pygame.sprite.Sprite):
 
 
     def __create_sprite_container(self):
+        """NAME(__create_sprite_container):
+            * WAS Passiert?
+            * WAS Passiert?
+            * WAS Passiert?
+
+        Args:
+
+        Returns:
+
+        Tests:
+
+        """
+
         self.sprites = {}
         sprite_array = ["IDLE", "RUN", "JUMP", "ATTACK"]
         for sprite in sprite_array:

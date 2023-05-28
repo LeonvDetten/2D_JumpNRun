@@ -25,6 +25,24 @@ from loguru import logger
 
 
 class Enemy(pygame.sprite.Sprite):
+    """Enemy:
+        * create and instantiate enemy object
+        * load sprites
+        * handle enemy movement
+        * update enemy chunk (chunksystem)
+
+    Args:
+        pygame.sprite.Sprite (class): simple base class for visible game objects from pygame
+
+    Returns:
+        none
+
+    Tests:
+        * Can be initialized
+        * Can be moved
+        * Objekts switching their current chunk by moving out of the previouse chunk
+
+    """
 
     __speed_x = 5
     __speed_y = 0

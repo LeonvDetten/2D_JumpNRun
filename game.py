@@ -31,6 +31,21 @@ from player import *
 
 
 class MyGame:
+    """MyGame:
+        * Set up screen width and height
+        * create and instantiate game object
+        * setup game caption
+    Args:
+        none 
+
+    Returns:
+        none
+
+    Tests:
+        * Screen can be created
+        * Scrren size can be set
+
+    """
     __WINDOWWIDTH = 1520
     __WINDOWHEIGHT = 800
     level = [
@@ -83,7 +98,7 @@ while True:
             sys.exit()
 
     #start_time= pygame.time.get_ticks()wd
-    world.main(my_game.screen)
+    world.main(my_game.screen)      #AB HIER GUT KOMMENTIEREN
     player.main(my_game.screen)
     for bullet in (player.bulletGroup):
             bullet.update()

@@ -29,14 +29,28 @@ bg_img = pygame.transform.scale(bg_img, (1520, 800))
 position = (0, 0)
 
 class World:
+    """World:
+        * create and instantiate world object
+        * generate world (blocks, enemies)
+        * handle collision detection
+
+    Args:
+        none 
+
+    Returns:
+        none
+
+    Tests:
+        * Can be initialized
+        * Collision detection works
+
+    """
 
     gravity = 1
     __chunkOffset = 20
 
-    """
-        DUMMY TEST 
-    """
-                                                                        #Konstruktor aus Buch (Buch angeben)
+
+    #Konstruktor aus Buch (Buch angeben)
     def __init__(self, level, block_size, player):
         self.__level = level
         self.__block_size = block_size
