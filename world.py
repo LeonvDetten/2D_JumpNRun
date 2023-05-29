@@ -23,6 +23,7 @@ os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide"
 import pygame
 
 from enemy import *
+from object import *
 
 bg_img = pygame.image.load('img/background_img/bg.jpg')
 bg_img = pygame.transform.scale(bg_img, (1520, 800))
@@ -52,6 +53,25 @@ class World:
 
     #Konstruktor aus Buch (Buch angeben)
     def __init__(self, level, block_size, player):
+        """__init__(constructor):
+            * Initialize world object
+
+        Args:
+            * self (object): player object
+            * level (list): list of strings containing the level
+            * block_size (int): size of the blocks
+            * player (object): player object
+
+        Returns:
+            none
+
+        Tests:
+            * Reight initialization of world object
+                -correct level
+                -correct blocksize
+            * Blocks are stored in correct chunk
+
+        """
         self.__level = level
         self.__block_size = block_size
         self.player = player
@@ -60,6 +80,7 @@ class World:
 
         self.enemyGroup = pygame.sprite.Group()
         self.chunkEnemyGroup = pygame.sprite.Group()
+        self.chestGroup = pygame.sprite.Group()
 
         self.block_img = pygame.image.load('img/ground_img/spaceground.png')
         self.block_img = pygame.transform.scale(self.block_img, (block_size, block_size))
@@ -86,8 +107,10 @@ class World:
                 if block == 'B':
                     #print(chunk)
                     self.__platforms[chunk].append(pygame.Rect(pos_x, pos_y, self.__block_size, self.__block_size))
-                if block == "E":
+                if block == 'E':
                     self.enemyGroup.add(Enemy(self, pos_x, pos_y, chunk, 40, 40, 1))
+                if block == 'C':
+                    self.chestGroup.add(Chest(self, pos_x, pos_y + (self.__block_size - 40), chunk, 60, 40))  #NO HardCODE am besten 40 in lok var auslagern
                 pos_x = pos_x + self.__block_size
             pos_y = pos_y + self.__block_size  
         #print(self.__platforms)

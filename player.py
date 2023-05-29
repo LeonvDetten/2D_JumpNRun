@@ -41,7 +41,7 @@ class Player(pygame.sprite.Sprite):
 
     Tests:
         * Can be initialized
-        * Can be moved
+        * Can be moved (reight movement on key interaction)
 
     """
 
@@ -55,6 +55,26 @@ class Player(pygame.sprite.Sprite):
 
 
     def __init__(self, start_x, start_y, width, height):
+        """__init__(constructor):
+            * Initialize player object
+
+        Args:
+            * self (object): player object
+            * start_x (int): x position of player
+            * start_y (int): y position of player
+            * width (int): width of player
+            * height (int): height of player
+
+        Returns:
+            none
+
+        Tests:
+            * Reight initialization of player object
+                -correct position
+                -correct size
+
+        """
+        
         pygame.sprite.Sprite.__init__(self)
        
         self.width = width
@@ -125,17 +145,16 @@ class Player(pygame.sprite.Sprite):
         self.world = world
 
 
-    def main(self, screen):
+    def main(self):
         self.movement()                                                                                                
         self.move_y()
         self.check_enemy_collision()
-        self.animation(screen)         
+        self.animation()         
 
 
-    def animation(self, screen):
+    def animation(self):
         animation_tag = self.__currentAnimation.split("_")
         self.image = self.sprites[animation_tag[0]][animation_tag[1]][int(self.__currentSprite)]
-        self.player_plain.draw(screen)
 
 
     def move_y(self):

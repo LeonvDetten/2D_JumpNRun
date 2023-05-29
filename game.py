@@ -50,7 +50,7 @@ class MyGame:
     __WINDOWHEIGHT = 800
     level = [
              "         E E E E E E E E E E E E                                                                                                                                                 E E E E B                                                                                                                                     ",                                                       
-             "                                                                                 B                                                                                                BBBBBBBB                                                                                                                    ",
+             "   C                                                                              B                                                                                                BBBBBBBB                                                                                                                    ",
              "                                                                                 B                     B   B   B  BB   B   B   B   BBB   B   B   B  B                                                        BB BB                                                                                                                        ",             
              "                                                                    B   BE E EB  B                 B         E       B                                                                                     BB        BB BB                                    BB BB                                                                              ",
              "                                       BBBB   B   B   B   B      B      BBBBBBB  B          BBBB                BBBBB                                    B                                              BB                  BB BB                      BB BB                                          ",
@@ -60,7 +60,7 @@ class MyGame:
              "                    BBBB            EEE                                                                    B                                                          BB                   BBB                                                                                                                                          ",
              "               BBB                                               E                            B        B                                                         B                                                                                                                                                                                                                  ",                                                               
              "         BBBB                            K  C                                                           B                                                                                                                                                                                                                                                                           ",                                         
-             "     B                              BBB         B                                                B   B                                                                                                                                                                       BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB                                                                                                          ",  
+             "     B     C        CC               BBB         B                                                B   B                                                                                                                                                                       BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB                                                                                                          ",  
              "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"]
 
 
@@ -99,9 +99,12 @@ while True:
 
     #start_time= pygame.time.get_ticks()wd
     world.main(my_game.screen)      #AB HIER GUT KOMMENTIEREN
-    player.main(my_game.screen)
+    player.main()
     for bullet in (player.bulletGroup):
             bullet.update()
+    for chest in world.chestGroup:
+        if player.getCurrentChunk() -1 <= chest.getChunk() <= player.getCurrentChunk() + 1:
+            chest.update()
     world.chunkEnemyGroup.empty()
     for enemy in world.enemyGroup:
         if player.getCurrentChunk() -1 <= enemy.getCurrentChunk() <= player.getCurrentChunk() + 1:
@@ -109,7 +112,9 @@ while True:
             world.chunkEnemyGroup.add(enemy)
     pygame.sprite.groupcollide(player.bulletGroup, world.chunkEnemyGroup, True, True)         
     pygame.sprite.Group.draw(world.chunkEnemyGroup, my_game.screen)
-    pygame.sprite.Group.draw(player.bulletGroup, my_game.screen)   
+    pygame.sprite.Group.draw(player.bulletGroup, my_game.screen)  
+    pygame.sprite.Group.draw(world.chestGroup, my_game.screen) 
+    player.player_plain.draw(my_game.screen)
     pygame.display.update()
     clock.tick(30)
 

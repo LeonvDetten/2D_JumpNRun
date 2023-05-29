@@ -39,7 +39,7 @@ class Enemy(pygame.sprite.Sprite):
 
     Tests:
         * Can be initialized
-        * Can be moved
+        * Is moving when in reight chunk
         * Objekts switching their current chunk by moving out of the previouse chunk
 
     """
@@ -49,7 +49,7 @@ class Enemy(pygame.sprite.Sprite):
     __spriteLoopSpeed = 0.3
 
 
-    def __init__(self, world, start_x, start_y,startChunk, width, height, direction):
+    def __init__(self, world, start_x, start_y, startChunk, width, height, direction):
         pygame.sprite.Sprite.__init__(self)
 
         self.world = world
@@ -60,12 +60,12 @@ class Enemy(pygame.sprite.Sprite):
         self.__currentChunk = startChunk
 
         self.__currentSprite = 0
-        self.runRightSprites = []
-        self.runLeftSprites = []
+        self.__runRightSprites = []
+        self.__runLeftSprites = []
         self.loadSprites()
 
         self.enemyPos = pygame.Rect(start_x, start_y, width, height)
-        self.image = self.runRightSprites[self.__currentSprite]
+        self.image = self.__runRightSprites[self.__currentSprite]
         self.rect = self.image.get_rect()
         self.rect.x = start_x
         self.rect.y = start_y
@@ -84,11 +84,10 @@ class Enemy(pygame.sprite.Sprite):
 
     def loadSprites(self):
         for image in range(3):
-            enemy = pygame.image.load('img/enemy_image/e1_r' + str(image) + '.png')
-            self.runRightSprites.append(pygame.transform.scale(enemy, (self.__width, self.__height)))
-        for image in range(3):
-            enemy = pygame.image.load('img/enemy_image/e1_l' + str(image) + '.png')
-            self.runLeftSprites.append(pygame.transform.scale(enemy, (self.__width, self.__height)))    
+            enemy = pygame.image.load('img/enemy_img/e1_r' + str(image) + '.png')
+            self.__runRightSprites.append(pygame.transform.scale(enemy, (self.__width, self.__height)))
+            enemy = pygame.image.load('img/enemy_img/e1_l' + str(image) + '.png')
+            self.__runLeftSprites.append(pygame.transform.scale(enemy, (self.__width, self.__height)))    
 
 
     def movement(self):
@@ -103,12 +102,12 @@ class Enemy(pygame.sprite.Sprite):
 
     def animation(self):
         if self.__direction == 1:
-            self.image = self.runRightSprites[int(self.__currentSprite)]
+            self.image = self.__runRightSprites[int(self.__currentSprite)]
         elif self.__direction == -1:
-            self.image = self.runLeftSprites[int(self.__currentSprite)]
+            self.image = self.__runLeftSprites[int(self.__currentSprite)]
 
         self.__currentSprite += self.__spriteLoopSpeed
-        if self.__currentSprite >= len(self.runRightSprites):
+        if self.__currentSprite >= len(self.__runRightSprites):
             self.__currentSprite = 0      
 
 
@@ -125,7 +124,7 @@ class Enemy(pygame.sprite.Sprite):
 
 
     def updateChunk(self):
-        self.__currentChunk = int(self.enemyPos.x / (20*60)) 
+        self.__currentChunk = int(self.enemyPos.x / (20*60)) #Gut Kommentieren
 
 
     def getCurrentChunk(self):
