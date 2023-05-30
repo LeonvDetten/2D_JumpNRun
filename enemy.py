@@ -37,11 +37,6 @@ class Enemy(pygame.sprite.Sprite):
     Returns:
         none
 
-    Tests:
-        * Can be initialized
-        * Is moving when in reight chunk
-        * Objekts switching their current chunk by moving out of the previouse chunk
-
     """
 
     __speed_x = 5
@@ -50,6 +45,29 @@ class Enemy(pygame.sprite.Sprite):
 
 
     def __init__(self, world, start_x, start_y, startChunk, width, height, direction):
+        """__init__(constructor):
+            * Initialize enemy object
+
+        Args:
+            * self (object): player object
+            * world (object): world object
+            * start_x (int): x position of enemy
+            * start_y (int): y position of enemy
+            * startChunk (int): chunk in which the enemy is spawned
+            * width (int): width of enemy
+            * height (int): height of enemy
+            * direction (int): direction of enemy
+
+        Returns:
+            none
+        
+        Tests:
+            * Reight initialization of bullet object
+                - correct start position
+                - correct width and height
+            * Sprite list is not empty
+            
+            """
         pygame.sprite.Sprite.__init__(self)
 
         self.world = world

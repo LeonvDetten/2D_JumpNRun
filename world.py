@@ -41,10 +41,6 @@ class World:
     Returns:
         none
 
-    Tests:
-        * Can be initialized
-        * Collision detection works
-
     """
 
     gravity = 1
@@ -67,9 +63,9 @@ class World:
 
         Tests:
             * Reight initialization of world object
-                -correct level
-                -correct blocksize
-            * Blocks are stored in correct chunk
+                - correct level
+                - correct blocksize
+            * Pygame sprite groups aren't empty
 
         """
         self.__level = level
@@ -91,6 +87,8 @@ class World:
     ### https://stackoverflow.com/questions/29640685/vectorized-2d-collision-detection-in-numpy
 
     def initializeWorld(self):
+
+        #FÜR TEST: BLÖCKE(ELEMENTE) sind in richtigem Chunk
         pos_y = 0
         for line in self.__level:#auslagern
             pos_x = 0

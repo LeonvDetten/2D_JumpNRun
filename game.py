@@ -32,18 +32,15 @@ from player import *
 
 class MyGame:
     """MyGame:
-        * Set up screen width and height
+        * Set up screen width and screen height
         * create and instantiate game object
         * setup game caption
+
     Args:
         none 
 
     Returns:
         none
-
-    Tests:
-        * Screen can be created
-        * Scrren size can be set
 
     """
     __WINDOWWIDTH = 1520
@@ -59,8 +56,8 @@ class MyGame:
              "                          BBBB                  E                              B  B      E                 B                                                            BB                    BB                                    BB BB                                                                                                  ",
              "                    BBBB            EEE                                                                    B                                                          BB                   BBB                                                                                                                                          ",
              "               BBB                                               E                            B        B                                                         B                                                                                                                                                                                                                  ",                                                               
-             "         BBBB                            K  C                                                           B                                                                                                                                                                                                                                                                           ",                                         
-             "     B     C        CC               BBB         B                                                B   B                                                                                                                                                                       BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB                                                                                                          ",  
+             "     C   BBBB                            K  C                                                           B                                                                                                                                                                                                                                                                           ",                                         
+             "C    B     C        CC               BBB         B                                                B   B                                                                                                                                                                       BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB                                                                                                          ",  
              "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"]
 
 
@@ -69,6 +66,11 @@ class MyGame:
         
 
     def create_window(self):
+        """
+    Tests:
+        * Screen can be created
+        * Scrren size can be set
+        """
         self.screen = pygame.display.set_mode((self.__WINDOWWIDTH, self.__WINDOWHEIGHT))
         pygame.display.set_caption("2D Game")
         logger.info("Created window with size: " + str(self.__WINDOWWIDTH) + "x" + str(self.__WINDOWHEIGHT))

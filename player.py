@@ -39,10 +39,6 @@ class Player(pygame.sprite.Sprite):
     Returns:
         none
 
-    Tests:
-        * Can be initialized
-        * Can be moved (reight movement on key interaction)
-
     """
 
     __currentSprite = 0
@@ -70,8 +66,8 @@ class Player(pygame.sprite.Sprite):
 
         Tests:
             * Reight initialization of player object
-                -correct position
-                -correct size
+                - correct position
+                - correct size
 
         """
         
@@ -86,6 +82,7 @@ class Player(pygame.sprite.Sprite):
         self.image = self.sprites['IDLE']['right'][self.__currentSprite]
         self.__currentAnimation = "idleRight"
         self.__latest_shot = 0
+        self.__latest_jump_kill = 0
         self.__direction = 1
 
         self.playerPos = pygame.Rect(start_x, start_y, width, height)
@@ -241,7 +238,9 @@ class Player(pygame.sprite.Sprite):
                     self.speed_y = -5
                     enemy.kill()
                     logger.info("Enemy killed with jump")
-                else:
+                    self.__latest_jump_kill = pygame.time.get_ticks()
+
+                elif self.speed_y <= 0 and self.__latest_jump_kill + 100 < pygame.time.get_ticks():
                     logger.info("Player killed by enemy")
                     pygame.quit()
                     sys.exit()
