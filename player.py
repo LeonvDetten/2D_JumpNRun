@@ -83,6 +83,7 @@ class Player(pygame.sprite.Sprite):
         self.__currentAnimation = "idleRight"
         self.__latest_shot = 0
         self.__latest_jump_kill = 0
+        self.__latest_log = 0
         self.__direction = 1
 
         self.playerPos = pygame.Rect(start_x, start_y, width, height)
@@ -190,6 +191,7 @@ class Player(pygame.sprite.Sprite):
             self.__speed_x = self.__movement_speed
             self.__direction = 1
             self.__currentAnimation = "RUN_right"
+            
 
         if key_state[K_a] and self.world.check_object_collision_sideblock(self.playerPos) != -2:
             if self.playerPos.x > 0:
@@ -197,11 +199,14 @@ class Player(pygame.sprite.Sprite):
                 self.__direction = -1
                 self.__currentAnimation = "RUN_left"
 
+
         if key_state[K_w] or key_state[K_SPACE]:
             self.jump(self.jump_speed)
 
+
         if key_state[K_RETURN] and self.__latest_shot + self.__shootAnimationTime < pygame.time.get_ticks():
             self.shoot()
+
 
         self.__currentSprite += self.__spriteLoopSpeed           #aus Vid (angeben in Docstring)
         if self.__currentSprite >= len(self.sprites['IDLE']['right']):
@@ -209,14 +214,17 @@ class Player(pygame.sprite.Sprite):
         self.playerPos.x += self.__speed_x
         self.base.x = self.playerPos.x         
         self.rect.x = self.playerPos.x - self.getCamOffset()  
+        self.logging_movement()
 
 
     def jump(self, speed):      #loggin einbauen
         if self.world.collided_get_y(self.base, self.height)>0 and self.speed_y == 0: 
             if self.__direction == -1:                          
                 self.__currentAnimation = "JUMP_left"
+                logger.info("Player jumped left")
             else:
                 self.__currentAnimation = "JUMP_right"
+                logger.info("Player jumped right")
             self.__currentSprite = 0
             self.speed_y = speed    
 
@@ -229,6 +237,17 @@ class Player(pygame.sprite.Sprite):
             self.__currentAnimation = "ATTACK_right"    
         self.bulletGroup.add(Bullet(self.playerPos.x + (0.8*self.width), self.playerPos.y + (self.height*0.45), 10, 5, self.__direction, self.world))
         self.__latest_shot = pygame.time.get_ticks()     
+        logger.info("Player shot")
+
+
+    def logging_movement(self):
+        __logging_timeBreak = 400
+        if self.__speed_x > 0 and self.__latest_log + __logging_timeBreak < pygame.time.get_ticks():
+            self.__latest_log = pygame.time.get_ticks()
+            logger.info("Player is moving right")
+        elif self.__speed_x < 0 and self.__latest_log + __logging_timeBreak < pygame.time.get_ticks():
+            self.__latest_log = pygame.time.get_ticks()
+            logger.info("Player is moving left")
 
 
     def check_enemy_collision(self):

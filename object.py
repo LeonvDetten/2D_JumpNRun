@@ -162,6 +162,8 @@ class Chest(pygame.sprite.Sprite):
         self.rect.x = position_x
         self.rect.y = position_y
 
+        logger.info("Created chest object")
+
 
     def update(self):
         self.collision()
@@ -169,9 +171,11 @@ class Chest(pygame.sprite.Sprite):
 
     
     def loadSprites(self):
+        start_time= pygame.time.get_ticks()
         for i in range(10):
             self.__chestSprites.append(pygame.transform.scale(pygame.image.load("img/chest_img/chest1_" + str(i) + ".png"), (self.width, self.height)))
-
+        logger.info("Loaded chest sprites in " + str(pygame.time.get_ticks() - start_time) + "ms")
+        
 
     def collision(self):
         if self.__gotOpened == False:

@@ -89,8 +89,7 @@ class Enemy(pygame.sprite.Sprite):
         self.rect.y = start_y
         self.base = pygame.Rect(start_x, start_y + height, width, 2)
         
-        logger.info("Created enemy object")
-
+        
 
     def update(self):
         self.movement()
@@ -105,7 +104,7 @@ class Enemy(pygame.sprite.Sprite):
             enemy = pygame.image.load('img/enemy_img/e1_r' + str(image) + '.png')
             self.__runRightSprites.append(pygame.transform.scale(enemy, (self.__width, self.__height)))
             enemy = pygame.image.load('img/enemy_img/e1_l' + str(image) + '.png')
-            self.__runLeftSprites.append(pygame.transform.scale(enemy, (self.__width, self.__height)))    
+            self.__runLeftSprites.append(pygame.transform.scale(enemy, (self.__width, self.__height)))  
 
 
     def movement(self):
@@ -152,4 +151,4 @@ class Enemy(pygame.sprite.Sprite):
     def checkEnemyFallOutOfMap(self):
         if self.enemyPos.y > 1000:
             self.kill()
-            logger.info("Enemy fell out of map. Got destroyed")
+            logger.info("Enemy fell out of map. Got killed")

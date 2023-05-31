@@ -85,6 +85,7 @@ class World:
         self.block_img = pygame.transform.scale(self.block_img, (block_size, block_size))
 
         self.initializeWorld()
+        logger.info("Created world object")
 
     ### numpy vectorized operations (.where) for collision detection
     ### https://stackoverflow.com/questions/29640685/vectorized-2d-collision-detection-in-numpy
@@ -93,29 +94,29 @@ class World:
 
         #FÜR TEST: BLÖCKE(ELEMENTE) sind in richtigem Chunk
         pos_y = 0
-        for line in self.__level:#auslagern
+        enemyCount = 0
+        for line in self.__level:
             pos_x = 0
             blockCount = 0
             chunk = 0
             for block in line:
                 blockCount += 1
-                #print(self.blockCount)
                 if blockCount > self.__chunkOffset:
                     chunk += 1
                     blockCount = 0
                     if len(self.__platforms) <= chunk:
                         self.__platforms.append([])
                 if block == 'B':
-                    #print(chunk)
                     self.__platforms[chunk].append(pygame.Rect(pos_x, pos_y, self.__block_size, self.__block_size))
                 if block == 'E':
                     self.enemyGroup.add(Enemy(self, pos_x, pos_y, chunk, self.__enemy_size, self.__enemy_size, 1))
+                    enemyCount += 1
                 if block == 'C':
                     self.chestGroup.add(Chest(self, self.__game, pos_x, pos_y + (self.__block_size - 40), chunk, self.__chest_size * 1.5, self.__chest_size))
                 pos_x = pos_x + self.__block_size
             pos_y = pos_y + self.__block_size  
-        #print(self.__platforms)
-
+        logger.info("Created " + str(enemyCount) + " enemie objects")
+        
 
     def update(self,screen):
         self.__chunkPlatforms = []                  
@@ -124,7 +125,7 @@ class World:
                 self.__chunkPlatforms.extend(self.__platforms[self.player.getCurrentChunk() + i])
         for block in self.__chunkPlatforms:
             screen.blit(self.block_img, (block.x-self.player.getCamOffset(), block.y))
-
+        
 
     def main(self, screen):
         self.check_player_collision_bottomblock(self.player.playerPos)

@@ -19,7 +19,6 @@
 """
 
 
-
 import os
 import sys
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide"
@@ -78,6 +77,7 @@ class MyGame:
         datei.close()
         logger.info("Read level from file")
 
+
     def end_game(self):
         self.__endTime = pygame.time.get_ticks()
         self.__timeNeeded = str(round((self.__endTime - self.__startTime)/1000, 2))
@@ -87,8 +87,6 @@ class MyGame:
         self.textRect.center = (self.__WINDOWWIDTH / 2, self.__WINDOWHEIGHT / 2)
         self.gameFinished = True
         
-    
-8
 
 pygame.init()
 logger.add("game.log")
@@ -141,9 +139,4 @@ while True:
         #TODOS in Functions als Comments schreiben (Kanten Fixen (an die Wand springen und oben auf dem Block landen), Nach Schuss folgende animation nicht durchlaufen lassen, wenn Eingabe nur kurz gedrückt)
 
         #Was soll ich alles loggen (Performance, Keyboard Interaktion, alles?(Wenn Gegner stirbt)) alles lieber zu viel als zu wenig 
-        #Wann Abgabe nach Pitch noch Veränderung vornehmen? eine Woche nach Klausuren 
-
-        #Startmenu einabauen
-        #Alte Bilder, die durch neue Bilder überlagert werden löschen sonst verwendet Pygame viel Speicher
-        #Punkte System einbauen
-        #Bestzeiten messen und persitnent speichernw
+        #Startmenu einabauen leider zeitich nicht in 45 h geschafft
