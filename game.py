@@ -50,6 +50,19 @@ class MyGame:
 
 
     def __init__(self):
+        """__init__(constructor):
+            * Initialize game object
+
+        Args:
+            * self (object): game object
+
+        Returns:
+            none
+
+        Tests:
+            * Reight initialization of game object
+            
+        """
         self.gameFinished = False
         self.read_level()
         self.__startTime = pygame.time.get_ticks()
@@ -140,3 +153,4 @@ while True:
 
         #Was soll ich alles loggen (Performance, Keyboard Interaktion, alles?(Wenn Gegner stirbt)) alles lieber zu viel als zu wenig 
         #Startmenu einabauen leider zeitich nicht in 45 h geschafft
+        #Bestzeit speichern und anzeigen

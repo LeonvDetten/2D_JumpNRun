@@ -99,16 +99,37 @@ class Player(pygame.sprite.Sprite):
 
 
     def __create_sprite_container(self):
-        """NAME(__create_sprite_container):
-            * WAS Passiert?
-            * WAS Passiert?
-            * WAS Passiert?
+        """__create_sprite_container:
+            * Creates sprite container for player sprites. Sprite container is a dictionary with the following structure:
+                * sprite_container = {
+                    "IDLE": {
+                        "right": [sprite1, sprite2, sprite3, ...],
+                        "left": [sprite1, sprite2, sprite3, ...]
+                    },
+                    "RUN": {
+                        "right": [sprite1, sprite2, sprite3, ...],
+                        "left": [sprite1, sprite2, sprite3, ...]
+                    },
+                    "JUMP": {
+                        "right": [sprite1, sprite2, sprite3, ...],
+                        "left": [sprite1, sprite2, sprite3, ...]
+                    },
+                    "ATTACK": {
+                        "right": [sprite1, sprite2, sprite3, ...],
+                        "left": [sprite1, sprite2, sprite3, ...]
+                    }
+                }
 
         Args:
+            * self (object): player object
 
         Returns:
+            none
 
         Tests:
+            * Correct creation of sprite container
+                - correct structure
+                - correct sprite names
 
         """
 
@@ -119,6 +140,21 @@ class Player(pygame.sprite.Sprite):
 
 
     def loadSprites(self): 
+        """loadSprites:
+            * Loads player sprites from file and adds them to sprite container
+
+        Args:
+            * self (object): player object
+
+        Returns:    
+            none
+
+        Tests:
+            * Correct adding of player sprites to sprite container
+                - correct sprite image 
+            * Time to load sprites not too long
+
+        """
         start_time= pygame.time.get_ticks()
         animation_states = ["IDLE", "RUN", "JUMP", "ATTACK"]
         for state in animation_states:
@@ -132,18 +168,78 @@ class Player(pygame.sprite.Sprite):
 
 
     def getCamOffset(self):
-        return self.playerPos.x - 300                                          #Player in the middle of the screen
+        """getCamOffset:
+            * Calculates camera offset used for scrolling through the world. Player is always at x-Position 300 on the screen.
+
+        Args:
+            * self (object): player object
+
+        Returns:
+            * int: camera offset
+
+        Tests:
+            * Correct calculation of camera offset 
+                - test with diffrend enemy or block positions 
+
+        """
+
+        return self.playerPos.x - 300                                          #Player in always at one position of the screen
     
 
     def getCurrentChunk(self):
+        """getCurrentChunk:
+            * Calculates current chunk of player. Chunk is used to load and unload chunks of the world.
+
+        Args:
+            * self (object): player object
+
+        Returns:    
+            * int: current chunk
+
+        Tests:
+            * Returns correct chunk
+                - compare calculated chunk from method with world chunk the player is in
+
+        """
+
         return int(self.playerPos.x / (20*60))                                    #*60 because of block size
 
 
     def setWorld(self, world):
+        """setWorld:
+            * Sets world object as attribute of player object
+
+        Args:
+            * self (object): player object
+            * world (object): world object
+
+        Returns:
+            none
+
+        Tests:  
+            * Test if world object is correctly set in player object
+
+        """
+
         self.world = world
 
 
     def main(self):
+        """main:
+            * Main method of player object. Calls most of the other methods from player class.
+
+        Args:
+            * self (object): player object
+
+        Returns:
+            none
+
+        Tests:
+            * Test if all methods are called
+            * Test if methods are called with correct parameters
+
+        """
+            
         self.movement()                                                                                                
         self.move_y()
         self.check_enemy_collision()
@@ -151,11 +247,42 @@ class Player(pygame.sprite.Sprite):
 
 
     def animation(self):
+        """animation:
+            * Animates player object. Changes sprite of player object depending on current animation state.
+
+        Args:
+            * self (object): player object
+
+        Returns:
+            none
+
+        Tests:  
+            * Test if correct sprite is set depending on current Sprite
+            * Test if correct sprite is set depending on current animation state
+
+        """
+
         animation_tag = self.__currentAnimation.split("_")
         self.image = self.sprites[animation_tag[0]][animation_tag[1]][int(self.__currentSprite)]
 
 
     def move_y(self):
+        """move_y:
+            * Handles y-movement of player object. Checks if player object is on ground or in air.
+              If player object is in air, gravity is applied. If player object is on ground, player position is set to ground position.
+
+        Args:
+            * self (object): player object
+
+        Returns:
+            none
+
+        Tests:
+            * Test if every condition is entered
+            * Test if player can fall through ground
+
+        """
+
         collided_y = self.world.collided_get_y(self.base, self.height)
         if self.speed_y < 0 or collided_y < 0 or (self.world.check_object_collision_sideblock(self.playerPos) != 1 and self.playerPos.y < 600):            
             self.playerPos.y += self.speed_y    
@@ -168,8 +295,25 @@ class Player(pygame.sprite.Sprite):
 
 
     def movement(self): #loggin einbauen
-        """Handles the movement of the player
-        MOVEMENT BASIERT AUF BUCH ... BUCH ANGEBEN 
+        """movement:
+            * Handles the movement of the player object. Checks for key inputs and changes the player position or calls methods. 
+        Also changes the animation state of the player object.
+
+        Args:
+            * self (object): player object
+
+        Returns:
+            none
+
+        Tests:
+            * Test if every condition is entered
+            * Test if player can press multiple keys at once 
+
+        
+        Sprite Animation and Current Sprite Logic inspired by: 
+            Python / Pygame Tutorial: Animations with sprites (Clear Code)
+            https://www.youtube.com/watch?v=MYaxPa_eZS0&
+            
         """
         key_state = pygame.key.get_pressed()
         key_down_event_list = pygame.event.get(KEYDOWN)
@@ -208,7 +352,7 @@ class Player(pygame.sprite.Sprite):
             self.shoot()
 
 
-        self.__currentSprite += self.__spriteLoopSpeed           #aus Vid (angeben in Docstring)
+        self.__currentSprite += self.__spriteLoopSpeed           
         if self.__currentSprite >= len(self.sprites['IDLE']['right']):
                 self.__currentSprite = 0
         self.playerPos.x += self.__speed_x
@@ -217,7 +361,24 @@ class Player(pygame.sprite.Sprite):
         self.logging_movement()
 
 
-    def jump(self, speed):      #loggin einbauen
+    def jump(self, speed):  
+        """jump:
+            * Handles the jump of the player object. Checks if player object is on ground and sets speed_y to the given speed (argument).
+              Changes the animation state of the player object depending on the direction of the jump.
+
+        Args:
+            * self (object): player object
+            * speed (int): jump speed
+
+        Returns:
+            none
+
+        Tests:
+            * Test if player can jump multiple times
+            * Test if player can jump while in air
+
+        """
+
         if self.world.collided_get_y(self.base, self.height)>0 and self.speed_y == 0: 
             if self.__direction == -1:                          
                 self.__currentAnimation = "JUMP_left"
@@ -230,6 +391,21 @@ class Player(pygame.sprite.Sprite):
 
 
     def shoot(self):
+        """shoot:
+            * Handles the shooting of the player object. Doing the logic for the shooting (which direction) and creating a bullet object.
+              Changes the animation state of the player object depending on the direction of the shot.
+        Args:
+            * self (object): player object
+
+        Returns:
+            none
+
+        Tests:
+            * Test if player can shoot multiple times in a row
+            * Test if animation is correctly changed after shooting 
+
+        """
+
         self.__currentSprite = 3
         if self.__direction == -1:
             self.__currentAnimation = "ATTACK_left"
@@ -241,7 +417,22 @@ class Player(pygame.sprite.Sprite):
 
 
     def logging_movement(self):
-        __logging_timeBreak = 400
+        """logging_movement:
+            * Handles movement logging. Checks in which direction the player object is moving and logs the movement.
+
+        Args:
+            * self (object): player object
+
+        Returns:
+            none
+
+        Tests:
+            * Test how often the player object is logged ! > __logging_timeBreak
+            * Test if right text is logged (Player is moving right / left)
+
+        """
+
+        __logging_timeBreak = 800
         if self.__speed_x > 0 and self.__latest_log + __logging_timeBreak < pygame.time.get_ticks():
             self.__latest_log = pygame.time.get_ticks()
             logger.info("Player is moving right")
@@ -251,6 +442,21 @@ class Player(pygame.sprite.Sprite):
 
 
     def check_enemy_collision(self):
+        """check_enemy_collision:
+            * Handles collision between player and every enemy near by. Checks how the player object collides with the enemy. Depending on the collision the game is over or the enemy object gets killed.
+        Args:
+            * self (object): player object
+
+        Returns:
+            none
+
+        Tests:
+            * Test if player can kill enemy with jump
+            * Test if player can kill enemy with jump and dies meanwhile
+            * Test if player gets killed by enemy while jumping
+
+        """
+        
         for enemy in self.world.chunkEnemyGroup:
             if enemy.enemyPos.colliderect(self.playerPos):
                 if self.speed_y > 0:
