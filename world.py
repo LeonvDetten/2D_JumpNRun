@@ -48,13 +48,13 @@ class World:
 
 
     #Konstruktor aus Buch (Buch angeben)
-    def __init__(self, level, block_size, player):
+    def __init__(self, game, block_size, player):
         """__init__(constructor):
             * Initialize world object
 
         Args:
             * self (object): player object
-            * level (list): list of strings containing the level
+            * game (object): game object
             * block_size (int): size of the blocks
             * player (object): player object
 
@@ -68,8 +68,11 @@ class World:
             * Pygame sprite groups aren't empty
 
         """
-        self.__level = level
+        self.__game = game
+        self.__level = self.__game.level
         self.__block_size = block_size
+        self.__enemy_size = 40
+        self.__chest_size = 40
         self.player = player
         self.__platforms = [[]]
         self.__chunkPlatforms = []
@@ -106,9 +109,9 @@ class World:
                     #print(chunk)
                     self.__platforms[chunk].append(pygame.Rect(pos_x, pos_y, self.__block_size, self.__block_size))
                 if block == 'E':
-                    self.enemyGroup.add(Enemy(self, pos_x, pos_y, chunk, 40, 40, 1))
+                    self.enemyGroup.add(Enemy(self, pos_x, pos_y, chunk, self.__enemy_size, self.__enemy_size, 1))
                 if block == 'C':
-                    self.chestGroup.add(Chest(self, pos_x, pos_y + (self.__block_size - 40), chunk, 60, 40))  #NO HardCODE am besten 40 in lok var auslagern
+                    self.chestGroup.add(Chest(self, self.__game, pos_x, pos_y + (self.__block_size - 40), chunk, self.__chest_size * 1.5, self.__chest_size))
                 pos_x = pos_x + self.__block_size
             pos_y = pos_y + self.__block_size  
         #print(self.__platforms)

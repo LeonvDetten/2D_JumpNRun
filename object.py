@@ -23,6 +23,8 @@ import pygame
 from pygame import *
 from loguru import logger
 
+
+
 class Bullet(pygame.sprite.Sprite):
     """Bullet:
         * create and instantiate bullet object
@@ -112,13 +114,14 @@ class Chest(pygame.sprite.Sprite):
 
     """
     
-    def __init__(self, world, position_x, position_y, chunk, width, height):
+    def __init__(self, world, game, position_x, position_y, chunk, width, height):
         """__init__(constructor):
             * Initialize chest object
 
         Args:
             * self (object): player object
             * world (object): world object
+            * game (object): game object
             * position_x (int): x position of chest
             * position_y (int): y position of chest
             * chunk (int): chunk in which the chest is spawned
@@ -134,6 +137,9 @@ class Chest(pygame.sprite.Sprite):
                 - correct width and height
 
         """
+
+
+        self.__game = game
 
         self.__spriteLoopSpeed = 0.2
 
@@ -180,7 +186,9 @@ class Chest(pygame.sprite.Sprite):
         self.__currentSprite += self.__spriteLoopSpeed
         if (self.__currentSprite >= len(self.__chestSprites) - self.__spriteLoopSpeed):  #Index des aktuellen Bildes muss kleiner als anzahl aller Bilder - 1 sein sein
             self.__gotOpened = True
-            logger.info("Chest got opened")
+            self.__game.end_game()
+            logger.info("Chest got opened. You won!")
+            
 
     def getChunk(self):
         return self.__chunk
