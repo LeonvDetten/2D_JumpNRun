@@ -32,9 +32,10 @@ from player import *
 
 class MyGame:
     """MyGame:
-        * Set up screen width and screen height
+        * set up screen width and screen height
         * create and instantiate game object
         * setup game caption
+        * read level from file
 
     Args:
         none 
@@ -45,24 +46,12 @@ class MyGame:
     """
     __WINDOWWIDTH = 1520
     __WINDOWHEIGHT = 800
-    level = [
-             "         E E E E E E E E E E E E                                                                                                                                                 E E E E B                                                                                                                                     ",                                                       
-             "   C                                                                              B                                                                                                BBBBBBBB                                                                                                                    ",
-             "                                                                                 B                     B   B   B  BB   B   B   B   BBB   B   B   B  B                                                        BB BB                                                                                                                        ",             
-             "                                                                    B   BE E EB  B                 B         E       B                                                                                     BB        BB BB                                    BB BB                                                                              ",
-             "                                       BBBB   B   B   B   B      B      BBBBBBB  B          BBBB                BBBBB                                    B                                              BB                  BB BB                      BB BB                                          ",
-             "                                 BBBB                         B      B                   B        E           B                                                               BBBBB                  BB                                         BB BB                                                                                                                                                                                                                                                                           ",         
-             "    E          E                 B                                                  B   B   B               B                                               B              BB       BB           BB                                      BB BB                                                                                                 ", 
-             "                          BBBB                  E                              B  B      E                 B                                                            BB                    BB                                    BB BB                                                                                                  ",
-             "                    BBBB            EEE                                                                    B                                                          BB                   BBB                                                                                                                                          ",
-             "               BBB                                               E                            B        B                                                         B                                                                                                                                                                                                                  ",                                                               
-             "     C   BBBB                            K  C                                                           B                                                                                                                                                                                                                                                                           ",                                         
-             "C    B     C        CC               BBB         B                                                B   B                                                                                                                                                                       BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB                                                                                                          ",  
-             "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"]
+    level = []
 
 
     def __init__(self):
         logger.info("Created game object")
+        self.read_level()
         
 
     def create_window(self):
@@ -74,6 +63,15 @@ class MyGame:
         self.screen = pygame.display.set_mode((self.__WINDOWWIDTH, self.__WINDOWHEIGHT))
         pygame.display.set_caption("2D Game")
         logger.info("Created window with size: " + str(self.__WINDOWWIDTH) + "x" + str(self.__WINDOWHEIGHT))
+
+    
+    def read_level(self):
+        datei = open('level.txt','r')
+        for zeile in datei:
+            self.level.append(zeile)
+        print(self.level)
+        datei.close()
+
 
 
 pygame.init()
