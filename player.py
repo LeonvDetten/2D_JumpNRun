@@ -55,7 +55,6 @@ class Player(pygame.sprite.Sprite):
             * Initialize player object
 
         Args:
-            * self (object): player object
             * start_x (int): x position of player
             * start_y (int): y position of player
             * width (int): width of player
@@ -65,7 +64,7 @@ class Player(pygame.sprite.Sprite):
             none
 
         Tests:
-            * Reight initialization of player object
+            * Correct initialization of player object
                 - correct position
                 - correct size
 
@@ -121,7 +120,7 @@ class Player(pygame.sprite.Sprite):
                 }
 
         Args:
-            * self (object): player object
+            none            
 
         Returns:
             none
@@ -144,7 +143,7 @@ class Player(pygame.sprite.Sprite):
             * Loads player sprites from file and adds them to sprite container
 
         Args:
-            * self (object): player object
+            none
 
         Returns:    
             none
@@ -172,7 +171,7 @@ class Player(pygame.sprite.Sprite):
             * Calculates camera offset used for scrolling through the world. Player is always at x-Position 300 on the screen.
 
         Args:
-            * self (object): player object
+            none
 
         Returns:
             * int: camera offset
@@ -191,7 +190,7 @@ class Player(pygame.sprite.Sprite):
             * Calculates current chunk of player. Chunk is used to load and unload chunks of the world.
 
         Args:
-            * self (object): player object
+            none
 
         Returns:    
             * int: current chunk
@@ -210,7 +209,6 @@ class Player(pygame.sprite.Sprite):
             * Sets world object as attribute of player object
 
         Args:
-            * self (object): player object
             * world (object): world object
 
         Returns:
@@ -229,7 +227,7 @@ class Player(pygame.sprite.Sprite):
             * Main method of player object. Calls most of the other methods from player class.
 
         Args:
-            * self (object): player object
+            none
 
         Returns:
             none
@@ -251,7 +249,7 @@ class Player(pygame.sprite.Sprite):
             * Animates player object. Changes sprite of player object depending on current animation state.
 
         Args:
-            * self (object): player object
+            none
 
         Returns:
             none
@@ -272,7 +270,7 @@ class Player(pygame.sprite.Sprite):
               If player object is in air, gravity is applied. If player object is on ground, player position is set to ground position.
 
         Args:
-            * self (object): player object
+            none
 
         Returns:
             none
@@ -300,7 +298,7 @@ class Player(pygame.sprite.Sprite):
         Also changes the animation state of the player object.
 
         Args:
-            * self (object): player object
+            none
 
         Returns:
             none
@@ -367,7 +365,6 @@ class Player(pygame.sprite.Sprite):
               Changes the animation state of the player object depending on the direction of the jump.
 
         Args:
-            * self (object): player object
             * speed (int): jump speed
 
         Returns:
@@ -395,7 +392,7 @@ class Player(pygame.sprite.Sprite):
             * Handles the shooting of the player object. Doing the logic for the shooting (which direction) and creating a bullet object.
               Changes the animation state of the player object depending on the direction of the shot.
         Args:
-            * self (object): player object
+            none
 
         Returns:
             none
@@ -421,7 +418,7 @@ class Player(pygame.sprite.Sprite):
             * Handles movement logging. Checks in which direction the player object is moving and logs the movement.
 
         Args:
-            * self (object): player object
+            none
 
         Returns:
             none
@@ -445,7 +442,7 @@ class Player(pygame.sprite.Sprite):
         """check_enemy_collision:
             * Handles collision between player and every enemy near by. Checks how the player object collides with the enemy. Depending on the collision the game is over or the enemy object gets killed.
         Args:
-            * self (object): player object
+            none
 
         Returns:
             none

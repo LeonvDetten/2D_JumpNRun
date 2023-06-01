@@ -54,13 +54,13 @@ class MyGame:
             * Initialize game object
 
         Args:
-            * self (object): game object
+            none
 
         Returns:
             none
 
         Tests:
-            * Reight initialization of game object
+            * Correct initialization of game object
             
         """
         self.gameFinished = False
@@ -73,17 +73,44 @@ class MyGame:
 
 
     def create_window(self):
+        """create_window:
+            * creates window, sets screen caption and screen size
+
+        Args:
+            none
+
+        Returns:
+            none
+
+        Tests:
+            * Screen caption can be set
+            * Scrren size is set correctly
+
         """
-    Tests:
-        * Screen can be created
-        * Scrren size can be set
-        """
+
         self.screen = pygame.display.set_mode((self.__WINDOWWIDTH, self.__WINDOWHEIGHT))
         pygame.display.set_caption("2D Game")
         logger.info("Created window with size: " + str(self.__WINDOWWIDTH) + "x" + str(self.__WINDOWHEIGHT))
 
     
     def read_level(self):
+        """read_level:
+            * read the level from the file and append it to the level list
+            
+        Args:
+            none
+
+        Returns:
+            none 
+
+        Tests:
+            * File can be read
+            * Level list is filled correctly
+                - correct order 
+                - entire file is read out
+
+        """
+
         datei = open('level.txt','r')
         for zeile in datei:
             self.level.append(zeile)
@@ -92,6 +119,21 @@ class MyGame:
 
 
     def end_game(self):
+        """end_game:
+            * ends the game and prints the needed time in the middle of the screen
+
+        Args:
+            none
+
+        Returns:
+            none
+
+        Tests:
+            * Needed time is calculated correctly
+            * Needed time gets printed in the middle of the screen
+
+        """
+
         self.__endTime = pygame.time.get_ticks()
         self.__timeNeeded = str(round((self.__endTime - self.__startTime)/1000, 2))
         logger.info("Game ended after: " + self.__timeNeeded + "s")
@@ -101,32 +143,34 @@ class MyGame:
         self.gameFinished = True
         
 
-pygame.init()
-logger.add("game.log")
+pygame.init()   #initialize pygame
+logger.add("game.log")  #create log file
 
-player_spawn_x = 120
-player_spawn_y = 50
-block_size = 60
+player_spawn_x = 120    #player spawn x coordinate
+player_spawn_y = 50     #player spawn y coordinate
+block_size = 60     #block size in pixel
 
-my_game = MyGame()
-my_game.create_window()
+my_game = MyGame()  #create game object
+my_game.create_window() #create window
 
-clock = pygame.time.Clock()
+clock = pygame.time.Clock() #create clock object
 
-player = Player(player_spawn_x, player_spawn_y, 40, 60)
-world = World(my_game, block_size, player)
-player.setWorld(world)
+player = Player(player_spawn_x, player_spawn_y, 40, 60) #instanciate player object from class Player
+world = World(my_game, block_size, player)  #instanciate world object from class World
+player.setWorld(world)  #set world for player object
 
-while True:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
-    if my_game.gameFinished == True:
+
+#----------Main Game Loop----------
+
+while True: 
+    for event in pygame.event.get():    #check for events
+        if event.type == pygame.QUIT:   #condition for closing the window
+            pygame.quit()   #quit pygame
+            sys.exit()  #quit program
+    if my_game.gameFinished == True:    #if game is finished print winning text
         my_game.screen.blit(my_game.winningText, my_game.textRect)
-    if my_game.gameFinished == False:
-        #start_time= pygame.time.get_ticks()wd
-        world.main(my_game.screen)      #AB HIER GUT KOMMENTIEREN
+    if my_game.gameFinished == False:   
+        world.main(my_game.screen)      
         player.main()
         for bullet in (player.bulletGroup):
                 bullet.update()
@@ -145,12 +189,6 @@ while True:
         player.player_plain.draw(my_game.screen)
         clock.tick(30)  
     pygame.display.update()
-              
-
-
-        #logger.info("Time for Iteration: " + str(pygame.time.get_ticks() - start_time) + "ms")  #Mit Modulo 1000 stichprobenaertig loggen
-        #TODOS in Functions als Comments schreiben (Kanten Fixen (an die Wand springen und oben auf dem Block landen), Nach Schuss folgende animation nicht durchlaufen lassen, wenn Eingabe nur kurz gedrückt)
-
-        #Was soll ich alles loggen (Performance, Keyboard Interaktion, alles?(Wenn Gegner stirbt)) alles lieber zu viel als zu wenig 
+ 
         #Startmenu einabauen leider zeitich nicht in 45 h geschafft
         #Bestzeit speichern und anzeigen

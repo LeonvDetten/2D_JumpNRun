@@ -53,7 +53,6 @@ class World:
             * Initialize world object
 
         Args:
-            * self (object): player object
             * game (object): game object
             * block_size (int): size of the blocks
             * player (object): player object
@@ -62,7 +61,7 @@ class World:
             none
 
         Tests:
-            * Reight initialization of world object
+            * Correct initialization of world object
                 - correct level
                 - correct blocksize
             * Pygame sprite groups aren't empty
@@ -91,8 +90,25 @@ class World:
     ### https://stackoverflow.com/questions/29640685/vectorized-2d-collision-detection-in-numpy
 
     def initializeWorld(self):
+        """initializeWorld:
+            * Initialize world objects by iterating through level list
 
-        #FÜR TEST: BLÖCKE(ELEMENTE) sind in richtigem Chunk
+        Args:
+            none
+
+        Returns:
+            none
+
+        Tests:
+            * Objects gets appended into pygame sprite groups
+            * blocks are in the correct chunk
+
+
+        Generating Level from list inspired by: 
+            https://www.reddit.com/r/pygame/comments/12ideai/level_from_the_list/
+
+        """
+
         pos_y = 0
         enemyCount = 0
         for line in self.__level:
@@ -119,6 +135,19 @@ class World:
         
 
     def update(self,screen):
+        """update:
+            * renders the blocks on screen and selecting the chunks near by player 
+            
+            Args:
+                * screen (object): pygame screen object
+                
+            Returns:
+                none
+                
+            Tests:
+                * Correct update of world objects
+                    
+        """
         self.__chunkPlatforms = []                  
         for i in range(-1, 2):
             if self.player.getCurrentChunk() + i >= 0 and self.player.getCurrentChunk() + i < len(self.__platforms):
@@ -128,12 +157,45 @@ class World:
         
 
     def main(self, screen):
+        """main:
+            *calling collision and update method and rendering background image
+
+            Args:
+                * screen (object): pygame screen object
+
+            Returns:
+                none
+
+            Tests:
+                * correct rendering position of background image 
+                * methods gets called correctly
+        """
+
         self.check_player_collision_bottomblock(self.player.playerPos)
         screen.blit(bg_img, position)
         self.update(screen) 
 
 
-    def collided_get_y(self, objct_rect, objekt_height):                          
+    def collided_get_y(self, objct_rect, objekt_height):  
+        """collided_get_y:
+            * returns top coordinate from block, the given "object_rect" (argument) is colliding with.
+
+            Args:
+                * objct_rect (object): pygame rect object
+                * objekt_height (int): height of the object
+
+            Returns:
+                * return_y (int): top coordinate of the block
+
+            Tests:
+                * correct return of top coordinate from block while colliding with multiple block objects
+                * correct return of -1 if no collision
+
+            Current Bug: 
+                * object gets printed on top of block when colliding with the side of block 
+
+        """                        
+
         return_y = -1
         for block in self.__chunkPlatforms:
             if block.colliderect(objct_rect):
@@ -141,7 +203,23 @@ class World:
         return return_y
     
 
-    def check_object_collision_sideblock(self, object_rect):                  #Unschöne Funktion, aber funktioniert
+    def check_object_collision_sideblock(self, object_rect):        # Could be coded cleaner with other returns      
+        """check_object_collision_sideblock:
+            * checks if the given "object_rect" (argument) is colliding with the side of a block
+              returns -1 if colliding with the left side of a block and -2 if colliding with the right side of a block 
+
+            Args:
+                * object_rect (object): pygame rect object
+
+            Returns: 
+                * -1 (int): colliding with the left side of a block
+                * -2 (int): colliding with the right side of a block
+                * 1 (int): no collision
+
+            Tests:
+                * Test if every block in chunkPlatforms gets checked 
+                * Test if returns are correct
+        """          
         for block in self.__chunkPlatforms:                                    
             #print("block.y: " + str(block.y) + " object_rect.y: " + str(object_rect.y + (object_rect.height)) + " block.height: " + str(block.y + block.height))
             if block.colliderect(object_rect) and block.y < (object_rect.y + object_rect.height -1): #and (object_rect.y + object_rect.height -1) < block.y + block.height: 
@@ -153,6 +231,21 @@ class World:
 
 
     def check_player_collision_bottomblock(self, object_rect):
+        """check_player_collision_bottomblock:
+            * checks if the given "object_rect" (argument) is colliding with the bottom of a block. If collision is detected the y-coordinate of the given object_rect gets set to the bottom of the block.
+
+            Args:
+                * object_rect (object): pygame rect object
+
+            Returns: 
+                none
+
+            Tests:
+                * Test if every block in chunkPlatforms gets checked 
+                * Test if y-coordinate of the given object_rect gets set correctly
+
+            """
+        
         for block in self.__chunkPlatforms:
             if block.colliderect(object_rect) and self.player.speed_y < 0 and block.y + (block.height/2) < object_rect.y:
                 self.player.speed_y = 0

@@ -49,7 +49,6 @@ class Enemy(pygame.sprite.Sprite):
             * Initialize enemy object
 
         Args:
-            * self (object): player object
             * world (object): world object
             * start_x (int): x position of enemy
             * start_y (int): y position of enemy
@@ -62,7 +61,7 @@ class Enemy(pygame.sprite.Sprite):
             none
         
         Tests:
-            * Reight initialization of bullet object
+            * Correct initialization of bullet object
                 - correct start position
                 - correct width and height
             * Sprite list is not empty
@@ -92,6 +91,21 @@ class Enemy(pygame.sprite.Sprite):
         
 
     def update(self):
+        """update:
+            * update enemy object by calling movement, animation, move_y, updateChunk and checkEnemyFallOutOfMap methods
+        
+        Args:
+            none
+
+        Returns:
+            none
+
+        Tests:
+            * Test if all methods are called
+            * Test if methods are called with correct parameters
+
+        """
+
         self.movement()
         self.animation()
         self.move_y()
@@ -100,6 +114,23 @@ class Enemy(pygame.sprite.Sprite):
 
 
     def loadSprites(self):
+        """loadSprites:
+            * prload enemy sprites and append them to correct sprite list
+
+        Args:
+            none
+
+        Returns:
+            none
+
+        Tests:
+            * Sprite list is not empty
+            * Sprite list contains correct sprites
+                - correct sprtie image 
+                - correct sprite size
+
+        """
+
         for image in range(3):
             enemy = pygame.image.load('img/enemy_img/e1_r' + str(image) + '.png')
             self.__runRightSprites.append(pygame.transform.scale(enemy, (self.__width, self.__height)))
@@ -108,6 +139,21 @@ class Enemy(pygame.sprite.Sprite):
 
 
     def movement(self):
+        """movement:
+            * handle enemy movement
+
+        Args:
+            none
+
+        Returns:
+            none
+
+        Tests:
+            * Enemy direction is set correctly after collision with block
+            * Enemy position gets updated correctly
+
+        """
+
         if self.world.check_object_collision_sideblock(self.enemyPos) == -1:
             self.__direction = -1
         elif self.world.check_object_collision_sideblock(self.enemyPos) == -2:
@@ -118,6 +164,21 @@ class Enemy(pygame.sprite.Sprite):
        
 
     def animation(self):
+        """animation:
+            * handle enemy animation. Switching sprite list when direction changes
+
+        Args:
+            none
+
+        Returns:
+            none
+
+        Tests:
+            * Enemy sprite list is switched when direction changes
+            * Current sprite set to 0 when sprite list is at the end
+
+        """
+
         if self.__direction == 1:
             self.image = self.__runRightSprites[int(self.__currentSprite)]
         elif self.__direction == -1:
@@ -129,6 +190,21 @@ class Enemy(pygame.sprite.Sprite):
 
 
     def move_y(self):
+        """move_y:
+            * handles enemy y position
+
+        Args:
+            none
+
+        Returns:
+            none
+
+        Tests:
+            * Test if every condition is entered
+            * Test if enemy can fall through ground
+
+        """
+
         collided_y = self.world.collided_get_y(self.base, self.__height)
         if self.__speed_y < 0 or collided_y < 0:            
             self.enemyPos.y += self.__speed_y    
@@ -141,14 +217,58 @@ class Enemy(pygame.sprite.Sprite):
 
 
     def updateChunk(self):
+        """updateChunk:
+            * update current chunk of enemy
+
+        Args:
+            none
+
+        Returns:
+            none
+
+        Tests:
+            * Enemy is in correct chunk
+            * Current chunk can be updated
+
+        """
+
         self.__currentChunk = int(self.enemyPos.x / (20*60)) #Gut Kommentieren
 
 
     def getCurrentChunk(self):
+        """getCurrentChunk:
+            * returns current chunk of enemy
+
+        Args:
+            none
+
+        Returns:
+            self.__currentChunk (int): current chunk of enemy
+
+        Tests:
+            * Test if correct chunk gets returned 
+
+        """
+
         return self.__currentChunk
     
 
     def checkEnemyFallOutOfMap(self):
+        """checkEnemyFallOutOfMap:
+            * checks if enemy is falling out of map
+
+        Args:
+            none
+
+        Returns:
+            none
+
+        Tests:
+            * Test if enemy is killed when y position is greater than 1000
+            * Test if enemy is not killed when y position is less than 1000
+
+        """
+
         if self.enemyPos.y > 1000:
             self.kill()
             logger.info("Enemy fell out of map. Got killed")

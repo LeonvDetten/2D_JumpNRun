@@ -46,7 +46,6 @@ class Bullet(pygame.sprite.Sprite):
             * Initialize bullet object
 
         Args:
-            * self (object): player object
             * start_x (int): x position of bullet
             * start_y (int): y position of bullet
             * width (int): width of bullet
@@ -58,7 +57,7 @@ class Bullet(pygame.sprite.Sprite):
             none
 
         Tests:
-            * Reight initialization of bullet object
+            * Correct initialization of bullet object
                 - correct start position
                 - correct direction
 
@@ -79,24 +78,84 @@ class Bullet(pygame.sprite.Sprite):
 
 
     def update(self):
+        """update:
+            *calls collision, movement and checkFlightDistance methods
+
+            Args:
+                none
+
+            Returns:
+                none
+
+            Tests:
+                * Test if all methods are called
+                * Test if methods are called with correct parameters
+
+        """
+
         self.collision() 
         self.movement()   
         self.checkFlightDistance()
         
         
     def collision(self):
+        """collision:
+            * checks if bullet collides with block and kills bullet if true
+
+            Args:
+                none
+
+            Returns:
+                none
+
+            Tests:
+                * Test if bullet is killed if collision with block is true
+                * Test if bullet is not killed if collision with block is false
+
+            """
+        
         if self.__world.check_object_collision_sideblock(self.bulletPos) != 1:
             self.kill()
             logger.info("Bullet collided with block. Got destroyed")
 
 
     def checkFlightDistance(self):
+        """checkFlightDistance:
+            * checks if bullet flew to long (in relation to the player position) and kills bullet if true
+
+            Args:
+                none
+
+            Retruns:
+                none
+            
+            Tests:
+                * Test if bullet is killed if it flew to long
+                * Test if bullet is still in pygame sprite group after flying to long
+            
+        """
+
         if self.bulletPos.x > self.__world.player.playerPos.x + 1220 or self.bulletPos.x < self.__world.player.playerPos.x - 1000:
             self.kill()
             logger.info("Bullet flew to long. Got destroyed")        
     
     
     def movement(self):
+        """movement:
+            * constantly moves bullet in given direction
+
+            Args:
+                none
+
+            Returns:
+                none
+
+            Tests:
+                * Test if bullet is moved in correct direction
+                * Test if bullet is moved with correct speed
+
+        """
+
         self.bulletPos.x += self.__direction * self.__speed
         self.rect.x = self.bulletPos.x - self.__world.player.getCamOffset() 
 
@@ -119,7 +178,6 @@ class Chest(pygame.sprite.Sprite):
             * Initialize chest object
 
         Args:
-            * self (object): player object
             * world (object): world object
             * game (object): game object
             * position_x (int): x position of chest
@@ -132,12 +190,11 @@ class Chest(pygame.sprite.Sprite):
             none
 
         Tests:
-            * Reight initialization of chest object
+            * Correct initialization of chest object
                 - correct position
                 - correct width and height
 
         """
-
 
         self.__game = game
 
@@ -166,11 +223,40 @@ class Chest(pygame.sprite.Sprite):
 
 
     def update(self):
+        """update:
+            * calls collision and animation methods
+
+            Args:
+                none
+
+            Returns:
+                none
+
+            Tests:
+                * Test if all methods are called
+                * Test if methods are called with correct parameters
+
+        """
         self.collision()
         self.rect.x = self.chestPos.x - self.__world.player.getCamOffset() #KOmmentieren: update position wo auf bilschcimr geupdated werden muss
 
     
     def loadSprites(self):
+        """loadSprites:
+            * preloads all chest sprites and scales them to given width and height
+
+            Args:
+                none
+
+            Returns:
+                none
+
+            Tests:
+                * Test if every sprite is loaded and append correctly
+                * Test if all sprites are scaled to given width and height
+
+        """
+
         start_time= pygame.time.get_ticks()
         for i in range(10):
             self.__chestSprites.append(pygame.transform.scale(pygame.image.load("img/chest_img/chest1_" + str(i) + ".png"), (self.width, self.height)))
@@ -178,6 +264,22 @@ class Chest(pygame.sprite.Sprite):
         
 
     def collision(self):
+        """collision:
+            * checks if player collides with chest and calls animation method if true
+
+            Args:
+                none
+
+            Returns:
+                none
+
+            Tests:
+                * Test if animation method is called if player collides with chest
+                * Test if animation method is not called if player does not collide with chest
+                * Test if current sprite is set to 0 if player doesn't collide with chest anymore
+
+        """
+
         if self.__gotOpened == False:
             if self.__world.player.playerPos.colliderect(self.chestPos) == True:
                 self.animation()
@@ -187,6 +289,21 @@ class Chest(pygame.sprite.Sprite):
 
 
     def animation(self):
+        """animation:
+            * Doing chest animation and calls end_game method if animation is finished
+
+            Args:
+                none
+
+            Returns:
+                none
+
+            Tests:
+                * Test if end_game method gets called after whole animation is finished
+                * Test if current sprite gets raised
+
+        """
+
         self.__currentSprite += self.__spriteLoopSpeed
         if (self.__currentSprite >= len(self.__chestSprites) - self.__spriteLoopSpeed):  #Index des aktuellen Bildes muss kleiner als anzahl aller Bilder - 1 sein sein
             self.__gotOpened = True
@@ -195,5 +312,19 @@ class Chest(pygame.sprite.Sprite):
             
 
     def getChunk(self):
+        """getChunk:
+            * returns chunk in which the chest is located
+
+            Args:
+                none
+
+            Returns:
+                chunk (int): chunk in which the chest is located
+
+            Tests:
+                * Test if correct chunk is returned
+
+        """
+
         return self.__chunk
     
