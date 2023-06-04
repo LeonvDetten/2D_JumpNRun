@@ -29,6 +29,7 @@ bg_img = pygame.image.load('img/background_img/bg.jpg')
 bg_img = pygame.transform.scale(bg_img, (1520, 800))
 position = (0, 0)
 
+
 class World:
     """World:
         * create and instantiate world object
@@ -47,7 +48,6 @@ class World:
     __chunkOffset = 20
 
 
-    #Konstruktor aus Buch (Buch angeben)
     def __init__(self, game, block_size, player):
         """__init__(constructor):
             * Initialize world object
@@ -67,27 +67,26 @@ class World:
             * Pygame sprite groups aren't empty
 
         """
+
         self.__game = game
         self.__level = self.__game.level
         self.__block_size = block_size
         self.__enemy_size = 40
         self.__chest_size = 40
         self.player = player
-        self.__platforms = [[]]
-        self.__chunkPlatforms = []
+        self.__platforms = [[]]     # list for platforms
+        self.__chunkPlatforms = []  # list for platforms (blocks) in chunks near player
 
-        self.enemyGroup = pygame.sprite.Group()
-        self.chunkEnemyGroup = pygame.sprite.Group()
-        self.chestGroup = pygame.sprite.Group()
+        self.enemyGroup = pygame.sprite.Group()     # pygamegroup for enemies
+        self.chunkEnemyGroup = pygame.sprite.Group()        # pygamegroup for enemies in chunks near player
+        self.chestGroup = pygame.sprite.Group()     # pygamegroup for chests
 
-        self.block_img = pygame.image.load('img/ground_img/spaceground.png')
-        self.block_img = pygame.transform.scale(self.block_img, (block_size, block_size))
+        self.block_img = pygame.image.load('img/ground_img/spaceground.png')    # load block image
+        self.block_img = pygame.transform.scale(self.block_img, (block_size, block_size))   # scale block image
 
         self.initializeWorld()
         logger.info("Created world object")
 
-    ### numpy vectorized operations (.where) for collision detection
-    ### https://stackoverflow.com/questions/29640685/vectorized-2d-collision-detection-in-numpy
 
     def initializeWorld(self):
         """initializeWorld:
@@ -99,38 +98,40 @@ class World:
         Returns:
             none
 
-        Tests:
+        Tests
             * Objects gets appended into pygame sprite groups
             * blocks are in the correct chunk
-
 
         Generating Level from list inspired by: 
             https://www.reddit.com/r/pygame/comments/12ideai/level_from_the_list/
 
+        Optimization:
+            - numpy vectorized operations (.where) for collision detection
+
         """
 
-        pos_y = 0
+        pos_y = 0   # reset y position for objects
         enemyCount = 0
-        for line in self.__level:
-            pos_x = 0
-            blockCount = 0
-            chunk = 0
-            for block in line:
-                blockCount += 1
-                if blockCount > self.__chunkOffset:
-                    chunk += 1
-                    blockCount = 0
+        for line in self.__level:   # iterate through lines in level list
+            pos_x = 0               # reset x position for objects
+            blockCount = 0          # reset block count
+            chunk = 0               # reset chunk
+            for block in line:      # iterate through blocks in line
+                blockCount += 1     # increase block count
+                if blockCount > self.__chunkOffset:     # check if block count is bigger than chunk offset
+                    chunk += 1                          # increase chunk
+                    blockCount = 0                      # reset block count
                     if len(self.__platforms) <= chunk:
                         self.__platforms.append([])
-                if block == 'B':
-                    self.__platforms[chunk].append(pygame.Rect(pos_x, pos_y, self.__block_size, self.__block_size))
-                if block == 'E':
-                    self.enemyGroup.add(Enemy(self, pos_x, pos_y, chunk, self.__enemy_size, self.__enemy_size, 1))
+                if block == 'B':    # check if B (block) is in current block
+                    self.__platforms[chunk].append(pygame.Rect(pos_x, pos_y, self.__block_size, self.__block_size))     # append block to platforms list
+                if block == 'E':    # check if E (enemy) is in current block
+                    self.enemyGroup.add(Enemy(self, pos_x, pos_y, chunk, self.__enemy_size, self.__enemy_size, 1))      # append enemy to enemy group
                     enemyCount += 1
-                if block == 'C':
-                    self.chestGroup.add(Chest(self, self.__game, pos_x, pos_y + (self.__block_size - 40), chunk, self.__chest_size * 1.5, self.__chest_size))
-                pos_x = pos_x + self.__block_size
-            pos_y = pos_y + self.__block_size  
+                if block == 'C':    # check if C (chest) is in current block
+                    self.chestGroup.add(Chest(self, self.__game, pos_x, pos_y + (self.__block_size - 40), chunk, self.__chest_size * 1.5, self.__chest_size))   # append chest to chest group
+                pos_x = pos_x + self.__block_size   # increase x position by block size
+            pos_y = pos_y + self.__block_size       # increase y position by block size
         logger.info("Created " + str(enemyCount) + " enemie objects")
         
 
@@ -145,15 +146,17 @@ class World:
                 none
                 
             Tests:
-                * Correct update of world objects
+                * Correct update of __chunkPlatforms list
+                * Correct blocks are rendered on screen 
                     
         """
-        self.__chunkPlatforms = []                  
-        for i in range(-1, 2):
-            if self.player.getCurrentChunk() + i >= 0 and self.player.getCurrentChunk() + i < len(self.__platforms):
-                self.__chunkPlatforms.extend(self.__platforms[self.player.getCurrentChunk() + i])
-        for block in self.__chunkPlatforms:
-            screen.blit(self.block_img, (block.x-self.player.getCamOffset(), block.y))
+
+        self.__chunkPlatforms = []      # reset chunk platforms list                  
+        for i in range(-1, 2):          # iterate through chunks near by player (+-1 chunk)
+            if self.player.getCurrentChunk() + i >= 0 and self.player.getCurrentChunk() + i < len(self.__platforms):    # check if chunk is in range of platforms list
+                self.__chunkPlatforms.extend(self.__platforms[self.player.getCurrentChunk() + i])                       # appending platforms in chunk near by player to chunk platforms list
+        for block in self.__chunkPlatforms: # iterate through chunk platforms list
+            screen.blit(self.block_img, (block.x-self.player.getCamOffset(), block.y))      # renders blocks on screen
         
 
     def main(self, screen):
@@ -172,7 +175,7 @@ class World:
         """
 
         self.check_player_collision_bottomblock(self.player.playerPos)
-        screen.blit(bg_img, position)
+        screen.blit(bg_img, position)       # renders background image
         self.update(screen) 
 
 
@@ -197,10 +200,10 @@ class World:
         """                        
 
         return_y = -1
-        for block in self.__chunkPlatforms:
-            if block.colliderect(objct_rect):
-                return_y = block.y - objekt_height           
-        return return_y
+        for block in self.__chunkPlatforms:     # iterate through chunk platforms list
+            if block.colliderect(objct_rect):   # check if object (argument) is colliding with block
+                return_y = block.y - objekt_height  
+        return return_y     #returns top coordinate of block - object height (needed for the calculation of objects position)
     
 
     def check_object_collision_sideblock(self, object_rect):        # Could be coded cleaner with other returns      
@@ -220,12 +223,11 @@ class World:
                 * Test if every block in chunkPlatforms gets checked 
                 * Test if returns are correct
         """          
-        for block in self.__chunkPlatforms:                                    
-            #print("block.y: " + str(block.y) + " object_rect.y: " + str(object_rect.y + (object_rect.height)) + " block.height: " + str(block.y + block.height))
-            if block.colliderect(object_rect) and block.y < (object_rect.y + object_rect.height -1): #and (object_rect.y + object_rect.height -1) < block.y + block.height: 
-                if block.x > object_rect.x:
+        for block in self.__chunkPlatforms:     # iterate through chunk platforms list                                    
+            if block.colliderect(object_rect) and block.y < (object_rect.y + object_rect.height -1): # check if object (argument) is colliding with block and if object is not above block
+                if block.x > object_rect.x:     # check if block is on the right side of object
                     return -1
-                elif block.x < object_rect.x:
+                elif block.x < object_rect.x:   # check if block is on the left side of object
                     return -2
         return 1   
 
@@ -246,8 +248,8 @@ class World:
 
             """
         
-        for block in self.__chunkPlatforms:
-            if block.colliderect(object_rect) and self.player.speed_y < 0 and block.y + (block.height/2) < object_rect.y:
+        for block in self.__chunkPlatforms:     # iterate through chunk platforms list
+            if block.colliderect(object_rect) and self.player.speed_y < 0 and block.y + (block.height/2) < object_rect.y:       # check if object (argument) is colliding with block and if the player is jumping
                 self.player.speed_y = 0
                 object_rect.y = block.y + block.height
 

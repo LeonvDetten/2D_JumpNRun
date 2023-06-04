@@ -23,7 +23,7 @@ Endpunkt und das Spiel wird nach Öffnen dieser Kiste beendet.
 
 Anforderungen:
 
-Siehe req.txt Datei.
+Siehe requirement.txt Datei.
 
 
 Installation:
@@ -54,3 +54,23 @@ Die W-Taste und Leertaste führen einen Sprung aus.
 Mit der A-Taste wird der Spieler nach links bewegt.
 Mit der D-Taste wird der Spieler nach rechts bewegt.
 Mit Enter führt der Spieler einen Revolverschuss aus.
+
+
+Lizenzen:
+
+Die verwenndeten Bilder (Sprites) sind Lizenzfrei und dürfen frei verwendet werden.
+Die Bilder können auf folgenden Seiten heruntergeladen werden:
+
+Player Spites: 
+    https://craftpix.net/freebies/free-2d-pirate-character-sprites/
+
+Enemy Sprites:
+    https://pipoya.itch.io/pipoya-free-rpg-character-sprites-32x32
+
+Block(Ground) Sprites:
+    https://www.pngwing.com/en/free-png-zoola/download
+
+Chest Sprites:
+    https://admurin.itch.io/free-chest-animations
+
+

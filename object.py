@@ -39,7 +39,8 @@ class Bullet(pygame.sprite.Sprite):
 
     """
 
-    __speed = 20
+    __speed = 20        #bullet speed
+
 
     def __init__(self, start_x, start_y, width, height, direction, world):#DOCString ARGS WEITER MACHEN
         """__init__(constructor):
@@ -63,7 +64,7 @@ class Bullet(pygame.sprite.Sprite):
 
         """
 
-        pygame.sprite.Sprite.__init__(self)
+        pygame.sprite.Sprite.__init__(self) 
 
         self.__direction = direction
         self.__world = world
@@ -114,8 +115,8 @@ class Bullet(pygame.sprite.Sprite):
 
             """
         
-        if self.__world.check_object_collision_sideblock(self.bulletPos) != 1:
-            self.kill()
+        if self.__world.check_object_collision_sideblock(self.bulletPos) != 1:      #check if bullet collides with block
+            self.kill()                                                             #destroy bullet if true
             logger.info("Bullet collided with block. Got destroyed")
 
 
@@ -135,8 +136,8 @@ class Bullet(pygame.sprite.Sprite):
             
         """
 
-        if self.bulletPos.x > self.__world.player.playerPos.x + 1220 or self.bulletPos.x < self.__world.player.playerPos.x - 1000:
-            self.kill()
+        if self.bulletPos.x > self.__world.player.playerPos.x + 1220 or self.bulletPos.x < self.__world.player.playerPos.x - 1000:  #check if bullet flew to long
+            self.kill()                                                                                                             #destroy bullet if true
             logger.info("Bullet flew to long. Got destroyed")        
     
     
@@ -156,8 +157,11 @@ class Bullet(pygame.sprite.Sprite):
 
         """
 
-        self.bulletPos.x += self.__direction * self.__speed
-        self.rect.x = self.bulletPos.x - self.__world.player.getCamOffset() 
+        self.bulletPos.x += self.__direction * self.__speed         #move bullet in given direction with given speed
+        self.rect.x = self.bulletPos.x - self.__world.player.getCamOffset() #update bullet position on screen
+
+
+
 
 class Chest(pygame.sprite.Sprite):
     """Chest:
@@ -193,6 +197,7 @@ class Chest(pygame.sprite.Sprite):
             * Correct initialization of chest object
                 - correct position
                 - correct width and height
+            * loadSprites method is called
 
         """
 
@@ -200,18 +205,18 @@ class Chest(pygame.sprite.Sprite):
 
         self.__spriteLoopSpeed = 0.2
 
-        self.__chunk = chunk
+        self.__chunk = chunk    #area in which the chest is spawned
         self.width = width
         self.height = height
         self.__world = world
 
         pygame.sprite.Sprite.__init__(self)
 
-        self.__currentSprite = 0
-        self.__chestSprites = []
+        self.__currentSprite = 0    #current sprite of chest animation
+        self.__chestSprites = []    #list of all chest sprites
         self.loadSprites()
 
-        self.__gotOpened = False
+        self.__gotOpened = False    
 
         self.image = self.__chestSprites[self.__currentSprite]
         self.chestPos = pygame.Rect(position_x, position_y, width, height)
@@ -238,7 +243,7 @@ class Chest(pygame.sprite.Sprite):
 
         """
         self.collision()
-        self.rect.x = self.chestPos.x - self.__world.player.getCamOffset() #KOmmentieren: update position wo auf bilschcimr geupdated werden muss
+        self.rect.x = self.chestPos.x - self.__world.player.getCamOffset() #update chest position on screen
 
     
     def loadSprites(self):
@@ -257,10 +262,10 @@ class Chest(pygame.sprite.Sprite):
 
         """
 
-        start_time= pygame.time.get_ticks()
-        for i in range(10):
-            self.__chestSprites.append(pygame.transform.scale(pygame.image.load("img/chest_img/chest1_" + str(i) + ".png"), (self.width, self.height)))
-        logger.info("Loaded chest sprites in " + str(pygame.time.get_ticks() - start_time) + "ms")
+        start_time= pygame.time.get_ticks() #start time for performance measurement
+        for i in range(10):                 #iterate through all chest sprites
+            self.__chestSprites.append(pygame.transform.scale(pygame.image.load("img/chest_img/chest1_" + str(i) + ".png"), (self.width, self.height))) #load and scale chest sprites
+        logger.info("Loaded chest sprites in " + str(pygame.time.get_ticks() - start_time) + "ms")  #log performance
         
 
     def collision(self):
@@ -280,11 +285,11 @@ class Chest(pygame.sprite.Sprite):
 
         """
 
-        if self.__gotOpened == False:
-            if self.__world.player.playerPos.colliderect(self.chestPos) == True:
-                self.animation()
+        if self.__gotOpened == False:   #check if chest is already opened
+            if self.__world.player.playerPos.colliderect(self.chestPos) == True:    #check if player collides with chest
+                self.animation()                                                    #if true do animation
             else:
-                self.__currentSprite = 0
+                self.__currentSprite = 0                                            #set current sprite to 0 if player doesn't collide with chest anymore(opening animation have to start again)
             self.image = self.__chestSprites[int(self.__currentSprite)] # Chestpicture wird geupdated
 
 
@@ -304,10 +309,10 @@ class Chest(pygame.sprite.Sprite):
 
         """
 
-        self.__currentSprite += self.__spriteLoopSpeed
-        if (self.__currentSprite >= len(self.__chestSprites) - self.__spriteLoopSpeed):  #Index des aktuellen Bildes muss kleiner als anzahl aller Bilder - 1 sein sein
+        self.__currentSprite += self.__spriteLoopSpeed  #index of current sprite gets raised
+        if (self.__currentSprite >= len(self.__chestSprites) - self.__spriteLoopSpeed):  #index of spirte have to be less than amount of sprites in list - 1 because index starts at 0
             self.__gotOpened = True
-            self.__game.end_game()
+            self.__game.end_game()      #call end_game method
             logger.info("Chest got opened. You won!")
             
 
@@ -326,5 +331,5 @@ class Chest(pygame.sprite.Sprite):
 
         """
 
-        return self.__chunk
+        return self.__chunk     #returns current chunk
     

@@ -77,9 +77,9 @@ class Enemy(pygame.sprite.Sprite):
         self.__currentChunk = startChunk
 
         self.__currentSprite = 0
-        self.__runRightSprites = []
-        self.__runLeftSprites = []
-        self.loadSprites()
+        self.__runRightSprites = [] # initialize empty lists for right sprites
+        self.__runLeftSprites = []  # initialize empty lists for left sprites
+        self.loadSprites()  # calls loadSprites method
 
         self.enemyPos = pygame.Rect(start_x, start_y, width, height)
         self.image = self.__runRightSprites[self.__currentSprite]
@@ -88,9 +88,8 @@ class Enemy(pygame.sprite.Sprite):
         self.rect.y = start_y
         self.base = pygame.Rect(start_x, start_y + height, width, 2)
         
-        
 
-    def update(self):
+    def update(self):   #calls methods for enemy logic
         """update:
             * update enemy object by calling movement, animation, move_y, updateChunk and checkEnemyFallOutOfMap methods
         
@@ -154,13 +153,13 @@ class Enemy(pygame.sprite.Sprite):
 
         """
 
-        if self.world.check_object_collision_sideblock(self.enemyPos) == -1:
-            self.__direction = -1
-        elif self.world.check_object_collision_sideblock(self.enemyPos) == -2:
-            self.__direction = 1    
-        self.enemyPos.x += (self.__direction * self.__speed_x)  
-        self.base.x = self.enemyPos.x
-        self.rect.x = self.enemyPos.x - self.world.player.getCamOffset() 
+        if self.world.check_object_collision_sideblock(self.enemyPos) == -1:    #check if enemy collides with block leftsided
+            self.__direction = -1                                            #change direction to move right
+        elif self.world.check_object_collision_sideblock(self.enemyPos) == -2:  #check if enemy collides with block rightsided
+            self.__direction = 1                                            #change direction to move left
+        self.enemyPos.x += (self.__direction * self.__speed_x)  #calculate new position of enemy
+        self.base.x = self.enemyPos.x                            #update base position
+        self.rect.x = self.enemyPos.x - self.world.player.getCamOffset()    #update rect position (position where sprite gets drawn)
        
 
     def animation(self):
@@ -179,12 +178,13 @@ class Enemy(pygame.sprite.Sprite):
 
         """
 
-        if self.__direction == 1:
+        if self.__direction == 1:   #check if enemy moves right
             self.image = self.__runRightSprites[int(self.__currentSprite)]
-        elif self.__direction == -1:
+        elif self.__direction == -1:    #check if enemy moves left
             self.image = self.__runLeftSprites[int(self.__currentSprite)]
 
-        self.__currentSprite += self.__spriteLoopSpeed
+        self.__currentSprite += self.__spriteLoopSpeed  #increase current sprite
+        
         if self.__currentSprite >= len(self.__runRightSprites):
             self.__currentSprite = 0      
 
@@ -205,15 +205,15 @@ class Enemy(pygame.sprite.Sprite):
 
         """
 
-        collided_y = self.world.collided_get_y(self.base, self.__height)
-        if self.__speed_y < 0 or collided_y < 0:            
-            self.enemyPos.y += self.__speed_y    
-            self.__speed_y += self.world.gravity
-        if self.__speed_y >= 0 and collided_y > 0:                 
-            self.enemyPos.y = collided_y                                         
+        collided_y = self.world.collided_get_y(self.base, self.__height)    #check if enemy collides with ground save new y position into collided_y
+        if self.__speed_y < 0 or collided_y < 0:    #check if enemy is jumping or isn't colliding with ground            
+            self.enemyPos.y += self.__speed_y       #update y position of enemy    
+            self.__speed_y += self.world.gravity    # increase falling speed by gravity
+        if self.__speed_y >= 0 and collided_y > 0:  #check if enemy stands or is falling and collides with ground                 
+            self.enemyPos.y = collided_y            #set enemy position to collided_y (ground position + height of enemy)                                         
             self.__speed_y = 0
-        self.base.y = self.enemyPos.y + self.__height                                                                    
-        self.rect.y = self.enemyPos.y
+        self.base.y = self.enemyPos.y + self.__height   #update base position                                                                       
+        self.rect.y = self.enemyPos.y                   #update rect position (position where sprite gets drawn)
 
 
     def updateChunk(self):
@@ -232,7 +232,7 @@ class Enemy(pygame.sprite.Sprite):
 
         """
 
-        self.__currentChunk = int(self.enemyPos.x / (20*60)) #Gut Kommentieren
+        self.__currentChunk = int(self.enemyPos.x / (20*60)) #calculate current chunk of enemy. 20*60 = width of chunk. 60 = width of block, 20 = amount of blocks in chunk.
 
 
     def getCurrentChunk(self):
@@ -269,6 +269,6 @@ class Enemy(pygame.sprite.Sprite):
 
         """
 
-        if self.enemyPos.y > 1000:
-            self.kill()
+        if self.enemyPos.y > 1000:  #check if enemy is falling under map(>1000)
+            self.kill()             #kill enemy
             logger.info("Enemy fell out of map. Got killed")

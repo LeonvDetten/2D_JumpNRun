@@ -43,10 +43,10 @@ class MyGame:
         none
 
     """
+
     __WINDOWWIDTH = 1520
     __WINDOWHEIGHT = 800
     level = []
-    
 
 
     def __init__(self):
@@ -61,10 +61,12 @@ class MyGame:
 
         Tests:
             * Correct initialization of game object
+                - gameFinished is set to False
+            * read_level method is called
             
         """
         self.gameFinished = False
-        self.read_level()
+        self.read_level()   #call read_level method
         self.__startTime = pygame.time.get_ticks()
         self.__endTime = 0
         self.__timeNeeded = 0
@@ -88,9 +90,9 @@ class MyGame:
 
         """
 
-        self.screen = pygame.display.set_mode((self.__WINDOWWIDTH, self.__WINDOWHEIGHT))
-        pygame.display.set_caption("2D Game")
-        logger.info("Created window with size: " + str(self.__WINDOWWIDTH) + "x" + str(self.__WINDOWHEIGHT))
+        self.screen = pygame.display.set_mode((self.__WINDOWWIDTH, self.__WINDOWHEIGHT))    #create screen with size(__WINDOWWIDTH, __WINDOWHEIGHT)
+        pygame.display.set_caption("2D Game")   #set screen caption to 2D Game  
+        logger.info("Created window with size: " + str(self.__WINDOWWIDTH) + "x" + str(self.__WINDOWHEIGHT))    #log window creation
 
     
     def read_level(self):
@@ -111,11 +113,11 @@ class MyGame:
 
         """
 
-        datei = open('level.txt','r')
-        for zeile in datei:
-            self.level.append(zeile)
-        datei.close()
-        logger.info("Read level from file")
+        datei = open('level.txt','r')   #open file
+        for zeile in datei:     #read file line by line
+            self.level.append(zeile)    #append line to level list
+        datei.close()       #close file
+        logger.info("Read level from file")    #log level reading
 
 
     def end_game(self):
@@ -134,12 +136,12 @@ class MyGame:
 
         """
 
-        self.__endTime = pygame.time.get_ticks()
-        self.__timeNeeded = str(round((self.__endTime - self.__startTime)/1000, 2))
-        logger.info("Game ended after: " + self.__timeNeeded + "s")
-        self.winningText = pygame.font.SysFont('Arial', 80).render("You won! Within: " + self.__timeNeeded + "s", False, (255, 255, 0))
-        self.textRect = self.winningText.get_rect()
-        self.textRect.center = (self.__WINDOWWIDTH / 2, self.__WINDOWHEIGHT / 2)
+        self.__endTime = pygame.time.get_ticks()    #save current time into __endTime
+        self.__timeNeeded = str(round((self.__endTime - self.__startTime)/1000, 2))     #calculate needed time and save it into __timeNeeded
+        logger.info("Game ended after: " + self.__timeNeeded + "s")    #log needed time
+        self.winningText = pygame.font.SysFont('Arial', 80).render("You won! Within: " + self.__timeNeeded + "s", False, (255, 255, 0))  #create winning text
+        self.textRect = self.winningText.get_rect()    #create rect of winning text
+        self.textRect.center = (self.__WINDOWWIDTH / 2, self.__WINDOWHEIGHT / 2)  
         self.gameFinished = True
         
 
@@ -167,28 +169,38 @@ while True:
         if event.type == pygame.QUIT:   #condition for closing the window
             pygame.quit()   #quit pygame
             sys.exit()  #quit program
+
     if my_game.gameFinished == True:    #if game is finished print winning text
-        my_game.screen.blit(my_game.winningText, my_game.textRect)
-    if my_game.gameFinished == False:   
+        my_game.screen.blit(my_game.winningText, my_game.textRect)  
+
+    if my_game.gameFinished == False:   #if game is not finished update screen and call main/update methods
         world.main(my_game.screen)      
         player.main()
-        for bullet in (player.bulletGroup):
+
+        for bullet in (player.bulletGroup): #update every bullet
                 bullet.update()
-        for chest in world.chestGroup:
+
+        for chest in world.chestGroup:  #update every chest 
             if player.getCurrentChunk() -1 <= chest.getChunk() <= player.getCurrentChunk() + 1:
                 chest.update()
-        world.chunkEnemyGroup.empty()
-        for enemy in world.enemyGroup:
-            if player.getCurrentChunk() -1 <= enemy.getCurrentChunk() <= player.getCurrentChunk() + 1:
+        world.chunkEnemyGroup.empty()   #clears the chunkEnemyGroup
+
+        for enemy in world.enemyGroup:  #iterate through every enemy
+            if player.getCurrentChunk() -1 <= enemy.getCurrentChunk() <= player.getCurrentChunk() + 1:  #if enemy is near player add it to chunkEnemyGroup
                 enemy.update()
                 world.chunkEnemyGroup.add(enemy)
-        pygame.sprite.groupcollide(player.bulletGroup, world.chunkEnemyGroup, True, True)         
-        pygame.sprite.Group.draw(world.chunkEnemyGroup, my_game.screen)
-        pygame.sprite.Group.draw(player.bulletGroup, my_game.screen)  
-        pygame.sprite.Group.draw(world.chestGroup, my_game.screen) #Only one chest but pygame Group for easier future implementation(multiple chestsv for loot)
-        player.player_plain.draw(my_game.screen)
-        clock.tick(30)  
-    pygame.display.update()
+
+        pygame.sprite.groupcollide(player.bulletGroup, world.chunkEnemyGroup, True, True)   #check for collision between bullet and enemy if true delete both            
+        pygame.sprite.Group.draw(world.chunkEnemyGroup, my_game.screen) #draw every enemy in chunkEnemyGroup
+        pygame.sprite.Group.draw(player.bulletGroup, my_game.screen)    #draw every bullet
+        pygame.sprite.Group.draw(world.chestGroup, my_game.screen) # draw every chest. Only one chest but pygame Group for easier future implementation (multiple chestsv for loot)
+        player.player_plain.draw(my_game.screen)    #draw player
+        clock.tick(30)  #set fps to 30
+
+    pygame.display.update() #update screen
+
+    #TODOs for future versions:
+    #   - add more levels
+    #   - save and display best times
+    #   - add Menu for start/end game, select level or pause game
  
-        #Startmenu einabauen leider zeitich nicht in 45 h geschafft
-        #Bestzeit speichern und anzeigen
