@@ -251,7 +251,8 @@ class World:
         for block in self.__chunkPlatforms:     # iterate through chunk platforms list
             if block.colliderect(object_rect) and self.player.speed_y < 0 and block.y + (block.height/2) < object_rect.y:       # check if object (argument) is colliding with block and if the player is jumping
                 self.player.speed_y = 0
-                object_rect.y = block.y + block.height
+                object_rect.y = block.y + block.height 
+                
 
     
                 
