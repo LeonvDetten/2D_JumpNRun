@@ -80,7 +80,7 @@ class Player(pygame.sprite.Sprite):
         self.loadSprites()
         
         self.image = self.sprites['IDLE']['right'][self.__currentSprite]
-        self.__currentAnimation = "idleRight"
+        self.__currentAnimation = "IDLE_right"
         self.__latest_shot = 0
         self.__latest_jump_kill = 0
         self.__latest_log = 0
@@ -262,8 +262,8 @@ class Player(pygame.sprite.Sprite):
 
         """
 
-        animation_tag = self.__currentAnimation.split("_")                                          # splitting animation: "IDLE_left" -> "IDLE" "left" 
-        self.image = self.sprites[animation_tag[0]][animation_tag[1]][int(self.__currentSprite)]    # set sprite depending on animation state and sprite number
+        animation_tag = self.__currentAnimation.split("_")  # splitting animation: "IDLE_right" -> "IDLE", "right"  
+        self.image = self.sprites[animation_tag[0]][animation_tag[1]][int(self.__currentSprite)]  # set sprite depending on animation state and sprite number  
 
 
     def move_y(self):
