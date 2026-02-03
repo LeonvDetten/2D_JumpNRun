@@ -42,9 +42,12 @@ def main():
     metrics_file = run_dir / "metrics" / "episodes.csv"
     if not metrics_file.exists():
         curriculum_full_metrics = run_dir / "curriculum_full" / "metrics" / "episodes.csv"
+        curriculum_medium_metrics = run_dir / "curriculum_medium" / "metrics" / "episodes.csv"
         curriculum_easy_metrics = run_dir / "curriculum_easy" / "metrics" / "episodes.csv"
         if curriculum_full_metrics.exists():
             metrics_file = curriculum_full_metrics
+        elif curriculum_medium_metrics.exists():
+            metrics_file = curriculum_medium_metrics
         elif curriculum_easy_metrics.exists():
             metrics_file = curriculum_easy_metrics
     plots_dir = run_dir / "plots"

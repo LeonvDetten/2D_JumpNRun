@@ -48,6 +48,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Train PPO agent for the 2D Jump'n'Run game.")
     parser.add_argument("--level-path", default="level.txt")
     parser.add_argument("--easy-level-path", default="level_easy.txt")
+    parser.add_argument("--medium-level-path", default="level_medium.txt")
     parser.add_argument("--timesteps", type=int, default=500_000)
     parser.add_argument("--run-name", default=f"ppo_{datetime.now().strftime('%Y%m%d_%H%M%S')}")
     parser.add_argument("--log-dir", default="runs")
@@ -90,6 +91,12 @@ def parse_args():
         type=int,
         default=120_000,
         help="Number of timesteps on easy level before full level.",
+    )
+    parser.add_argument(
+        "--curriculum-medium-steps",
+        type=int,
+        default=120_000,
+        help="Number of timesteps on medium level before full level.",
     )
     parser.add_argument(
         "--load-model",
@@ -198,7 +205,9 @@ def main():
     try:
         if args.curriculum:
             easy_steps = min(args.curriculum_easy_steps, args.timesteps)
-            full_steps = max(0, args.timesteps - easy_steps)
+            remaining_after_easy = max(0, args.timesteps - easy_steps)
+            medium_steps = min(args.curriculum_medium_steps, remaining_after_easy)
+            full_steps = max(0, remaining_after_easy - medium_steps)
 
             easy_train_env = DummyVecEnv(
                 [make_env(args.easy_level_path, True, args.max_episode_steps, args.frame_skip, args.action_preset)]
@@ -206,10 +215,34 @@ def main():
             easy_eval_env = DummyVecEnv(
                 [make_env(args.easy_level_path, True, args.max_episode_steps, args.frame_skip, args.action_preset)]
             )
-            easy_callbacks = build_callbacks(run_dir / "curriculum_easy", easy_eval_env, args.eval_freq, args.eval_episodes, args.checkpoint_freq)
+            easy_callbacks = build_callbacks(
+                run_dir / "curriculum_easy",
+                easy_eval_env,
+                args.eval_freq,
+                args.eval_episodes,
+                args.checkpoint_freq,
+            )
             model = build_model(args, easy_train_env, device, tensorboard_dir / "easy")
             train_stage(model, easy_steps, easy_callbacks, args.progress_bar, reset_num_timesteps=True)
             model.save(str(models_dir / "curriculum_easy_model"))
+
+            if medium_steps > 0:
+                medium_train_env = DummyVecEnv(
+                    [make_env(args.medium_level_path, True, args.max_episode_steps, args.frame_skip, args.action_preset)]
+                )
+                medium_eval_env = DummyVecEnv(
+                    [make_env(args.medium_level_path, True, args.max_episode_steps, args.frame_skip, args.action_preset)]
+                )
+                model.set_env(medium_train_env)
+                medium_callbacks = build_callbacks(
+                    run_dir / "curriculum_medium",
+                    medium_eval_env,
+                    args.eval_freq,
+                    args.eval_episodes,
+                    args.checkpoint_freq,
+                )
+                train_stage(model, medium_steps, medium_callbacks, args.progress_bar, reset_num_timesteps=False)
+                model.save(str(models_dir / "curriculum_medium_model"))
 
             if full_steps > 0:
                 full_train_env = DummyVecEnv(
@@ -219,7 +252,13 @@ def main():
                     [make_env(args.level_path, True, args.max_episode_steps, args.frame_skip, args.action_preset)]
                 )
                 model.set_env(full_train_env)
-                full_callbacks = build_callbacks(run_dir / "curriculum_full", full_eval_env, args.eval_freq, args.eval_episodes, args.checkpoint_freq)
+                full_callbacks = build_callbacks(
+                    run_dir / "curriculum_full",
+                    full_eval_env,
+                    args.eval_freq,
+                    args.eval_episodes,
+                    args.checkpoint_freq,
+                )
                 train_stage(model, full_steps, full_callbacks, args.progress_bar, reset_num_timesteps=False)
         else:
             train_env = DummyVecEnv(
