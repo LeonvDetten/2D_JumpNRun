@@ -78,6 +78,8 @@ class PirateGameEnv(gym.Env):
             dtype=np.float32,
         )
         self._episode_steps = 0
+        self._no_progress_steps = 0
+        self._prev_x = 0.0
 
     def _to_action(self, action_id: int) -> GameAction:
         if action_id == 0:
@@ -103,6 +105,8 @@ class PirateGameEnv(gym.Env):
         level_path = self.level_path if options is None else options.get("level_path", self.level_path)
         obs = self.session.reset(level_path=level_path, seed=seed)
         self._episode_steps = 0
+        self._no_progress_steps = 0
+        self._prev_x = float(self.session.player.playerPos.x)
         return np.asarray(obs, dtype=np.float32), {}
 
     def step(self, action):
@@ -111,15 +115,34 @@ class PirateGameEnv(gym.Env):
         obs = np.asarray(result["observation"], dtype=np.float32)
         status = result["status"]
 
-        terminated = bool(status["is_done"])
+        terminated = bool(status["is_win"] or status["is_dead"] or status["is_done"])
         self._episode_steps += 1
         truncated = self._episode_steps >= self.max_episode_steps and not terminated
 
-        reward = 0.0
+        current_x = float(result["current_x"])
+        delta_x = float(result["delta_x"])
+
+        progress_reward = max(delta_x, 0.0) / 20.0
+        backtrack_penalty = min(delta_x, 0.0) / 25.0
+        time_penalty = -0.01
+        kill_bonus = float(result["killed_enemies"]) * 2.5
+        reward = progress_reward + backtrack_penalty + time_penalty + kill_bonus
+
+        if delta_x <= 0.5:
+            self._no_progress_steps += 1
+        else:
+            self._no_progress_steps = 0
+        if self._no_progress_steps >= 120:
+            reward -= 1.0
+
         if status["is_win"]:
-            reward = 1.0
+            reward += 200.0
         elif status["is_dead"]:
-            reward = -1.0
+            reward -= 200.0
+        elif truncated:
+            reward -= 5.0
+
+        self._prev_x = current_x
 
         info = {
             "killed_enemies": result["killed_enemies"],
@@ -127,6 +150,13 @@ class PirateGameEnv(gym.Env):
             "is_dead": status["is_dead"],
             "step_count": status["step_count"],
             "max_progress_x": status["max_progress_x"],
+            "current_x": current_x,
+            "delta_x": delta_x,
+            "no_progress_steps": self._no_progress_steps,
+            "reward_progress": progress_reward,
+            "reward_backtrack": backtrack_penalty,
+            "reward_time": time_penalty,
+            "reward_kill_bonus": kill_bonus,
         }
         return obs, reward, terminated, truncated, info
 

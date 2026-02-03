@@ -135,6 +135,7 @@ class GameSession:
         return killed_enemies
 
     def step(self, action: Optional[GameAction], frames: int = 4):
+        start_x = float(self.player.playerPos.x)
         killed_enemies = 0
         for _ in range(frames):
             killed_enemies += self._simulate_frame(action)
@@ -142,11 +143,14 @@ class GameSession:
                 break
 
         self.status.step_count += 1
-        self.status.max_progress_x = max(self.status.max_progress_x, float(self.player.playerPos.x))
+        current_x = float(self.player.playerPos.x)
+        self.status.max_progress_x = max(self.status.max_progress_x, current_x)
 
         return {
             "observation": self.get_observation(),
             "killed_enemies": killed_enemies,
+            "current_x": current_x,
+            "delta_x": current_x - start_x,
             "status": asdict(self.get_status()),
         }
 
