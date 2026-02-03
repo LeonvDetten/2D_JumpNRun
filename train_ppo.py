@@ -22,7 +22,7 @@ def detect_device():
     return "cpu"
 
 
-def make_env(level_path: str, headless: bool, max_episode_steps: int, frame_skip: int):
+def make_env(level_path: str, headless: bool, max_episode_steps: int, frame_skip: int, action_preset: str):
     def _factory():
         env = PirateGameEnv(
             level_path=level_path,
@@ -30,6 +30,7 @@ def make_env(level_path: str, headless: bool, max_episode_steps: int, frame_skip
             render_mode="none",
             max_episode_steps=max_episode_steps,
             frame_skip=frame_skip,
+            action_preset=action_preset,
         )
         return Monitor(env)
 
@@ -43,6 +44,12 @@ def parse_args():
     parser.add_argument("--run-name", default=f"ppo_{datetime.now().strftime('%Y%m%d_%H%M%S')}")
     parser.add_argument("--log-dir", default="runs")
     parser.add_argument("--frame-skip", type=int, default=4)
+    parser.add_argument(
+        "--action-preset",
+        default="simple",
+        choices=["simple", "full"],
+        help="Action set for training. 'simple' is faster to learn on this level.",
+    )
     parser.add_argument("--max-episode-steps", type=int, default=2500)
     parser.add_argument("--eval-freq", type=int, default=10_000)
     parser.add_argument("--eval-episodes", type=int, default=10)
@@ -81,10 +88,10 @@ def main():
         path.mkdir(parents=True, exist_ok=True)
 
     train_env = DummyVecEnv(
-        [make_env(args.level_path, True, args.max_episode_steps, args.frame_skip)]
+        [make_env(args.level_path, True, args.max_episode_steps, args.frame_skip, args.action_preset)]
     )
     eval_env = DummyVecEnv(
-        [make_env(args.level_path, True, args.max_episode_steps, args.frame_skip)]
+        [make_env(args.level_path, True, args.max_episode_steps, args.frame_skip, args.action_preset)]
     )
 
     device = detect_device()

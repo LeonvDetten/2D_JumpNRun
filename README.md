@@ -49,6 +49,9 @@ Das Projekt enthält zusätzlich eine RL-Pipeline mit Gymnasium + Stable-Baselin
   - `python3 train_ppo.py --timesteps 500000 --run-name ppo_level1 --game-log-level WARNING`
 - Optional mit Progressbar:
   - `python3 train_ppo.py --timesteps 500000 --run-name ppo_level1 --progress-bar`
+- Action-Set für schnelleres Lernen:
+  - `python3 train_ppo.py --timesteps 500000 --run-name ppo_level1 --action-preset simple`
+  - Für volle Aktionstiefe später: `--action-preset full`
 
 Das Training schreibt Artefakte nach `runs/<run-name>/`:
 - `tb/` (TensorBoard-Logs)
