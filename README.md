@@ -71,14 +71,6 @@ Dabei werden folgende Diagramme erzeugt:
 - `episode_length.png`
 - `success_rate.png`
 - `progress_x.png`
-
-### Beispiel für README-Visualisierung  
-Wenn du fertige Plots in dein Portfolio einbinden willst, kopiere sie z. B. nach `artifacts/plots/` und referenziere sie in Markdown:
-
-```md
-![Reward Curve](artifacts/plots/reward_curve.png)
-![Success Rate](artifacts/plots/success_rate.png)
-```
   
 ## Lizenzen:  
 Die verwendeten Bilder (Sprites) sind lizenzfrei und dürfen frei verwendet werden. Die Bilder können auf folgenden Seiten heruntergeladen werden:  
