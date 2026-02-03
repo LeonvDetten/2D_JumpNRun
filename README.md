@@ -52,6 +52,12 @@ Das Projekt enthält zusätzlich eine RL-Pipeline mit Gymnasium + Stable-Baselin
 - Action-Set für schnelleres Lernen:
   - `python3 train_ppo.py --timesteps 500000 --run-name ppo_level1 --action-preset simple`
   - Für volle Aktionstiefe später: `--action-preset full`
+- Curriculum (empfohlen):
+  - `python3 train_ppo.py --timesteps 500000 --run-name ppo_curriculum --curriculum --easy-level-path level_easy.txt --curriculum-easy-steps 120000 --action-preset simple`
+
+### Fine-Tuning / Resume
+- Bestehendes Modell weitertrainieren:
+  - `python3 train_ppo.py --timesteps 200000 --run-name ppo_finetune --load-model runs/ppo_curriculum/models/final_model.zip --action-preset simple`
 
 Das Training schreibt Artefakte nach `runs/<run-name>/`:
 - `tb/` (TensorBoard-Logs)
@@ -60,6 +66,11 @@ Das Training schreibt Artefakte nach `runs/<run-name>/`:
 - `checkpoints/` (Best/Checkpoint-Modelle)
 - `models/` (Finales Modell)
 - `plots/` (exportierte PNG-Visualisierungen)
+
+Bei Curriculum-Läufen werden die Artefakte zusätzlich in:
+- `curriculum_easy/`
+- `curriculum_full/`
+gespeichert.
 
 ### Live-Metriken mit TensorBoard  
 - `tensorboard --logdir runs`
