@@ -1,85 +1,87 @@
 import gymnasium as gym
-from gymnasium import spaces
 import numpy as np
+from gymnasium import spaces
+
+from game_session import GameSession
+from game_types import GameAction
+
 
 class PirateGameEnv(gym.Env):
-    """Custom Environment for Pirate Game compatible with OpenAI Gym"""
+    metadata = {"render_modes": ["none", "human"], "render_fps": 30}
 
-    def __init__(self):
-        super(PirateGameEnv, self).__init__()
+    def __init__(
+        self,
+        level_path: str = "level.txt",
+        headless: bool = True,
+        render_mode: str = "none",
+        max_episode_steps: int = 2500,
+        frame_skip: int = 4,
+    ):
+        super().__init__()
+        self.level_path = level_path
+        self.headless = headless
+        self.render_mode = render_mode
+        self.max_episode_steps = max_episode_steps
+        self.frame_skip = frame_skip
 
-        # Define action space: 4 actions (move left, move right, jump, shoot)
-        self.action_space = spaces.Discrete(4)
-
-        # Define observation space: Include player position, enemy positions, and obstacles
-        self.observation_space = spaces.Box(
-            low=np.array([0, 0, 0, 0]),  # Example: Min values for player position, enemy positions, obstacles
-            high=np.array([1520, 800, 10, 10]),  # Example: Max values for player position, enemy positions, obstacles
-            dtype=np.float32
+        self.session = GameSession(
+            level_path=self.level_path,
+            headless=self.headless,
+            render_mode=self.render_mode,
+            fps=self.metadata["render_fps"],
         )
 
-        # Initialize game state
-        self.state = np.array([0, 0, 0, 0], dtype=np.float32)  # Example: Initial state
-        self.done = False
+        self.action_space = spaces.Discrete(4)
+        self.observation_space = spaces.Box(
+            low=np.array([0.0, 0.0, -100.0, 0.0], dtype=np.float32),
+            high=np.array([5000.0, 1200.0, 100.0, 5000.0], dtype=np.float32),
+            dtype=np.float32,
+        )
+        self._episode_steps = 0
+
+    def _to_action(self, action_id: int) -> GameAction:
+        if action_id == 0:
+            return GameAction(left=True)
+        if action_id == 1:
+            return GameAction(right=True)
+        if action_id == 2:
+            return GameAction(jump=True)
+        return GameAction(shoot=True)
+
+    def reset(self, *, seed=None, options=None):
+        super().reset(seed=seed)
+        level_path = self.level_path if options is None else options.get("level_path", self.level_path)
+        obs = self.session.reset(level_path=level_path, seed=seed)
+        self._episode_steps = 0
+        return np.asarray(obs, dtype=np.float32), {}
 
     def step(self, action):
-        """Execute one time step within the environment."""
-        # Update game state based on action
-        if action == 0:  # Move left
-            self.state[0] = max(0, self.state[0] - 10)  # Update player x position
-        elif action == 1:  # Move right
-            self.state[0] = min(1520, self.state[0] + 10)  # Update player x position
-        elif action == 2:  # Jump
-            self.state[1] = min(800, self.state[1] + 50)  # Update player y position
-        elif action == 3:  # Shoot
-            self.state[2] += 1  # Example: Increment bullets shot
+        game_action = self._to_action(int(action))
+        result = self.session.step(game_action, frames=self.frame_skip)
+        obs = np.asarray(result["observation"], dtype=np.float32)
+        status = result["status"]
 
-        # Refined reward logic
-        reward = 0
-        if self.state[0] >= 1520:  # Reward for reaching the far right
-            reward += 100
-        # Remove irrelevant rewards for shooting bullets
+        terminated = bool(status["is_done"])
+        self._episode_steps += 1
+        truncated = self._episode_steps >= self.max_episode_steps and not terminated
 
-        # Check if the game is over
-        self.done = self._check_done()
+        reward = 0.0
+        if status["is_win"]:
+            reward = 1.0
+        elif status["is_dead"]:
+            reward = -1.0
 
-        # Return state, reward, done, and additional info
-        return self.state, reward, self.done, {}
+        info = {
+            "killed_enemies": result["killed_enemies"],
+            "is_win": status["is_win"],
+            "is_dead": status["is_dead"],
+            "step_count": status["step_count"],
+            "max_progress_x": status["max_progress_x"],
+        }
+        return obs, reward, terminated, truncated, info
 
-    def reset(self):
-        """Reset the state of the environment to an initial state."""
-        # Reset state to initial values
-        self.state = np.array([120, 50, 0, 0], dtype=np.float32)  # Example: Reset player position and other state variables
-        self.done = False
-        return self.state
-
-    def render(self, mode="human"):
-        """Render the environment (optional)."""
-        import pygame
-
-        if not hasattr(self, 'screen'):
-            pygame.init()
-            self.screen = pygame.display.set_mode((800, 600))
-            pygame.display.set_caption("Pirate Game")
-
-        self.screen.fill((0, 0, 0))  # Schwarzer Hintergrund
-
-        # Beispiel: Zeichne den Spieler als Rechteck
-        player_x, player_y = self.state[0], self.state[1]
-        pygame.draw.rect(self.screen, (255, 0, 0), (player_x, player_y, 50, 50))
-
-        pygame.display.flip()
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                exit()
+    def render(self):
+        self.session.render()
 
     def close(self):
-        """Close the environment (optional)."""
-        pass
-
-    def _check_done(self):
-        """Check if the game is over."""
-        # Game ends when the player reaches the far right of the map
-        return self.state[0] >= 1520
+        self.session.close()
