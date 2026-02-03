@@ -85,6 +85,9 @@ class PirateGameEnv(gym.Env):
         self._no_progress_steps = 0
         self._prev_x = 0.0
         self._prev_goal_distance = 0.0
+        self._max_checkpoint_reached = 0
+        self.checkpoint_spacing = 600.0
+        self.checkpoint_bonus = 3.0
 
     def _simple_action(self, action_id: int) -> GameAction:
         if action_id == 0:
@@ -127,6 +130,7 @@ class PirateGameEnv(gym.Env):
         self._no_progress_steps = 0
         self._prev_x = float(self.session.player.playerPos.x)
         self._prev_goal_distance = float(self.session.get_goal_distance())
+        self._max_checkpoint_reached = int(float(self.session.player.playerPos.x) // self.checkpoint_spacing)
         return np.asarray(obs, dtype=np.float32), {}
 
     def step(self, action):
@@ -145,18 +149,23 @@ class PirateGameEnv(gym.Env):
         delta_x = float(result["delta_x"])
         goal_distance = float(self.session.get_goal_distance())
         goal_delta = self._prev_goal_distance - goal_distance
+        current_checkpoint = int(float(status["max_progress_x"]) // self.checkpoint_spacing)
+        new_checkpoints = max(0, current_checkpoint - self._max_checkpoint_reached)
+        checkpoint_reward = float(new_checkpoints) * self.checkpoint_bonus
+        if new_checkpoints > 0:
+            self._max_checkpoint_reached = current_checkpoint
 
-        goal_progress_reward = np.clip((goal_delta / max(level_width, 1.0)) * 300.0, -3.0, 3.0)
-        time_penalty = -0.02
+        goal_progress_reward = float(np.clip(np.tanh(goal_delta / 45.0) * 1.5, -1.5, 1.5))
+        time_penalty = -0.01
         kill_bonus = float(result["killed_enemies"]) * 1.0
-        reward = float(goal_progress_reward + time_penalty + kill_bonus)
+        reward = float(goal_progress_reward + time_penalty + kill_bonus + checkpoint_reward)
 
         if goal_delta <= 1.0:
             self._no_progress_steps += 1
         else:
             self._no_progress_steps = 0
         if self._no_progress_steps >= 90:
-            reward -= 0.75
+            reward -= 0.6
 
         is_runaway = (
             current_x < -120.0
@@ -169,11 +178,11 @@ class PirateGameEnv(gym.Env):
             reward -= 120.0
 
         if status["is_win"]:
-            reward += 250.0
+            reward += 260.0
         elif status["is_dead"]:
-            reward -= 150.0
+            reward -= 130.0
         elif truncated:
-            reward -= 20.0
+            reward -= 25.0
 
         self._prev_x = current_x
         self._prev_goal_distance = goal_distance
@@ -190,7 +199,9 @@ class PirateGameEnv(gym.Env):
             "no_progress_steps": self._no_progress_steps,
             "goal_distance": goal_distance,
             "goal_delta": goal_delta,
+            "checkpoint_index": self._max_checkpoint_reached,
             "reward_goal_progress": float(goal_progress_reward),
+            "reward_checkpoint": checkpoint_reward,
             "reward_time": time_penalty,
             "reward_kill_bonus": kill_bonus,
             "is_runaway": bool(is_runaway),

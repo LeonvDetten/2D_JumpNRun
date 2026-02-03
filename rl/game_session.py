@@ -175,16 +175,14 @@ class GameSession:
         vy = float(self.player.speed_y)
 
         chest_dx, chest_dy = self._nearest_chest_delta()
-        enemy_dx, enemy_dy = self._nearest_enemy_delta()
-
-        collision_side = self.world.check_object_collision_sideblock(self.player.playerPos)
-        wall_left = 1.0 if collision_side == -2 else 0.0
-        wall_right = 1.0 if collision_side == -1 else 0.0
+        enemy_dx, enemy_dy, has_enemy = self._nearest_enemy_info()
 
         on_ground = 1.0 if self.world.collided_get_y(self.player.base, self.player.height) >= 0 and self.player.speed_y == 0 else 0.0
         direction = float(self.player.get_direction())
-        enemy_ahead = 1.0 if (direction > 0 and 0 < enemy_dx < 300) or (direction < 0 and -300 < enemy_dx < 0) else 0.0
+        enemy_ahead = 1.0 if has_enemy and ((direction > 0 and 0 < enemy_dx < 300) or (direction < 0 and -300 < enemy_dx < 0)) else 0.0
+        enemy_close = 1.0 if has_enemy and abs(enemy_dx) <= 120.0 and abs(enemy_dy) <= 100.0 else 0.0
         gap_ahead = self._gap_ahead_flag()
+        safe_ground_ahead_distance = self._safe_ground_ahead_distance()
 
         obs = np.array(
             [
@@ -200,8 +198,8 @@ class GameSession:
                 np.clip(enemy_dy / level_height, -1.0, 1.0),
                 enemy_ahead,
                 gap_ahead,
-                wall_left,
-                wall_right,
+                enemy_close,
+                safe_ground_ahead_distance,
                 np.clip(self.status.max_progress_x / level_width, 0.0, 1.0),
                 np.clip(self.status.step_count / float(self.max_episode_steps), 0.0, 1.0),
             ],
@@ -229,19 +227,36 @@ class GameSession:
         return float(self.context.level_width), float(self.context.level_height)
 
     def _nearest_enemy_delta(self):
+        enemy_dx, enemy_dy, _ = self._nearest_enemy_info()
+        return enemy_dx, enemy_dy
+
+    def _nearest_enemy_info(self):
         if len(self.world.enemyGroup) == 0:
-            return 0.0, 0.0
+            return 0.0, 0.0, False
         nearest = min(
             self.world.enemyGroup,
             key=lambda enemy: abs(enemy.enemyPos.x - self.player.playerPos.x),
         )
-        return float(nearest.enemyPos.x - self.player.playerPos.x), float(nearest.enemyPos.y - self.player.playerPos.y)
+        return (
+            float(nearest.enemyPos.x - self.player.playerPos.x),
+            float(nearest.enemyPos.y - self.player.playerPos.y),
+            True,
+        )
 
     def _gap_ahead_flag(self):
         direction = 1 if self.player.get_direction() >= 0 else -1
         probe_x = self.player.playerPos.x + (direction * (self.player.width + 12))
         probe_rect = pygame.Rect(int(probe_x), self.player.base.y + 4, 4, 2)
         return 1.0 if self.world.collided_get_y(probe_rect, 2) < 0 else 0.0
+
+    def _safe_ground_ahead_distance(self, max_scan: int = 360, step: int = 12):
+        direction = 1 if self.player.get_direction() >= 0 else -1
+        for distance in range(0, max_scan + step, step):
+            probe_x = self.player.playerPos.x + (direction * (self.player.width + distance))
+            probe_rect = pygame.Rect(int(probe_x), self.player.base.y + 4, 4, 2)
+            if self.world.collided_get_y(probe_rect, 2) >= 0:
+                return float(np.clip(distance / float(max_scan), 0.0, 1.0))
+        return 1.0
 
     def get_status(self):
         if self.status.is_win or self.status.is_dead:
