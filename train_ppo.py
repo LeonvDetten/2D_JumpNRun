@@ -9,6 +9,7 @@ from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.vec_env import DummyVecEnv
 
 from pirate_game_env import PirateGameEnv
+from training_metrics import EpisodeMetricsCallback
 
 
 def detect_device():
@@ -50,7 +51,15 @@ def parse_args():
 def main():
     args = parse_args()
     run_dir = Path(args.log_dir) / args.run_name
-    run_dir.mkdir(parents=True, exist_ok=True)
+    checkpoints_dir = run_dir / "checkpoints"
+    eval_dir = run_dir / "eval"
+    tensorboard_dir = run_dir / "tb"
+    metrics_dir = run_dir / "metrics"
+    plots_dir = run_dir / "plots"
+    models_dir = run_dir / "models"
+
+    for path in [run_dir, checkpoints_dir, eval_dir, tensorboard_dir, metrics_dir, plots_dir, models_dir]:
+        path.mkdir(parents=True, exist_ok=True)
 
     train_env = DummyVecEnv(
         [make_env(args.level_path, True, args.max_episode_steps, args.frame_skip)]
@@ -71,15 +80,15 @@ def main():
         gae_lambda=0.95,
         ent_coef=0.01,
         device=device,
-        tensorboard_log=str(run_dir / "tb"),
+        tensorboard_log=str(tensorboard_dir),
     )
 
     callbacks = CallbackList(
         [
             EvalCallback(
                 eval_env,
-                best_model_save_path=str(run_dir / "checkpoints"),
-                log_path=str(run_dir / "eval"),
+                best_model_save_path=str(checkpoints_dir),
+                log_path=str(eval_dir),
                 eval_freq=args.eval_freq,
                 n_eval_episodes=args.eval_episodes,
                 deterministic=True,
@@ -87,20 +96,21 @@ def main():
             ),
             CheckpointCallback(
                 save_freq=args.checkpoint_freq,
-                save_path=str(run_dir / "checkpoints"),
+                save_path=str(checkpoints_dir),
                 name_prefix="ppo_checkpoint",
                 save_replay_buffer=False,
                 save_vecnormalize=False,
             ),
+            EpisodeMetricsCallback(metrics_dir=str(metrics_dir), window_size=100),
         ]
     )
 
     model.learn(total_timesteps=args.timesteps, callback=callbacks)
-    model.save(str(run_dir / "final_model"))
+    model.save(str(models_dir / "final_model"))
 
     print(f"Training complete. Artifacts in: {run_dir}")
     print(f"Selected device: {device}")
-    print(f"TensorBoard log dir: {run_dir / 'tb'}")
+    print(f"TensorBoard log dir: {tensorboard_dir}")
 
 
 if __name__ == "__main__":
