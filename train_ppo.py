@@ -1,8 +1,10 @@
 import argparse
+import sys
 from datetime import datetime
 from pathlib import Path
 
 import torch
+from loguru import logger
 from stable_baselines3 import PPO
 from stable_baselines3.common.callbacks import CallbackList, CheckpointCallback, EvalCallback
 from stable_baselines3.common.monitor import Monitor
@@ -45,11 +47,23 @@ def parse_args():
     parser.add_argument("--eval-freq", type=int, default=10_000)
     parser.add_argument("--eval-episodes", type=int, default=10)
     parser.add_argument("--checkpoint-freq", type=int, default=50_000)
+    parser.add_argument(
+        "--game-log-level",
+        default="WARNING",
+        choices=["TRACE", "DEBUG", "INFO", "SUCCESS", "WARNING", "ERROR", "CRITICAL"],
+        help="Log level for game-side Loguru logs during training.",
+    )
     return parser.parse_args()
+
+
+def configure_game_logging(level: str):
+    logger.remove()
+    logger.add(sys.stderr, level=level)
 
 
 def main():
     args = parse_args()
+    configure_game_logging(args.game_log_level)
     run_dir = Path(args.log_dir) / args.run_name
     checkpoints_dir = run_dir / "checkpoints"
     eval_dir = run_dir / "eval"

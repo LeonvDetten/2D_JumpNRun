@@ -1,5 +1,6 @@
 import argparse
 from pathlib import Path
+from typing import Optional
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -12,7 +13,7 @@ def parse_args():
     return parser.parse_args()
 
 
-def resolve_run_dir(run_dir: str | None):
+def resolve_run_dir(run_dir: Optional[str]):
     if run_dir is not None:
         return Path(run_dir)
     runs = sorted(Path("runs").glob("ppo_*"))
