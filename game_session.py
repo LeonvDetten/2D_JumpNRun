@@ -191,7 +191,7 @@ class GameSession:
                 wall_left,
                 wall_right,
                 np.clip(self.status.max_progress_x / level_width, 0.0, 1.0),
-                np.clip(px / level_width, 0.0, 1.0),
+                np.clip(self.status.step_count / 2500.0, 0.0, 1.0),
             ],
             dtype=np.float32,
         )
