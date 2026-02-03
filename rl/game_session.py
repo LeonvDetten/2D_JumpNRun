@@ -36,11 +36,19 @@ class _GameContext:
 
 
 class GameSession:
-    def __init__(self, level_path: str = "level.txt", headless: bool = True, render_mode: str = "none", fps: int = 30):
+    def __init__(
+        self,
+        level_path: str = "level.txt",
+        headless: bool = True,
+        render_mode: str = "none",
+        fps: int = 30,
+        max_episode_steps: int = 2500,
+    ):
         self.level_path = level_path
         self.headless = headless
         self.render_mode = render_mode
         self.fps = fps
+        self.max_episode_steps = max(1, int(max_episode_steps))
 
         if self.headless:
             os.environ.setdefault("SDL_VIDEODRIVER", "dummy")
@@ -195,7 +203,7 @@ class GameSession:
                 wall_left,
                 wall_right,
                 np.clip(self.status.max_progress_x / level_width, 0.0, 1.0),
-                np.clip(self.status.step_count / 2500.0, 0.0, 1.0),
+                np.clip(self.status.step_count / float(self.max_episode_steps), 0.0, 1.0),
             ],
             dtype=np.float32,
         )

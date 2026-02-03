@@ -104,6 +104,15 @@ def configure_game_logging(level: str):
     logger.add(sys.stderr, level=level)
 
 
+def warn_if_loading_model(args):
+    if not args.load_model:
+        return
+    logger.warning(
+        "Loading a saved model: PPO hyperparameters from the checkpoint are reused. "
+        "Only env-related flags (e.g. --level-path, --action-preset, --max-episode-steps) are applied."
+    )
+
+
 def build_callbacks(run_dir: Path, eval_env, eval_freq: int, eval_episodes: int, checkpoint_freq: int):
     checkpoints_dir = run_dir / "checkpoints"
     eval_dir = run_dir / "eval"
@@ -173,6 +182,7 @@ def train_stage(model: PPO, timesteps: int, callbacks, progress_bar: bool, reset
 def main():
     args = parse_args()
     configure_game_logging(args.game_log_level)
+    warn_if_loading_model(args)
     run_dir = Path(args.log_dir) / args.run_name
     tensorboard_dir = run_dir / "tb"
     plots_dir = run_dir / "plots"
@@ -182,46 +192,58 @@ def main():
         path.mkdir(parents=True, exist_ok=True)
 
     device = detect_device()
+    model = None
+    interrupted = False
 
-    if args.curriculum:
-        easy_steps = min(args.curriculum_easy_steps, args.timesteps)
-        full_steps = max(0, args.timesteps - easy_steps)
+    try:
+        if args.curriculum:
+            easy_steps = min(args.curriculum_easy_steps, args.timesteps)
+            full_steps = max(0, args.timesteps - easy_steps)
 
-        easy_train_env = DummyVecEnv(
-            [make_env(args.easy_level_path, True, args.max_episode_steps, args.frame_skip, args.action_preset)]
-        )
-        easy_eval_env = DummyVecEnv(
-            [make_env(args.easy_level_path, True, args.max_episode_steps, args.frame_skip, args.action_preset)]
-        )
-        easy_callbacks = build_callbacks(run_dir / "curriculum_easy", easy_eval_env, args.eval_freq, args.eval_episodes, args.checkpoint_freq)
-        model = build_model(args, easy_train_env, device, tensorboard_dir / "easy")
-        train_stage(model, easy_steps, easy_callbacks, args.progress_bar, reset_num_timesteps=True)
-        model.save(str(models_dir / "curriculum_easy_model"))
+            easy_train_env = DummyVecEnv(
+                [make_env(args.easy_level_path, True, args.max_episode_steps, args.frame_skip, args.action_preset)]
+            )
+            easy_eval_env = DummyVecEnv(
+                [make_env(args.easy_level_path, True, args.max_episode_steps, args.frame_skip, args.action_preset)]
+            )
+            easy_callbacks = build_callbacks(run_dir / "curriculum_easy", easy_eval_env, args.eval_freq, args.eval_episodes, args.checkpoint_freq)
+            model = build_model(args, easy_train_env, device, tensorboard_dir / "easy")
+            train_stage(model, easy_steps, easy_callbacks, args.progress_bar, reset_num_timesteps=True)
+            model.save(str(models_dir / "curriculum_easy_model"))
 
-        if full_steps > 0:
-            full_train_env = DummyVecEnv(
+            if full_steps > 0:
+                full_train_env = DummyVecEnv(
+                    [make_env(args.level_path, True, args.max_episode_steps, args.frame_skip, args.action_preset)]
+                )
+                full_eval_env = DummyVecEnv(
+                    [make_env(args.level_path, True, args.max_episode_steps, args.frame_skip, args.action_preset)]
+                )
+                model.set_env(full_train_env)
+                full_callbacks = build_callbacks(run_dir / "curriculum_full", full_eval_env, args.eval_freq, args.eval_episodes, args.checkpoint_freq)
+                train_stage(model, full_steps, full_callbacks, args.progress_bar, reset_num_timesteps=False)
+        else:
+            train_env = DummyVecEnv(
                 [make_env(args.level_path, True, args.max_episode_steps, args.frame_skip, args.action_preset)]
             )
-            full_eval_env = DummyVecEnv(
+            eval_env = DummyVecEnv(
                 [make_env(args.level_path, True, args.max_episode_steps, args.frame_skip, args.action_preset)]
             )
-            model.set_env(full_train_env)
-            full_callbacks = build_callbacks(run_dir / "curriculum_full", full_eval_env, args.eval_freq, args.eval_episodes, args.checkpoint_freq)
-            train_stage(model, full_steps, full_callbacks, args.progress_bar, reset_num_timesteps=False)
-    else:
-        train_env = DummyVecEnv(
-            [make_env(args.level_path, True, args.max_episode_steps, args.frame_skip, args.action_preset)]
-        )
-        eval_env = DummyVecEnv(
-            [make_env(args.level_path, True, args.max_episode_steps, args.frame_skip, args.action_preset)]
-        )
-        callbacks = build_callbacks(run_dir, eval_env, args.eval_freq, args.eval_episodes, args.checkpoint_freq)
-        model = build_model(args, train_env, device, tensorboard_dir / "main")
-        train_stage(model, args.timesteps, callbacks, args.progress_bar, reset_num_timesteps=True)
+            callbacks = build_callbacks(run_dir, eval_env, args.eval_freq, args.eval_episodes, args.checkpoint_freq)
+            model = build_model(args, train_env, device, tensorboard_dir / "main")
+            train_stage(model, args.timesteps, callbacks, args.progress_bar, reset_num_timesteps=True)
+    except KeyboardInterrupt:
+        interrupted = True
+        print("Training interrupted by user.")
 
-    model.save(str(models_dir / "final_model"))
+    if model is not None:
+        if interrupted:
+            interrupted_path = models_dir / "interrupted_model"
+            model.save(str(interrupted_path))
+            print(f"Interrupted model saved to: {interrupted_path}.zip")
+        else:
+            model.save(str(models_dir / "final_model"))
+            print(f"Training complete. Artifacts in: {run_dir}")
 
-    print(f"Training complete. Artifacts in: {run_dir}")
     print(f"Selected device: {device}")
     print(f"TensorBoard log dir: {tensorboard_dir}")
 

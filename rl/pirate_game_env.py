@@ -31,6 +31,7 @@ class PirateGameEnv(gym.Env):
             headless=self.headless,
             render_mode=self.render_mode,
             fps=self.metadata["render_fps"],
+            max_episode_steps=self.max_episode_steps,
         )
 
         action_count = 5 if self.action_preset == "simple" else 9

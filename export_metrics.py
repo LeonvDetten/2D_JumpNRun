@@ -93,7 +93,8 @@ def main():
     plt.savefig(plots_dir / "success_rate.png")
     plt.close()
 
-    summary = run_dir / "metrics" / "metrics_summary.md"
+    summary = metrics_file.parent / "metrics_summary.md"
+    summary.parent.mkdir(parents=True, exist_ok=True)
     with open(summary, "w", encoding="utf-8") as file_obj:
         file_obj.write("# Training Metrics Summary\n\n")
         file_obj.write(f"- Episodes: {len(df)}\n")
