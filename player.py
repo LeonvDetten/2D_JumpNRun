@@ -224,7 +224,7 @@ class Player(pygame.sprite.Sprite):
         self.world = world
 
 
-    def main(self):
+    def main(self, action=None):
         """main:
             * Main method of player object. Calls most of the other methods from player class.
 
@@ -240,7 +240,7 @@ class Player(pygame.sprite.Sprite):
 
         """
             
-        self.movement()                                                                                                
+        self.movement(action)                                                                                                
         self.move_y()
         self.check_enemy_collision()
         self.animation()         
@@ -294,7 +294,7 @@ class Player(pygame.sprite.Sprite):
         self.rect.y = self.playerPos.y                      # update rect position of player object
 
 
-    def movement(self): 
+    def movement(self, action=None): 
         """movement:
             * Handles the movement of the player object. Checks for key inputs and changes the player position or calls methods. 
         Also changes the animation state of the player object.
@@ -315,9 +315,22 @@ class Player(pygame.sprite.Sprite):
             https://www.youtube.com/watch?v=MYaxPa_eZS0&
             
         """
-        key_state = pygame.key.get_pressed()
-        key_down_event_list = pygame.event.get(KEYDOWN)
-        if len(key_down_event_list)==0:                 # check if no key is pressed
+        if action is None:
+            key_state = pygame.key.get_pressed()
+            key_down_event_list = pygame.event.get(KEYDOWN)
+            move_left = key_state[K_a]
+            move_right = key_state[K_d]
+            jump_pressed = key_state[K_w] or key_state[K_SPACE]
+            shoot_pressed = key_state[K_RETURN]
+            idle_input = len(key_down_event_list) == 0
+        else:
+            move_left = bool(getattr(action, "left", False))
+            move_right = bool(getattr(action, "right", False))
+            jump_pressed = bool(getattr(action, "jump", False))
+            shoot_pressed = bool(getattr(action, "shoot", False))
+            idle_input = not (move_left or move_right or jump_pressed or shoot_pressed)
+
+        if idle_input:                 # check if no input is pressed
             self.__speed_x = 0   
             if self.__latest_shot + self.__shootAnimationTime < pygame.time.get_ticks():    # check if shoot animation is over
                 if self.world.collided_get_y(self.base, self.height) >= 0:                  # check if player is on ground  
@@ -331,24 +344,24 @@ class Player(pygame.sprite.Sprite):
                     else:
                         self.__currentAnimation = "JUMP_right"                      # set animation to jump right
 
-        if key_state[K_d] and self.world.check_object_collision_sideblock(self.playerPos) != -1:    # check if d-key is pressed and if player can move right
+        if move_right and self.world.check_object_collision_sideblock(self.playerPos) != -1:    # check if move right was triggered and if player can move right
             self.__speed_x = self.__movement_speed                           # set player speed to movement speed
             self.__direction = 1        
             self.__currentAnimation = "RUN_right"                            # set animation to run right
             
 
-        if key_state[K_a] and self.world.check_object_collision_sideblock(self.playerPos) != -2:    # check if a-key is pressed and if player can move left
+        if move_left and self.world.check_object_collision_sideblock(self.playerPos) != -2:    # check if move left was triggered and if player can move left
             if self.playerPos.x > 0:                                  # check if player is not at the left border of the world
                 self.__speed_x = self.__movement_speed * -1           # set player speed to movement speed * -1 (negative)
                 self.__direction = -1
                 self.__currentAnimation = "RUN_left"                  # set animation to run left
 
 
-        if key_state[K_w] or key_state[K_SPACE]:                  # check if w-key or space-key is pressed
+        if jump_pressed:                  # check if jump input is pressed
             self.jump(self.jump_speed)                          # call jump method with jump speed as argument
 
 
-        if key_state[K_RETURN] and self.__latest_shot + self.__shootAnimationTime < pygame.time.get_ticks():    # check if return-key is pressed and if latest shot is 1 second ago
+        if shoot_pressed and self.__latest_shot + self.__shootAnimationTime < pygame.time.get_ticks():    # check if shoot input is pressed and if latest shot is 1 second ago
             self.shoot()                                                                                     # call shoot method
 
 
@@ -467,8 +480,17 @@ class Player(pygame.sprite.Sprite):
 
                 elif self.speed_y <= 0 and self.__latest_jump_kill + 100 < pygame.time.get_ticks():  # check if player is not in jump and if latest jump kill is 0.1 seconds ago
                     logger.info("Player killed by enemy")   # log player death
+                    if hasattr(self.world, "on_player_death") and callable(self.world.on_player_death):
+                        self.world.on_player_death()
+                        return
                     pygame.quit()                           # quit pygame
                     sys.exit()                              # exit program
+
+    def get_speed_x(self):
+        return self.__speed_x
+
+    def get_direction(self):
+        return self.__direction
                           
           
     
