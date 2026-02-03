@@ -6,17 +6,19 @@ from stable_baselines3.common.callbacks import BaseCallback
 
 
 class EpisodeMetricsCallback(BaseCallback):
-    def __init__(self, metrics_dir: str, window_size: int = 100, verbose: int = 0):
+    def __init__(self, metrics_dir: str, filename: str = "episodes.csv", window_size: int = 100, verbose: int = 0):
         super().__init__(verbose)
         self.metrics_dir = Path(metrics_dir)
+        self.filename = filename
         self.window_size = window_size
         self._rows = []
         self._recent_wins = deque(maxlen=window_size)
 
     def _on_training_start(self) -> None:
         self.metrics_dir.mkdir(parents=True, exist_ok=True)
-        self.metrics_file = self.metrics_dir / "episodes.csv"
-        self._write_header()
+        self.metrics_file = self.metrics_dir / self.filename
+        if not self.metrics_file.exists():
+            self._write_header()
 
     def _write_header(self):
         with open(self.metrics_file, "w", newline="", encoding="utf-8") as file_obj:
