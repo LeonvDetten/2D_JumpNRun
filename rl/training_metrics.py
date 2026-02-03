@@ -29,6 +29,7 @@ class EpisodeMetricsCallback(BaseCallback):
                     "is_win",
                     "is_dead",
                     "max_progress_x",
+                    "goal_distance",
                 ]
             )
 
@@ -42,6 +43,7 @@ class EpisodeMetricsCallback(BaseCallback):
             is_win = int(bool(info.get("is_win", False)))
             is_dead = int(bool(info.get("is_dead", False)))
             max_progress_x = float(info.get("max_progress_x", 0.0))
+            goal_distance = float(info.get("goal_distance", 0.0))
             reward = float(episode_info.get("r", 0.0))
             length = int(episode_info.get("l", 0))
 
@@ -52,6 +54,7 @@ class EpisodeMetricsCallback(BaseCallback):
                 is_win,
                 is_dead,
                 max_progress_x,
+                goal_distance,
             ]
             self._rows.append(row)
             self._recent_wins.append(is_win)
@@ -59,6 +62,7 @@ class EpisodeMetricsCallback(BaseCallback):
             self.logger.record("rollout/episode_reward", reward)
             self.logger.record("rollout/episode_length", length)
             self.logger.record("rollout/max_progress_x", max_progress_x)
+            self.logger.record("rollout/goal_distance", goal_distance)
             self.logger.record("rollout/win_rate_100", sum(self._recent_wins) / len(self._recent_wins))
 
         if self._rows:

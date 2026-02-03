@@ -136,6 +136,7 @@ class GameSession:
 
     def step(self, action: Optional[GameAction], frames: int = 4):
         start_x = float(self.player.playerPos.x)
+        start_y = float(self.player.playerPos.y)
         killed_enemies = 0
         for _ in range(frames):
             killed_enemies += self._simulate_frame(action)
@@ -144,13 +145,16 @@ class GameSession:
 
         self.status.step_count += 1
         current_x = float(self.player.playerPos.x)
+        current_y = float(self.player.playerPos.y)
         self.status.max_progress_x = max(self.status.max_progress_x, current_x)
 
         return {
             "observation": self.get_observation(),
             "killed_enemies": killed_enemies,
             "current_x": current_x,
+            "current_y": current_y,
             "delta_x": current_x - start_x,
+            "delta_y": current_y - start_y,
             "status": asdict(self.get_status()),
         }
 
@@ -205,6 +209,16 @@ class GameSession:
             key=lambda chest: abs(chest.chestPos.x - self.player.playerPos.x),
         )
         return float(nearest.chestPos.x - self.player.playerPos.x), float(nearest.chestPos.y - self.player.playerPos.y)
+
+    def get_goal_distance(self):
+        chest_dx, chest_dy = self._nearest_chest_delta()
+        return abs(float(chest_dx)) + abs(float(chest_dy))
+
+    def get_player_position(self):
+        return float(self.player.playerPos.x), float(self.player.playerPos.y)
+
+    def get_level_size(self):
+        return float(self.context.level_width), float(self.context.level_height)
 
     def _nearest_enemy_delta(self):
         if len(self.world.enemyGroup) == 0:
