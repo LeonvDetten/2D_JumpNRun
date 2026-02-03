@@ -77,6 +77,11 @@ Bei Curriculum-Läufen werden die Artefakte zusätzlich in:
 - `curriculum_full/`
 gespeichert.
 
+### Reward-Highlights (aktuelle Version)
+- Distanzreduktion zur Chest über `goal_delta` (mit `tanh`-Skalierung).
+- Einmaliger Checkpoint-Bonus alle 600 Pixel Fortschritt.
+- Zeitstrafe pro Schritt, Death-/Timeout-Strafen und Win-Bonus.
+
 ### Live-Metriken mit TensorBoard  
 - `tensorboard --logdir runs`
 
