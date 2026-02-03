@@ -29,6 +29,45 @@ Der Piratenspieler kann mit den Tasten `W`, `A`, `D`, Leertaste und Enter gesteu
 - Mit der `A`-Taste wird der Spieler nach links bewegt.  
 - Mit der `D`-Taste wird der Spieler nach rechts bewegt.  
 - Mit Enter führt der Spieler einen Revolverschuss aus.  
+
+## RL Agent (PPO)  
+Das Projekt enthält zusätzlich eine RL-Pipeline mit Gymnasium + Stable-Baselines3 (PPO), die auf den echten Spielzuständen trainiert.  
+
+### RL-Setup  
+1. Virtuelle Umgebung aktivieren  
+2. RL-Abhängigkeiten installieren:
+   - `pip install -r requirements-rl.txt`
+
+### Training starten  
+- `python3 train_ppo.py --timesteps 500000 --run-name ppo_level1`
+
+Das Training schreibt Artefakte nach `runs/<run-name>/`:
+- `tb/` (TensorBoard-Logs)
+- `metrics/episodes.csv` (Episode-Metriken)
+- `eval/` (Evaluation-Logs)
+- `checkpoints/` (Best/Checkpoint-Modelle)
+- `models/` (Finales Modell)
+- `plots/` (exportierte PNG-Visualisierungen)
+
+### Live-Metriken mit TensorBoard  
+- `tensorboard --logdir runs`
+
+### PNG-Metriken exportieren  
+- `python3 export_metrics.py --run-dir runs/ppo_level1 --window 50`
+
+Dabei werden folgende Diagramme erzeugt:
+- `reward_curve.png`
+- `episode_length.png`
+- `success_rate.png`
+- `progress_x.png`
+
+### Beispiel für README-Visualisierung  
+Wenn du fertige Plots in dein Portfolio einbinden willst, kopiere sie z. B. nach `artifacts/plots/` und referenziere sie in Markdown:
+
+```md
+![Reward Curve](artifacts/plots/reward_curve.png)
+![Success Rate](artifacts/plots/success_rate.png)
+```
   
 ## Lizenzen:  
 Die verwendeten Bilder (Sprites) sind lizenzfrei und dürfen frei verwendet werden. Die Bilder können auf folgenden Seiten heruntergeladen werden:  
