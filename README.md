@@ -33,6 +33,11 @@ Der Piratenspieler kann mit den Tasten `W`, `A`, `D`, Leertaste und Enter gesteu
 ## RL Agent (PPO)  
 Das Projekt enthält zusätzlich eine RL-Pipeline mit Gymnasium + Stable-Baselines3 (PPO), die auf den echten Spielzuständen trainiert.  
 
+### Projektstruktur (RL)
+- `rl/` enthält die RL-Kernmodule (`game_session`, `pirate_game_env`, `training_metrics`, `game_types`).
+- Root-Dateien (`pirate_game_env.py`, `game_session.py`, ...) sind nur noch Kompatibilitäts-Wrapper.
+- `train_ppo.py` und `export_metrics.py` bleiben als einfache CLI-Entrypoints im Projektroot.
+
 ### RL-Setup  
 1. Virtuelle Umgebung aktivieren  
 2. RL-Abhängigkeiten installieren:
@@ -40,6 +45,10 @@ Das Projekt enthält zusätzlich eine RL-Pipeline mit Gymnasium + Stable-Baselin
 
 ### Training starten  
 - `python3 train_ppo.py --timesteps 500000 --run-name ppo_level1`
+- Optional mit geringerem Log-Noise:
+  - `python3 train_ppo.py --timesteps 500000 --run-name ppo_level1 --game-log-level WARNING`
+- Optional mit Progressbar:
+  - `python3 train_ppo.py --timesteps 500000 --run-name ppo_level1 --progress-bar`
 
 Das Training schreibt Artefakte nach `runs/<run-name>/`:
 - `tb/` (TensorBoard-Logs)
@@ -54,6 +63,8 @@ Das Training schreibt Artefakte nach `runs/<run-name>/`:
 
 ### PNG-Metriken exportieren  
 - `python3 export_metrics.py --run-dir runs/ppo_level1 --window 50`
+
+Hinweis: Python `3.9.6` ist für diese RL-Skripte kompatibel.
 
 Dabei werden folgende Diagramme erzeugt:
 - `reward_curve.png`

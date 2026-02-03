@@ -10,8 +10,8 @@ from stable_baselines3.common.callbacks import CallbackList, CheckpointCallback,
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.vec_env import DummyVecEnv
 
-from pirate_game_env import PirateGameEnv
-from training_metrics import EpisodeMetricsCallback
+from rl.pirate_game_env import PirateGameEnv
+from rl.training_metrics import EpisodeMetricsCallback
 
 
 def detect_device():
@@ -52,6 +52,11 @@ def parse_args():
         default="WARNING",
         choices=["TRACE", "DEBUG", "INFO", "SUCCESS", "WARNING", "ERROR", "CRITICAL"],
         help="Log level for game-side Loguru logs during training.",
+    )
+    parser.add_argument(
+        "--progress-bar",
+        action="store_true",
+        help="Show SB3 progress bar (small overhead).",
     )
     return parser.parse_args()
 
@@ -119,7 +124,7 @@ def main():
         ]
     )
 
-    model.learn(total_timesteps=args.timesteps, callback=callbacks)
+    model.learn(total_timesteps=args.timesteps, callback=callbacks, progress_bar=args.progress_bar)
     model.save(str(models_dir / "final_model"))
 
     print(f"Training complete. Artifacts in: {run_dir}")
