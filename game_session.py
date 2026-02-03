@@ -5,6 +5,7 @@ from typing import Optional
 
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide"
 import pygame
+import numpy as np
 
 from game_types import EpisodeStatus, GameAction
 from player import Player
@@ -21,6 +22,8 @@ BLOCK_SIZE = 60
 class _GameContext:
     def __init__(self, level_path: str):
         self.level = self._read_level(level_path)
+        self.level_width = max((len(line.rstrip("\n")) for line in self.level), default=1) * BLOCK_SIZE
+        self.level_height = max(len(self.level), 1) * BLOCK_SIZE
         self.gameFinished = False
 
     @staticmethod
@@ -63,6 +66,7 @@ class GameSession:
         self.world = World(self.context, BLOCK_SIZE, self.player)
         self.player.setWorld(self.world)
         self.world.on_player_death = self._on_player_death
+        self.world.main(self.surface)
 
         self.status = EpisodeStatus(
             is_win=False,
@@ -147,12 +151,71 @@ class GameSession:
         }
 
     def get_observation(self):
-        return [
-            float(self.player.playerPos.x),
-            float(self.player.playerPos.y),
-            float(self.player.speed_y),
-            float(self.status.max_progress_x),
-        ]
+        level_width = max(float(self.context.level_width), 1.0)
+        level_height = max(float(self.context.level_height), 1.0)
+        px = float(self.player.playerPos.x)
+        py = float(self.player.playerPos.y)
+        vx = float(self.player.get_speed_x())
+        vy = float(self.player.speed_y)
+
+        chest_dx, chest_dy = self._nearest_chest_delta()
+        enemy_dx, enemy_dy = self._nearest_enemy_delta()
+
+        collision_side = self.world.check_object_collision_sideblock(self.player.playerPos)
+        wall_left = 1.0 if collision_side == -2 else 0.0
+        wall_right = 1.0 if collision_side == -1 else 0.0
+
+        on_ground = 1.0 if self.world.collided_get_y(self.player.base, self.player.height) >= 0 and self.player.speed_y == 0 else 0.0
+        direction = float(self.player.get_direction())
+        enemy_ahead = 1.0 if (direction > 0 and 0 < enemy_dx < 300) or (direction < 0 and -300 < enemy_dx < 0) else 0.0
+        gap_ahead = self._gap_ahead_flag()
+
+        obs = np.array(
+            [
+                np.clip(px / level_width, 0.0, 1.0),
+                np.clip(py / level_height, 0.0, 1.0),
+                np.clip(vx / 12.0, -1.0, 1.0),
+                np.clip(vy / 20.0, -1.0, 1.0),
+                on_ground,
+                np.clip(direction, -1.0, 1.0),
+                np.clip(chest_dx / level_width, -1.0, 1.0),
+                np.clip(chest_dy / level_height, -1.0, 1.0),
+                np.clip(enemy_dx / level_width, -1.0, 1.0),
+                np.clip(enemy_dy / level_height, -1.0, 1.0),
+                enemy_ahead,
+                gap_ahead,
+                wall_left,
+                wall_right,
+                np.clip(self.status.max_progress_x / level_width, 0.0, 1.0),
+                np.clip(px / level_width, 0.0, 1.0),
+            ],
+            dtype=np.float32,
+        )
+        return obs
+
+    def _nearest_chest_delta(self):
+        if len(self.world.chestGroup) == 0:
+            return 0.0, 0.0
+        nearest = min(
+            self.world.chestGroup,
+            key=lambda chest: abs(chest.chestPos.x - self.player.playerPos.x),
+        )
+        return float(nearest.chestPos.x - self.player.playerPos.x), float(nearest.chestPos.y - self.player.playerPos.y)
+
+    def _nearest_enemy_delta(self):
+        if len(self.world.enemyGroup) == 0:
+            return 0.0, 0.0
+        nearest = min(
+            self.world.enemyGroup,
+            key=lambda enemy: abs(enemy.enemyPos.x - self.player.playerPos.x),
+        )
+        return float(nearest.enemyPos.x - self.player.playerPos.x), float(nearest.enemyPos.y - self.player.playerPos.y)
+
+    def _gap_ahead_flag(self):
+        direction = 1 if self.player.get_direction() >= 0 else -1
+        probe_x = self.player.playerPos.x + (direction * (self.player.width + 12))
+        probe_rect = pygame.Rect(int(probe_x), self.player.base.y + 4, 4, 2)
+        return 1.0 if self.world.collided_get_y(probe_rect, 2) < 0 else 0.0
 
     def get_status(self):
         if self.status.is_win or self.status.is_dead:

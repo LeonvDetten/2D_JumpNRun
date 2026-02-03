@@ -31,22 +31,72 @@ class PirateGameEnv(gym.Env):
             fps=self.metadata["render_fps"],
         )
 
-        self.action_space = spaces.Discrete(4)
+        self.action_space = spaces.Discrete(9)
         self.observation_space = spaces.Box(
-            low=np.array([0.0, 0.0, -100.0, 0.0], dtype=np.float32),
-            high=np.array([5000.0, 1200.0, 100.0, 5000.0], dtype=np.float32),
+            low=np.array(
+                [
+                    0.0,
+                    0.0,
+                    -1.0,
+                    -1.0,
+                    0.0,
+                    -1.0,
+                    -1.0,
+                    -1.0,
+                    -1.0,
+                    -1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                ],
+                dtype=np.float32,
+            ),
+            high=np.array(
+                [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0,
+                ],
+                dtype=np.float32,
+            ),
             dtype=np.float32,
         )
         self._episode_steps = 0
 
     def _to_action(self, action_id: int) -> GameAction:
         if action_id == 0:
-            return GameAction(left=True)
+            return GameAction()
         if action_id == 1:
-            return GameAction(right=True)
+            return GameAction(left=True)
         if action_id == 2:
+            return GameAction(right=True)
+        if action_id == 3:
             return GameAction(jump=True)
-        return GameAction(shoot=True)
+        if action_id == 4:
+            return GameAction(left=True, jump=True)
+        if action_id == 5:
+            return GameAction(right=True, jump=True)
+        if action_id == 6:
+            return GameAction(shoot=True)
+        if action_id == 7:
+            return GameAction(left=True, shoot=True)
+        return GameAction(right=True, shoot=True)
 
     def reset(self, *, seed=None, options=None):
         super().reset(seed=seed)
