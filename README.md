@@ -53,7 +53,11 @@ Das Projekt enthält zusätzlich eine RL-Pipeline mit Gymnasium + Stable-Baselin
   - `python3 train_ppo.py --timesteps 500000 --run-name ppo_level1 --action-preset simple`
   - Für volle Aktionstiefe später: `--action-preset full`
 - Curriculum (empfohlen):
-  - `python3 train_ppo.py --timesteps 500000 --run-name ppo_curriculum --curriculum --easy-level-path level_easy.txt --curriculum-easy-steps 120000 --action-preset simple`
+  - `python3 train_ppo.py --timesteps 500000 --run-name ppo_curriculum --curriculum --easy-level-path level_easy.txt --curriculum-easy-steps 100000 --medium-level-path level_medium.txt --curriculum-medium-steps 120000 --level-path level.txt --action-preset simple`
+  - Trainingsmaps:
+    - `level_easy.txt`: nur Grundbewegung/Zielerreichung
+    - `level_medium.txt`: kontrollierte Gaps, kleine Plattformen, wenige Gegner
+    - `level.txt`: Originallevel
 
 ### Fine-Tuning / Resume
 - Bestehendes Modell weitertrainieren:
@@ -69,6 +73,7 @@ Das Training schreibt Artefakte nach `runs/<run-name>/`:
 
 Bei Curriculum-Läufen werden die Artefakte zusätzlich in:
 - `curriculum_easy/`
+- `curriculum_medium/`
 - `curriculum_full/`
 gespeichert.
 
