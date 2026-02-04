@@ -1,3 +1,5 @@
+"""Gymnasium environment wrapper around the custom 2D Jump'n'Run game."""
+
 import gymnasium as gym
 import numpy as np
 from gymnasium import spaces
@@ -7,6 +9,8 @@ from rl.game_types import GameAction
 
 
 class PirateGameEnv(gym.Env):
+    """Stable-Baselines3 compatible environment using handcrafted feature observations."""
+
     metadata = {"render_modes": ["none", "human"], "render_fps": 30}
 
     def __init__(
@@ -39,6 +43,7 @@ class PirateGameEnv(gym.Env):
 
         action_count = 5 if self.action_preset == "simple" else 9
         self.action_space = spaces.Discrete(action_count)
+        # Observation bounds stay stable so old checkpoints remain loadable.
         self.observation_space = spaces.Box(
             low=np.array(
                 [
@@ -175,6 +180,7 @@ class PirateGameEnv(gym.Env):
         if new_checkpoints > 0:
             self._max_checkpoint_reached = current_checkpoint
 
+        # Base shaping: encourage measurable progress and sparse milestone rewards.
         goal_progress_reward = float(np.clip(np.tanh(goal_delta / 45.0) * 1.5, -1.5, 1.5))
         time_penalty = -0.01
         kill_bonus = float(result["killed_enemies"]) * 1.0
@@ -206,6 +212,7 @@ class PirateGameEnv(gym.Env):
         elif truncated:
             reward -= 25.0
 
+        # Optional balanced-profile shaping for better reactivity near immediate hazards.
         hazard_response_reward = 0.0
         if self.obs_profile == "balanced":
             hazard_ahead_short_before = self._prev_hazard_ahead_short >= 0.5

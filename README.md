@@ -1,104 +1,149 @@
-# 2D_JumpNRun
-  
-## Spielbeschreibung:  
-Das Spiel Space Pirate ist ein 2D-Spiel, in welchem ein Pirat gesteuert wird. Der Pirat muss sich durch ein Level kämpfen und dabei Gegner besiegen und Hindernisse überwinden. Gegner können durch einen Sprung auf den Kopf oder durch einen Revolverschuss besiegt werden. Das Spiel ist in Python geschrieben und verwendet die Pygame-Bibliothek. Das Ziel ist es, das Level zu beenden, indem die Kiste am Ende des Levels geöffnet wird. Sobald das Level beendet ist, wird die benötigte Zeit ausgegeben.  
-  
-Bitte beachten Sie, dass es sich bei diesem Spiel um einen Prototyp handelt, welcher noch kein Game Over Screen oder Menü enthält. Des Weiteren existiert lediglich ein Level. Dieses kann jedoch beliebig bearbeitet werden. Das Level wird verändert, indem die `level.txt` Datei bearbeitet wird. Hierbei müssen ASCII Zeichen verwendet werden, um die verschiedenen Objekte zu platzieren:  
-- `E` = Enemy (Gegner)  
-- `B` = Block  
-- `C` = Chest (Kiste)  
-  
-Es können mehrere Kisten in der Welt platziert werden. In diesem Fall dient jede Kiste als Endpunkt und das Spiel wird nach Öffnen dieser Kiste beendet.  
-  
-## Anforderungen:  
-Siehe `requirement.txt` Datei.  
-  
-## Installation:  
-Um die Applikation ausführen zu können, müssen die benötigten Bibliotheken heruntergeladen werden. Für dieses Spiel werden die Pygame und Loguru Bibliotheken benötigt. Diese können mit folgenden Befehlen heruntergeladen werden:  
-- `pip install loguru==0.7.0`  
-- `pip install pygame==2.1.0`  
-  
-Außerdem wird Python3 benötigt. Diese Applikation wurde mit Python 3.9.13 entwickelt. Die Version kann auf der offiziellen Python-Seite heruntergeladen werden: [Python Downloads](https://www.python.org/downloads/windows/)  
-  
-## Ausführen des Spiels:  
-Um das Spiel zu starten, muss die Datei `game.py` ausgeführt werden. Sobald das Spiel gestartet wird, öffnet sich ein neues Fenster und das Spiel beginnt. Das Spiel kann lediglich durch das Schließen des Fensters beendet werden. Sollte der Spieler durch einen Gegner eliminiert werden, beendet sich die Applikation automatisch.  
-  
-## Steuerung:  
-Der Piratenspieler kann mit den Tasten `W`, `A`, `D`, Leertaste und Enter gesteuert werden.  
-- Die `W`-Taste und Leertaste führen einen Sprung aus.  
-- Mit der `A`-Taste wird der Spieler nach links bewegt.  
-- Mit der `D`-Taste wird der Spieler nach rechts bewegt.  
-- Mit Enter führt der Spieler einen Revolverschuss aus.  
+# Space Pirate 2D Jump'n'Run + PPO Agent
 
-## RL Agent (PPO)  
-Das Projekt enthält zusätzlich eine RL-Pipeline mit Gymnasium + Stable-Baselines3 (PPO), die auf den echten Spielzuständen trainiert.  
+This repository contains a custom 2D platformer written with Pygame and an integrated PPO training pipeline (Gymnasium + Stable-Baselines3).
 
-### Projektstruktur (RL)
-- `rl/` enthält die RL-Kernmodule (`game_session`, `pirate_game_env`, `training_metrics`, `game_types`).
-- Root-Dateien (`pirate_game_env.py`, `game_session.py`, ...) sind nur noch Kompatibilitäts-Wrapper.
-- `train_ppo.py` und `export_metrics.py` bleiben als einfache CLI-Entrypoints im Projektroot.
+The current codebase is focused on **one RL approach (PPO)**. Legacy DQN code and old generated artifacts were removed to keep the project easier to understand and maintain.
 
-### RL-Setup  
-1. Virtuelle Umgebung aktivieren  
-2. RL-Abhängigkeiten installieren:
-   - `pip install -r requirements-rl.txt`
+## Core Idea
 
-### Training starten  
-- `python3 train_ppo.py --timesteps 500000 --run-name ppo_level1`
-- Optional mit geringerem Log-Noise:
-  - `python3 train_ppo.py --timesteps 500000 --run-name ppo_level1 --game-log-level WARNING`
-- Optional mit Progressbar:
-  - `python3 train_ppo.py --timesteps 500000 --run-name ppo_level1 --progress-bar`
-- Action-Set für schnelleres Lernen:
-  - `python3 train_ppo.py --timesteps 500000 --run-name ppo_level1 --action-preset simple`
-  - Für volle Aktionstiefe später: `--action-preset full`
-- Curriculum (empfohlen):
-  - `python3 train_ppo.py --timesteps 500000 --run-name ppo_curriculum --curriculum --easy-level-path level_easy.txt --curriculum-easy-steps 100000 --medium-level-path level_medium.txt --curriculum-medium-steps 120000 --level-path level.txt --action-preset simple`
-  - Trainingsmaps:
-    - `level_easy.txt`: nur Grundbewegung/Zielerreichung
-    - `level_medium.txt`: kontrollierte Gaps, kleine Plattformen, wenige Gegner
-    - `level.txt`: Originallevel
+- `game.py` runs the manual game loop (keyboard control).
+- `rl/game_session.py` wraps the existing game objects into a `reset/step/observation` API.
+- `rl/pirate_game_env.py` exposes the game as a Gymnasium environment.
+- `train_ppo.py` trains PPO agents (single-level or curriculum).
+- `GameWithBot.py` loads a PPO model and lets you watch it play.
 
-### Fine-Tuning / Resume
-- Bestehendes Modell weitertrainieren:
-  - `python3 train_ppo.py --timesteps 200000 --run-name ppo_finetune --load-model runs/ppo_curriculum/models/final_model.zip --action-preset simple`
+## Project Structure
 
-Das Training schreibt Artefakte nach `runs/<run-name>/`:
-- `tb/` (TensorBoard-Logs)
-- `metrics/episodes.csv` (Episode-Metriken)
-- `eval/` (Evaluation-Logs)
-- `checkpoints/` (Best/Checkpoint-Modelle)
-- `models/` (Finales Modell)
-- `plots/` (exportierte PNG-Visualisierungen)
+```text
+2D_JumpNRun/
+├── game.py                    # Manual game (Pygame loop)
+├── player.py                  # Player logic and controls
+├── world.py                   # World loading/collision/chunks
+├── enemy.py                   # Enemy behavior
+├── object.py                  # Chest/bullet objects
+├── level.txt                  # Full/original level
+├── level_medium.txt           # Medium curriculum level
+├── level_easy.txt             # Easy curriculum level
+├── rl/
+│   ├── game_types.py          # RL dataclasses (action/status)
+│   ├── game_session.py        # Game wrapper for RL stepping
+│   ├── pirate_game_env.py     # Gymnasium env + reward shaping
+│   └── training_metrics.py    # CSV + TensorBoard metrics callback
+├── train_ppo.py               # Training entrypoint
+├── GameWithBot.py             # Visual bot playback entrypoint
+├── export_metrics.py          # Export plots from episode CSV
+└── requirements-rl.txt        # Dependencies for game + RL
+```
 
-Bei Curriculum-Läufen werden die Artefakte zusätzlich in:
-- `curriculum_easy/`
-- `curriculum_medium/`
-- `curriculum_full/`
-gespeichert.
+## Installation
 
-### Reward-Highlights (aktuelle Version)
-- Distanzreduktion zur Chest über `goal_delta` (mit `tanh`-Skalierung).
-- Einmaliger Checkpoint-Bonus alle 600 Pixel Fortschritt.
-- Zeitstrafe pro Schritt, Death-/Timeout-Strafen und Win-Bonus.
+Recommended Python: `3.9+`
 
-### Live-Metriken mit TensorBoard  
-- `tensorboard --logdir runs`
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements-rl.txt
+```
 
-### PNG-Metriken exportieren  
-- `python3 export_metrics.py --run-dir runs/ppo_level1 --window 50`
+## Run the Game (manual)
 
-Hinweis: Python `3.9.6` ist für diese RL-Skripte kompatibel.
+```bash
+python3 game.py
+```
 
-Dabei werden folgende Diagramme erzeugt:
-- `reward_curve.png`
-- `episode_length.png`
-- `success_rate.png`
-- `progress_x.png`
-  
-## Lizenzen:  
-Die verwendeten Bilder (Sprites) sind lizenzfrei und dürfen frei verwendet werden. Die Bilder können auf folgenden Seiten heruntergeladen werden:  
-- Player Sprites: [Craftpix](https://craftpix.net/freebies/free-2d-pirate-character-sprites/)  
-- Enemy Sprites: [Pipoya](https://pipoya.itch.io/pipoya-free-rpg-character-sprites-32x32)  
-- Block (Ground) Sprites: [PNG Wing](https://www.pngwing.com/en/free-png-zoola/download)  
-- Chest Sprites: [Admurin](https://admurin.itch.io/free-chest-animations)  
+Controls:
+- `A` left
+- `D` right
+- `W` or `SPACE` jump
+- `ENTER` shoot
+
+## Train PPO
+
+### Simple run
+
+```bash
+python3 train_ppo.py \
+  --run-name ppo_baseline \
+  --level-path level_medium.txt \
+  --timesteps 200000 \
+  --action-preset simple \
+  --obs-profile balanced \
+  --game-log-level WARNING \
+  --progress-bar
+```
+
+### Curriculum run (easy -> medium -> full)
+
+```bash
+python3 train_ppo.py \
+  --run-name ppo_curriculum \
+  --curriculum \
+  --easy-level-path level_easy.txt \
+  --curriculum-easy-steps 100000 \
+  --medium-level-path level_medium.txt \
+  --curriculum-medium-steps 120000 \
+  --level-path level.txt \
+  --timesteps 420000 \
+  --action-preset simple \
+  --obs-profile balanced \
+  --game-log-level WARNING \
+  --progress-bar
+```
+
+### Continue from checkpoint
+
+```bash
+python3 train_ppo.py \
+  --run-name ppo_resume \
+  --load-model runs/ppo_curriculum/checkpoints/best_model.zip \
+  --level-path level_medium.txt \
+  --timesteps 120000
+```
+
+## Watch the Bot Play
+
+```bash
+python3 GameWithBot.py \
+  --model-path runs/ppo_curriculum/checkpoints/best_model.zip \
+  --level-path level_medium.txt \
+  --action-preset simple \
+  --obs-profile balanced \
+  --loop
+```
+
+> Important: `--obs-profile` should match the profile used during training (`balanced` or `legacy`).
+
+## Metrics
+
+### TensorBoard
+
+```bash
+tensorboard --logdir runs
+```
+
+### PNG export
+
+```bash
+python3 export_metrics.py --run-dir runs/ppo_curriculum --window 50
+```
+
+## Observation Vector (shape = 16)
+
+`0..9, 14, 15` are stable base features. `10..13` depend on profile:
+
+- `legacy`: old features (enemy ahead, gap ahead, enemy close, safe ground distance)
+- `balanced`: hazard-focused features (short/mid hazard + threat ahead/behind)
+
+This keeps model input shape stable while allowing safer feature experiments.
+
+## What to Tune Next
+
+- Reward weights in `rl/pirate_game_env.py`
+- Hazard feature thresholds in `rl/game_session.py`
+- Curriculum step split in `train_ppo.py`
+- Action set (`simple` vs `full`)
+- `frame_skip` (default is `2` for more reactive control)
+
+## Assets / Licenses
+
+Sprites and art assets are stored in `img/` and remain under their original source licenses.

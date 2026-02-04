@@ -1,3 +1,9 @@
+"""Game runtime wrapper used by RL training and evaluation.
+
+It adapts the existing Pygame world/player code into a deterministic
+`reset/step/get_observation` interface without changing the original game loop.
+"""
+
 import os
 import random
 from dataclasses import asdict
@@ -20,6 +26,8 @@ BLOCK_SIZE = 60
 
 
 class _GameContext:
+    """Small adapter that mirrors the fields expected by `World`."""
+
     def __init__(self, level_path: str):
         self.level = self._read_level(level_path)
         self.level_width = max((len(line.rstrip("\n")) for line in self.level), default=1) * BLOCK_SIZE
@@ -36,6 +44,8 @@ class _GameContext:
 
 
 class GameSession:
+    """Owns one live game instance and exposes RL-friendly stepping APIs."""
+
     def __init__(
         self,
         level_path: str = "level.txt",
@@ -171,6 +181,8 @@ class GameSession:
         }
 
     def get_observation(self):
+        """Return the fixed-size observation vector used by PPO (shape = 16)."""
+
         level_width = max(float(self.context.level_width), 1.0)
         level_height = max(float(self.context.level_height), 1.0)
         px = float(self.player.playerPos.x)
@@ -201,7 +213,7 @@ class GameSession:
             feature_12 = enemy_threat_ahead
             feature_13 = enemy_threat_behind
 
-        # Slots 10-13 stay shape-compatible (legacy or balanced semantics).
+        # Slots 10-13 can switch semantics via obs_profile while keeping shape=16.
         obs = np.array(
             [
                 np.clip(px / level_width, 0.0, 1.0),
@@ -262,6 +274,8 @@ class GameSession:
         )
 
     def _gap_in_distance_window(self, min_distance: int, max_distance: int, step: int = 12):
+        """Binary gap detector in front of the player for a distance window."""
+
         direction = 1 if self.player.get_direction() >= 0 else -1
         start = max(0, int(min_distance))
         end = max(start, int(max_distance))
@@ -273,12 +287,16 @@ class GameSession:
         return 0.0
 
     def _gap_ahead_flag(self):
+        """Legacy short-range gap feature kept for backward-compatible obs semantics."""
+
         direction = 1 if self.player.get_direction() >= 0 else -1
         probe_x = self.player.playerPos.x + (direction * (self.player.width + 12))
         probe_rect = pygame.Rect(int(probe_x), self.player.base.y + 4, 4, 2)
         return 1.0 if self.world.collided_get_y(probe_rect, 2) < 0 else 0.0
 
     def _safe_ground_ahead_distance(self, max_scan: int = 360, step: int = 12):
+        """Legacy normalized distance to next safe ground tile in front."""
+
         direction = 1 if self.player.get_direction() >= 0 else -1
         for distance in range(0, max_scan + step, step):
             probe_x = self.player.playerPos.x + (direction * (self.player.width + distance))
@@ -288,6 +306,8 @@ class GameSession:
         return 1.0
 
     def _enemy_threat_bands(self, short_distance: float, mid_distance: float, vertical_tolerance: float):
+        """Compute threat features for enemies in front/behind relative to facing direction."""
+
         direction = 1.0 if self.player.get_direction() >= 0 else -1.0
         enemy_hazard_short = 0.0
         enemy_hazard_mid = 0.0

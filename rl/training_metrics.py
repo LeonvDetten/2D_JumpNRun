@@ -1,3 +1,5 @@
+"""Custom SB3 callback that persists per-episode metrics to CSV and TensorBoard."""
+
 import csv
 from collections import deque
 from pathlib import Path
@@ -6,6 +8,8 @@ from stable_baselines3.common.callbacks import BaseCallback
 
 
 class EpisodeMetricsCallback(BaseCallback):
+    """Collects episode-level diagnostics for later plotting and comparisons."""
+
     def __init__(self, metrics_dir: str, filename: str = "episodes.csv", window_size: int = 100, verbose: int = 0):
         super().__init__(verbose)
         self.metrics_dir = Path(metrics_dir)

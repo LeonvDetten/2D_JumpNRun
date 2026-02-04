@@ -1,3 +1,8 @@
+# Core game dependencies
+pygame>=2.1.0
+loguru>=0.7.0
+
+# RL + training stack
 gymnasium>=0.29.1
 stable-baselines3>=2.3.2
 tensorboard>=2.16.0

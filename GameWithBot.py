@@ -1,3 +1,5 @@
+"""Run a trained PPO model inside the live game window for visual inspection."""
+
 import argparse
 from pathlib import Path
 
@@ -33,6 +35,8 @@ def parse_args():
 
 
 def run_ppo_bot(args):
+    """Load one PPO checkpoint and execute it episode-by-episode."""
+
     model_path = Path(args.model_path)
     if not model_path.exists():
         raise FileNotFoundError(f"Model file not found: {model_path}")

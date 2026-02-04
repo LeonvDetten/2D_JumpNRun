@@ -1,3 +1,5 @@
+"""CLI entrypoint for PPO training, fine-tuning, and curriculum runs."""
+
 import argparse
 import sys
 from datetime import datetime
@@ -16,6 +18,8 @@ from rl.training_metrics import EpisodeMetricsCallback
 
 
 def detect_device():
+    """Pick the fastest available backend on the current machine."""
+
     if torch.backends.mps.is_available():
         return "mps"
     if torch.cuda.is_available():
@@ -31,6 +35,8 @@ def make_env(
     action_preset: str,
     obs_profile: str,
 ):
+    """Create one monitored environment factory for SB3 vectorized wrappers."""
+
     def _factory():
         env = PirateGameEnv(
             level_path=level_path,
@@ -135,6 +141,8 @@ def warn_if_loading_model(args):
 
 
 def build_callbacks(run_dir: Path, eval_env, eval_freq: int, eval_episodes: int, checkpoint_freq: int):
+    """Create eval/checkpoint/custom-metrics callbacks for one stage."""
+
     checkpoints_dir = run_dir / "checkpoints"
     eval_dir = run_dir / "eval"
     metrics_dir = run_dir / "metrics"
@@ -218,6 +226,7 @@ def main():
 
     try:
         if args.curriculum:
+            # Stage schedule: easy -> medium -> full.
             easy_steps = min(args.curriculum_easy_steps, args.timesteps)
             remaining_after_easy = max(0, args.timesteps - easy_steps)
             medium_steps = min(args.curriculum_medium_steps, remaining_after_easy)
