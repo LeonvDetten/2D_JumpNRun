@@ -94,6 +94,7 @@ class Player(pygame.sprite.Sprite):
         self.player_plain = pygame.sprite.RenderPlain(self)     
 
         self.bulletGroup = pygame.sprite.Group()
+        self.__frozen = False
 
         logger.info("Created player object")
 
@@ -240,7 +241,22 @@ class Player(pygame.sprite.Sprite):
 
         """
             
-        self.movement(action)                                                                                                
+        if self.__frozen:
+            # Freeze player after chest touch while allowing chest animation to finish.
+            self.__speed_x = 0
+            self.speed_y = 0
+            if self.__direction == -1:
+                self.__currentAnimation = "IDLE_left"
+            else:
+                self.__currentAnimation = "IDLE_right"
+            self.base.x = self.playerPos.x
+            self.base.y = self.playerPos.y + self.height
+            self.rect.x = self.playerPos.x - self.getCamOffset()
+            self.rect.y = self.playerPos.y
+            self.animation()
+            return
+
+        self.movement(action)
         self.move_y()
         self.check_enemy_collision()
         self.animation()         
@@ -491,6 +507,9 @@ class Player(pygame.sprite.Sprite):
 
     def get_direction(self):
         return self.__direction
+
+    def set_frozen(self, frozen: bool):
+        self.__frozen = bool(frozen)
                           
           
     

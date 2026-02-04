@@ -217,6 +217,7 @@ class Chest(pygame.sprite.Sprite):
         self.loadSprites()
 
         self.__gotOpened = False    
+        self.__openingStarted = False
 
         self.image = self.__chestSprites[self.__currentSprite]
         self.chestPos = pygame.Rect(position_x, position_y, width, height)
@@ -285,12 +286,20 @@ class Chest(pygame.sprite.Sprite):
 
         """
 
-        if self.__gotOpened == False:   #check if chest is already opened
-            if self.__world.player.playerPos.colliderect(self.chestPos) == True:    #check if player collides with chest
-                self.animation()                                                    #if true do animation
-            else:
-                self.__currentSprite = 0                                            #set current sprite to 0 if player doesn't collide with chest anymore(opening animation have to start again)
-            self.image = self.__chestSprites[int(self.__currentSprite)] # Chestpicture wird geupdated
+        if self.__gotOpened:
+            return
+
+        # One touch is enough to trigger the win flow.
+        if not self.__openingStarted and self.__world.player.playerPos.colliderect(self.chestPos):
+            self.__openingStarted = True
+            if hasattr(self.__world.player, "set_frozen"):
+                self.__world.player.set_frozen(True)
+            logger.info("Chest touched. Start opening animation")
+
+        # Continue opening once started, even if player no longer overlaps the chest.
+        if self.__openingStarted:
+            self.animation()
+        self.image = self.__chestSprites[int(self.__currentSprite)]
 
 
     def animation(self):
