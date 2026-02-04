@@ -33,6 +33,9 @@ class EpisodeMetricsCallback(BaseCallback):
                     "max_progress_x",
                     "goal_distance",
                     "checkpoint_index",
+                    "jump_rate",
+                    "hazard_ignore_rate",
+                    "hazard_reaction_rate",
                 ]
             )
 
@@ -48,6 +51,9 @@ class EpisodeMetricsCallback(BaseCallback):
             max_progress_x = float(info.get("max_progress_x", 0.0))
             goal_distance = float(info.get("goal_distance", 0.0))
             checkpoint_index = int(info.get("checkpoint_index", 0))
+            jump_rate = float(info.get("jump_rate", 0.0))
+            hazard_ignore_rate = float(info.get("hazard_ignore_rate", 0.0))
+            hazard_reaction_rate = float(info.get("hazard_reaction_rate", 0.0))
             reward = float(episode_info.get("r", 0.0))
             length = int(episode_info.get("l", 0))
 
@@ -60,6 +66,9 @@ class EpisodeMetricsCallback(BaseCallback):
                 max_progress_x,
                 goal_distance,
                 checkpoint_index,
+                jump_rate,
+                hazard_ignore_rate,
+                hazard_reaction_rate,
             ]
             self._rows.append(row)
             self._recent_wins.append(is_win)
@@ -69,6 +78,9 @@ class EpisodeMetricsCallback(BaseCallback):
             self.logger.record("rollout/max_progress_x", max_progress_x)
             self.logger.record("rollout/goal_distance", goal_distance)
             self.logger.record("rollout/checkpoint_index", checkpoint_index)
+            self.logger.record("rollout/jump_rate", jump_rate)
+            self.logger.record("rollout/hazard_ignore_rate", hazard_ignore_rate)
+            self.logger.record("rollout/hazard_reaction_rate", hazard_reaction_rate)
             self.logger.record("rollout/win_rate_100", sum(self._recent_wins) / len(self._recent_wins))
 
         if self._rows:

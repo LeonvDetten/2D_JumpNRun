@@ -23,7 +23,14 @@ def detect_device():
     return "cpu"
 
 
-def make_env(level_path: str, headless: bool, max_episode_steps: int, frame_skip: int, action_preset: str):
+def make_env(
+    level_path: str,
+    headless: bool,
+    max_episode_steps: int,
+    frame_skip: int,
+    action_preset: str,
+    obs_profile: str,
+):
     def _factory():
         env = PirateGameEnv(
             level_path=level_path,
@@ -32,6 +39,7 @@ def make_env(level_path: str, headless: bool, max_episode_steps: int, frame_skip
             max_episode_steps=max_episode_steps,
             frame_skip=frame_skip,
             action_preset=action_preset,
+            obs_profile=obs_profile,
         )
         return Monitor(env)
 
@@ -52,12 +60,18 @@ def parse_args():
     parser.add_argument("--timesteps", type=int, default=500_000)
     parser.add_argument("--run-name", default=f"ppo_{datetime.now().strftime('%Y%m%d_%H%M%S')}")
     parser.add_argument("--log-dir", default="runs")
-    parser.add_argument("--frame-skip", type=int, default=4)
+    parser.add_argument("--frame-skip", type=int, default=2)
     parser.add_argument(
         "--action-preset",
         default="simple",
         choices=["simple", "full"],
         help="Action set for training. 'simple' is faster to learn on this level.",
+    )
+    parser.add_argument(
+        "--obs-profile",
+        default="balanced",
+        choices=["balanced", "legacy"],
+        help="Observation semantics for slots 10-13.",
     )
     parser.add_argument("--max-episode-steps", type=int, default=1800)
     parser.add_argument("--eval-freq", type=int, default=10_000)
@@ -116,7 +130,7 @@ def warn_if_loading_model(args):
         return
     logger.warning(
         "Loading a saved model: PPO hyperparameters from the checkpoint are reused. "
-        "Only env-related flags (e.g. --level-path, --action-preset, --max-episode-steps) are applied."
+        "Only env-related flags (e.g. --level-path, --action-preset, --obs-profile, --max-episode-steps) are applied."
     )
 
 
@@ -210,10 +224,28 @@ def main():
             full_steps = max(0, remaining_after_easy - medium_steps)
 
             easy_train_env = DummyVecEnv(
-                [make_env(args.easy_level_path, True, args.max_episode_steps, args.frame_skip, args.action_preset)]
+                [
+                    make_env(
+                        args.easy_level_path,
+                        True,
+                        args.max_episode_steps,
+                        args.frame_skip,
+                        args.action_preset,
+                        args.obs_profile,
+                    )
+                ]
             )
             easy_eval_env = DummyVecEnv(
-                [make_env(args.easy_level_path, True, args.max_episode_steps, args.frame_skip, args.action_preset)]
+                [
+                    make_env(
+                        args.easy_level_path,
+                        True,
+                        args.max_episode_steps,
+                        args.frame_skip,
+                        args.action_preset,
+                        args.obs_profile,
+                    )
+                ]
             )
             easy_callbacks = build_callbacks(
                 run_dir / "curriculum_easy",
@@ -228,10 +260,28 @@ def main():
 
             if medium_steps > 0:
                 medium_train_env = DummyVecEnv(
-                    [make_env(args.medium_level_path, True, args.max_episode_steps, args.frame_skip, args.action_preset)]
+                    [
+                        make_env(
+                            args.medium_level_path,
+                            True,
+                            args.max_episode_steps,
+                            args.frame_skip,
+                            args.action_preset,
+                            args.obs_profile,
+                        )
+                    ]
                 )
                 medium_eval_env = DummyVecEnv(
-                    [make_env(args.medium_level_path, True, args.max_episode_steps, args.frame_skip, args.action_preset)]
+                    [
+                        make_env(
+                            args.medium_level_path,
+                            True,
+                            args.max_episode_steps,
+                            args.frame_skip,
+                            args.action_preset,
+                            args.obs_profile,
+                        )
+                    ]
                 )
                 model.set_env(medium_train_env)
                 medium_callbacks = build_callbacks(
@@ -246,10 +296,28 @@ def main():
 
             if full_steps > 0:
                 full_train_env = DummyVecEnv(
-                    [make_env(args.level_path, True, args.max_episode_steps, args.frame_skip, args.action_preset)]
+                    [
+                        make_env(
+                            args.level_path,
+                            True,
+                            args.max_episode_steps,
+                            args.frame_skip,
+                            args.action_preset,
+                            args.obs_profile,
+                        )
+                    ]
                 )
                 full_eval_env = DummyVecEnv(
-                    [make_env(args.level_path, True, args.max_episode_steps, args.frame_skip, args.action_preset)]
+                    [
+                        make_env(
+                            args.level_path,
+                            True,
+                            args.max_episode_steps,
+                            args.frame_skip,
+                            args.action_preset,
+                            args.obs_profile,
+                        )
+                    ]
                 )
                 model.set_env(full_train_env)
                 full_callbacks = build_callbacks(
@@ -262,10 +330,28 @@ def main():
                 train_stage(model, full_steps, full_callbacks, args.progress_bar, reset_num_timesteps=False)
         else:
             train_env = DummyVecEnv(
-                [make_env(args.level_path, True, args.max_episode_steps, args.frame_skip, args.action_preset)]
+                [
+                    make_env(
+                        args.level_path,
+                        True,
+                        args.max_episode_steps,
+                        args.frame_skip,
+                        args.action_preset,
+                        args.obs_profile,
+                    )
+                ]
             )
             eval_env = DummyVecEnv(
-                [make_env(args.level_path, True, args.max_episode_steps, args.frame_skip, args.action_preset)]
+                [
+                    make_env(
+                        args.level_path,
+                        True,
+                        args.max_episode_steps,
+                        args.frame_skip,
+                        args.action_preset,
+                        args.obs_profile,
+                    )
+                ]
             )
             callbacks = build_callbacks(run_dir, eval_env, args.eval_freq, args.eval_episodes, args.checkpoint_freq)
             model = build_model(args, train_env, device, tensorboard_dir / "main")

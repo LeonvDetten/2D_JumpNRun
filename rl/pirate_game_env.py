@@ -15,8 +15,9 @@ class PirateGameEnv(gym.Env):
         headless: bool = True,
         render_mode: str = "none",
         max_episode_steps: int = 2500,
-        frame_skip: int = 4,
+        frame_skip: int = 2,
         action_preset: str = "simple",
+        obs_profile: str = "balanced",
     ):
         super().__init__()
         self.level_path = level_path
@@ -25,6 +26,7 @@ class PirateGameEnv(gym.Env):
         self.max_episode_steps = max_episode_steps
         self.frame_skip = frame_skip
         self.action_preset = action_preset
+        self.obs_profile = obs_profile
 
         self.session = GameSession(
             level_path=self.level_path,
@@ -32,6 +34,7 @@ class PirateGameEnv(gym.Env):
             render_mode=self.render_mode,
             fps=self.metadata["render_fps"],
             max_episode_steps=self.max_episode_steps,
+            obs_profile=self.obs_profile,
         )
 
         action_count = 5 if self.action_preset == "simple" else 9
@@ -86,8 +89,16 @@ class PirateGameEnv(gym.Env):
         self._prev_x = 0.0
         self._prev_goal_distance = 0.0
         self._max_checkpoint_reached = 0
+        self._prev_hazard_ahead_short = 0.0
+        self._hazard_events = 0
+        self._hazard_reactions = 0
+        self._hazard_ignores = 0
+        self._jump_actions = 0
         self.checkpoint_spacing = 600.0
         self.checkpoint_bonus = 3.0
+        self.hazard_response_bonus = 0.2
+        self.hazard_ignore_step_penalty = -0.03
+        self.hazard_ignore_death_penalty = -0.5
 
     def _simple_action(self, action_id: int) -> GameAction:
         if action_id == 0:
@@ -131,10 +142,19 @@ class PirateGameEnv(gym.Env):
         self._prev_x = float(self.session.player.playerPos.x)
         self._prev_goal_distance = float(self.session.get_goal_distance())
         self._max_checkpoint_reached = int(float(self.session.player.playerPos.x) // self.checkpoint_spacing)
+        self._prev_hazard_ahead_short = float(obs[10]) if self.obs_profile == "balanced" and len(obs) > 10 else 0.0
+        self._hazard_events = 0
+        self._hazard_reactions = 0
+        self._hazard_ignores = 0
+        self._jump_actions = 0
         return np.asarray(obs, dtype=np.float32), {}
 
     def step(self, action):
         game_action = self._to_action(int(action))
+        jump_taken = bool(getattr(game_action, "jump", False))
+        if jump_taken:
+            self._jump_actions += 1
+
         result = self.session.step(game_action, frames=self.frame_skip)
         obs = np.asarray(result["observation"], dtype=np.float32)
         status = result["status"]
@@ -177,20 +197,42 @@ class PirateGameEnv(gym.Env):
             terminated = True
             reward -= 120.0
 
+        is_dead = bool(status["is_dead"]) or bool(is_runaway)
+
         if status["is_win"]:
             reward += 260.0
-        elif status["is_dead"]:
+        elif is_dead:
             reward -= 130.0
         elif truncated:
             reward -= 25.0
 
+        hazard_response_reward = 0.0
+        if self.obs_profile == "balanced":
+            hazard_ahead_short_before = self._prev_hazard_ahead_short >= 0.5
+            if hazard_ahead_short_before:
+                self._hazard_events += 1
+                if jump_taken and not is_dead:
+                    self._hazard_reactions += 1
+                    hazard_response_reward += self.hazard_response_bonus
+                else:
+                    self._hazard_ignores += 1
+                    hazard_response_reward += self.hazard_ignore_step_penalty
+                    if is_dead:
+                        hazard_response_reward += self.hazard_ignore_death_penalty
+        reward += hazard_response_reward
+
         self._prev_x = current_x
         self._prev_goal_distance = goal_distance
+        self._prev_hazard_ahead_short = float(obs[10]) if self.obs_profile == "balanced" and len(obs) > 10 else 0.0
+
+        jump_rate = float(self._jump_actions / max(1, self._episode_steps))
+        hazard_ignore_rate = float(self._hazard_ignores / max(1, self._hazard_events))
+        hazard_reaction_rate = float(self._hazard_reactions / max(1, self._hazard_events))
 
         info = {
             "killed_enemies": result["killed_enemies"],
             "is_win": status["is_win"],
-            "is_dead": status["is_dead"] or bool(is_runaway),
+            "is_dead": is_dead,
             "step_count": status["step_count"],
             "max_progress_x": status["max_progress_x"],
             "current_x": current_x,
@@ -204,6 +246,18 @@ class PirateGameEnv(gym.Env):
             "reward_checkpoint": checkpoint_reward,
             "reward_time": time_penalty,
             "reward_kill_bonus": kill_bonus,
+            "reward_hazard_response": float(hazard_response_reward),
+            "jump_taken": int(jump_taken),
+            "jump_rate": jump_rate,
+            "hazard_events": int(self._hazard_events),
+            "hazard_ignores": int(self._hazard_ignores),
+            "hazard_reactions": int(self._hazard_reactions),
+            "hazard_ignore_rate": hazard_ignore_rate,
+            "hazard_reaction_rate": hazard_reaction_rate,
+            "hazard_ahead_short": float(obs[10]) if self.obs_profile == "balanced" else 0.0,
+            "hazard_ahead_mid": float(obs[11]) if self.obs_profile == "balanced" else 0.0,
+            "enemy_threat_ahead": float(obs[12]) if self.obs_profile == "balanced" else 0.0,
+            "enemy_threat_behind": float(obs[13]) if self.obs_profile == "balanced" else 0.0,
             "is_runaway": bool(is_runaway),
         }
         return obs, reward, terminated, truncated, info

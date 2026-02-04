@@ -43,12 +43,16 @@ class GameSession:
         render_mode: str = "none",
         fps: int = 30,
         max_episode_steps: int = 2500,
+        obs_profile: str = "balanced",
     ):
         self.level_path = level_path
         self.headless = headless
         self.render_mode = render_mode
         self.fps = fps
         self.max_episode_steps = max(1, int(max_episode_steps))
+        self.obs_profile = obs_profile
+        if self.obs_profile not in {"balanced", "legacy"}:
+            raise ValueError(f"Unsupported obs_profile: {self.obs_profile}")
 
         if self.headless:
             os.environ.setdefault("SDL_VIDEODRIVER", "dummy")
@@ -179,11 +183,25 @@ class GameSession:
 
         on_ground = 1.0 if self.world.collided_get_y(self.player.base, self.player.height) >= 0 and self.player.speed_y == 0 else 0.0
         direction = float(self.player.get_direction())
-        enemy_ahead = 1.0 if has_enemy and ((direction > 0 and 0 < enemy_dx < 300) or (direction < 0 and -300 < enemy_dx < 0)) else 0.0
-        enemy_close = 1.0 if has_enemy and abs(enemy_dx) <= 120.0 and abs(enemy_dy) <= 100.0 else 0.0
-        gap_ahead = self._gap_ahead_flag()
-        safe_ground_ahead_distance = self._safe_ground_ahead_distance()
+        if self.obs_profile == "legacy":
+            feature_10 = 1.0 if has_enemy and ((direction > 0 and 0 < enemy_dx < 300) or (direction < 0 and -300 < enemy_dx < 0)) else 0.0
+            feature_11 = self._gap_ahead_flag()
+            feature_12 = 1.0 if has_enemy and abs(enemy_dx) <= 120.0 and abs(enemy_dy) <= 100.0 else 0.0
+            feature_13 = self._safe_ground_ahead_distance()
+        else:
+            gap_ahead_short = self._gap_in_distance_window(min_distance=0, max_distance=90)
+            gap_ahead_mid = self._gap_in_distance_window(min_distance=90, max_distance=240)
+            enemy_hazard_short, enemy_hazard_mid, enemy_threat_ahead, enemy_threat_behind = self._enemy_threat_bands(
+                short_distance=90.0,
+                mid_distance=240.0,
+                vertical_tolerance=100.0,
+            )
+            feature_10 = 1.0 if (gap_ahead_short > 0.5 or enemy_hazard_short > 0.5) else 0.0
+            feature_11 = 1.0 if (gap_ahead_mid > 0.5 or enemy_hazard_mid > 0.5) else 0.0
+            feature_12 = enemy_threat_ahead
+            feature_13 = enemy_threat_behind
 
+        # Slots 10-13 stay shape-compatible (legacy or balanced semantics).
         obs = np.array(
             [
                 np.clip(px / level_width, 0.0, 1.0),
@@ -196,10 +214,10 @@ class GameSession:
                 np.clip(chest_dy / level_height, -1.0, 1.0),
                 np.clip(enemy_dx / level_width, -1.0, 1.0),
                 np.clip(enemy_dy / level_height, -1.0, 1.0),
-                enemy_ahead,
-                gap_ahead,
-                enemy_close,
-                safe_ground_ahead_distance,
+                feature_10,
+                feature_11,
+                feature_12,
+                feature_13,
                 np.clip(self.status.max_progress_x / level_width, 0.0, 1.0),
                 np.clip(self.status.step_count / float(self.max_episode_steps), 0.0, 1.0),
             ],
@@ -243,6 +261,17 @@ class GameSession:
             True,
         )
 
+    def _gap_in_distance_window(self, min_distance: int, max_distance: int, step: int = 12):
+        direction = 1 if self.player.get_direction() >= 0 else -1
+        start = max(0, int(min_distance))
+        end = max(start, int(max_distance))
+        for distance in range(start, end + step, step):
+            probe_x = self.player.playerPos.x + (direction * (self.player.width + distance))
+            probe_rect = pygame.Rect(int(probe_x), self.player.base.y + 4, 4, 2)
+            if self.world.collided_get_y(probe_rect, 2) < 0:
+                return 1.0
+        return 0.0
+
     def _gap_ahead_flag(self):
         direction = 1 if self.player.get_direction() >= 0 else -1
         probe_x = self.player.playerPos.x + (direction * (self.player.width + 12))
@@ -257,6 +286,34 @@ class GameSession:
             if self.world.collided_get_y(probe_rect, 2) >= 0:
                 return float(np.clip(distance / float(max_scan), 0.0, 1.0))
         return 1.0
+
+    def _enemy_threat_bands(self, short_distance: float, mid_distance: float, vertical_tolerance: float):
+        direction = 1.0 if self.player.get_direction() >= 0 else -1.0
+        enemy_hazard_short = 0.0
+        enemy_hazard_mid = 0.0
+        enemy_threat_ahead = 0.0
+        enemy_threat_behind = 0.0
+        px = float(self.player.playerPos.x)
+        py = float(self.player.playerPos.y)
+
+        for enemy in self.world.enemyGroup:
+            dx = float(enemy.enemyPos.x - px)
+            dy = float(enemy.enemyPos.y - py)
+            if abs(dy) > vertical_tolerance:
+                continue
+
+            distance_x = abs(dx)
+            is_ahead = (dx * direction) > 0.0
+            if is_ahead:
+                enemy_threat_ahead = 1.0
+                if distance_x <= short_distance:
+                    enemy_hazard_short = 1.0
+                elif distance_x <= mid_distance:
+                    enemy_hazard_mid = 1.0
+            elif distance_x <= short_distance:
+                enemy_threat_behind = 1.0
+
+        return enemy_hazard_short, enemy_hazard_mid, enemy_threat_ahead, enemy_threat_behind
 
     def get_status(self):
         if self.status.is_win or self.status.is_dead:
