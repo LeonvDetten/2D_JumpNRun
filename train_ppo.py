@@ -1,16 +1,20 @@
 """CLI entrypoint for PPO training, fine-tuning, and curriculum runs."""
 
 import argparse
+import json
+import random
 import sys
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
+import numpy as np
 import torch
 from loguru import logger
 from stable_baselines3 import PPO
 from stable_baselines3.common.callbacks import CallbackList, CheckpointCallback, EvalCallback
 from stable_baselines3.common.monitor import Monitor
+from stable_baselines3.common.utils import set_random_seed
 from stable_baselines3.common.vec_env import DummyVecEnv
 
 from rl.pirate_game_env import PirateGameEnv
@@ -52,6 +56,23 @@ def make_env(
     return _factory
 
 
+def build_vec_env(args, level_path: str, num_envs: int, seed: int):
+    factories = [
+        make_env(
+            level_path,
+            True,
+            args.max_episode_steps,
+            args.frame_skip,
+            args.action_preset,
+            args.obs_profile,
+        )
+        for _ in range(max(1, int(num_envs)))
+    ]
+    vec_env = DummyVecEnv(factories)
+    vec_env.seed(int(seed))
+    return vec_env
+
+
 def parse_optional_float(value: Optional[str]):
     if value is None:
         return None
@@ -70,7 +91,7 @@ def parse_args():
     parser.add_argument(
         "--action-preset",
         default="simple",
-        choices=["simple", "full"],
+        choices=["forward", "simple", "full"],
         help="Action set for training. 'simple' is faster to learn on this level.",
     )
     parser.add_argument(
@@ -86,9 +107,28 @@ def parse_args():
     parser.add_argument("--learning-rate", type=float, default=2.5e-4)
     parser.add_argument("--n-steps", type=int, default=1024)
     parser.add_argument("--batch-size", type=int, default=256)
+    parser.add_argument("--num-envs", type=int, default=1, help="Number of parallel environments for training.")
     parser.add_argument("--gamma", type=float, default=0.99)
     parser.add_argument("--gae-lambda", type=float, default=0.95)
     parser.add_argument("--ent-coef", type=float, default=0.005)
+    parser.add_argument(
+        "--ent-coef-easy",
+        type=parse_optional_float,
+        default=None,
+        help="Optional entropy coefficient override for easy curriculum stage.",
+    )
+    parser.add_argument(
+        "--ent-coef-medium",
+        type=parse_optional_float,
+        default=None,
+        help="Optional entropy coefficient override for medium curriculum stage.",
+    )
+    parser.add_argument(
+        "--ent-coef-full",
+        type=parse_optional_float,
+        default=None,
+        help="Optional entropy coefficient override for full curriculum stage.",
+    )
     parser.add_argument("--clip-range", type=parse_optional_float, default=0.2)
     parser.add_argument(
         "--game-log-level",
@@ -123,6 +163,12 @@ def parse_args():
         default=None,
         help="Optional model path for resume/fine-tuning (e.g. runs/<run>/models/final_model.zip).",
     )
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=42,
+        help="Global random seed for reproducible training/evaluation behavior.",
+    )
     return parser.parse_args()
 
 
@@ -138,6 +184,24 @@ def warn_if_loading_model(args):
         "Loading a saved model: PPO hyperparameters from the checkpoint are reused. "
         "Only env-related flags (e.g. --level-path, --action-preset, --obs-profile, --max-episode-steps) are applied."
     )
+
+
+def seed_everything(seed: int):
+    seed = int(seed)
+    random.seed(seed)
+    np.random.seed(seed)
+    set_random_seed(seed, using_cuda=torch.cuda.is_available())
+
+
+def write_run_config(args, run_dir: Path, device: str):
+    """Persist all resolved CLI settings for reproducible reruns and debugging."""
+
+    config_path = run_dir / "config.json"
+    config_data = vars(args).copy()
+    config_data["device"] = device
+    config_data["created_at"] = datetime.now().isoformat(timespec="seconds")
+    with open(config_path, "w", encoding="utf-8") as file_obj:
+        json.dump(config_data, file_obj, indent=2, sort_keys=True)
 
 
 def build_callbacks(run_dir: Path, eval_env, eval_freq: int, eval_episodes: int, checkpoint_freq: int):
@@ -194,7 +258,15 @@ def build_model(args, train_env, device: str, tensorboard_dir: Path):
         clip_range=args.clip_range,
         device=device,
         tensorboard_log=str(tensorboard_dir),
+        seed=args.seed,
     )
+
+
+def apply_stage_entropy(model: PPO, value: Optional[float], stage_name: str):
+    if value is None:
+        return
+    model.ent_coef = float(value)
+    logger.info(f"Set ent_coef for stage '{stage_name}' to {model.ent_coef}")
 
 
 def train_stage(model: PPO, timesteps: int, callbacks, progress_bar: bool, reset_num_timesteps: bool):
@@ -221,6 +293,8 @@ def main():
         path.mkdir(parents=True, exist_ok=True)
 
     device = detect_device()
+    seed_everything(args.seed)
+    write_run_config(args, run_dir, device)
     model = None
     interrupted = False
 
@@ -232,30 +306,8 @@ def main():
             medium_steps = min(args.curriculum_medium_steps, remaining_after_easy)
             full_steps = max(0, remaining_after_easy - medium_steps)
 
-            easy_train_env = DummyVecEnv(
-                [
-                    make_env(
-                        args.easy_level_path,
-                        True,
-                        args.max_episode_steps,
-                        args.frame_skip,
-                        args.action_preset,
-                        args.obs_profile,
-                    )
-                ]
-            )
-            easy_eval_env = DummyVecEnv(
-                [
-                    make_env(
-                        args.easy_level_path,
-                        True,
-                        args.max_episode_steps,
-                        args.frame_skip,
-                        args.action_preset,
-                        args.obs_profile,
-                    )
-                ]
-            )
+            easy_train_env = build_vec_env(args, args.easy_level_path, args.num_envs, args.seed)
+            easy_eval_env = build_vec_env(args, args.easy_level_path, 1, args.seed + 1_000)
             easy_callbacks = build_callbacks(
                 run_dir / "curriculum_easy",
                 easy_eval_env,
@@ -264,34 +316,17 @@ def main():
                 args.checkpoint_freq,
             )
             model = build_model(args, easy_train_env, device, tensorboard_dir / "easy")
+            apply_stage_entropy(
+                model,
+                args.ent_coef if args.ent_coef_easy is None else args.ent_coef_easy,
+                "easy",
+            )
             train_stage(model, easy_steps, easy_callbacks, args.progress_bar, reset_num_timesteps=True)
             model.save(str(models_dir / "curriculum_easy_model"))
 
             if medium_steps > 0:
-                medium_train_env = DummyVecEnv(
-                    [
-                        make_env(
-                            args.medium_level_path,
-                            True,
-                            args.max_episode_steps,
-                            args.frame_skip,
-                            args.action_preset,
-                            args.obs_profile,
-                        )
-                    ]
-                )
-                medium_eval_env = DummyVecEnv(
-                    [
-                        make_env(
-                            args.medium_level_path,
-                            True,
-                            args.max_episode_steps,
-                            args.frame_skip,
-                            args.action_preset,
-                            args.obs_profile,
-                        )
-                    ]
-                )
+                medium_train_env = build_vec_env(args, args.medium_level_path, args.num_envs, args.seed + 2_000)
+                medium_eval_env = build_vec_env(args, args.medium_level_path, 1, args.seed + 3_000)
                 model.set_env(medium_train_env)
                 medium_callbacks = build_callbacks(
                     run_dir / "curriculum_medium",
@@ -300,34 +335,17 @@ def main():
                     args.eval_episodes,
                     args.checkpoint_freq,
                 )
+                apply_stage_entropy(
+                    model,
+                    args.ent_coef if args.ent_coef_medium is None else args.ent_coef_medium,
+                    "medium",
+                )
                 train_stage(model, medium_steps, medium_callbacks, args.progress_bar, reset_num_timesteps=False)
                 model.save(str(models_dir / "curriculum_medium_model"))
 
             if full_steps > 0:
-                full_train_env = DummyVecEnv(
-                    [
-                        make_env(
-                            args.level_path,
-                            True,
-                            args.max_episode_steps,
-                            args.frame_skip,
-                            args.action_preset,
-                            args.obs_profile,
-                        )
-                    ]
-                )
-                full_eval_env = DummyVecEnv(
-                    [
-                        make_env(
-                            args.level_path,
-                            True,
-                            args.max_episode_steps,
-                            args.frame_skip,
-                            args.action_preset,
-                            args.obs_profile,
-                        )
-                    ]
-                )
+                full_train_env = build_vec_env(args, args.level_path, args.num_envs, args.seed + 4_000)
+                full_eval_env = build_vec_env(args, args.level_path, 1, args.seed + 5_000)
                 model.set_env(full_train_env)
                 full_callbacks = build_callbacks(
                     run_dir / "curriculum_full",
@@ -336,34 +354,18 @@ def main():
                     args.eval_episodes,
                     args.checkpoint_freq,
                 )
+                apply_stage_entropy(
+                    model,
+                    args.ent_coef if args.ent_coef_full is None else args.ent_coef_full,
+                    "full",
+                )
                 train_stage(model, full_steps, full_callbacks, args.progress_bar, reset_num_timesteps=False)
         else:
-            train_env = DummyVecEnv(
-                [
-                    make_env(
-                        args.level_path,
-                        True,
-                        args.max_episode_steps,
-                        args.frame_skip,
-                        args.action_preset,
-                        args.obs_profile,
-                    )
-                ]
-            )
-            eval_env = DummyVecEnv(
-                [
-                    make_env(
-                        args.level_path,
-                        True,
-                        args.max_episode_steps,
-                        args.frame_skip,
-                        args.action_preset,
-                        args.obs_profile,
-                    )
-                ]
-            )
+            train_env = build_vec_env(args, args.level_path, args.num_envs, args.seed)
+            eval_env = build_vec_env(args, args.level_path, 1, args.seed + 1_000)
             callbacks = build_callbacks(run_dir, eval_env, args.eval_freq, args.eval_episodes, args.checkpoint_freq)
             model = build_model(args, train_env, device, tensorboard_dir / "main")
+            apply_stage_entropy(model, args.ent_coef, "main")
             train_stage(model, args.timesteps, callbacks, args.progress_bar, reset_num_timesteps=True)
     except KeyboardInterrupt:
         interrupted = True

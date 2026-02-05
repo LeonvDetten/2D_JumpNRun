@@ -42,6 +42,11 @@ class _GameContext:
     def end_game(self):
         self.gameFinished = True
 
+    def on_chest_touch(self):
+        """Immediate win trigger used by RL when the chest is touched."""
+
+        self.end_game()
+
 
 class GameSession:
     """Owns one live game instance and exposes RL-friendly stepping APIs."""
@@ -195,18 +200,28 @@ class GameSession:
 
         on_ground = 1.0 if self.world.collided_get_y(self.player.base, self.player.height) >= 0 and self.player.speed_y == 0 else 0.0
         direction = float(self.player.get_direction())
+        target_direction = 1.0  # Always reason about hazards in level-goal direction (right).
         if self.obs_profile == "legacy":
-            feature_10 = 1.0 if has_enemy and ((direction > 0 and 0 < enemy_dx < 300) or (direction < 0 and -300 < enemy_dx < 0)) else 0.0
-            feature_11 = self._gap_ahead_flag()
+            feature_10 = 1.0 if has_enemy and 0 < enemy_dx < 300 else 0.0
+            feature_11 = self._gap_ahead_flag(direction_override=target_direction)
             feature_12 = 1.0 if has_enemy and abs(enemy_dx) <= 120.0 and abs(enemy_dy) <= 100.0 else 0.0
-            feature_13 = self._safe_ground_ahead_distance()
+            feature_13 = self._safe_ground_ahead_distance(direction_override=target_direction)
         else:
-            gap_ahead_short = self._gap_in_distance_window(min_distance=0, max_distance=90)
-            gap_ahead_mid = self._gap_in_distance_window(min_distance=90, max_distance=240)
+            gap_ahead_short = self._gap_in_distance_window(
+                min_distance=0,
+                max_distance=90,
+                direction_override=target_direction,
+            )
+            gap_ahead_mid = self._gap_in_distance_window(
+                min_distance=90,
+                max_distance=240,
+                direction_override=target_direction,
+            )
             enemy_hazard_short, enemy_hazard_mid, enemy_threat_ahead, enemy_threat_behind = self._enemy_threat_bands(
                 short_distance=90.0,
                 mid_distance=240.0,
                 vertical_tolerance=100.0,
+                direction_override=target_direction,
             )
             feature_10 = 1.0 if (gap_ahead_short > 0.5 or enemy_hazard_short > 0.5) else 0.0
             feature_11 = 1.0 if (gap_ahead_mid > 0.5 or enemy_hazard_mid > 0.5) else 0.0
@@ -273,10 +288,21 @@ class GameSession:
             True,
         )
 
-    def _gap_in_distance_window(self, min_distance: int, max_distance: int, step: int = 12):
+    def _resolve_probe_direction(self, direction_override: Optional[float] = None):
+        if direction_override is not None:
+            return 1 if direction_override >= 0 else -1
+        return 1 if self.player.get_direction() >= 0 else -1
+
+    def _gap_in_distance_window(
+        self,
+        min_distance: int,
+        max_distance: int,
+        step: int = 12,
+        direction_override: Optional[float] = None,
+    ):
         """Binary gap detector in front of the player for a distance window."""
 
-        direction = 1 if self.player.get_direction() >= 0 else -1
+        direction = self._resolve_probe_direction(direction_override)
         start = max(0, int(min_distance))
         end = max(start, int(max_distance))
         for distance in range(start, end + step, step):
@@ -286,18 +312,23 @@ class GameSession:
                 return 1.0
         return 0.0
 
-    def _gap_ahead_flag(self):
+    def _gap_ahead_flag(self, direction_override: Optional[float] = None):
         """Legacy short-range gap feature kept for backward-compatible obs semantics."""
 
-        direction = 1 if self.player.get_direction() >= 0 else -1
+        direction = self._resolve_probe_direction(direction_override)
         probe_x = self.player.playerPos.x + (direction * (self.player.width + 12))
         probe_rect = pygame.Rect(int(probe_x), self.player.base.y + 4, 4, 2)
         return 1.0 if self.world.collided_get_y(probe_rect, 2) < 0 else 0.0
 
-    def _safe_ground_ahead_distance(self, max_scan: int = 360, step: int = 12):
+    def _safe_ground_ahead_distance(
+        self,
+        max_scan: int = 360,
+        step: int = 12,
+        direction_override: Optional[float] = None,
+    ):
         """Legacy normalized distance to next safe ground tile in front."""
 
-        direction = 1 if self.player.get_direction() >= 0 else -1
+        direction = self._resolve_probe_direction(direction_override)
         for distance in range(0, max_scan + step, step):
             probe_x = self.player.playerPos.x + (direction * (self.player.width + distance))
             probe_rect = pygame.Rect(int(probe_x), self.player.base.y + 4, 4, 2)
@@ -305,10 +336,16 @@ class GameSession:
                 return float(np.clip(distance / float(max_scan), 0.0, 1.0))
         return 1.0
 
-    def _enemy_threat_bands(self, short_distance: float, mid_distance: float, vertical_tolerance: float):
+    def _enemy_threat_bands(
+        self,
+        short_distance: float,
+        mid_distance: float,
+        vertical_tolerance: float,
+        direction_override: Optional[float] = None,
+    ):
         """Compute threat features for enemies in front/behind relative to facing direction."""
 
-        direction = 1.0 if self.player.get_direction() >= 0 else -1.0
+        direction = float(self._resolve_probe_direction(direction_override))
         enemy_hazard_short = 0.0
         enemy_hazard_mid = 0.0
         enemy_threat_ahead = 0.0

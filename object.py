@@ -294,6 +294,9 @@ class Chest(pygame.sprite.Sprite):
             self.__openingStarted = True
             if hasattr(self.__world.player, "set_frozen"):
                 self.__world.player.set_frozen(True)
+            # RL sessions can opt into immediate win on first chest touch.
+            if hasattr(self.__game, "on_chest_touch") and callable(self.__game.on_chest_touch):
+                self.__game.on_chest_touch()
             logger.info("Chest touched. Start opening animation")
 
         # Continue opening once started, even if player no longer overlaps the chest.

@@ -231,6 +231,18 @@ class World:
                     return -2
         return 1   
 
+    def intersects_side_solid(self, object_rect):
+        """Return True if rect intersects a solid side-collision block.
+
+        This boolean helper avoids directional ambiguity from `check_object_collision_sideblock`
+        once a moving rect already overlaps deeply with a tile.
+        """
+
+        for block in self.__chunkPlatforms:
+            if block.colliderect(object_rect) and block.y < (object_rect.y + object_rect.height - 1):
+                return True
+        return False
+
 
     def check_player_collision_bottomblock(self, object_rect):
         """check_player_collision_bottomblock:

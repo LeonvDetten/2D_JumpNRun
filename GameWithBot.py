@@ -16,7 +16,7 @@ def parse_args():
         help="Path to a PPO .zip checkpoint (best_model.zip, final_model.zip, ...)",
     )
     parser.add_argument("--level-path", default="level_easy.txt", help="Level file to play")
-    parser.add_argument("--action-preset", default="simple", choices=["simple", "full"])
+    parser.add_argument("--action-preset", default="simple", choices=["forward", "simple", "full"])
     parser.add_argument("--obs-profile", default="balanced", choices=["balanced", "legacy"])
     parser.add_argument("--frame-skip", type=int, default=2)
     parser.add_argument("--max-episode-steps", type=int, default=1800)
@@ -25,12 +25,20 @@ def parse_args():
         action="store_true",
         help="Auto-restart after episode end.",
     )
-    parser.add_argument(
+    action_group = parser.add_mutually_exclusive_group()
+    action_group.add_argument(
         "--deterministic",
+        dest="deterministic",
         action="store_true",
-        default=True,
-        help="Use deterministic action selection.",
+        help="Use deterministic action selection (default).",
     )
+    action_group.add_argument(
+        "--stochastic",
+        dest="deterministic",
+        action="store_false",
+        help="Sample actions stochastically from the policy distribution.",
+    )
+    parser.set_defaults(deterministic=True)
     return parser.parse_args()
 
 

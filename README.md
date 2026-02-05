@@ -90,6 +90,35 @@ python3 train_ppo.py \
   --progress-bar
 ```
 
+### Training-level curriculum (very easy -> mixed)
+
+For faster, more stable early learning you can use the new handcrafted training levels:
+
+- `level_train_01_runway.txt`
+- `level_train_02_gaps.txt`
+- `level_train_03_enemies.txt`
+- `level_train_04_mixed.txt`
+- `level_train_05_bridge.txt`
+
+Example run (forward-only action set + parallel envs):
+
+```bash
+python3 train_ppo.py \
+  --run-name ppo_train_levels_v1 \
+  --curriculum \
+  --easy-level-path level_train_01_runway.txt \
+  --medium-level-path level_train_04_mixed.txt \
+  --level-path level_train_05_bridge.txt \
+  --curriculum-easy-steps 60000 \
+  --curriculum-medium-steps 60000 \
+  --timesteps 120000 \
+  --action-preset forward \
+  --num-envs 4 \
+  --ent-coef 0.002 \
+  --ent-coef-easy 0.01 \
+  --ent-coef-medium 0.003
+```
+
 ### Continue from checkpoint
 
 ```bash

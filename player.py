@@ -45,7 +45,8 @@ class Player(pygame.sprite.Sprite):
     __shootAnimationTime = 1000
     speed_y = 0
     __speed_x = 0
-    jump_speed = -10
+    # Slightly higher jump so the player can clear one-block obstacles reliably.
+    jump_speed = -11
     __movement_speed = 8
     __spriteLoopSpeed = 0.3
 
@@ -300,7 +301,7 @@ class Player(pygame.sprite.Sprite):
         """
 
         collided_y = self.world.collided_get_y(self.base, self.height)
-        if self.speed_y < 0 or collided_y < 0 or (self.world.check_object_collision_sideblock(self.playerPos) != 1 and self.playerPos.y < 600):            
+        if self.speed_y < 0 or collided_y < 0 or (self.world.intersects_side_solid(self.playerPos) and self.playerPos.y < 600):
             self.playerPos.y += self.speed_y        # move player object in y-direction
             self.speed_y += self.world.gravity      # increase falling speed by gravity
         if self.speed_y >= 0 and collided_y > 0 :                
@@ -360,17 +361,22 @@ class Player(pygame.sprite.Sprite):
                     else:
                         self.__currentAnimation = "JUMP_right"                      # set animation to jump right
 
-        if move_right and self.world.check_object_collision_sideblock(self.playerPos) != -1:    # check if move right was triggered and if player can move right
-            self.__speed_x = self.__movement_speed                           # set player speed to movement speed
-            self.__direction = 1        
-            self.__currentAnimation = "RUN_right"                            # set animation to run right
+        if move_right:
+            next_rect = self.playerPos.copy()
+            next_rect.x += self.__movement_speed
+            if not self.world.intersects_side_solid(next_rect):
+                self.__speed_x = self.__movement_speed                        # set player speed to movement speed
+                self.__direction = 1
+                self.__currentAnimation = "RUN_right"                         # set animation to run right
             
 
-        if move_left and self.world.check_object_collision_sideblock(self.playerPos) != -2:    # check if move left was triggered and if player can move left
-            if self.playerPos.x > 0:                                  # check if player is not at the left border of the world
-                self.__speed_x = self.__movement_speed * -1           # set player speed to movement speed * -1 (negative)
+        if move_left:
+            next_rect = self.playerPos.copy()
+            next_rect.x -= self.__movement_speed
+            if self.playerPos.x > 0 and not self.world.intersects_side_solid(next_rect):
+                self.__speed_x = self.__movement_speed * -1            # set player speed to movement speed * -1 (negative)
                 self.__direction = -1
-                self.__currentAnimation = "RUN_left"                  # set animation to run left
+                self.__currentAnimation = "RUN_left"                   # set animation to run left
 
 
         if jump_pressed:                  # check if jump input is pressed
@@ -384,7 +390,12 @@ class Player(pygame.sprite.Sprite):
         self.__currentSprite += self.__spriteLoopSpeed    # increase current sprite by sprite loop speed           
         if self.__currentSprite >= len(self.sprites['IDLE']['right']):  # check if current sprite is bigger than the number of sprites in the idle animation (sprite amount is the same for every animation)
                 self.__currentSprite = 0
-        self.playerPos.x += self.__speed_x             # move player object in x-direction  
+        previous_x = self.playerPos.x
+        self.playerPos.x += self.__speed_x             # move player object in x-direction
+        # Safety clamp: never allow ending a frame inside side-solid blocks.
+        if self.world.intersects_side_solid(self.playerPos):
+            self.playerPos.x = previous_x
+            self.__speed_x = 0
         self.base.x = self.playerPos.x          # update base position of player object
         self.rect.x = self.playerPos.x - self.getCamOffset()    # update rect position of player object
         self.logging_movement()                # call logging method
