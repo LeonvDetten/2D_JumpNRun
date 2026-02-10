@@ -113,7 +113,7 @@ class MyGame:
 
         """
 
-        datei = open('level_medium.txt','r')   #open file
+        datei = open('level_train_04_mixed.txt','r')   #open file
         for zeile in datei:     #read file line by line
             self.level.append(zeile)    #append line to level list
         datei.close()       #close file

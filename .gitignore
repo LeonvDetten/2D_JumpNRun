@@ -6,3 +6,4 @@ runs/
 artifacts/
 .venv/
 *.DS_Store
+*.sh

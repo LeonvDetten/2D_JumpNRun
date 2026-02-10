@@ -14,7 +14,7 @@ from loguru import logger
 from stable_baselines3 import PPO
 from stable_baselines3.common.callbacks import CallbackList, CheckpointCallback, EvalCallback
 from stable_baselines3.common.monitor import Monitor
-from stable_baselines3.common.utils import set_random_seed
+from stable_baselines3.common.utils import get_schedule_fn, set_random_seed
 from stable_baselines3.common.vec_env import DummyVecEnv
 
 from rl.pirate_game_env import PirateGameEnv
@@ -181,8 +181,8 @@ def warn_if_loading_model(args):
     if not args.load_model:
         return
     logger.warning(
-        "Loading a saved model: PPO hyperparameters from the checkpoint are reused. "
-        "Only env-related flags (e.g. --level-path, --action-preset, --obs-profile, --max-episode-steps) are applied."
+        "Loading a saved model: policy weights are reused, and selected PPO hyperparameters "
+        "(learning rate / entropy / clip-range / gamma / gae-lambda) are re-applied from CLI."
     )
 
 
@@ -238,12 +238,14 @@ def build_callbacks(run_dir: Path, eval_env, eval_freq: int, eval_episodes: int,
 
 def build_model(args, train_env, device: str, tensorboard_dir: Path):
     if args.load_model:
-        return PPO.load(
+        model = PPO.load(
             args.load_model,
             env=train_env,
             device=device,
             tensorboard_log=str(tensorboard_dir),
         )
+        apply_loaded_model_overrides(model, args)
+        return model
 
     return PPO(
         "MlpPolicy",
@@ -262,11 +264,49 @@ def build_model(args, train_env, device: str, tensorboard_dir: Path):
     )
 
 
+def apply_loaded_model_overrides(model: PPO, args):
+    """Re-apply selected CLI hyperparameters after loading a checkpoint."""
+
+    lr = float(args.learning_rate)
+    model.learning_rate = lr
+    model.lr_schedule = get_schedule_fn(lr)
+    if getattr(model.policy, "optimizer", None) is not None:
+        for group in model.policy.optimizer.param_groups:
+            group["lr"] = lr
+
+    model.ent_coef = float(args.ent_coef)
+    if args.clip_range is not None:
+        model.clip_range = get_schedule_fn(float(args.clip_range))
+    model.gamma = float(args.gamma)
+    model.gae_lambda = float(args.gae_lambda)
+
+    if int(args.n_steps) != int(model.n_steps):
+        logger.warning(
+            f"Loaded model keeps n_steps={model.n_steps} (requested {args.n_steps}). "
+            "Use matching n_steps when fine-tuning from checkpoints."
+        )
+    if int(args.batch_size) != int(model.batch_size):
+        logger.warning(
+            f"Loaded model keeps batch_size={model.batch_size} (requested {args.batch_size}). "
+            "Use matching batch_size when fine-tuning from checkpoints."
+        )
+
+
 def apply_stage_entropy(model: PPO, value: Optional[float], stage_name: str):
     if value is None:
         return
     model.ent_coef = float(value)
     logger.info(f"Set ent_coef for stage '{stage_name}' to {model.ent_coef}")
+
+
+def apply_stage_learning_rate(model: PPO, value: float, stage_name: str):
+    lr = float(value)
+    model.learning_rate = lr
+    model.lr_schedule = get_schedule_fn(lr)
+    if getattr(model.policy, "optimizer", None) is not None:
+        for group in model.policy.optimizer.param_groups:
+            group["lr"] = lr
+    logger.info(f"Set learning_rate for stage '{stage_name}' to {lr}")
 
 
 def train_stage(model: PPO, timesteps: int, callbacks, progress_bar: bool, reset_num_timesteps: bool):
@@ -316,6 +356,7 @@ def main():
                 args.checkpoint_freq,
             )
             model = build_model(args, easy_train_env, device, tensorboard_dir / "easy")
+            apply_stage_learning_rate(model, args.learning_rate, "easy")
             apply_stage_entropy(
                 model,
                 args.ent_coef if args.ent_coef_easy is None else args.ent_coef_easy,
@@ -335,6 +376,7 @@ def main():
                     args.eval_episodes,
                     args.checkpoint_freq,
                 )
+                apply_stage_learning_rate(model, args.learning_rate, "medium")
                 apply_stage_entropy(
                     model,
                     args.ent_coef if args.ent_coef_medium is None else args.ent_coef_medium,
@@ -354,6 +396,7 @@ def main():
                     args.eval_episodes,
                     args.checkpoint_freq,
                 )
+                apply_stage_learning_rate(model, args.learning_rate, "full")
                 apply_stage_entropy(
                     model,
                     args.ent_coef if args.ent_coef_full is None else args.ent_coef_full,
@@ -365,6 +408,7 @@ def main():
             eval_env = build_vec_env(args, args.level_path, 1, args.seed + 1_000)
             callbacks = build_callbacks(run_dir, eval_env, args.eval_freq, args.eval_episodes, args.checkpoint_freq)
             model = build_model(args, train_env, device, tensorboard_dir / "main")
+            apply_stage_learning_rate(model, args.learning_rate, "main")
             apply_stage_entropy(model, args.ent_coef, "main")
             train_stage(model, args.timesteps, callbacks, args.progress_bar, reset_num_timesteps=True)
     except KeyboardInterrupt:

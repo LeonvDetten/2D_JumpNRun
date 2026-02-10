@@ -212,19 +212,18 @@ class GameSession:
                 max_distance=90,
                 direction_override=target_direction,
             )
-            gap_ahead_mid = self._gap_in_distance_window(
-                min_distance=90,
-                max_distance=240,
+            gap_distance_norm = self._gap_distance_norm(
+                max_scan=240,
                 direction_override=target_direction,
             )
-            enemy_hazard_short, enemy_hazard_mid, enemy_threat_ahead, enemy_threat_behind = self._enemy_threat_bands(
+            enemy_hazard_short, _, enemy_threat_ahead, enemy_threat_behind = self._enemy_threat_bands(
                 short_distance=90.0,
                 mid_distance=240.0,
                 vertical_tolerance=100.0,
                 direction_override=target_direction,
             )
             feature_10 = 1.0 if (gap_ahead_short > 0.5 or enemy_hazard_short > 0.5) else 0.0
-            feature_11 = 1.0 if (gap_ahead_mid > 0.5 or enemy_hazard_mid > 0.5) else 0.0
+            feature_11 = gap_distance_norm
             feature_12 = enemy_threat_ahead
             feature_13 = enemy_threat_behind
 
@@ -319,6 +318,23 @@ class GameSession:
         probe_x = self.player.playerPos.x + (direction * (self.player.width + 12))
         probe_rect = pygame.Rect(int(probe_x), self.player.base.y + 4, 4, 2)
         return 1.0 if self.world.collided_get_y(probe_rect, 2) < 0 else 0.0
+
+    def _gap_distance_norm(
+        self,
+        max_scan: int = 240,
+        step: int = 12,
+        direction_override: Optional[float] = None,
+    ):
+        """Normalized distance to the next gap (0 = very close, 1 = far/no gap in scan range)."""
+
+        direction = self._resolve_probe_direction(direction_override)
+        max_scan = max(1, int(max_scan))
+        for distance in range(0, max_scan + step, step):
+            probe_x = self.player.playerPos.x + (direction * (self.player.width + distance))
+            probe_rect = pygame.Rect(int(probe_x), self.player.base.y + 4, 4, 2)
+            if self.world.collided_get_y(probe_rect, 2) < 0:
+                return float(np.clip(distance / float(max_scan), 0.0, 1.0))
+        return 1.0
 
     def _safe_ground_ahead_distance(
         self,
