@@ -1,0 +1,13 @@
+start (models/phase3.zip): validation win rate 43.8% on 48 levels
+imitation data: 369,708 samples
+  BC epoch 1/5: loss 0.119, accuracy 96.0%, validation win rate 33.3% (57s)
+  BC epoch 2/5: loss 0.082, accuracy 97.0%, validation win rate 33.3% (54s)
+  BC epoch 3/5: loss 0.070, accuracy 97.4%, validation win rate 58.3% (54s)
+  BC epoch 4/5: loss 0.059, accuracy 97.7%, validation win rate 54.2% (57s)
+  BC epoch 5/5: loss 0.052, accuracy 98.0%, validation win rate 52.1% (51s)
+DAgger round 1: 8,417 rescue samples
+  BC epoch 1/2: loss 0.069, accuracy 97.4%, validation win rate 45.8% (10s)
+  BC epoch 2/2: loss 0.059, accuracy 97.8%, validation win rate 56.2% (8s)
+  value warm-up epoch 1/3: MSE 1.568 on 296,355 states
+  value warm-up epoch 2/3: MSE 1.474 on 296,355 states
+  value warm-up epoch 3/3: MSE 1.456 on 296,355 states

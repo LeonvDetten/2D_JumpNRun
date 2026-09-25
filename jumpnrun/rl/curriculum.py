@@ -33,7 +33,8 @@ def load_pool(pool_dir) -> dict:
     path = Path(pool_dir) / "pool.json"
     if not path.exists():
         return {}
-    return {int(tier): seeds for tier, seeds in json.loads(path.read_text()).items() if seeds}
+    # tiers with only a few verified levels keep generating fresh ones (those tiers are always solvable)
+    return {int(tier): seeds for tier, seeds in json.loads(path.read_text()).items() if len(seeds) >= 100}
 
 
 class CurriculumSource:
