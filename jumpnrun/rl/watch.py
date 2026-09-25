@@ -31,9 +31,10 @@ from jumpnrun.rl.env import JumpNRunEnv, fixed_levels
 class GhostRun:
     """N bots on the same level, advanced frame by frame together."""
 
-    def __init__(self, level: Level, n: int):
+    def __init__(self, level: Level, n: int, action_repeat: int = ACTION_REPEAT):
         self.level = level
-        self.envs = [JumpNRunEnv(fixed_levels([level])) for _ in range(n)]
+        self.action_repeat = action_repeat
+        self.envs = [JumpNRunEnv(fixed_levels([level]), action_repeat=action_repeat) for _ in range(n)]
         self.obs = [env.reset(seed=i)[0] for i, env in enumerate(self.envs)]
         self.running = [True] * n
         self.deaths: List[tuple] = []
@@ -55,7 +56,7 @@ class GhostRun:
         batch = {key: np.stack([self.obs[i][key] for i in active]) for key in ("grid", "vec")}
         actions, _ = model.predict(batch, deterministic=deterministic)
         before = {i: self.envs[i].sim.max_x for i in active}
-        for _ in range(ACTION_REPEAT):
+        for _ in range(self.action_repeat):
             for i, action in zip(active, actions):
                 self.envs[i].sim.step(BOT_ACTIONS[int(action)])
             yield
@@ -99,7 +100,7 @@ def run_episode(model, level: Level, ghosts: int, view, surface, title: str, sub
                 on_frame, speed: int = 2, max_seconds: float = 60.0, deterministic: bool = False):
     """Play one ghost episode, calling on_frame(surface) for every rendered frame."""
 
-    run = GhostRun(level, ghosts)
+    run = GhostRun(level, ghosts, getattr(model, "action_repeat", ACTION_REPEAT))
     frame = 0
     max_frames = int(max_seconds * 30)
     while not run.done() and frame < max_frames:
@@ -140,7 +141,7 @@ def main() -> None:
 
     os.environ.setdefault("PYGAME_HIDE_SUPPORT_PROMPT", "hide")
     import pygame
-    from stable_baselines3 import PPO
+    from jumpnrun.rl.modelinfo import load_model
 
     from jumpnrun.core.constants import SCREEN_H, SCREEN_W
     from jumpnrun.render.ghosts import GhostView
@@ -172,7 +173,7 @@ def main() -> None:
                 show(surface)
                 time.sleep(1)
                 continue
-            model = PPO.load(str(path), device="cpu")
+            model = load_model(path)
             steps = checkpoint_steps(path) if path.stem.startswith("step_") else 0
             run_episode(model, level, args.ghosts, view, surface,
                         f"Nach {steps:,} Trainingsschritten".replace(",", "."), level_label, show, args.speed)
@@ -182,7 +183,7 @@ def main() -> None:
     view = GhostView(level)
     if args.video:
         model_path = args.model or str(latest_checkpoint(Path(args.run)))
-        model = PPO.load(model_path, device="cpu")
+        model = load_model(model_path)
         with VideoWriter(args.video) as video:
             run = run_episode(model, level, args.ghosts, view, surface, Path(model_path).stem, level_label,
                               video.add, args.speed, deterministic=args.deterministic)
@@ -193,7 +194,7 @@ def main() -> None:
         checkpoints = pick_timelapse(sorted((Path(args.run) / "checkpoints").glob("step_*.zip")), args.clips)
         with VideoWriter(args.timelapse) as video:
             for path in checkpoints:
-                model = PPO.load(str(path), device="cpu")
+                model = load_model(path)
                 steps = checkpoint_steps(path)
                 title = "Untrainiert" if steps < 1000 else f"Nach {steps:,} Trainingsschritten".replace(",", ".")
                 run = run_episode(model, level, args.ghosts, view, surface, title, level_label,

@@ -11,6 +11,7 @@ from typing import Dict, List, Sequence
 
 import numpy as np
 
+from jumpnrun.core.actions import ACTION_REPEAT
 from jumpnrun.core.level import Level
 from jumpnrun.levelgen.generator import generate
 from jumpnrun.rl.curriculum import EVAL_SEED_OFFSET
@@ -26,7 +27,8 @@ def eval_level_set(tiers: Sequence[int], per_tier: int) -> List[tuple]:
 def evaluate_levels(model, levels: Sequence[Level], deterministic: bool = True) -> List[Dict]:
     """Play every level once; all levels run in lock-step so the network sees one batch."""
 
-    envs = [JumpNRunEnv(fixed_levels([level])) for level in levels]
+    repeat = getattr(model, "action_repeat", ACTION_REPEAT)
+    envs = [JumpNRunEnv(fixed_levels([level]), action_repeat=repeat) for level in levels]
     obs = [env.reset(seed=i)[0] for i, env in enumerate(envs)]
     results: List[Dict] = [None] * len(envs)
     active = list(range(len(envs)))
@@ -45,7 +47,7 @@ def evaluate_levels(model, levels: Sequence[Level], deterministic: bool = True) 
 
 
 def main() -> None:
-    from stable_baselines3 import PPO
+    from jumpnrun.rl.modelinfo import load_model
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", required=True)
@@ -54,7 +56,7 @@ def main() -> None:
     parser.add_argument("--levels", nargs="*", default=[])
     args = parser.parse_args()
 
-    model = PPO.load(args.model, device="cpu")
+    model = load_model(args.model)
     for tier in args.tiers:
         levels = [level for _, level in eval_level_set([tier], args.per_tier)]
         results = evaluate_levels(model, levels)

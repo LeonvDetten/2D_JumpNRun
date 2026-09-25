@@ -25,4 +25,5 @@ BOT_ACTIONS = (
     Action(shoot=True),
 )
 BOT_ACTION_NAMES = ("noop", "left", "right", "jump", "right+jump", "shoot")
-ACTION_REPEAT = 4  # frames per bot decision
+ACTION_REPEAT = 4  # frames per bot decision (models up to phase 3, exam solutions)
+DEFAULT_REPEAT = 2  # finer control for new models (phase 5+)

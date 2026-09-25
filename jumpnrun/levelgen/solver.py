@@ -122,6 +122,7 @@ def solve_via(
     waypoints: Sequence[Tuple[int, int]],
     max_expansions: int = 200_000,
     weight: float = 1.5,
+    action_repeat: int = ACTION_REPEAT,
 ) -> SolveResult:
     """Solve a long level in legs: waypoint -> waypoint -> chest (enemies stay simulated).
 
@@ -133,12 +134,12 @@ def solve_via(
     actions: List[int] = []
     expanded = 0
     for goal in list(waypoints) + [None]:
-        leg = solve(level, max_expansions, weight=weight, start=sim, goal=goal)
+        leg = solve(level, max_expansions, action_repeat=action_repeat, weight=weight, start=sim, goal=goal)
         expanded += leg.expanded
         if not leg.solved:
             return SolveResult(False, None, expanded, max(sim.player.x, leg.max_x), time.time() - start_time)
         for action_index in leg.actions:
-            sim.step(BOT_ACTIONS[action_index], frames=ACTION_REPEAT)
+            sim.step(BOT_ACTIONS[action_index], frames=action_repeat)
         actions += leg.actions
     return SolveResult(True, actions, expanded, sim.player.x, time.time() - start_time)
 
@@ -186,7 +187,7 @@ def replay(level: Level, actions: List[int], action_repeat: int = ACTION_REPEAT)
     return sim
 
 
-def _record(level: Level, actions: List[int], path: str) -> None:
+def _record(level: Level, actions: List[int], path: str, action_repeat: int = ACTION_REPEAT) -> None:
     from jumpnrun.render.renderer import Renderer
     from jumpnrun.render.video import VideoWriter, init_headless
 
@@ -195,7 +196,7 @@ def _record(level: Level, actions: List[int], path: str) -> None:
     sim = Simulation(level)
     with VideoWriter(path) as video:
         for action_index in actions:
-            for _ in range(ACTION_REPEAT):
+            for _ in range(action_repeat):
                 sim.step(BOT_ACTIONS[action_index])
                 renderer.draw(surface, sim)
                 video.add(surface)

@@ -11,7 +11,8 @@ Observation (what the bot "sees" - roughly the human's screen, as tiles):
           sub-tile x offset, y position, and for the 3 nearest enemies
           (dx, dy, present)
 
-Actions: 6 discrete (see core.actions.BOT_ACTIONS), each held for 4 frames.
+Actions: 6 discrete (see core.actions.BOT_ACTIONS), each held for `action_repeat` frames
+(4 for models up to phase 3, 2 from phase 5 on).
 
 Reward (deliberately minimal):
     +0.1 per tile of new rightmost progress, -1 on death, +2 on the chest.
@@ -42,7 +43,8 @@ NEAREST_ENEMIES = 3
 REWARD_PER_TILE = 0.1
 REWARD_DEATH = -1.0
 REWARD_WIN = 2.0
-NO_PROGRESS_STEPS = 150
+NO_PROGRESS_FRAMES = 600  # episode is truncated after this many frames without new progress
+NO_PROGRESS_STEPS = NO_PROGRESS_FRAMES // ACTION_REPEAT  # (at the legacy repeat of 4)
 
 # A level source returns (level, tier) for each new episode. tier = -1 for hand-made levels.
 LevelSource = Callable[[random.Random], "tuple[Level, int]"]
@@ -58,11 +60,19 @@ def fixed_levels(levels) -> LevelSource:
 class JumpNRunEnv(gym.Env):
     metadata = {"render_modes": []}
 
-    def __init__(self, level_source: LevelSource, seed: Optional[int] = None, max_steps_per_tile: float = 3.0):
+    def __init__(
+        self,
+        level_source: LevelSource,
+        seed: Optional[int] = None,
+        max_frames_per_tile: float = 12.0,
+        action_repeat: int = ACTION_REPEAT,
+    ):
         super().__init__()
         self.level_source = level_source
         self.rng = random.Random(seed)
-        self.max_steps_per_tile = max_steps_per_tile
+        self.action_repeat = int(action_repeat)
+        self.max_steps_per_tile = max_frames_per_tile / self.action_repeat
+        self.no_progress_steps = NO_PROGRESS_FRAMES // self.action_repeat
         self.action_space = gym.spaces.Discrete(len(BOT_ACTIONS))
         self.observation_space = gym.spaces.Dict(
             {
@@ -87,13 +97,13 @@ class JumpNRunEnv(gym.Env):
         self.sim = Simulation(level)
         self.steps = 0
         self.steps_since_progress = 0
-        self.max_steps = int(level.cols * self.max_steps_per_tile) + 50
+        self.max_steps = int(level.cols * self.max_steps_per_tile) + 200 // self.action_repeat
         self.actions_taken = []
         return self._observe(), {}
 
     def step(self, action: int):
         before = self.sim.max_x
-        self.sim.step(BOT_ACTIONS[int(action)], frames=ACTION_REPEAT)
+        self.sim.step(BOT_ACTIONS[int(action)], frames=self.action_repeat)
         return self.finish_step(int(action), before)
 
     def finish_step(self, action: int, max_x_before: int):
@@ -117,7 +127,7 @@ class JumpNRunEnv(gym.Env):
         elif terminated:
             reward += REWARD_DEATH
         truncated = not terminated and (
-            self.steps_since_progress >= NO_PROGRESS_STEPS or self.steps >= self.max_steps
+            self.steps_since_progress >= self.no_progress_steps or self.steps >= self.max_steps
         )
 
         info = {}
@@ -130,6 +140,7 @@ class JumpNRunEnv(gym.Env):
                 "progress": min(1.0, sim.max_x / max(1, sim.level.goal_x)),
                 "steps": self.steps,
                 "kills": sim.kills_stomp + sim.kills_shot,
+                "blocks": sorted(getattr(sim.level, "building_blocks", {})),
             }
         return self._observe(), float(reward), terminated, truncated, info
 

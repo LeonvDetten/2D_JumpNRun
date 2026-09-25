@@ -24,6 +24,18 @@ EMA = 0.05  # how fast the success estimate follows new results
 EVAL_SEED_OFFSET = 10**12  # evaluation levels use seeds the training never sees
 
 
+def load_pool(pool_dir) -> dict:
+    """Read `<pool_dir>/pool.json` ({tier: [seed, ...]}) written by jumpnrun.imitation.demos."""
+
+    import json
+    from pathlib import Path
+
+    path = Path(pool_dir) / "pool.json"
+    if not path.exists():
+        return {}
+    return {int(tier): seeds for tier, seeds in json.loads(path.read_text()).items() if seeds}
+
+
 class CurriculumSource:
     """Level source for JumpNRunEnv. Lives inside each (sub-process) env."""
 
@@ -33,6 +45,7 @@ class CurriculumSource:
         max_tier: int = NUM_TIERS - 1,
         handmade: Optional[Sequence[Level]] = None,
         handmade_prob: float = 0.0,
+        pool_dir=None,
     ):
         self.min_tier = min_tier
         self.max_tier = max_tier
@@ -40,12 +53,16 @@ class CurriculumSource:
         self.weights[min_tier] = 1.0
         self.handmade = list(handmade or [])
         self.handmade_prob = handmade_prob if self.handmade else 0.0
+        # optional pool of solver-verified seeds per tier (tier -> list of seeds)
+        self.pool = load_pool(pool_dir) if pool_dir else {}
 
     def __call__(self, rng: random.Random):
         if self.handmade_prob and rng.random() < self.handmade_prob:
             return rng.choice(self.handmade), -1
         tier = rng.choices(range(NUM_TIERS), weights=self.weights)[0]
-        return generate(tier, rng.randrange(EVAL_SEED_OFFSET)), tier
+        seeds = self.pool.get(tier)
+        seed = rng.choice(seeds) if seeds else rng.randrange(EVAL_SEED_OFFSET)
+        return generate(tier, seed), tier
 
 
 class CurriculumTracker:
