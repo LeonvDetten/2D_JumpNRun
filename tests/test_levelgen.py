@@ -37,3 +37,14 @@ def test_solver_rejects_an_impossible_level():
     # a 2-tile high wall cannot be jumped (jump apex 78 px < 120 px)
     level = Level.from_text("\n".join([""] * 9 + ["      B", "      B    C", " P    B", "BBBBBBBBBBBB"]))
     assert not solve(level, max_expansions=20_000).solved
+
+
+def test_defused_exam_level_is_solvable_with_enemies():
+    """levels/exam/level_entschaerft.loesung.json is a solver-found action list (proof of solvability)."""
+
+    import json
+
+    level = Level.from_file("levels/exam/level_entschaerft.txt")
+    with open("levels/exam/level_entschaerft.loesung.json") as f:
+        actions = json.load(f)
+    assert replay(level, actions).status == Status.WON
