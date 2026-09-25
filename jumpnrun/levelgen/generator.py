@@ -46,6 +46,7 @@ class TierConfig:
     enemy_groups: bool = False  # valleys may hold 2-3 enemies
     rain: float = 0.0  # chance that enemies start high up and drop down
     high_roads: float = 0.0  # probability weight of a long upper road above a long dead-end floor
+    stones: float = 0.0  # probability weight of single-block stepping stones with 3-tile gaps
 
 
 TIERS = (
@@ -62,10 +63,10 @@ TIERS = (
                platform_enemies=True, free_enemies=0.35),                               # 7 expert
     TierConfig(length=150, max_gap=3, steps=True, max_drop=4, valleys=2.5, platforms=2.0,
                platform_enemies=True, free_enemies=0.35, climbs=1.5, enemy_groups=True,
-               rain=0.3, high_roads=1.0),                                               # 8 climbing, groups
+               rain=0.3, high_roads=1.0, stones=1.0),                                               # 8 climbing, groups
     TierConfig(length=200, max_gap=3, steps=True, max_drop=4, valleys=3.0, platforms=2.5,
                platform_enemies=True, free_enemies=0.4, climbs=2.5, enemy_groups=True,
-               rain=0.5, high_roads=2.0),                                               # 9 like the exam
+               rain=0.5, high_roads=2.0, stones=1.5),                                               # 9 like the exam
 )
 NUM_TIERS = len(TIERS)
 
@@ -124,6 +125,8 @@ def _segment(b: _Builder, cfg: TierConfig) -> None:
         choices.append(("climb", cfg.climbs))
     if cfg.high_roads and b.surface == GROUND:
         choices.append(("high_road", cfg.high_roads))
+    if cfg.stones:
+        choices.append(("stones", cfg.stones))
     kind = rng.choices([c[0] for c in choices], weights=[c[1] for c in choices])[0]
 
     if kind == "flat":
@@ -171,6 +174,17 @@ def _segment(b: _Builder, cfg: TierConfig) -> None:
 
     elif kind == "high_road":
         _high_road(b, cfg)
+
+    elif kind == "stones":
+        # single blocks over a pit, 3 tiles apart at the same height (the exam's hardest jumps)
+        row = max(HIGHEST_SURFACE, b.surface - rng.randint(0, 1))
+        b.flat(1)
+        b.gap(2)
+        for _ in range(rng.randint(2, 5)):
+            b.column(None, {row: "B"})
+            b.gap(3)
+        b.surface = max(row, min(GROUND, row + rng.randint(0, 2)))
+        b.flat(rng.randint(2, 4))
 
     elif kind == "platforms":
         # pit with floating platforms; heights change by at most one row per hop
