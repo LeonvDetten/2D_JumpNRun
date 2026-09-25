@@ -20,7 +20,7 @@ import heapq
 import itertools
 import time
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import List, Optional, Sequence, Tuple
 
 from jumpnrun.core.actions import ACTION_REPEAT, BOT_ACTIONS
 from jumpnrun.core.constants import PLAYER_SPEED, TILE
@@ -52,18 +52,36 @@ def solve(
     max_expansions: int = 200_000,
     action_repeat: int = ACTION_REPEAT,
     weight: float = 1.5,
+    start: Optional[Simulation] = None,
+    goal: Optional[Tuple[int, int]] = None,
 ) -> SolveResult:
+    """Search for the chest - or, with `goal=(col, row)`, for standing on that tile's top."""
+
     start_time = time.time()
-    root = Simulation(level)
+    root = start.clone() if start is not None else Simulation(level)
+    if goal is None:
+        target_x, target_y = level.goal_x, None
+    else:
+        target_x, target_y = goal[0] * TILE + TILE // 2, goal[1] * TILE  # feet on top of tile (col, row)
+
+    def reached(sim: Simulation) -> bool:
+        if goal is None:
+            return sim.status == Status.WON
+        p = sim.player
+        return p.on_ground and p.y + p.h == target_y and abs(p.x + p.w // 2 - target_x) <= TILE
+
+    def priority(sim: Simulation) -> float:
+        p = sim.player
+        if target_y is None:
+            remaining = max(0, target_x - p.x)
+        else:
+            remaining = abs(target_x - p.x - p.w // 2) + abs(target_y - p.y - p.h)
+        return sim.frame + weight * remaining / PLAYER_SPEED
+
     # node storage for path reconstruction: parent index + action index
     parents: List[int] = [-1]
     via: List[int] = [-1]
     counter = itertools.count()
-    goal_x = level.goal_x
-
-    def priority(sim: Simulation) -> float:
-        return sim.frame + weight * max(0, goal_x - sim.player.x) / PLAYER_SPEED
-
     heap = [(priority(root), next(counter), 0, root)]
     seen = {_state_key(root)}
     expanded = 0
@@ -80,13 +98,15 @@ def solve(
             parents.append(node_id)
             via.append(action_index)
             child_id = len(parents) - 1
-            if status == Status.WON:
+            if reached(child):
                 path = []
                 while child_id > 0:
                     path.append(via[child_id])
                     child_id = parents[child_id]
                 path.reverse()
                 return SolveResult(True, path, expanded, child.player.x, time.time() - start_time)
+            if status == Status.WON:
+                continue  # touched a chest while looking for a waypoint
             key = _state_key(child)
             if key in seen:
                 continue
@@ -95,6 +115,32 @@ def solve(
             heapq.heappush(heap, (priority(child), next(counter), child_id, child))
 
     return SolveResult(False, None, expanded, best_x, time.time() - start_time)
+
+
+def solve_via(
+    level: Level,
+    waypoints: Sequence[Tuple[int, int]],
+    max_expansions: int = 200_000,
+    weight: float = 1.5,
+) -> SolveResult:
+    """Solve a long level in legs: waypoint -> waypoint -> chest (enemies stay simulated).
+
+    The result is still one real, replayable action list from the level start.
+    """
+
+    start_time = time.time()
+    sim = Simulation(level)
+    actions: List[int] = []
+    expanded = 0
+    for goal in list(waypoints) + [None]:
+        leg = solve(level, max_expansions, weight=weight, start=sim, goal=goal)
+        expanded += leg.expanded
+        if not leg.solved:
+            return SolveResult(False, None, expanded, max(sim.player.x, leg.max_x), time.time() - start_time)
+        for action_index in leg.actions:
+            sim.step(BOT_ACTIONS[action_index], frames=ACTION_REPEAT)
+        actions += leg.actions
+    return SolveResult(True, actions, expanded, sim.player.x, time.time() - start_time)
 
 
 def reachable_map(level: Level, max_expansions: int = 400_000, action_repeat: int = ACTION_REPEAT) -> str:
@@ -165,6 +211,8 @@ def main() -> None:
     parser.add_argument("--weight", type=float, default=1.5, help="A* weight (1 = optimal path, higher = faster search)")
     parser.add_argument("--video", help="record the found solution as mp4 (first level only)")
     parser.add_argument("--map", action="store_true", help="print where the player can stand (level design help)")
+    parser.add_argument("--via", nargs="*", default=[], metavar="COL,ROW",
+                        help="waypoints (tile the player must stand on) for long levels")
     args = parser.parse_args()
 
     for i, path in enumerate(args.levels):
@@ -172,7 +220,11 @@ def main() -> None:
         if args.map:
             print(reachable_map(level, max_expansions=args.budget))
             continue
-        result = solve(level, max_expansions=args.budget, weight=args.weight)
+        if args.via:
+            waypoints = [tuple(int(v) for v in wp.split(",")) for wp in args.via]
+            result = solve_via(level, waypoints, max_expansions=args.budget, weight=args.weight)
+        else:
+            result = solve(level, max_expansions=args.budget, weight=args.weight)
         verdict = "SOLVED" if result.solved else "NOT SOLVED"
         extra = f"{len(result.actions)} steps" if result.solved else f"reached x={result.max_x}/{level.goal_x}"
         print(f"{path}: {verdict} ({extra}, {result.expanded} expansions, {result.seconds:.1f}s)")

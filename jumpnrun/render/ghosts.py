@@ -54,13 +54,13 @@ class GhostView:
         self.level_h = ROWS * TILE
         # layout: 1 row, 2 wrapped rows, or a camera following the leading ghost
         one_row = min(0.75, SCREEN_W / level_px)
-        two_rows = min(PANEL_MIN_ZOOM_2ROWS, 2 * SCREEN_W / level_px)
-        if one_row >= 0.5:
-            self.rows, self.zoom = 1, one_row
-        elif two_rows >= 0.36:
-            self.rows, self.zoom = 2, two_rows
-        else:
+        two_rows = min(PANEL_MIN_ZOOM_2ROWS, SCREEN_W / -(-level_px // 2))
+        if max(one_row, two_rows) < 0.36:
             self.rows, self.zoom = 1, 0.6
+        elif one_row >= two_rows:
+            self.rows, self.zoom = 1, one_row
+        else:
+            self.rows, self.zoom = 2, two_rows
         self.row_w = int(min(SCREEN_W / self.zoom, -(-level_px // self.rows)))
         self.fits = self.row_w * self.rows >= level_px
         self.view_w = level_px if self.fits else self.row_w
