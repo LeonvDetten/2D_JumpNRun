@@ -39,12 +39,13 @@ def test_solver_rejects_an_impossible_level():
     assert not solve(level, max_expansions=20_000).solved
 
 
-def test_defused_exam_level_is_solvable_with_enemies():
-    """levels/exam/level_entschaerft.loesung.json is a solver-found action list (proof of solvability)."""
+@pytest.mark.parametrize("name", ["level", "level_entschaerft"])
+def test_exam_levels_are_solvable_with_enemies(name):
+    """levels/exam/<name>.loesung.json is a solver-found action list (proof of solvability)."""
 
     import json
 
-    level = Level.from_file("levels/exam/level_entschaerft.txt")
-    with open("levels/exam/level_entschaerft.loesung.json") as f:
+    level = Level.from_file(f"levels/exam/{name}.txt")
+    with open(f"levels/exam/{name}.loesung.json") as f:
         actions = json.load(f)
     assert replay(level, actions).status == Status.WON
