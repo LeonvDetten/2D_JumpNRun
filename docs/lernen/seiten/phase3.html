@@ -1,0 +1,416 @@
+<title>Die Prüfung des Piraten</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root {
+  --bg: #F3F4F9;
+  --surface: #FFFFFF;
+  --surface-2: #E9EBF4;
+  --ink: #181A31;
+  --muted: #5A5D78;
+  --line: #D6D9E7;
+  --accent: #0B84A0;
+  --accent-soft: #BFE6EF;
+  --gold: #A8700F;
+  --red: #C23F37;
+  --green: #2B8A52;
+  --grey: #8A8DA6;
+  --world-top: #241C55;
+  --world-bottom: #3A6DB0;
+  --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", sans-serif;
+  --body: "Literata", Georgia, "Times New Roman", serif;
+  --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0F1120;
+    --surface: #171A2C;
+    --surface-2: #20243A;
+    --ink: #E7E8F3;
+    --muted: #9B9EBA;
+    --line: #2B2F48;
+    --accent: #3CC2DA;
+    --accent-soft: #19485A;
+    --gold: #E3AA4B;
+    --red: #F06B60;
+    --green: #5CC98A;
+    --grey: #7B7F9C;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0F1120;
+  --surface: #171A2C;
+  --surface-2: #20243A;
+  --ink: #E7E8F3;
+  --muted: #9B9EBA;
+  --line: #2B2F48;
+  --accent: #3CC2DA;
+  --accent-soft: #19485A;
+  --gold: #E3AA4B;
+  --red: #F06B60;
+  --green: #5CC98A;
+  --grey: #7B7F9C;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 17px;
+  line-height: 1.62;
+  padding-inline: 18px;
+  padding-block: 0 64px;
+}
+.wrap { max-width: 1040px; margin: 0 auto; }
+.col { max-width: 680px; margin-inline: auto; }
+h1, h2, h3 { font-family: var(--display); line-height: 1.12; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2.3rem, 6vw, 4rem); font-weight: 800; letter-spacing: -0.02em; }
+h2 { font-size: clamp(1.6rem, 3.4vw, 2.2rem); font-weight: 700; letter-spacing: -0.01em; }
+h3 { font-size: 1.15rem; font-weight: 700; }
+p { margin: 0; }
+.stack { display: flex; flex-direction: column; gap: 1rem; }
+.eyebrow {
+  font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent);
+}
+.muted { color: var(--muted); }
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+section { padding-block: 56px 8px; }
+section > .col { display: flex; flex-direction: column; gap: 1rem; }
+a { color: var(--accent); }
+code, .term { font-family: var(--mono); font-size: 0.88em; background: var(--surface-2); padding: 0.05em 0.35em; border-radius: 4px; }
+
+/* hero */
+header.hero { padding-block: 48px 8px; display: grid; gap: 28px; }
+.hero-text { display: flex; flex-direction: column; gap: 14px; max-width: 760px; }
+.hero-text .lede { font-size: 1.2rem; color: var(--muted); max-width: 640px; }
+.video-frame { background: #0b0a1c; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); }
+.video-frame video { display: block; width: 100%; height: auto; }
+.facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.fact { border-top: 2px solid var(--ink); padding-top: 10px; display: flex; flex-direction: column; gap: 2px; }
+.fact .n { font-family: var(--display); font-weight: 800; font-size: 1.9rem; font-variant-numeric: tabular-nums; }
+.fact .l { font-size: 0.86rem; color: var(--muted); line-height: 1.35; }
+@media (max-width: 720px) { .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* figures */
+figure { margin: 0; }
+.figure {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 20px;
+  display: flex; flex-direction: column; gap: 14px; margin-block: 8px;
+}
+.figure figcaption { font-size: 0.9rem; color: var(--muted); }
+.controls { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; }
+.control { display: flex; flex-direction: column; gap: 4px; min-width: 150px; flex: 1 1 180px; }
+.control label { font-family: var(--mono); font-size: 0.78rem; color: var(--muted); display: flex; justify-content: space-between; gap: 8px; }
+.control label b { color: var(--ink); font-weight: 600; }
+input[type="range"] { width: 100%; accent-color: var(--accent); }
+button {
+  font-family: var(--mono); font-size: 0.85rem; border: 1px solid var(--ink); background: var(--ink); color: var(--bg);
+  border-radius: 6px; padding: 8px 14px; cursor: pointer;
+}
+button.ghost { background: transparent; color: var(--ink); }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.seg button { border: 0; border-radius: 0; background: transparent; color: var(--muted); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+
+/* loop diagram */
+.loop svg { width: 100%; height: auto; display: block; }
+
+/* bot view */
+.botview { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 18px; }
+@media (max-width: 820px) { .botview { grid-template-columns: minmax(0, 1fr); } }
+canvas { display: block; width: 100%; height: auto; border-radius: 6px; }
+.panel-title { font-family: var(--mono); font-size: 0.76rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 0.8rem; color: var(--muted); font-family: var(--mono); }
+.legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; background: var(--c); vertical-align: -1px; }
+.bars { display: grid; grid-template-columns: 8.5em minmax(0, 1fr); gap: 6px 10px; align-items: center; font-size: 0.86rem; }
+.bars .name { font-family: var(--mono); font-size: 0.78rem; }
+.bars .name.chosen { color: var(--accent); font-weight: 600; }
+.trio { display: flex; flex-direction: column; gap: 2px; }
+.bar { height: 7px; border-radius: 3px; background: var(--c); width: 0; transition: width 0.18s ease; min-width: 1px; }
+.readouts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.readout { background: var(--surface-2); border-radius: 8px; padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; }
+.readout .k { font-family: var(--mono); font-size: 0.72rem; color: var(--muted); }
+.readout .v { font-family: var(--display); font-weight: 700; font-size: 1.35rem; font-variant-numeric: tabular-nums; }
+.note { font-size: 0.92rem; background: var(--surface-2); border-left: 3px solid var(--accent); padding: 10px 14px; border-radius: 0 6px 6px 0; }
+
+/* charts */
+.chart svg { width: 100%; height: auto; display: block; overflow: visible; }
+.chart text { font-family: var(--mono); font-size: 11px; fill: var(--muted); }
+.two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+@media (max-width: 820px) { .two { grid-template-columns: minmax(0, 1fr); } }
+
+/* formula */
+.formula { font-family: var(--mono); font-size: 0.95rem; background: var(--surface-2); padding: 12px 14px; border-radius: 8px; overflow-x: auto; white-space: nowrap; }
+
+/* reward table */
+table { border-collapse: collapse; width: 100%; font-size: 0.95rem; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-family: var(--mono); font-size: 0.76rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 400; }
+td.num { font-family: var(--mono); white-space: nowrap; }
+.table-wrap { overflow-x: auto; }
+
+/* verdict */
+.verdict { font-family: var(--display); font-weight: 700; font-size: 1.2rem; }
+.verdict.good { color: var(--green); }
+.verdict.bad { color: var(--red); }
+.scen { display: grid; grid-template-columns: 11em minmax(0, 1fr) 4.5em; gap: 8px 12px; align-items: center; font-size: 0.9rem; }
+.scen .track { position: relative; height: 18px; background: var(--surface-2); border-radius: 4px; }
+.scen .zero { position: absolute; top: -3px; bottom: -3px; width: 1px; background: var(--muted); left: 50%; }
+.scen .fill { position: absolute; top: 3px; bottom: 3px; border-radius: 3px; }
+
+/* network */
+.net { display: flex; flex-wrap: wrap; align-items: stretch; gap: 8px; }
+.net .blk { flex: 1 1 120px; background: var(--surface-2); border-radius: 8px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; }
+.net .blk b { font-family: var(--display); font-size: 1rem; }
+.net .blk span { font-family: var(--mono); font-size: 0.74rem; color: var(--muted); }
+.net .arrow { align-self: center; color: var(--muted); font-family: var(--mono); }
+.net .blk.out { background: var(--accent-soft); }
+
+/* glossary */
+dl { display: grid; grid-template-columns: 9em minmax(0, 1fr); gap: 8px 16px; margin: 0; }
+dt { font-family: var(--display); font-weight: 700; }
+dd { margin: 0; color: var(--muted); }
+@media (max-width: 560px) { dl { grid-template-columns: minmax(0, 1fr); } dd { margin-bottom: 8px; } .scen { grid-template-columns: 7.5em minmax(0, 1fr) 4em; } .readouts { grid-template-columns: minmax(0,1fr) minmax(0,1fr); } }
+footer { margin-top: 56px; padding-top: 18px; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.9rem; }
+@media (prefers-reduced-motion: reduce) { .bar { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="hero-text">
+      <span class="eyebrow">Lerntagebuch · Phase 3 und 4 von 4</span>
+      <h1>Die Prüfung des Piraten</h1>
+      <p class="lede">Nach 11 Millionen Trainingsschritten schafft der Bot fast alle Level, die er nie gesehen hat, bis hin zu langen Leveln mit Kletterpassagen und Sackgassen. Dein Level von 2023 hat er trotzdem nicht bestanden: 0 von 32 Versuchen. Diese Seite zeigt, woran das liegt und was wir daraus lernen.</p>
+    </div>
+    <figure class="video-frame">
+      <video src="pruefung_geister.mp4" controls muted playsinline preload="metadata"></video>
+    </figure>
+    <div class="facts">
+      <div class="fact"><span class="n mono">99 / 120</span><span class="l">unbekannte Level der Stufen 4–9 geschafft</span></div>
+      <div class="fact"><span class="n mono">0 / 32</span><span class="l">Versuche auf der Prüfung (entschärft und original)</span></div>
+      <div class="fact"><span class="n mono">48 %</span><span class="l">weitester Versuch auf der Prüfung, bei 7,75 Mio. Schritten</span></div>
+      <div class="fact"><span class="n mono">11 Mio.</span><span class="l">Trainingsschritte über alle Phasen, ≈ 3 Stunden CPU</span></div>
+    </div>
+  </header>
+
+  <section id="verlauf">
+    <div class="col">
+      <span class="eyebrow">Phase 3</span>
+      <h2>Drei Mal nachgebessert</h2>
+      <p>Phase 3 trainiert auf allen Stufen 0–9. Unterwegs habe ich den Bot regelmäßig auf deinem Level beobachten lassen, ohne dass er darauf trainiert. Dreimal hat das eine Lücke im Training aufgedeckt, und dreimal habe ich den Level-Generator erweitert:</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Schritte</th><th>Beobachtung auf der Prüfung</th><th>Änderung im Training</th></tr></thead>
+          <tbody>
+            <tr><td class="num">4,65 Mio.</td><td>alle Versuche laufen unten entlang und fallen bei Kachel 100 in die Grube</td><td><strong>lange Sackgassen</strong>: Der Boden endet erst 20–35 Kacheln später, oben läuft der richtige Weg</td></tr>
+            <tr><td class="num">7,15 Mio.</td><td>10 von 16 nehmen jetzt den oberen Weg, stürzen aber an den Einzelblöcken ab</td><td><strong>Trittsteine</strong>: Einzelblöcke mit 3 Kacheln Abstand</td></tr>
+            <tr><td class="num">8,45 Mio.</td><td>der Sprung von Kachel 99 auf 103 geht zusätzlich eine Reihe hoch; der Löser bremst dafür in der Luft</td><td>Trittsteine mit <strong>Höhenwechsel</strong>, damit Bremsen in der Luft nötig wird</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="figure" style="margin-top:14px">
+      <div class="chart" id="tierChart"></div>
+      <div class="legend">
+        <span style="--c:var(--grey)">Stufe 0–5 (Mittel)</span>
+        <span style="--c:var(--accent)">Stufe 7</span>
+        <span style="--c:var(--gold)">Stufe 8</span>
+        <span style="--c:var(--ink)">Stufe 9</span>
+      </div>
+      <figcaption>Erfolgsrate im Training. Die gestrichelten Linien markieren die drei Änderungen am Generator. Nach der dritten brechen Stufe 8 und 9 ein: Das Bremsen in der Luft ist neu und schwer, und bis zum Ende erholen sie sich nur langsam.</figcaption>
+    </div>
+  </section>
+
+  <section id="pruefung">
+    <div class="col">
+      <span class="eyebrow">Phase 4</span>
+      <h2>Wo scheitert der Bot?</h2>
+      <p>32 Versuche pro Version, jeder mit etwas Zufall in den Entscheidungen. Jeder Punkt markiert, wo ein Versuch geendet hat.</p>
+    </div>
+    <div class="figure" style="margin-top:14px">
+      <div class="seg" role="group" aria-label="Prüfungsversion">
+        <button type="button" id="vEnt" aria-pressed="true">entschärft (4 Startgegner)</button>
+        <button type="button" id="vOrig" aria-pressed="false">original (12 Startgegner)</button>
+      </div>
+      <canvas id="examMap" width="2400" height="260" aria-label="Prüfungslevel mit Todespunkten"></canvas>
+      <div class="legend"><span style="--c:var(--red)">Grube</span><span style="--c:var(--gold)">Gegner</span><span style="--c:var(--grey)">Zeit abgelaufen</span></div>
+      <div class="scen" id="endBars"></div>
+      <figcaption>Das ganze Level, stark verkleinert (297 Kacheln bis zur Truhe). Die meisten Versuche enden in der Grube bei Kachel 90–103. Im Original sterben zusätzlich viele gleich am Start am Gegnerregen.</figcaption>
+    </div>
+    <div class="col" style="margin-top:22px">
+      <h3>Fortschritt auf der Prüfung während des Trainings</h3>
+    </div>
+    <div class="figure" style="margin-top:10px">
+      <div class="chart" id="examChart"></div>
+      <div class="legend"><span style="--c:var(--accent)">bester von 16 Versuchen, entschärft</span><span style="--c:var(--grey)">bester von 16 Versuchen, original</span></div>
+      <figcaption>Die waagrechte Linie bei 34 % ist die Grube bei Kachel 100. Nur wenige Versuche kamen darüber hinaus, der weiteste bis 48 %.</figcaption>
+    </div>
+  </section>
+
+  <section id="warum">
+    <div class="col">
+      <span class="eyebrow">Analyse</span>
+      <h2>Warum dein Level so schwer ist</h2>
+      <ol class="stack" style="padding-left:1.2em;margin:0;gap:0.8rem">
+        <li><strong>Die Falle liegt außer Sicht.</strong> Der Bot sieht 19 Kacheln nach vorn. Die Entscheidung „oben oder unten“ fällt bei Kachel 30–40, der Boden endet erst bei Kachel 97. Von der Startposition aus sieht der untere Weg völlig in Ordnung aus. Ein Mensch lernt das nach dem ersten Tod auswendig. Der Bot darf das nicht, sonst wäre es keine Prüfung.</li>
+        <li><strong>Die Sprünge sind extrem präzise.</strong> Von Kachel 99 auf 103 geht es 3 Kacheln weit und eine Reihe hoch auf einen einzelnen Block. Der Löser schafft das nur, indem er springt, in der Luft kurz anhält und dann weitersteuert. Der Bot entscheidet nur alle 4 Frames (32 Pixel Laufweg). Das ist für diese Stelle sehr grob.</li>
+        <li><strong>Der Bot hat eine bequeme Gewohnheit.</strong> Seit Phase 1 hüpft er fast ununterbrochen nach rechts. Das ist ein lokales Optimum wie beim Schießen in Phase 2: Es klappt fast überall, deshalb gibt es wenig Druck, das Bremsen in der Luft zu lernen.</li>
+        <li><strong>Gegnerregen am Start.</strong> Im Original fallen 12 Gegner auf die Treppe. 17 von 32 Versuchen sterben dort, bevor es überhaupt interessant wird.</li>
+      </ol>
+      <p>Dass dein Level lösbar ist, steht fest: Der Löser hat für beide Versionen einen Weg gefunden, und ein Test spielt ihn jedes Mal nach. Es ist nur deutlich schwerer als alles, was der Generator bisher baut.</p>
+    </div>
+  </section>
+
+  <section id="auswahl">
+    <div class="col">
+      <span class="eyebrow">Methodik</span>
+      <h2>Validierung und Test sind zwei Dinge</h2>
+      <p>Welches Modell tritt zur Prüfung an? Es wäre verlockend, einfach das zu nehmen, das auf deinem Level am weitesten kommt. Dann hätten wir aber die Prüfung zum Aussuchen benutzt, und ihr Ergebnis wäre geschönt. Deshalb gibt es drei Arten von Leveln:</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Menge</th><th>wofür</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Training</strong></td><td>daraus lernt der Bot</td></tr>
+            <tr><td><strong>Validierung</strong> (generiert, Seeds ab 10¹²)</td><td>Entscheidungen treffen: Welches Modell? Hilft eine Änderung?</td></tr>
+            <tr><td><strong>Test</strong> (dein Level)</td><td>einmal am Ende ehrlich messen</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Drei Kandidaten auf je 20 Validierungs-Leveln der Stufen 4–9:</p>
+    </div>
+    <div class="col figure" style="margin-top:10px">
+      <div class="table-wrap">
+        <table id="selTable"><thead><tr><th>Checkpoint</th><th>ohne Zufall</th><th>mit Zufall</th><th>Stufe 8</th><th>Stufe 9</th></tr></thead><tbody></tbody></table>
+      </div>
+      <figcaption>Alle drei liegen gleichauf. Gewählt wurde der letzte Stand (<code>models/phase3.zip</code>), weil er am meisten trainiert hat. Dass die Prüfung danach 0 von 32 ergibt, war vor der Wahl nicht bekannt.</figcaption>
+    </div>
+  </section>
+
+  <section id="weiter">
+    <div class="col">
+      <span class="eyebrow">Deine Entscheidung</span>
+      <h2>Wie es weitergehen könnte</h2>
+      <p>Jede Option bringt eine eigene RL-Lektion mit. Sie lassen sich auch kombinieren.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Idee</th><th>was sie ändert</th><th>Lektion</th></tr></thead>
+          <tbody>
+            <tr><td><strong>A · Vom Löser lernen</strong></td><td>Der Löser erzeugt tausende Musterlösungen. Das Netz lernt zuerst, sie nachzumachen, danach verbessert PPO weiter.</td><td>Imitation Learning (Behavior Cloning), wie bei vielen echten Robotern</td></tr>
+            <tr><td><strong>B · Feinere Steuerung</strong></td><td>Entscheidung alle 2 statt 4 Frames</td><td>Wie die Zeitauflösung schwierige Manöver ermöglicht und das Lernen verlangsamt</td></tr>
+            <tr><td><strong>C · Weiter sehen</strong></td><td>Sichtfeld 40 statt 19 Kacheln, oder eine grobe Übersicht über das ganze Level</td><td>Wie viel Information braucht eine gute Entscheidung?</td></tr>
+            <tr><td><strong>D · Länger trainieren</strong></td><td>über Nacht auf deinem PC, gleiche Einstellungen</td><td>Wann bringt mehr Rechenzeit noch etwas?</td></tr>
+            <tr><td><strong>E · Auf dem Prüfungslevel trainieren</strong></td><td>würde es vermutlich schaffen</td><td>Das ist Auswendiglernen. Als Gegenbeispiel lehrreich, als Prüfung wertlos.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Meine Empfehlung ist <strong>A + B</strong>: Der Löser kennt die präzisen Manöver bereits. Wenn der Bot sie abschaut, muss er das Bremsen in der Luft nicht zufällig entdecken.</p>
+    </div>
+  </section>
+
+  <footer class="col">Space Pirate Jump'n'Run · Phase 3 und 4 · Daten aus <code>runs/phase3</code>, Modell <code>models/phase3.zip</code>, Prüfung mit 32 Versuchen je Version.</footer>
+</div>
+
+<script id="data" type="application/json">{"curve":[{"t":3750000,"won":0.951,"pit":0.028,"enemy":0.02,"timeout":0.001,"tiers":{"-1":0.995,"0":1.0,"1":0.995,"2":0.994,"3":0.966,"4":0.962,"5":0.895,"6":0.872,"7":0.736,"8":0.429}},{"t":4000000,"won":0.805,"pit":0.114,"enemy":0.07,"timeout":0.012,"tiers":{"-1":0.979,"0":1.0,"1":0.976,"2":1.0,"3":0.938,"4":0.964,"5":0.87,"6":0.883,"7":0.763,"8":0.605,"9":0.56}},{"t":4250000,"won":0.838,"pit":0.091,"enemy":0.063,"timeout":0.008,"tiers":{"-1":0.96,"0":1.0,"1":1.0,"2":1.0,"3":0.921,"4":0.947,"5":0.971,"6":0.885,"7":0.785,"8":0.705,"9":0.663}},{"t":4500000,"won":0.855,"pit":0.08,"enemy":0.061,"timeout":0.005,"tiers":{"-1":0.971,"0":1.0,"1":1.0,"2":1.0,"3":0.941,"4":0.934,"5":0.929,"6":0.838,"7":0.879,"8":0.724,"9":0.706}},{"t":4750000,"won":0.846,"pit":0.088,"enemy":0.061,"timeout":0.006,"tiers":{"-1":0.989,"0":1.0,"1":1.0,"2":0.977,"3":0.927,"4":0.92,"5":0.932,"6":0.871,"7":0.833,"8":0.747,"9":0.648}},{"t":5000000,"won":0.828,"pit":0.099,"enemy":0.062,"timeout":0.011,"tiers":{"-1":0.978,"0":1.0,"1":0.959,"2":1.0,"3":0.963,"4":0.962,"5":0.876,"6":0.862,"7":0.807,"8":0.673,"9":0.633}},{"t":5250000,"won":0.874,"pit":0.063,"enemy":0.063,"timeout":0.0,"tiers":{"-1":0.981,"0":1.0,"1":0.983,"2":1.0,"3":0.943,"4":0.982,"5":0.964,"6":0.873,"7":0.82,"8":0.847,"9":0.665}},{"t":5500000,"won":0.894,"pit":0.056,"enemy":0.049,"timeout":0.002,"tiers":{"-1":0.96,"0":1.0,"1":1.0,"2":1.0,"3":0.967,"4":0.974,"5":0.971,"6":0.931,"7":0.903,"8":0.835,"9":0.724}},{"t":5750000,"won":0.899,"pit":0.06,"enemy":0.038,"timeout":0.002,"tiers":{"-1":0.989,"0":1.0,"1":1.0,"2":1.0,"3":1.0,"4":0.951,"5":0.921,"6":0.898,"7":0.876,"8":0.856,"9":0.747}},{"t":6000000,"won":0.916,"pit":0.044,"enemy":0.04,"timeout":0.0,"tiers":{"-1":0.951,"0":1.0,"1":0.963,"2":1.0,"3":0.983,"4":0.965,"5":0.951,"6":0.965,"7":0.906,"8":0.83,"9":0.843}},{"t":6250000,"won":0.917,"pit":0.052,"enemy":0.03,"timeout":0.0,"tiers":{"-1":0.98,"0":1.0,"1":1.0,"2":1.0,"3":0.966,"4":0.923,"5":0.922,"6":0.961,"7":0.914,"8":0.817,"9":0.838}},{"t":6500000,"won":0.888,"pit":0.06,"enemy":0.052,"timeout":0.0,"tiers":{"-1":0.989,"0":1.0,"1":1.0,"2":0.955,"3":0.925,"4":0.937,"5":0.973,"6":0.885,"7":0.855,"8":0.81,"9":0.755}},{"t":6750000,"won":0.885,"pit":0.069,"enemy":0.046,"timeout":0.0,"tiers":{"-1":0.983,"0":1.0,"1":1.0,"2":1.0,"3":0.974,"4":0.986,"5":0.933,"6":0.855,"7":0.901,"8":0.769,"9":0.753}},{"t":7000000,"won":0.884,"pit":0.085,"enemy":0.031,"timeout":0.0,"tiers":{"-1":0.978,"0":1.0,"1":1.0,"2":1.0,"3":0.963,"4":1.0,"5":0.972,"6":0.923,"7":0.887,"8":0.785,"9":0.717}},{"t":7250000,"won":0.904,"pit":0.072,"enemy":0.023,"timeout":0.0,"tiers":{"-1":0.994,"0":1.0,"1":1.0,"2":1.0,"3":0.976,"4":0.98,"5":1.0,"6":0.954,"7":0.95,"8":0.824,"9":0.757}},{"t":7500000,"won":0.94,"pit":0.036,"enemy":0.024,"timeout":0.0,"tiers":{"-1":1.0,"0":1.0,"1":0.988,"2":1.0,"3":0.954,"4":1.0,"5":1.0,"6":0.958,"7":0.939,"8":0.869,"9":0.84}},{"t":7750000,"won":0.944,"pit":0.031,"enemy":0.024,"timeout":0.0,"tiers":{"-1":1.0,"0":1.0,"1":1.0,"2":1.0,"3":0.989,"4":1.0,"5":1.0,"6":0.976,"7":0.901,"8":0.882,"9":0.861}},{"t":8000000,"won":0.899,"pit":0.057,"enemy":0.044,"timeout":0.0,"tiers":{"-1":0.984,"0":1.0,"1":1.0,"2":1.0,"3":0.961,"4":0.957,"5":1.0,"6":0.926,"7":0.872,"8":0.867,"9":0.748}},{"t":8250000,"won":0.929,"pit":0.033,"enemy":0.038,"timeout":0.0,"tiers":{"-1":0.995,"0":1.0,"1":0.987,"2":1.0,"3":0.987,"4":1.0,"5":0.948,"6":0.987,"7":0.919,"8":0.916,"9":0.791}},{"t":8500000,"won":0.904,"pit":0.065,"enemy":0.026,"timeout":0.004,"tiers":{"-1":0.99,"0":1.0,"1":1.0,"2":1.0,"3":0.981,"4":0.987,"5":0.977,"6":0.977,"7":0.948,"8":0.789,"9":0.729}},{"t":8750000,"won":0.743,"pit":0.204,"enemy":0.034,"timeout":0.02,"tiers":{"-1":1.0,"0":1.0,"1":0.949,"2":1.0,"3":0.987,"4":0.986,"5":0.972,"6":0.931,"7":0.891,"8":0.496,"9":0.352}},{"t":9000000,"won":0.75,"pit":0.192,"enemy":0.027,"timeout":0.031,"tiers":{"-1":0.969,"0":1.0,"1":0.987,"2":1.0,"3":0.973,"4":1.0,"5":0.969,"6":0.919,"7":0.885,"8":0.498,"9":0.318}},{"t":9250000,"won":0.732,"pit":0.164,"enemy":0.027,"timeout":0.076,"tiers":{"-1":0.989,"0":1.0,"1":1.0,"2":1.0,"3":1.0,"4":0.966,"5":0.935,"6":0.96,"7":0.941,"8":0.494,"9":0.314}},{"t":9500000,"won":0.724,"pit":0.132,"enemy":0.041,"timeout":0.103,"tiers":{"-1":0.981,"0":1.0,"1":1.0,"2":1.0,"3":1.0,"4":0.915,"5":0.984,"6":0.937,"7":0.863,"8":0.462,"9":0.288}},{"t":9750000,"won":0.725,"pit":0.13,"enemy":0.034,"timeout":0.111,"tiers":{"-1":1.0,"0":1.0,"1":0.969,"2":1.0,"3":0.954,"4":1.0,"5":0.981,"6":0.941,"7":0.943,"8":0.448,"9":0.333}},{"t":10000000,"won":0.743,"pit":0.135,"enemy":0.037,"timeout":0.085,"tiers":{"-1":0.973,"0":1.0,"1":0.957,"2":1.0,"3":1.0,"4":0.974,"5":0.982,"6":0.92,"7":0.924,"8":0.507,"9":0.392}},{"t":10250000,"won":0.735,"pit":0.148,"enemy":0.026,"timeout":0.091,"tiers":{"-1":1.0,"0":1.0,"1":1.0,"2":1.0,"3":0.98,"4":1.0,"5":0.98,"6":1.0,"7":0.931,"8":0.518,"9":0.37}},{"t":10500000,"won":0.748,"pit":0.127,"enemy":0.035,"timeout":0.09,"tiers":{"-1":0.989,"0":1.0,"1":0.982,"2":1.0,"3":0.985,"4":0.971,"5":0.948,"6":0.911,"7":0.941,"8":0.512,"9":0.37}},{"t":10750000,"won":0.749,"pit":0.137,"enemy":0.03,"timeout":0.084,"tiers":{"-1":0.99,"0":1.0,"1":1.0,"2":1.0,"3":0.983,"4":1.0,"5":0.974,"6":0.912,"7":0.905,"8":0.517,"9":0.367}},{"t":11000000,"won":0.754,"pit":0.145,"enemy":0.022,"timeout":0.079,"tiers":{"-1":1.0,"0":1.0,"1":1.0,"2":0.979,"3":1.0,"4":1.0,"5":1.0,"6":0.945,"7":0.929,"8":0.529,"9":0.369}},{"t":11250000,"won":0.741,"pit":0.147,"enemy":0.037,"timeout":0.076,"tiers":{"-1":0.985,"0":1.0,"1":1.0,"2":1.0,"3":0.929,"4":1.0,"5":1.0,"6":0.923,"7":0.935,"8":0.527,"9":0.348}}],"evs":[{"t":3751216,"exam_best":0.338,"ent_best":0.338,"ent_mean":0.213,"exam_mean":0.171},{"t":4001216,"exam_best":0.345,"ent_best":0.345,"ent_mean":0.205,"exam_mean":0.232},{"t":4251224,"exam_best":0.338,"ent_best":0.345,"ent_mean":0.291,"exam_mean":0.226},{"t":4501232,"exam_best":0.339,"ent_best":0.339,"ent_mean":0.323,"exam_mean":0.176},{"t":4751240,"exam_best":0.34,"ent_best":0.34,"ent_mean":0.295,"exam_mean":0.24},{"t":5001240,"exam_best":0.34,"ent_best":0.34,"ent_mean":0.259,"exam_mean":0.323},{"t":5251240,"exam_best":0.347,"ent_best":0.346,"ent_mean":0.34,"exam_mean":0.341},{"t":5501240,"exam_best":0.348,"ent_best":0.381,"ent_mean":0.295,"exam_mean":0.282},{"t":5751240,"exam_best":0.348,"ent_best":0.348,"ent_mean":0.339,"exam_mean":0.339},{"t":6001240,"exam_best":0.368,"ent_best":0.348,"ent_mean":0.339,"exam_mean":0.264},{"t":6251240,"exam_best":0.367,"ent_best":0.34,"ent_mean":0.338,"exam_mean":0.31},{"t":6501240,"exam_best":0.348,"ent_best":0.348,"ent_mean":0.321,"exam_mean":0.233},{"t":6751240,"exam_best":0.348,"ent_best":0.348,"ent_mean":0.34,"exam_mean":0.293},{"t":7001248,"exam_best":0.348,"ent_best":0.348,"ent_mean":0.345,"exam_mean":0.313},{"t":7251248,"exam_best":0.34,"ent_best":0.426,"ent_mean":0.348,"exam_mean":0.184},{"t":7501248,"exam_best":0.34,"ent_best":0.34,"ent_mean":0.337,"exam_mean":0.296},{"t":7751248,"exam_best":0.37,"ent_best":0.477,"ent_mean":0.326,"exam_mean":0.257},{"t":8001248,"exam_best":0.348,"ent_best":0.348,"ent_mean":0.341,"exam_mean":0.327},{"t":8251248,"exam_best":0.348,"ent_best":0.348,"ent_mean":0.172,"exam_mean":0.245},{"t":8501256,"exam_best":0.348,"ent_best":0.348,"ent_mean":0.324,"exam_mean":0.31},{"t":8751256,"exam_best":0.348,"ent_best":0.34,"ent_mean":0.207,"exam_mean":0.296},{"t":9001256,"exam_best":0.348,"ent_best":0.34,"ent_mean":0.31,"exam_mean":0.282},{"t":9251256,"exam_best":0.348,"ent_best":0.348,"ent_mean":0.106,"exam_mean":0.292},{"t":9501256,"exam_best":0.34,"ent_best":0.361,"ent_mean":0.185,"exam_mean":0.322},{"t":9751256,"exam_best":0.348,"ent_best":0.476,"ent_mean":0.349,"exam_mean":0.339},{"t":10001256,"exam_best":0.348,"ent_best":0.348,"ent_mean":0.34,"exam_mean":0.298},{"t":10251256,"exam_best":0.34,"ent_best":0.348,"ent_mean":0.31,"exam_mean":0.296},{"t":10501256,"exam_best":0.348,"ent_best":0.477,"ent_mean":0.319,"exam_mean":0.262},{"t":10751256,"exam_best":0.34,"ent_best":0.366,"ent_mean":0.307,"exam_mean":0.232},{"t":11001256,"exam_best":0.348,"ent_best":0.348,"ent_mean":0.295,"exam_mean":0.192}],"sel":[{"ck":"step_0008001248.zip","det":{"stufe_4":20,"stufe_5":20,"stufe_6":19,"stufe_7":20,"stufe_8":10,"stufe_9":11},"sto":{"stufe_4":20,"stufe_5":20,"stufe_6":19,"stufe_7":20,"stufe_8":11,"stufe_9":10},"det_total":100,"sto_total":100},{"ck":"step_0008451248.zip","det":{"stufe_4":20,"stufe_5":20,"stufe_6":18,"stufe_7":19,"stufe_8":11,"stufe_9":10},"sto":{"stufe_4":19,"stufe_5":20,"stufe_6":17,"stufe_7":19,"stufe_8":7,"stufe_9":11},"det_total":98,"sto_total":93},{"ck":"step_0011051256.zip","det":{"stufe_4":20,"stufe_5":19,"stufe_6":19,"stufe_7":19,"stufe_8":12,"stufe_9":10},"sto":{"stufe_4":19,"stufe_5":18,"stufe_6":20,"stufe_7":18,"stufe_8":13,"stufe_9":11},"det_total":99,"sto_total":99}],"exam":{"level_entschaerft":[{"outcome":"died_pit","progress":0.34,"col":100,"upper":false},{"outcome":"timeout","progress":0.361,"col":107,"upper":true},{"outcome":"died_enemy","progress":0.104,"col":30,"upper":false},{"outcome":"died_pit","progress":0.34,"col":100,"upper":false},{"outcome":"died_pit","progress":0.34,"col":100,"upper":false},{"outcome":"died_pit","progress":0.337,"col":100,"upper":false},{"outcome":"died_pit","progress":0.337,"col":100,"upper":false},{"outcome":"died_pit","progress":0.348,"col":103,"upper":false},{"outcome":"died_pit","progress":0.337,"col":100,"upper":false},{"outcome":"died_pit","progress":0.337,"col":100,"upper":false},{"outcome":"died_pit","progress":0.335,"col":99,"upper":false},{"outcome":"died_pit","progress":0.348,"col":103,"upper":false},{"outcome":"died_pit","progress":0.337,"col":100,"upper":false},{"outcome":"died_enemy","progress":0.328,"col":97,"upper":false},{"outcome":"died_pit","progress":0.337,"col":100,"upper":false},{"outcome":"died_enemy","progress":0.028,"col":8,"upper":false},{"outcome":"died_pit","progress":0.337,"col":100,"upper":false},{"outcome":"died_pit","progress":0.34,"col":100,"upper":false},{"outcome":"died_pit","progress":0.337,"col":100,"upper":false},{"outcome":"died_enemy","progress":0.101,"col":28,"upper":false},{"outcome":"died_pit","progress":0.337,"col":100,"upper":false},{"outcome":"died_pit","progress":0.34,"col":100,"upper":false},{"outcome":"died_pit","progress":0.334,"col":99,"upper":false},{"outcome":"died_pit","progress":0.34,"col":100,"upper":false},{"outcome":"died_pit","progress":0.337,"col":100,"upper":false},{"outcome":"died_pit","progress":0.34,"col":100,"upper":false},{"outcome":"died_enemy","progress":0.028,"col":7,"upper":false},{"outcome":"died_pit","progress":0.337,"col":100,"upper":false},{"outcome":"died_pit","progress":0.34,"col":100,"upper":false},{"outcome":"died_pit","progress":0.34,"col":100,"upper":false},{"outcome":"died_pit","progress":0.34,"col":100,"upper":false},{"outcome":"died_enemy","progress":0.116,"col":34,"upper":false}],"level":[{"outcome":"died_pit","progress":0.337,"col":100,"upper":false},{"outcome":"died_enemy","progress":0.111,"col":32,"upper":false},{"outcome":"died_pit","progress":0.34,"col":100,"upper":false},{"outcome":"died_enemy","progress":0.109,"col":32,"upper":false},{"outcome":"died_enemy","progress":0.114,"col":33,"upper":false},{"outcome":"died_pit","progress":0.34,"col":100,"upper":false},{"outcome":"died_pit","progress":0.337,"col":100,"upper":false},{"outcome":"died_pit","progress":0.335,"col":99,"upper":false},{"outcome":"died_enemy","progress":0.107,"col":30,"upper":false},{"outcome":"died_pit","progress":0.337,"col":100,"upper":false},{"outcome":"died_enemy","progress":0.112,"col":33,"upper":false},{"outcome":"died_pit","progress":0.348,"col":103,"upper":false},{"outcome":"died_pit","progress":0.337,"col":100,"upper":false},{"outcome":"died_enemy","progress":0.109,"col":31,"upper":false},{"outcome":"died_enemy","progress":0.109,"col":31,"upper":false},{"outcome":"died_pit","progress":0.348,"col":103,"upper":false},{"outcome":"died_enemy","progress":0.109,"col":31,"upper":false},{"outcome":"died_pit","progress":0.34,"col":100,"upper":false},{"outcome":"died_enemy","progress":0.109,"col":31,"upper":false},{"outcome":"died_pit","progress":0.335,"col":99,"upper":false},{"outcome":"died_pit","progress":0.335,"col":99,"upper":false},{"outcome":"died_pit","progress":0.335,"col":99,"upper":false},{"outcome":"died_pit","progress":0.34,"col":100,"upper":false},{"outcome":"died_enemy","progress":0.114,"col":33,"upper":false},{"outcome":"died_enemy","progress":0.109,"col":31,"upper":false},{"outcome":"died_enemy","progress":0.109,"col":31,"upper":false},{"outcome":"died_enemy","progress":0.117,"col":34,"upper":false},{"outcome":"died_enemy","progress":0.111,"col":32,"upper":false},{"outcome":"died_enemy","progress":0.109,"col":31,"upper":false},{"outcome":"died_pit","progress":0.34,"col":100,"upper":false},{"outcome":"died_enemy","progress":0.117,"col":34,"upper":false},{"outcome":"died_enemy","progress":0.109,"col":30,"upper":false}]},"level":["             E     E     E     E                                                                                                                                                 E E E E B                                                                                                                                                                                            ","                                                                                 B                                                                                                BBBBBBBB                                                                                                                    ","                                                                                 B                     B   B   B  BB   B   B   B   BBB   B   B   B   B                                                        BB BB                                                                                                                                     ","                                                                    B   BE E EB  B                 B  B       E       B                                                                                     BB        BB BB                                    BB BB                                                                              ","                                       BBBB   B   B   B   B      B      BBBBBBB  B          BBBB  B              BBBBB                                   B                                              BB                  BB BB                      BB BB                                          ","                                 BBBB                         B      B                   B        E           B                                                               BBBBB                  BB                                         BB BB                                                                                                                                                                                                                                                                                    ","    E          E               B B                                                  B   B   B               B                                               B              BB       BB           BB                                      BB BB                                                                                                  ","                          BBBBB                  E                              B  B      E                 B                                                            BB             B      BB                                    BB BB                                                                                                  ","                    BBBB            EEE                                                                    B                                                  B       BB                   BBB                                                                                                                                          ","               BBB                                               E                            B        B                                                         B B                                                                                                                                                                                                                                                                                ","         BBBB                                                                                          B                                                                                                                                                                                                 C                                                                                                          ","      B                                BBB         B                                                 B   B                                                                                                                                                              BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB                                                                                                            ","BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"]}</script>
+<script>
+(function () {
+  const D = JSON.parse(document.getElementById("data").textContent);
+  const css = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const SVGNS = "http://www.w3.org/2000/svg";
+  function svgEl(tag, attrs, parent) { const e = document.createElementNS(SVGNS, tag); for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v); if (parent) parent.appendChild(e); return e; }
+  function frame(el, o) {
+    el.innerHTML = "";
+    const W = 720, H = o.h || 260, m = { l: 44, r: 14, t: 12, b: 34 };
+    const svg = svgEl("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": o.label }, el);
+    const X = (v) => m.l + ((v - o.x0) / (o.x1 - o.x0)) * (W - m.l - m.r);
+    const Y = (v) => H - m.b - ((v - o.y0) / (o.y1 - o.y0)) * (H - m.t - m.b);
+    for (const t of o.yt) { svgEl("line", { x1: m.l, x2: W - m.r, y1: Y(t), y2: Y(t), style: "stroke:var(--line)" }, svg); const tx = svgEl("text", { x: m.l - 8, y: Y(t) + 4, "text-anchor": "end" }, svg); tx.textContent = o.yf(t); }
+    for (const t of o.xt) { const tx = svgEl("text", { x: X(t), y: H - m.b + 18, "text-anchor": "middle" }, svg); tx.textContent = o.xf(t); }
+    if (o.xlabel) { const tx = svgEl("text", { x: W - m.r, y: H - m.b - 6, "text-anchor": "end" }, svg); tx.textContent = o.xlabel; }
+    return { svg, X, Y };
+  }
+  const line = (f, pts, color, w = 2.2, dash) => svgEl("path", { d: pts.map((p, i) => (i ? "L" : "M") + f.X(p[0]).toFixed(1) + "," + f.Y(p[1]).toFixed(1)).join(""), style: `fill:none;stroke:${color};stroke-width:${w};stroke-linejoin:round;${dash ? "stroke-dasharray:" + dash : ""}` }, f.svg);
+  const mio = (t) => (t / 1e6).toLocaleString("de-DE") + " Mio.";
+  const pct = (t) => Math.round(t * 100) + " %";
+  const changes = [[4.65e6, "Sackgassen"], [7.15e6, "Trittsteine"], [8.45e6, "Höhenwechsel"]];
+
+  // tier curves
+  (function () {
+    const C = D.curve;
+    const f = frame(document.getElementById("tierChart"), { x0: 3.6e6, x1: 11.3e6, y0: 0, y1: 1, h: 280, label: "Erfolg je Stufe in Phase 3",
+      yt: [0, 0.25, 0.5, 0.75, 1], yf: pct, xt: [4e6, 6e6, 8e6, 10e6], xf: mio, xlabel: "Schritte gesamt" });
+    changes.forEach(([t, name], i) => {
+      svgEl("line", { x1: f.X(t), x2: f.X(t), y1: f.Y(1), y2: f.Y(0), style: "stroke:var(--muted);stroke-dasharray:3 4" }, f.svg);
+      const tx = svgEl("text", { x: f.X(t) + 4, y: f.Y(0.06) + (i % 2) * 12 }, f.svg); tx.textContent = name;
+    });
+    const easy = C.map((r) => { const v = ["0", "1", "2", "3", "4", "5"].map((k) => r.tiers[k]).filter((x) => x !== undefined); return [r.t, v.reduce((a, b) => a + b, 0) / Math.max(1, v.length)]; });
+    line(f, easy, "var(--grey)", 2);
+    [["7", "var(--accent)"], ["8", "var(--gold)"], ["9", "var(--ink)"]].forEach(([k, c]) => line(f, C.filter((r) => r.tiers[k] !== undefined).map((r) => [r.t, r.tiers[k]]), c, 2.4));
+  })();
+
+  // exam over training
+  (function () {
+    const E = D.evs.filter((e) => e.t >= 3.6e6);
+    const f = frame(document.getElementById("examChart"), { x0: 3.6e6, x1: 11.3e6, y0: 0, y1: 0.6, h: 240, label: "Bester Versuch auf der Prüfung je Checkpoint",
+      yt: [0, 0.2, 0.34, 0.4, 0.6], yf: pct, xt: [4e6, 6e6, 8e6, 10e6], xf: mio, xlabel: "Schritte gesamt" });
+    svgEl("line", { x1: f.X(3.6e6), x2: f.X(11.3e6), y1: f.Y(0.34), y2: f.Y(0.34), style: "stroke:var(--red);stroke-dasharray:6 4" }, f.svg);
+    const tx = svgEl("text", { x: f.X(3.7e6), y: f.Y(0.34) - 6 }, f.svg); tx.textContent = "Grube bei Kachel 100";
+    changes.forEach(([t]) => svgEl("line", { x1: f.X(t), x2: f.X(t), y1: f.Y(0.6), y2: f.Y(0), style: "stroke:var(--muted);stroke-dasharray:3 4" }, f.svg));
+    line(f, E.map((e) => [e.t, e.exam_best]), "var(--grey)", 1.8);
+    line(f, E.map((e) => [e.t, e.ent_best]), "var(--accent)", 2.6);
+    E.forEach((e) => svgEl("circle", { cx: f.X(e.t), cy: f.Y(e.ent_best), r: 3, style: "fill:var(--accent)" }, f.svg));
+  })();
+
+  // exam map with deaths
+  const map = document.getElementById("examMap");
+  const rows = D.level.map((r) => r.padEnd(300, " "));
+  let version = "level_entschaerft";
+  function drawMap() {
+    const ctx = map.getContext("2d");
+    const cols = 300, T = map.width / cols;
+    map.height = Math.round(13 * T) + 64;
+    ctx.fillStyle = "#1c1848"; ctx.fillRect(0, 0, map.width, map.height);
+    for (let r = 0; r < 13; r++) for (let c = 0; c < cols; c++) {
+      const ch = version === "level" && r === 0 && c < 33 && c % 2 === 1 && c >= 9 ? "E" : rows[r][c];
+      if (ch === "B") { ctx.fillStyle = "#9aa3c7"; ctx.fillRect(c * T, r * T, T - 0.5, T - 0.5); }
+      if (ch === "E") { ctx.fillStyle = "#e3aa4b"; ctx.beginPath(); ctx.arc(c * T + T / 2, r * T + T / 2, T / 3, 0, 7); ctx.fill(); }
+      if (ch === "C") { ctx.fillStyle = "#ffd54a"; ctx.fillRect(c * T, r * T + T / 3, T, (2 * T) / 3); }
+    }
+    const runs = D.exam[version];
+    const stack = {};
+    for (const r of runs) {
+      const col = r.col; stack[col] = (stack[col] || 0) + 1;
+      ctx.fillStyle = r.outcome === "died_pit" ? "#f06b60" : r.outcome === "died_enemy" ? "#e3aa4b" : "#9b9eba";
+      ctx.beginPath(); ctx.arc(col * T + T / 2, 13 * T + 8 + stack[col] * 1.8, 4, 0, 7); ctx.fill();
+    }
+    const counts = { "Grube": 0, "Gegner": 0, "Zeit um": 0, "Truhe": 0 };
+    runs.forEach((r) => { counts[r.outcome === "died_pit" ? "Grube" : r.outcome === "died_enemy" ? "Gegner" : r.outcome === "won" ? "Truhe" : "Zeit um"]++; });
+    const el = document.getElementById("endBars"); el.innerHTML = "";
+    const colors = { "Grube": "var(--red)", "Gegner": "var(--gold)", "Zeit um": "var(--grey)", "Truhe": "var(--green)" };
+    for (const [k, v] of Object.entries(counts)) {
+      const n = document.createElement("span"); n.textContent = k;
+      const t = document.createElement("div"); t.className = "track";
+      const f = document.createElement("div"); f.className = "fill"; f.style.left = "0"; f.style.background = colors[k]; f.style.width = Math.max(0.6, (v / runs.length) * 100) + "%"; t.appendChild(f);
+      const val = document.createElement("span"); val.className = "mono"; val.textContent = v + " / " + runs.length;
+      el.append(n, t, val);
+    }
+  }
+  const bE = document.getElementById("vEnt"), bO = document.getElementById("vOrig");
+  bE.addEventListener("click", () => { version = "level_entschaerft"; bE.setAttribute("aria-pressed", "true"); bO.setAttribute("aria-pressed", "false"); drawMap(); });
+  bO.addEventListener("click", () => { version = "level"; bO.setAttribute("aria-pressed", "true"); bE.setAttribute("aria-pressed", "false"); drawMap(); });
+  drawMap();
+
+  // selection table
+  const tb = document.querySelector("#selTable tbody");
+  for (const s of D.sel) {
+    const tr = document.createElement("tr");
+    const steps = parseInt(s.ck.slice(5), 10);
+    tr.innerHTML = `<td class="num">${mio(steps)}${steps > 11e6 ? " (gewählt)" : ""}</td><td class="num">${s.det_total} / 120</td><td class="num">${s.sto_total} / 120</td><td class="num">${s.det.stufe_8} / 20</td><td class="num">${s.det.stufe_9} / 20</td>`;
+    tb.appendChild(tr);
+  }
+})();
+</script>
