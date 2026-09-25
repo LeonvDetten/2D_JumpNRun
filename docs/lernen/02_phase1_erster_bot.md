@@ -68,4 +68,23 @@ Zusätzlich kommen in 20 % der Episoden die handgebauten Level aus `levels/phase
 
 ## Ergebnisse
 
-*(wird nach dem Training ergänzt)*
+Training: 1,5 Mio. Schritte, ≈ 25 Minuten auf 2 CPU-Kernen (`runs/phase1`, Modell `models/phase1.zip`).
+
+| Trainingsschritte | Showcase-Level (nie trainiert), 32 Geister im Ziel |
+|---|---|
+| untrainiert | 0 / 32 |
+| 50.000 | 1 / 32 |
+| 300.000 | 11 / 32 |
+| 500.000 | 23 / 32 |
+| 750.000 | **32 / 32** |
+
+- Curriculum: Stufe 1 nach 10.360 Schritten freigeschaltet, Stufe 2 nach 41.696.
+- Zwischen 25.000 und 150.000 Schritten liegt die Erfolgsrate bei ~50 % – so gewollt, das Curriculum
+  hält den Bot an der Grenze seines Könnens. Fast jeder Misserfolg ist ein Grubentod.
+- Ab ~600.000 Schritten liegen alle Stufen über 97 %.
+- **Überraschung:** Der Bot hat sich *Dauerhüpfen* beigebracht (`rechts+springen` fast immer) und hört nur
+  kurz auf, um vor einer Lücke im richtigen Moment abzuspringen. Nichts in der Belohnung verbietet das –
+  typisch für RL: Der Bot findet die einfachste Strategie, die funktioniert.
+
+Die interaktive Lernseite zu dieser Phase (Beobachtung, Belohnung, Value, PPO-Clipping mit echten Daten)
+liegt als Artifact vor; das Video zeigt der Zeitraffer (`python -m jumpnrun.rl.watch --run runs/phase1 --timelapse …`).
