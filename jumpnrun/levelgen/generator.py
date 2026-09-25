@@ -180,7 +180,10 @@ def _segment(b: _Builder, cfg: TierConfig) -> None:
         row = max(HIGHEST_SURFACE, b.surface - rng.randint(0, 1))
         b.flat(1)
         b.gap(2)
-        for _ in range(rng.randint(2, 5)):
+        for i in range(rng.randint(2, 5)):
+            if i and cfg.max_drop >= 4 and rng.random() < 0.5:
+                # one row up or down: needs braking in mid-air to land on the single block
+                row = max(4, min(GROUND - 1, row + rng.choice((-1, 1))))
             b.column(None, {row: "B"})
             b.gap(3)
         b.surface = max(row, min(GROUND, row + rng.randint(0, 2)))
