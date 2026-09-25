@@ -45,6 +45,7 @@ class TierConfig:
     climbs: float = 0.0  # probability weight of climbing routes (upper path, dead end below)
     enemy_groups: bool = False  # valleys may hold 2-3 enemies
     rain: float = 0.0  # chance that enemies start high up and drop down
+    high_roads: float = 0.0  # probability weight of a long upper road above a long dead-end floor
 
 
 TIERS = (
@@ -61,10 +62,10 @@ TIERS = (
                platform_enemies=True, free_enemies=0.35),                               # 7 expert
     TierConfig(length=150, max_gap=3, steps=True, max_drop=4, valleys=2.5, platforms=2.0,
                platform_enemies=True, free_enemies=0.35, climbs=1.5, enemy_groups=True,
-               rain=0.3),                                                               # 8 climbing, groups
+               rain=0.3, high_roads=1.0),                                               # 8 climbing, groups
     TierConfig(length=200, max_gap=3, steps=True, max_drop=4, valleys=3.0, platforms=2.5,
                platform_enemies=True, free_enemies=0.4, climbs=2.5, enemy_groups=True,
-               rain=0.5),                                                               # 9 like the exam
+               rain=0.5, high_roads=2.0),                                               # 9 like the exam
 )
 NUM_TIERS = len(TIERS)
 
@@ -121,6 +122,8 @@ def _segment(b: _Builder, cfg: TierConfig) -> None:
         choices.append(("platforms", cfg.platforms))
     if cfg.climbs:
         choices.append(("climb", cfg.climbs))
+    if cfg.high_roads and b.surface == GROUND:
+        choices.append(("high_road", cfg.high_roads))
     kind = rng.choices([c[0] for c in choices], weights=[c[1] for c in choices])[0]
 
     if kind == "flat":
@@ -165,6 +168,9 @@ def _segment(b: _Builder, cfg: TierConfig) -> None:
 
     elif kind == "climb":
         _climb(b, cfg)
+
+    elif kind == "high_road":
+        _high_road(b, cfg)
 
     elif kind == "platforms":
         # pit with floating platforms; heights change by at most one row per hop
@@ -229,6 +235,49 @@ def _climb(b: _Builder, cfg: TierConfig) -> None:
     b.gap(rng.randint(1, 2))
     b.surface = min(GROUND, row + rng.randint(1, 4))
     b.flat(rng.randint(2, 4))
+
+
+def _high_road(b: _Builder, cfg: TierConfig) -> None:
+    """A long upper road over a comfortable floor that ends in a pit far ahead.
+
+    Like the exam level: from the start the floor looks fine, the dead end is
+    20-35 tiles away (beyond the bot's view). The road is at least 2 rows higher
+    than anything reachable from the floor, so the choice has to be made early.
+    """
+
+    rng = b.rng
+    b.flat(2)
+    start = len(b.columns)
+    road_row = GROUND
+    items = []
+    for _ in range(3):  # stairs up: one row per hop
+        road_row -= 1
+        items.append((1, None))
+        items.append((rng.randint(1, 2), road_row))
+    length = rng.randint(20, 35)
+    placed = 0
+    while placed < length:
+        gap = rng.randint(1, 2)
+        change = rng.choice((-1, 0, 0, 1)) if gap == 1 else rng.choice((0, 0, 1))
+        road_row = max(4, min(GROUND - 3, road_row - change))
+        width = rng.randint(2, 4)
+        items.append((gap, None))
+        items.append((width, road_row))
+        placed += gap + width
+    for count, row in items:
+        for _ in range(count):
+            b.column(None, {row: "B"} if row is not None else None)
+    if cfg.platform_enemies and rng.random() < 0.5:
+        b.columns[-2][road_row - 1] = "E"
+    end = len(b.columns)
+    # the tempting floor: starts right away, ends 6+ tiles before the road does
+    for c in range(start, end - rng.randint(6, 9)):
+        b.columns[c][GROUND] = "B"
+    if rng.random() < cfg.free_enemies:
+        b.columns[start + rng.randint(4, 10)][GROUND - 1] = "E"
+    b.gap(rng.randint(1, 2))
+    b.surface = min(GROUND, road_row + rng.randint(1, 3))
+    b.flat(rng.randint(3, 5))
 
 
 def generate(tier: int, seed: int) -> Level:
