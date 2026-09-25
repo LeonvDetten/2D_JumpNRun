@@ -8,6 +8,8 @@ jump physics (apex 78 px, ~3 tiles horizontal reach):
     valley        drop down, flat floor with an enemy, climb back up
                   (the enemy is trapped between the walls)
     platforms     pit with floating platforms to hop across
+    climb         floating blocks leading up to a high plateau; below it the
+                  ground runs into a dead end (the upper route is the only way)
 
 Every level is reproducible from (tier, seed). The solver checks samples in
 the tests, so "solvable for the bot" is verified, not assumed.
@@ -40,6 +42,9 @@ class TierConfig:
     platforms: float = 0.0  # probability weight of platform chains
     platform_enemies: bool = False
     free_enemies: float = 0.0  # chance of an enemy walking on open flat ground
+    climbs: float = 0.0  # probability weight of climbing routes (upper path, dead end below)
+    enemy_groups: bool = False  # valleys may hold 2-3 enemies
+    rain: float = 0.0  # chance that enemies start high up and drop down
 
 
 TIERS = (
@@ -54,6 +59,12 @@ TIERS = (
                platform_enemies=True, free_enemies=0.25),                               # 6 dense
     TierConfig(length=130, max_gap=3, steps=True, max_drop=4, valleys=2.5, platforms=2.5,
                platform_enemies=True, free_enemies=0.35),                               # 7 expert
+    TierConfig(length=150, max_gap=3, steps=True, max_drop=4, valleys=2.5, platforms=2.0,
+               platform_enemies=True, free_enemies=0.35, climbs=1.5, enemy_groups=True,
+               rain=0.3),                                                               # 8 climbing, groups
+    TierConfig(length=200, max_gap=3, steps=True, max_drop=4, valleys=3.0, platforms=2.5,
+               platform_enemies=True, free_enemies=0.4, climbs=2.5, enemy_groups=True,
+               rain=0.5),                                                               # 9 like the exam
 )
 NUM_TIERS = len(TIERS)
 
@@ -108,6 +119,8 @@ def _segment(b: _Builder, cfg: TierConfig) -> None:
         choices.append(("valley", cfg.valleys))
     if cfg.platforms:
         choices.append(("platforms", cfg.platforms))
+    if cfg.climbs:
+        choices.append(("climb", cfg.climbs))
     kind = rng.choices([c[0] for c in choices], weights=[c[1] for c in choices])[0]
 
     if kind == "flat":
@@ -136,11 +149,22 @@ def _segment(b: _Builder, cfg: TierConfig) -> None:
         depth = rng.randint(1, min(2, GROUND - b.surface))
         top = b.surface
         b.drop(depth)
-        b.flat(rng.randint(5, 8), enemy=True)
+        width = rng.randint(5, 8)
+        start = len(b.columns)
+        b.flat(width, enemy=True)
+        if cfg.enemy_groups and rng.random() < 0.5:
+            for offset in rng.sample(range(1, width - 1), k=min(2, width - 2)):
+                b.columns[start + offset][b.surface - 1] = "E"
+        if cfg.rain and rng.random() < cfg.rain:
+            # an enemy waiting high above the valley; it drops when it becomes active
+            b.columns[start + rng.randrange(width)][rng.randint(1, 3)] = "E"
         for _ in range(depth):  # climb back out, one row per step
             b.rise()
             b.flat(2)
         b.surface = top
+
+    elif kind == "climb":
+        _climb(b, cfg)
 
     elif kind == "platforms":
         # pit with floating platforms; heights change by at most one row per hop
@@ -159,6 +183,52 @@ def _segment(b: _Builder, cfg: TierConfig) -> None:
         b.gap(rng.randint(1, 2))
         b.surface = max(level_row, min(GROUND, level_row + rng.randint(0, 1)))
         b.flat(rng.randint(2, 4))
+
+
+def _climb(b: _Builder, cfg: TierConfig) -> None:
+    """Upper route: hop up floating blocks, cross a plateau, come back down.
+
+    Under the climb the ground continues for a while and then ends at a pit
+    that is too wide to jump - a dead end for bots that stay on the floor.
+    """
+
+    rng = b.rng
+    start_surface = b.surface
+    b.flat(2)
+    row = start_surface
+    climb_cols = []
+    hops = rng.randint(2, 4)
+    for _ in range(hops):
+        if row - 1 < 3:
+            break
+        row -= 1  # one row higher per hop
+        climb_cols.append(("gap", 1))
+        climb_cols.append(("block", row, rng.randint(1, 2)))
+    plateau = rng.randint(3, 5)
+    climb_cols.append(("gap", rng.randint(1, 2)))
+    climb_cols.append(("block", row, plateau))
+    if cfg.platform_enemies and rng.random() < 0.4:
+        climb_cols.append(("enemy_on_last", row))
+
+    trap = start_surface == GROUND and rng.random() < 0.7
+    columns_before = len(b.columns)
+    for item in climb_cols:
+        if item[0] == "gap":
+            for _ in range(item[1]):
+                b.column(None)
+        elif item[0] == "block":
+            for _ in range(item[2]):
+                b.column(None, {item[1]: "B"})
+        else:
+            b.columns[-2][item[1] - 1] = "E"
+    if trap:
+        # dead-end floor under the first part of the climb (never under the plateau)
+        span = len(b.columns) - columns_before
+        for i in range(max(1, span - plateau - 3)):
+            b.columns[columns_before + i][GROUND] = "B"
+    b.gap(rng.randint(1, 2))
+    b.surface = min(GROUND, row + rng.randint(1, 4))
+    b.flat(rng.randint(2, 4))
 
 
 def generate(tier: int, seed: int) -> Level:

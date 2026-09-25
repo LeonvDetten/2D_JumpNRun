@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import argparse
 import glob
+import json
 import os
 import subprocess
 import sys
@@ -63,7 +64,12 @@ def main() -> None:
     parser.add_argument("--max-tier", type=int, default=NUM_TIERS - 1)
     parser.add_argument("--handmade", nargs="*", default=[], help="glob(s) of hand-made training levels")
     parser.add_argument("--handmade-prob", type=float, default=0.25)
+    parser.add_argument("--test-levels", nargs="*", default=["levels/showcase/*.txt"],
+                        help="hand-made levels only used for evaluation, never for training")
     parser.add_argument("--resume", help="continue from this model .zip")
+    parser.add_argument("--target", type=int, default=0,
+                        help="train until this total step count; restarts continue from the newest "
+                             "checkpoint in --run (safe to re-run the same command after a crash)")
     parser.add_argument("--checkpoint-every", type=int, default=50_000)
     parser.add_argument("--eval-every", type=int, default=100_000)
     parser.add_argument("--eval-per-tier", type=int, default=8)
@@ -87,8 +93,30 @@ def main() -> None:
     vec_env = VecMonitor(vec_env)
 
     tracker = CurriculumTracker(args.min_tier, args.max_tier)
+    if args.target:
+        checkpoints = sorted((run_dir / "checkpoints").glob("step_*.zip"))
+        if checkpoints:
+            args.resume = str(checkpoints[-1])
+            done = int(checkpoints[-1].stem.split("_")[1])
+            state_path = run_dir / "curriculum.json"
+            if state_path.exists():
+                state = json.loads(state_path.read_text())
+                n = len(tracker.success)
+                tracker.success = (state["success"] + [0.0] * n)[:n]
+                tracker.episodes = (state["episodes"] + [0] * n)[:n]
+                tracker.unlocked = max(args.min_tier, min(state["unlocked"], args.max_tier))
+        else:
+            done = int(PPO.load(args.resume, device="cpu").num_timesteps) if args.resume else 0
+        args.steps = args.target - done
+        if args.steps <= 0:
+            print(f"Target {args.target:,} already reached ({done:,}).")
+            return
+        print(f"Auto-resume: {done:,} steps done, {args.steps:,} to go (from {args.resume or 'scratch'})")
     eval_levels = eval_level_set(range(args.min_tier, args.max_tier + 1), args.eval_per_tier)
-    eval_levels += [(f"handgebaut", Level.from_file(p)) for p in handmade_paths]
+    # hand-made training levels are "practice grades"; --test-levels are never trained on
+    eval_levels += [("training_handgebaut", Level.from_file(p)) for p in handmade_paths]
+    eval_levels += [("test_handgebaut", Level.from_file(p))
+                    for pattern in args.test_levels for p in sorted(glob.glob(pattern))]
 
     if args.resume:
         model = PPO.load(args.resume, env=vec_env, device="cpu", tensorboard_log=str(run_dir / "tb"))

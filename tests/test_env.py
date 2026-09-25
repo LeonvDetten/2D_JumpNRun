@@ -81,6 +81,9 @@ def test_curriculum_source_follows_weights():
     import random
 
     source = CurriculumSource(0, 3)
-    source.weights = [0, 0, 1, 0, 0, 0, 0, 0]
+    from jumpnrun.levelgen.generator import NUM_TIERS
+
+    source.weights = [0.0] * NUM_TIERS
+    source.weights[2] = 1.0
     tiers = {source(random.Random(i))[1] for i in range(20)}
     assert tiers == {2}
