@@ -96,6 +96,29 @@ class GhostView:
             tiny.set_at((cx // TILE, min(ROWS - 1, cy // TILE)), (255, 215, 0))
         return pygame.transform.scale(tiny, (SCREEN_W - 40, 52))
 
+    def _draw_progress_bars(self, surface, sims, running, top: int) -> None:
+        """One bar per ghost: how far it got (green = chest, red = died, white = on its way)."""
+
+        available = SCREEN_H - top - 10
+        if available < 40 or not sims:
+            return
+        pitch = max(3, min(12, available // len(sims)))
+        bar_h = max(2, pitch - 2)
+        width = SCREEN_W - 40
+        goal = max(1, self.level.goal_x)
+        order = sorted(range(len(sims)), key=lambda i: -sims[i].max_x)
+        pygame.draw.line(surface, DIM, (20 + width, top - 2), (20 + width, top + pitch * len(sims)), 1)
+        for rank, i in enumerate(order):
+            sim = sims[i]
+            if sim.status == Status.WON:
+                color = WIN
+            elif sim.status in (Status.DIED_PIT, Status.DIED_ENEMY):
+                color = DEATH
+            else:
+                color = TEXT if running[i] else DIM
+            length = int(width * min(1.0, sim.max_x / goal))
+            pygame.draw.rect(surface, color, (20, top + rank * pitch, max(2, length), bar_h))
+
     # ------------------------------------------------------------------ draw
     def draw(
         self,
@@ -182,6 +205,7 @@ class GhostView:
             y += 34
 
         if self.fits:
+            self._draw_progress_bars(surface, sims, running, y + 6)
             return
         # minimap
         mm_y = min(y + 4, SCREEN_H - self.minimap.get_height() - 8)
