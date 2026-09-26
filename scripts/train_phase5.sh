@@ -12,8 +12,8 @@ fi
 if pgrep -f "python3 -m jumpnrun.rl.train --run $run " > /dev/null; then
     echo "$run is already running"; exit 0
 fi
-nohup python3 -m jumpnrun.rl.train --run $run --resume $start --target 17050000 \
-    --pool runs/demos --unlock-all --threads 4 \
+nohup taskset -c 0-2 python3 -m jumpnrun.rl.train --run $run --resume $start --target 17050000 \
+    --pool runs/demos --unlock-all --threads 3 \
     --lr 1e-4 --clip 0.1 --ent 0.003 --target-kl 0.02 \
     --checkpoint-every 100000 --eval-every 500000 --eval-per-tier 6 \
     --handmade "levels/phase1/*.txt" "levels/phase2/*.txt" --handmade-prob 0.1 \
