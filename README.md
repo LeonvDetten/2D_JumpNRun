@@ -62,6 +62,12 @@ python -m jumpnrun.rl.watch --run runs/phase1 --live --level levels/showcase/lue
 # oder beides in einem: Training mit Live-Fenster
 python -m jumpnrun.rl.train --run runs/phase1 --max-tier 2 --watch --watch-level levels/showcase/luecken.txt
 
+# Phase 5: vom Löser abschauen, dann selbst üben (Entscheidung alle 2 Frames)
+python -m jumpnrun.imitation.demos --out runs/demos          # Musterlösungen + geprüfter Level-Pool
+python -m jumpnrun.imitation.bc --demos runs/demos --init models/phase3.zip --out models/phase5_bc.zip
+scripts/train_phase5.sh main                                 # PPO mit Vorbild-Bremse
+scripts/train_phase5.sh control                              # Vergleich ohne Vorbild
+
 # Auswertung
 tensorboard --logdir runs                         # Dashboard im Browser
 python -m jumpnrun.rl.report runs/phase1 --png lernkurve.png
@@ -76,7 +82,8 @@ game.py              selbst spielen
 jumpnrun/core/       deterministische Spielsimulation (ohne Grafik, ohne Uhr)
 jumpnrun/render/     Grafik: Spiel, Geister-Ansicht, Video-Export
 jumpnrun/levelgen/   Level-Generator und Löser
-jumpnrun/rl/         Gymnasium-Umgebung, Netz, Curriculum, Training, Auswertung
+jumpnrun/rl/         Gymnasium-Umgebung, Netz, Curriculum, Training (PPO, PPO mit Vorbild), Auswertung
+jumpnrun/imitation/  Musterlösungen vom Löser, Behavior Cloning, DAgger
 levels/              Level-Dateien
 models/              trainierte Bots
 tests/               python -m pytest tests

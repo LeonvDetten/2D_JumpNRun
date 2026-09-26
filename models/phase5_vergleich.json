@@ -1,0 +1,5 @@
+{
+  "action_repeat": 2,
+  "source": "PPO without teacher (comparison)",
+  "init": "models/phase3.zip"
+}
