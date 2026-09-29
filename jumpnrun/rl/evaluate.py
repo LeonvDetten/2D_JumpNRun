@@ -11,7 +11,6 @@ from typing import Dict, List, Sequence
 
 import numpy as np
 
-from jumpnrun.core.actions import ACTION_REPEAT
 from jumpnrun.core.level import Level
 from jumpnrun.levelgen.generator import generate
 from jumpnrun.rl.curriculum import EVAL_SEED_OFFSET
@@ -27,13 +26,14 @@ def eval_level_set(tiers: Sequence[int], per_tier: int) -> List[tuple]:
 def evaluate_levels(model, levels: Sequence[Level], deterministic: bool = True) -> List[Dict]:
     """Play every level once; all levels run in lock-step so the network sees one batch."""
 
-    repeat = getattr(model, "action_repeat", ACTION_REPEAT)
-    envs = [JumpNRunEnv(fixed_levels([level]), action_repeat=repeat) for level in levels]
+    from jumpnrun.rl.modelinfo import env_kwargs
+
+    envs = [JumpNRunEnv(fixed_levels([level]), **env_kwargs(model)) for level in levels]
     obs = [env.reset(seed=i)[0] for i, env in enumerate(envs)]
     results: List[Dict] = [None] * len(envs)
     active = list(range(len(envs)))
     while active:
-        batch = {key: np.stack([obs[i][key] for i in active]) for key in ("grid", "vec")}
+        batch = {key: np.stack([obs[i][key] for i in active]) for key in obs[active[0]]}
         actions, _ = model.predict(batch, deterministic=deterministic)
         still_active = []
         for i, action in zip(active, actions):

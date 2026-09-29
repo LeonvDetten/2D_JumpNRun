@@ -37,8 +37,10 @@ class PPOWithDemos(PPO):
     def _load_demos(self):
         if self._demos is None and self.demo_path:
             folder = Path(self.demo_path)
-            files = [folder / "demos.jsonl"] + sorted(folder.glob("dagger_*.jsonl"))
-            self._demos = cached_dataset(files, folder / "dataset_ppo.npz", max_samples=300_000)
+            files = sorted(folder.glob("demos*.jsonl")) + sorted(folder.glob("dagger_*.jsonl"))
+            overview = "overview" in self.observation_space.spaces
+            cache = folder / ("dataset_ppo_ov.npz" if overview else "dataset_ppo.npz")
+            self._demos = cached_dataset(files, cache, max_samples=300_000, overview=overview, shuffle=overview)
             self._demo_allowed = torch.as_tensor(self._demos["allowed"].astype(np.int64))
         return self._demos
 

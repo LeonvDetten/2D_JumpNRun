@@ -33,7 +33,7 @@ from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv, VecMoni
 from jumpnrun.core.actions import DEFAULT_REPEAT
 from jumpnrun.core.level import Level
 from jumpnrun.levelgen.generator import NUM_TIERS
-from jumpnrun.rl.callbacks import CheckpointSaver, Evaluator, TrainingMonitor
+from jumpnrun.rl.callbacks import CheckpointSaver, Evaluator, TimeLimit, TrainingMonitor
 from jumpnrun.rl.curriculum import CurriculumSource, CurriculumTracker
 from jumpnrun.rl.env import JumpNRunEnv
 from jumpnrun.rl.evaluate import eval_level_set
@@ -41,11 +41,12 @@ from jumpnrun.rl.policy import GridFeatures
 
 
 def make_env(rank: int, seed: int, min_tier: int, max_tier: int, handmade_paths, handmade_prob: float,
-             action_repeat: int, pool_dir=None):
+             action_repeat: int, pool_dir=None, overview: bool = False, start_prob: float = 0.0, start_dirs=()):
     def _init():
         handmade = [Level.from_file(p) for p in handmade_paths]
-        source = CurriculumSource(min_tier, max_tier, handmade, handmade_prob, pool_dir=pool_dir)
-        return JumpNRunEnv(source, seed=seed * 1000 + rank, action_repeat=action_repeat)
+        source = CurriculumSource(min_tier, max_tier, handmade, handmade_prob, pool_dir=pool_dir,
+                                  start_prob=start_prob, start_dirs=start_dirs)
+        return JumpNRunEnv(source, seed=seed * 1000 + rank, action_repeat=action_repeat, overview=overview)
 
     return _init
 
@@ -91,6 +92,14 @@ def main() -> None:
     parser.add_argument("--bc-coef", type=float, default=0.5)
     parser.add_argument("--bc-decay", type=float, default=0.99)
     parser.add_argument("--bc-min", type=float, default=0.02)
+    parser.add_argument("--overview", action="store_true", help="observe the coarse overview map (phase 6)")
+    parser.add_argument("--start-prob", type=float, default=0.0,
+                        help="share of episodes that start in the middle of a teacher's winning run")
+    parser.add_argument("--start-dirs", nargs="*", default=[], help="demo directories for --start-prob")
+    parser.add_argument("--keep-every", type=int, default=0,
+                        help="delete older checkpoints except multiples of this step count (0 = keep all)")
+    parser.add_argument("--time-limit-hours", type=float, default=0,
+                        help="stop after this much training time, summed over restarts (0 = no limit)")
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--watch", action="store_true", help="open the live ghost view next to training")
     parser.add_argument("--watch-level", help="level for --watch (default: a generated one)")
@@ -103,7 +112,7 @@ def main() -> None:
     handmade_paths = sorted(p for pattern in args.handmade for p in glob.glob(pattern))
     env_fns = [
         make_env(i, args.seed, args.min_tier, args.max_tier, handmade_paths, args.handmade_prob,
-                 args.action_repeat, args.pool)
+                 args.action_repeat, args.pool, args.overview, args.start_prob, tuple(args.start_dirs))
         for i in range(args.envs)
     ]
     # the game is so fast that the network update dominates; one process is usually best
@@ -113,7 +122,8 @@ def main() -> None:
     tracker = CurriculumTracker(args.min_tier, args.max_tier)
     if args.unlock_all:
         tracker.unlocked = args.max_tier
-    (run_dir / "config.json").write_text(json.dumps({"action_repeat": args.action_repeat}, indent=2) + "\n")
+    (run_dir / "config.json").write_text(json.dumps({"action_repeat": args.action_repeat, "overview": args.overview},
+                                                   indent=2) + "\n")
     if args.target:
         checkpoints = sorted((run_dir / "checkpoints").glob("step_*.zip"))
         if checkpoints:
@@ -186,9 +196,11 @@ def main() -> None:
     model.action_repeat = args.action_repeat
     callbacks = [
         TrainingMonitor(tracker, run_dir),
-        CheckpointSaver(run_dir, args.checkpoint_every, tracker),
+        CheckpointSaver(run_dir, args.checkpoint_every, tracker, keep_every=args.keep_every),
         Evaluator(eval_levels, args.eval_every, run_dir),
     ]
+    if args.time_limit_hours:
+        callbacks.append(TimeLimit(run_dir, args.time_limit_hours))
     print(f"Training {args.steps:,} steps, tiers {args.min_tier}-{args.max_tier}, "
           f"{args.envs} envs, {len(handmade_paths)} hand-made levels -> {run_dir}")
     try:

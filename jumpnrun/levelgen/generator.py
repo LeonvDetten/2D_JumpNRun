@@ -11,6 +11,13 @@ jump physics (apex 78 px, ~3 tiles horizontal reach):
     climb         floating blocks leading up to a high plateau; below it the
                   ground runs into a dead end (the upper route is the only way)
 
+Generator v3 (phase 6) adds tiers 10 and 11: long levels (~220 / ~320 tiles) with
+combinations like the exam level - enemy rain over floating stairs, a dead-end
+floor 40-80 tiles long, long chains of stepping stones going up and down, and a
+trench full of enemies on a high plateau. Tiers 0-9 are unchanged (v2).
+Levels also carry `waypoints` (tiles on the right route) so the solver can plan
+long levels in legs.
+
 Every level is reproducible from (tier, seed). The solver checks samples in
 the tests, so "solvable for the bot" is verified, not assumed.
 
@@ -28,6 +35,7 @@ from typing import List
 from jumpnrun.core.constants import ROWS
 from jumpnrun.core.level import Level
 
+GENERATOR_VERSION = 3
 GROUND = ROWS - 1  # surface row of the lowest possible ground
 HIGHEST_SURFACE = 5  # never build terrain higher than this row (headroom for jumps)
 
@@ -51,7 +59,10 @@ class TierConfig:
     shafts: float = 0.0  # staircase up, then drop onto a small platform (needs braking in mid-air)
     ceilings: float = 0.0  # low ceiling over gaps: short jumps only
     two_routes: float = 0.0  # upper road and floor both lead on
-    hard: int = 0  # 0 = easy, 1 = medium, 2 = hard form of the new building blocks
+    hard: int = 0  # 0 = easy, 1 = medium, 2 = hard, 3 = exam-like form of the building blocks
+    rain_stairs: float = 0.0  # floating stairs up, enemies dropping from above (v3)
+    chains: float = 0.0  # long chains of stepping stones with height changes (v3)
+    trenches: float = 0.0  # enemies trapped in a trench on a high floating plateau (v3)
 
 
 TIERS = (
@@ -76,6 +87,14 @@ TIERS = (
                platform_enemies=True, free_enemies=0.4, climbs=2.5, enemy_groups=True,
                rain=0.5, high_roads=2.0, stones=1.5, tunnels=1.2, ceilings=1.2, shafts=1.2,
                two_routes=1.2, hard=2),                                                 # 9 like the exam
+    TierConfig(length=220, max_gap=3, steps=True, max_drop=4, valleys=2.0, platforms=2.0,
+               platform_enemies=True, free_enemies=0.4, climbs=1.5, enemy_groups=True,
+               rain=0.5, high_roads=1.5, stones=1.0, tunnels=1.0, ceilings=1.0, shafts=1.0,
+               two_routes=1.0, hard=3, rain_stairs=1.2, chains=1.5, trenches=1.0),        # 10 exam patterns
+    TierConfig(length=320, max_gap=3, steps=True, max_drop=4, valleys=2.0, platforms=2.0,
+               platform_enemies=True, free_enemies=0.45, climbs=1.5, enemy_groups=True,
+               rain=0.6, high_roads=2.0, stones=1.2, tunnels=1.0, ceilings=1.0, shafts=1.0,
+               two_routes=1.0, hard=3, rain_stairs=1.5, chains=2.0, trenches=1.3),        # 11 long journey
 )
 NUM_TIERS = len(TIERS)
 
@@ -87,6 +106,7 @@ class _Builder:
         self.surface = GROUND  # row of the current ground surface
         self.style: dict = {}
         self.stats: dict = {}  # how often each building block was used
+        self.waypoints: list = []  # (col, row) tiles on the right route (for the solver)
 
     def column(self, surface=None, extra=None) -> List[str]:
         """Append a column with terrain from `surface` down (None = pit)."""
@@ -141,6 +161,9 @@ def _style(rng: random.Random, cfg: TierConfig) -> dict:
         "shaft": cfg.shafts,
         "ceiling": cfg.ceilings,
         "two_routes": cfg.two_routes,
+        "rain_stairs": cfg.rain_stairs,
+        "chain": cfg.chains,
+        "trench": cfg.trenches,
     }
     return {kind: w * (0.3 + rng.gammavariate(1.0, 1.0)) for kind, w in base.items() if w > 0}
 
@@ -154,6 +177,8 @@ def _segment(b: _Builder, cfg: TierConfig) -> None:
         "shaft": b.surface >= HIGHEST_SURFACE + 3,  # room for the staircase
         "tunnel": b.surface >= 4,
         "ceiling": b.surface >= 5,
+        "rain_stairs": b.surface >= GROUND - 1,
+        "trench": b.surface >= 6,
     }
     choices = [(kind, w) for kind, w in b.style.items() if allowed.get(kind, True)]
     kind = rng.choices([c[0] for c in choices], weights=[c[1] for c in choices])[0]
@@ -216,6 +241,15 @@ def _segment(b: _Builder, cfg: TierConfig) -> None:
 
     elif kind == "two_routes":
         _two_routes(b, cfg)
+
+    elif kind == "rain_stairs":
+        _rain_stairs(b, cfg)
+
+    elif kind == "chain":
+        _chain(b, cfg)
+
+    elif kind == "trench":
+        _trench(b, cfg)
 
     elif kind == "stones":
         # single blocks over a pit, 3 tiles apart at the same height (the exam's hardest jumps)
@@ -313,7 +347,7 @@ def _high_road(b: _Builder, cfg: TierConfig) -> None:
         road_row -= 1
         items.append((1, None))
         items.append((rng.randint(1, 2), road_row))
-    length = rng.randint(20, 70 if cfg.hard >= 2 else 35)
+    length = rng.randint(40, 80) if cfg.hard >= 3 else rng.randint(20, 70 if cfg.hard >= 2 else 35)
     placed = 0
     while placed < length:
         gap = rng.randint(1, 2)
@@ -427,6 +461,104 @@ def _two_routes(b: _Builder, cfg: TierConfig) -> None:
     b.flat(rng.randint(2, 4))
 
 
+TOP_ROW = 3  # v3 blocks may float this high (standing on row 3 still leaves room to jump)
+
+
+def _floating(b: _Builder, row, count: int = 1, floor: bool = False) -> None:
+    """Columns with a single block at `row` (None = air); optionally with the ground below."""
+
+    for _ in range(count):
+        extra = {row: "B"} if row is not None else None
+        b.column(GROUND if floor else None, extra)
+
+
+def _rain_stairs(b: _Builder, cfg: TierConfig) -> None:
+    """Floating stairs up from the ground while enemies rain down from the sky.
+
+    The enemies start in the top rows and fall onto the stairs when they become
+    active - like the start of the exam level. The ground runs on below the
+    stairs and ends at a wall: going up is the only way.
+    """
+
+    rng = b.rng
+    b.flat(2)
+    row = GROUND
+    start = len(b.columns)
+    target = rng.randint(TOP_ROW + 1, 6)
+    while row > target:
+        row -= 1
+        _floating(b, None, 1, floor=True)
+        width = rng.randint(2, 4)
+        first = len(b.columns)
+        _floating(b, row, width, floor=True)
+        if rng.random() < 0.8:  # an enemy waiting in the sky above this step
+            b.columns[first + rng.randrange(width)][rng.randint(0, 1)] = "E"
+    for c in range(start + 2, len(b.columns), rng.randint(3, 5)):
+        if rng.random() < 0.5 and b.columns[c][GROUND - 1] == " ":
+            b.columns[c][GROUND - 1] = "E"  # enemies on the floor below
+    b.surface = row
+    b.waypoints.append((len(b.columns) - 1, row))
+    b.flat(rng.randint(2, 4))
+    b.waypoints.append((len(b.columns) - 1, b.surface))
+
+
+def _chain(b: _Builder, cfg: TierConfig) -> None:
+    """A long chain of 1-2 wide stones over the void, drifting up and down.
+
+    Rising needs a short gap, same height or falling allows a longer one;
+    single stones after a fall need braking in mid-air.
+    """
+
+    rng = b.rng
+    row = b.surface
+    b.flat(1)
+    trend = rng.choice((-1, 0, 1))
+    for _ in range(rng.randint(6, 14)):
+        if rng.random() < 0.3:
+            trend = rng.choice((-1, 0, 1))
+        change = trend if rng.random() < 0.7 else 0
+        new_row = max(TOP_ROW, min(GROUND - 1, row + change))
+        change = new_row - row
+        gap = rng.randint(1, 2) if change < 0 else rng.randint(1, 3)
+        width = rng.choice((1, 2, 2)) if gap < 3 else 2
+        b.gap(gap)
+        row = new_row
+        _floating(b, row, width)
+    b.waypoints.append((len(b.columns) - 1, row))
+    b.gap(rng.randint(1, 2))
+    b.surface = max(row, min(GROUND, row + rng.randint(0, 2)))
+    b.flat(rng.randint(2, 4))
+    b.waypoints.append((len(b.columns) - 1, b.surface))
+
+
+def _trench(b: _Builder, cfg: TierConfig) -> None:
+    """Hop up to a floating plateau with a trench of enemies between two low walls."""
+
+    rng = b.rng
+    b.flat(1)
+    row = b.surface
+    plateau = rng.randint(TOP_ROW + 1, 5)
+    while row > plateau:
+        row -= 1
+        b.gap(1)
+        _floating(b, row, rng.randint(1, 2))
+    b.gap(rng.randint(1, 2))
+    _floating(b, row, rng.randint(2, 3))
+    b.column(None, {row: "B", row - 1: "B"})  # left wall
+    width = rng.randint(5, 8)
+    first = len(b.columns)
+    _floating(b, row, width)
+    for offset in rng.sample(range(1, width - 1), k=rng.randint(2, 3)):
+        b.columns[first + offset][row - 1] = "E"
+    b.column(None, {row: "B", row - 1: "B"})  # right wall
+    _floating(b, row, rng.randint(2, 3))
+    b.waypoints.append((len(b.columns) - 1, row))
+    b.gap(rng.randint(1, 2))
+    b.surface = min(GROUND, row + rng.randint(1, 4))
+    b.flat(rng.randint(2, 4))
+    b.waypoints.append((len(b.columns) - 1, b.surface))
+
+
 def generate(tier: int, seed: int) -> Level:
     """Build a level of the given difficulty tier (0 .. NUM_TIERS-1)."""
 
@@ -438,6 +570,9 @@ def generate(tier: int, seed: int) -> Level:
     b.columns[1][b.surface - 1] = "P"
     while len(b.columns) < cfg.length:
         _segment(b, cfg)
+        top = b.columns[-1]
+        if top[b.surface] == "B" and b.surface > 0 and top[b.surface - 1] == " ":
+            b.waypoints.append((len(b.columns) - 1, b.surface))
     b.flat(4)
     b.columns[-2][b.surface - 1] = "C"
     b.column(b.surface - 3)  # wall behind the chest
@@ -445,6 +580,8 @@ def generate(tier: int, seed: int) -> Level:
     lines = ["".join(col[r] for col in b.columns).rstrip() for r in range(ROWS)]
     level = Level(lines, name=f"gen_t{tier}_s{seed}")
     level.building_blocks = dict(b.stats)  # which blocks this level contains (for statistics)
+    level.waypoints = sorted(set(b.waypoints))
+    level.tier = tier
     return level
 
 

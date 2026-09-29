@@ -41,6 +41,8 @@ Mehrere Kisten sind erlaubt, jede ist ein Ziel.
 | `levels/exam/` | Prüfungslevel – der Bot trainiert **nie** darauf |
 | `levels/phase1/`, `phase2/`, … | handgebaute Trainingslevel je Phase |
 | `levels/showcase/` | feste Level für Videos / Geister-Ansicht |
+| `levels/test_serie/` | 6 handgebaute schwere Test-Level (nie trainiert, mit geprüfter Lösung) |
+| `levels/validierung/` | eingefrorene Validierungs-Level (v2: Stufen 4–9, v3: Stufen 10–11) |
 
 Werkzeuge:
 
@@ -67,6 +69,13 @@ python -m jumpnrun.imitation.demos --out runs/demos          # Musterlösungen +
 python -m jumpnrun.imitation.bc --demos runs/demos --init models/phase3.zip --out models/phase5_bc.zip
 scripts/train_phase5.sh main                                 # PPO mit Vorbild-Bremse
 scripts/train_phase5.sh control                              # Vergleich ohne Vorbild
+
+# Phase 6: Übersichtskarte, lange Level (Stufen 10-11), Startpunkte mitten im Level
+python -m jumpnrun.imitation.demos --out runs/demos3 --tiers 10 11 --counts 500 400 --merge-pool runs/demos/pool.json
+python -m jumpnrun.imitation.bc --demos runs/demos3 --init models/phase5.zip --grow --only-overview \
+    --dagger-rounds 0 --out models/phase6_start.zip
+scripts/train_phase6.sh                                      # max. 16 h, danach oder bei bestandener Prüfung Schluss
+python -m jumpnrun.rl.milestones --run runs/phase6           # Meilensteine: Validierung, Test-Serie, Prüfung
 
 # Auswertung
 tensorboard --logdir runs                         # Dashboard im Browser

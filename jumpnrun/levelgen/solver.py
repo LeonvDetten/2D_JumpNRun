@@ -144,6 +144,54 @@ def solve_via(
     return SolveResult(True, actions, expanded, sim.player.x, time.time() - start_time)
 
 
+def solve_auto(
+    level: Level,
+    max_expansions: int = 60_000,
+    action_repeat: int = ACTION_REPEAT,
+    weight: float = 1.2,
+    start: Optional[Simulation] = None,
+    spacing: int = 15,
+    total_budget: int = 0,
+) -> SolveResult:
+    """Direct search for short levels; for long generated levels (with `waypoints`) leg by leg.
+
+    Only waypoints ahead of the start position are used, at least `spacing` tiles apart.
+    Each leg gets a third of `max_expansions`; awkward waypoints are skipped. The whole search
+    stops after `total_budget` expansions (default: 3 x max_expansions), so no level takes forever.
+    """
+
+    waypoints = getattr(level, "waypoints", None)
+    if not waypoints or level.cols < 150:
+        return solve(level, max_expansions, action_repeat=action_repeat, weight=weight, start=start)
+    sim = start.clone() if start is not None else Simulation(level)
+    col = (sim.player.x + sim.player.w // 2) // TILE
+    legs, last = [], col
+    for wp in waypoints:
+        if wp[0] >= last + spacing:
+            legs.append(wp)
+            last = wp[0]
+    t0 = time.time()
+    actions: List[int] = []
+    expanded = 0
+    total_budget = total_budget or 3 * max_expansions
+    for goal in legs + [None]:
+        budget = min(max(max_expansions // 3, 5_000), total_budget - expanded)
+        if budget <= 0:
+            break
+        leg = solve(level, budget, action_repeat=action_repeat, weight=weight, start=sim, goal=goal)
+        expanded += leg.expanded
+        if not leg.solved:
+            if goal is None:
+                return SolveResult(False, None, expanded, max(sim.player.x, leg.max_x), time.time() - t0)
+            continue  # skip an awkward waypoint, aim for the next one
+        for action_index in leg.actions:
+            sim.step(BOT_ACTIONS[action_index], frames=action_repeat)
+        actions += leg.actions
+    if sim.status != Status.WON:
+        return SolveResult(False, None, expanded, sim.player.x, time.time() - t0)
+    return SolveResult(True, actions, expanded, sim.player.x, time.time() - t0)
+
+
 def reachable_map(level: Level, max_expansions: int = 400_000, action_repeat: int = ACTION_REPEAT) -> str:
     """Level as text with every tile the player can stand on marked '*' (enemies ignored).
 

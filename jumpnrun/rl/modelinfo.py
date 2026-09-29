@@ -29,6 +29,13 @@ def write_model_config(model_path, **values) -> None:
     Path(model_path).with_suffix(".json").write_text(json.dumps(values, indent=2) + "\n")
 
 
+def env_kwargs(model) -> dict:
+    """JumpNRunEnv arguments that match a loaded model (decision rate, overview map yes/no)."""
+
+    return dict(action_repeat=getattr(model, "action_repeat", ACTION_REPEAT),
+                overview="overview" in model.observation_space.spaces)
+
+
 def load_model(model_path):
     """Load a PPO model and attach its `action_repeat` (used by evaluation and ghost view)."""
 
@@ -36,4 +43,29 @@ def load_model(model_path):
 
     model = PPO.load(str(model_path), device="cpu")
     model.action_repeat = action_repeat_for(model_path)
+    return model
+
+
+def grow_overview(old_model_path, env, algo=None, **kwargs):
+    """Network surgery: a new model for `env` (with overview map) that starts with the old weights.
+
+    All old layers are copied; the new overview branch is added with a zero output layer,
+    so at first the new model acts exactly like the old one.
+    """
+
+    from stable_baselines3 import PPO
+
+    old = PPO.load(str(old_model_path), device="cpu")
+    algo = algo or PPO
+    params = dict(policy_kwargs=old.policy_kwargs, n_steps=old.n_steps, batch_size=old.batch_size,
+                  n_epochs=old.n_epochs, gamma=old.gamma, gae_lambda=old.gae_lambda, vf_coef=old.vf_coef,
+                  ent_coef=old.ent_coef, device="cpu", verbose=0)
+    params.update(kwargs)
+    model = algo("MultiInputPolicy", env, **params)
+    missing, unexpected = model.policy.load_state_dict(old.policy.state_dict(), strict=False)
+    assert not unexpected and all(".ov_" in k for k in missing), (missing, unexpected)
+    for extractor in {model.policy.features_extractor, model.policy.pi_features_extractor,
+                      model.policy.vf_features_extractor}:
+        extractor.zero_overview_output()
+    model.action_repeat = action_repeat_for(old_model_path)
     return model

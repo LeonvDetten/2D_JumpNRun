@@ -27,8 +27,8 @@ import numpy as np
 from jumpnrun.core.actions import BOT_ACTIONS, DEFAULT_REPEAT
 from jumpnrun.core.level import Level
 from jumpnrun.core.sim import Simulation, Status
-from jumpnrun.levelgen.generator import generate
-from jumpnrun.levelgen.solver import solve
+from jumpnrun.levelgen.generator import GENERATOR_VERSION, generate
+from jumpnrun.levelgen.solver import solve_auto
 
 LEVELS_PER_TIER = (50, 50, 50, 50, 150, 150, 300, 300, 700, 700)
 SOLVER_WEIGHT = 1.2
@@ -49,15 +49,20 @@ def make_demo(tier: int, seed: int, repeat: int = DEFAULT_REPEAT, noise: float =
 
     level = generate(tier, seed)
     sim = Simulation(level)
-    result = solve(level, SOLVER_BUDGET, action_repeat=repeat, weight=SOLVER_WEIGHT)
+    result = solve_auto(level, SOLVER_BUDGET, action_repeat=repeat, weight=SOLVER_WEIGHT)
     if not result.solved:
         return None
     rng = random.Random(f"noise:{tier}:{seed}")
     plan = list(result.actions)
     actions: List[int] = []
     mask: List[int] = []
+    # re-planning a long level is expensive: there a nudge is only kept if the plan still wins after it
+    long_level = level.cols > 150
+    nudges_left = 15 if long_level else 10**9  # every check replays the rest of the plan
     while plan and sim.status == Status.RUNNING and len(actions) < 5000:
-        if noise and rng.random() < noise and len(plan) > 10:
+        if noise and nudges_left and rng.random() < noise and len(plan) > 10:
+            nudges_left -= 1
+            backup = (sim.clone(), list(plan), len(actions))
             for _ in range(rng.randint(1, 2)):
                 nudge = rng.randrange(len(BOT_ACTIONS))
                 sim.step(BOT_ACTIONS[nudge], frames=repeat)
@@ -66,20 +71,26 @@ def make_demo(tier: int, seed: int, repeat: int = DEFAULT_REPEAT, noise: float =
                 plan.pop(0)
                 if sim.status != Status.RUNNING:
                     break
-            if sim.status != Status.RUNNING:
+            if long_level and (sim.status != Status.RUNNING or not _plan_still_wins(sim, plan, repeat)):
+                sim, plan, n = backup
+                del actions[n:], mask[n:]
+            elif sim.status != Status.RUNNING:
                 break
-            if not _plan_still_wins(sim, plan, repeat):
-                replan = solve(level, SOLVER_BUDGET // 2, action_repeat=repeat, weight=SOLVER_WEIGHT, start=sim)
+            elif not _plan_still_wins(sim, plan, repeat):
+                replan = solve_auto(level, SOLVER_BUDGET // 2, action_repeat=repeat, weight=SOLVER_WEIGHT,
+                                    start=sim)
                 if not replan.solved:
                     break
                 plan = list(replan.actions)
-            continue
+            if not long_level or len(actions) > backup[2]:
+                continue
         action = plan.pop(0)
         sim.step(BOT_ACTIONS[action], frames=repeat)
         actions.append(action)
         mask.append(1)
     return dict(tier=tier, seed=seed, repeat=repeat, actions=actions, mask=mask,
-                won=sim.status == Status.WON, solver_steps=len(result.actions), solved=True)
+                won=sim.status == Status.WON, solver_steps=len(result.actions), solved=True,
+                generator=GENERATOR_VERSION, level=level.to_text())
 
 
 def _work(args):
@@ -98,48 +109,57 @@ def equivalent_actions(sim: Simulation, action: int, repeat: int) -> int:
     return sum(1 << a for a, r in enumerate(results) if r == target)
 
 
-def load_dataset(paths, max_samples: int = 800_000, thin_flat: float = 2 / 3, seed: int = 0):
+def load_dataset(paths, max_samples: int = 800_000, thin_flat: float = 2 / 3, seed: int = 0,
+                 overview: bool = False, shuffle: bool = False):
     """Rebuild (observation, label-set) samples from demo files.
 
     Returns dict with grid (int8, N x 4 x 13 x 25), vec (float32, N x 15),
     action (int64) and allowed (uint8 bit mask of equivalent actions).
     Long stretches where only "right" makes sense are thinned out.
+    With overview=True also `overview` (uint8 quarters, N x 4 x 13 x 32).
+    shuffle=True mixes the demos of all files first, so max_samples does not cut off the last file.
     """
 
     from jumpnrun.rl.env import JumpNRunEnv, fixed_levels
 
     rng = random.Random(seed)
-    grids, vecs, acts, allowed = [], [], [], []
+    grids, vecs, overviews, acts, allowed = [], [], [], [], []
     right_only = 1 << 2
+    demos = []
     for path in paths:
         with open(path, encoding="utf-8") as f:
-            demos = [json.loads(line) for line in f if line.strip()]
-        for demo in demos:
-            level = generate(demo["tier"], demo["seed"]) if "level" not in demo else Level.from_text(demo["level"])
-            repeat = demo["repeat"]
-            env = JumpNRunEnv(fixed_levels([level]), action_repeat=repeat)
-            env.reset(seed=0)
-            sim = env.sim
-            streak = 0
-            for action, labelled in zip(demo["actions"], demo["mask"]):
-                if labelled:
-                    eq = equivalent_actions(sim, action, repeat)
-                    streak = streak + 1 if eq == right_only else 0
-                    if not (streak > 2 and rng.random() < thin_flat):
-                        obs = env.observe()
-                        grids.append(obs["grid"].astype(np.int8))
-                        vecs.append(obs["vec"])
-                        acts.append(action)
-                        allowed.append(eq)
-                sim.step(BOT_ACTIONS[action], frames=repeat)
-                if sim.status != Status.RUNNING:
-                    break
-            if len(acts) >= max_samples:
+            demos += [json.loads(line) for line in f if line.strip()]
+    if shuffle:
+        rng.shuffle(demos)
+    for demo in demos:
+        level = generate(demo["tier"], demo["seed"]) if "level" not in demo else Level.from_text(demo["level"])
+        repeat = demo["repeat"]
+        env = JumpNRunEnv(fixed_levels([level]), action_repeat=repeat, overview=overview)
+        env.reset(seed=0)
+        sim = env.sim
+        streak = 0
+        for action, labelled in zip(demo["actions"], demo["mask"]):
+            if labelled:
+                eq = equivalent_actions(sim, action, repeat)
+                streak = streak + 1 if eq == right_only else 0
+                if not (streak > 2 and rng.random() < thin_flat):
+                    obs = env.observe()
+                    grids.append(obs["grid"].astype(np.int8))
+                    vecs.append(obs["vec"])
+                    if overview:
+                        overviews.append(np.rint(obs["overview"] * 4).astype(np.uint8))
+                    acts.append(action)
+                    allowed.append(eq)
+            sim.step(BOT_ACTIONS[action], frames=repeat)
+            if sim.status != Status.RUNNING:
                 break
         if len(acts) >= max_samples:
             break
-    return dict(grid=np.stack(grids), vec=np.stack(vecs).astype(np.float32),
+    data = dict(grid=np.stack(grids), vec=np.stack(vecs).astype(np.float32),
                 action=np.array(acts, np.int64), allowed=np.array(allowed, np.uint8))
+    if overview:
+        data["overview"] = np.stack(overviews)
+    return data
 
 
 def cached_dataset(demo_files, cache: Path, **kwargs):
@@ -159,14 +179,20 @@ def main() -> None:
     parser.add_argument("--repeat", type=int, default=DEFAULT_REPEAT)
     parser.add_argument("--scale", type=float, default=1.0, help="multiply the number of levels per tier")
     parser.add_argument("--procs", type=int, default=4)
+    parser.add_argument("--tiers", type=int, nargs="*", help="only these tiers ...")
+    parser.add_argument("--counts", type=int, nargs="*", help="... with this many levels each")
+    parser.add_argument("--merge-pool", help="pool.json whose entries are kept (e.g. the v2 pool)")
     args = parser.parse_args()
 
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
-    jobs = [(tier, seed, args.repeat) for tier, n in enumerate(LEVELS_PER_TIER)
-            for seed in range(int(n * args.scale))]
+    per_tier = dict(zip(args.tiers, args.counts)) if args.tiers else dict(enumerate(LEVELS_PER_TIER))
+    jobs = [(tier, seed, args.repeat) for tier, n in per_tier.items() for seed in range(int(n * args.scale))]
     random.Random(0).shuffle(jobs)  # mix easy and hard levels across processes
     pool: Dict[int, List[int]] = {}
+    if args.merge_pool:
+        pool = {int(t): list(v) for t, v in json.loads(Path(args.merge_pool).read_text()).items()
+                if int(t) not in per_tier}
     solved = 0
     with Pool(args.procs) as workers, open(out / "demos.jsonl", "w", encoding="utf-8") as f:
         for i, demo in enumerate(workers.imap_unordered(_work, jobs, chunksize=4)):

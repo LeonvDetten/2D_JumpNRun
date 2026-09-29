@@ -13,7 +13,7 @@ from stable_baselines3.common.callbacks import BaseCallback
 
 from jumpnrun.core.level import Level
 from jumpnrun.levelgen.generator import NUM_TIERS
-from jumpnrun.rl.curriculum import CurriculumTracker
+from jumpnrun.rl.curriculum import MID_START_TIER, CurriculumTracker
 
 
 class TrainingMonitor(BaseCallback):
@@ -32,6 +32,7 @@ class TrainingMonitor(BaseCallback):
         self.tracker = tracker
         self.run_dir = run_dir
         self.recent: deque = deque(maxlen=200)
+        self.mid_starts: deque = deque(maxlen=200)  # episodes started in the middle of a level
         self.start_time = time.time()
         self.history_path = run_dir / "episodes.jsonl"
         self._history = None
@@ -46,7 +47,7 @@ class TrainingMonitor(BaseCallback):
             if end is None:
                 continue
             self.tracker.record(end["tier"], end["won"])
-            self.recent.append(end)
+            (self.mid_starts if end["tier"] == MID_START_TIER else self.recent).append(end)
             end = dict(end, timesteps=self.num_timesteps)
             self._history.write(json.dumps(end) + "\n")
         return True
@@ -62,6 +63,9 @@ class TrainingMonitor(BaseCallback):
         self.logger.record("episoden/tod_grube", outcomes["died_pit"] / n)
         self.logger.record("episoden/tod_gegner", outcomes["died_enemy"] / n)
         self.logger.record("episoden/zeit_abgelaufen", outcomes["timeout"] / n)
+        if self.mid_starts:
+            self.logger.record("episoden/start_mitte_erfolg",
+                               float(np.mean([e["won"] for e in self.mid_starts])))
         self.logger.record("curriculum/stufe", self.tracker.unlocked)
         for tier in range(self.tracker.min_tier, self.tracker.unlocked + 1):
             self.logger.record(f"curriculum/erfolg_stufe_{tier}", self.tracker.success[tier])
@@ -76,11 +80,14 @@ class TrainingMonitor(BaseCallback):
 class CheckpointSaver(BaseCallback):
     """Saves the model every `every` steps - these checkpoints feed the ghost view and timelapse."""
 
-    def __init__(self, run_dir: Path, every: int, tracker: CurriculumTracker):
+    def __init__(self, run_dir: Path, every: int, tracker: CurriculumTracker, keep_every: int = 0,
+                 keep_last: int = 5):
         super().__init__()
         self.dir = run_dir / "checkpoints"
         self.dir.mkdir(parents=True, exist_ok=True)
         self.every = every
+        self.keep_every = keep_every
+        self.keep_last = keep_last
         self.tracker = tracker
         self._next = 0
 
@@ -96,6 +103,11 @@ class CheckpointSaver(BaseCallback):
         state = {"timesteps": self.num_timesteps, "success": self.tracker.success,
                  "episodes": self.tracker.episodes, "unlocked": self.tracker.unlocked}
         (self.dir.parent / "curriculum.json").write_text(json.dumps(state))
+        if self.keep_every:  # long runs: keep every keep_every-th checkpoint plus the newest few
+            checkpoints = sorted(self.dir.glob("step_*.zip"))
+            for old in checkpoints[:-self.keep_last]:
+                if int(old.stem.split("_")[1]) % self.keep_every >= self.every:
+                    old.unlink()
 
     def _on_training_end(self) -> None:
         self.save()
@@ -134,3 +146,29 @@ class Evaluator(BaseCallback):
             self.best = overall
             self.model.save(str(self.run_dir / "best_model.zip"))
         return overall
+
+
+class TimeLimit(BaseCallback):
+    """Stops training after `hours` of training time, summed over restarts (run_dir/seconds_used)."""
+
+    def __init__(self, run_dir: Path, hours: float):
+        super().__init__()
+        self.path = run_dir / "seconds_used"
+        self.limit = hours * 3600
+        self.before = float(self.path.read_text()) if self.path.exists() else 0.0
+        self.start = time.time()
+        self._last_write = 0.0
+
+    def used(self) -> float:
+        return self.before + time.time() - self.start
+
+    def _on_step(self) -> bool:
+        now = time.time()
+        if now - self._last_write > 30:
+            self._last_write = now
+            self.path.write_text(f"{self.used():.0f}")
+        if self.used() >= self.limit:
+            self.path.write_text(f"{self.used():.0f}")
+            (self.path.parent / "STOP").write_text(f"time limit of {self.limit / 3600:.0f} h reached\n")
+            return False
+        return True

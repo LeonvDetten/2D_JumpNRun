@@ -37,6 +37,35 @@ def load_pool(pool_dir) -> dict:
     return {int(tier): seeds for tier, seeds in json.loads(path.read_text()).items() if len(seeds) >= 100}
 
 
+MID_START_TIER = -2  # episodes that start in the middle of a level (not counted for the curriculum)
+_START_CACHE: dict = {}
+
+
+def load_starts(demo_dirs, min_tier: int = 4) -> list:
+    """Won teacher demos as (tier, seed, level text or None, repeat, actions) - the start-point pool."""
+
+    key = tuple(str(d) for d in demo_dirs)
+    if key not in _START_CACHE:
+        import json
+        from pathlib import Path
+
+        starts = []
+        for folder in demo_dirs:
+            for path in sorted(Path(folder).glob("demos*.jsonl")):
+                with open(path, encoding="utf-8") as f:
+                    for line in f:
+                        if not line.strip():
+                            continue
+                        demo = json.loads(line)
+                        if demo.get("won") and demo["tier"] >= min_tier and len(demo["actions"]) > 60:
+                            entry = (demo["tier"], demo["seed"], demo.get("level"), demo["repeat"],
+                                     demo["actions"])
+                            # long levels hold most of the hard late sections: offered 3x as often
+                            starts += [entry] * (3 if demo["tier"] >= 10 else 1)
+        _START_CACHE[key] = starts
+    return _START_CACHE[key]
+
+
 class CurriculumSource:
     """Level source for JumpNRunEnv. Lives inside each (sub-process) env."""
 
@@ -47,6 +76,8 @@ class CurriculumSource:
         handmade: Optional[Sequence[Level]] = None,
         handmade_prob: float = 0.0,
         pool_dir=None,
+        start_prob: float = 0.0,
+        start_dirs=(),
     ):
         self.min_tier = min_tier
         self.max_tier = max_tier
@@ -56,8 +87,16 @@ class CurriculumSource:
         self.handmade_prob = handmade_prob if self.handmade else 0.0
         # optional pool of solver-verified seeds per tier (tier -> list of seeds)
         self.pool = load_pool(pool_dir) if pool_dir else {}
+        # "random start points": sometimes begin somewhere along a teacher's winning run
+        self.starts = load_starts(start_dirs) if start_prob and start_dirs else []
+        self.start_prob = start_prob if self.starts else 0.0
 
     def __call__(self, rng: random.Random):
+        if self.start_prob and rng.random() < self.start_prob:
+            tier, seed, text, repeat, actions = rng.choice(self.starts)
+            level = Level.from_text(text) if text else generate(tier, seed)
+            cut = rng.randrange(len(actions) // 10, len(actions) - 30)
+            return level, MID_START_TIER, (repeat, actions[:cut])
         if self.handmade_prob and rng.random() < self.handmade_prob:
             return rng.choice(self.handmade), -1
         tier = rng.choices(range(NUM_TIERS), weights=self.weights)[0]

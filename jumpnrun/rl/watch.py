@@ -26,15 +26,17 @@ from jumpnrun.core.sim import Status
 from jumpnrun.levelgen.generator import generate
 from jumpnrun.rl.curriculum import EVAL_SEED_OFFSET
 from jumpnrun.rl.env import JumpNRunEnv, fixed_levels
+from jumpnrun.rl.modelinfo import env_kwargs
 
 
 class GhostRun:
     """N bots on the same level, advanced frame by frame together."""
 
-    def __init__(self, level: Level, n: int, action_repeat: int = ACTION_REPEAT):
+    def __init__(self, level: Level, n: int, action_repeat: int = ACTION_REPEAT, overview: bool = False):
         self.level = level
         self.action_repeat = action_repeat
-        self.envs = [JumpNRunEnv(fixed_levels([level]), action_repeat=action_repeat) for _ in range(n)]
+        self.envs = [JumpNRunEnv(fixed_levels([level]), action_repeat=action_repeat, overview=overview)
+                     for _ in range(n)]
         self.obs = [env.reset(seed=i)[0] for i, env in enumerate(self.envs)]
         self.running = [True] * n
         self.deaths: List[tuple] = []
@@ -53,7 +55,7 @@ class GhostRun:
         active = [i for i, r in enumerate(self.running) if r]
         if not active:
             return
-        batch = {key: np.stack([self.obs[i][key] for i in active]) for key in ("grid", "vec")}
+        batch = {key: np.stack([self.obs[i][key] for i in active]) for key in self.obs[active[0]]}
         actions, _ = model.predict(batch, deterministic=deterministic)
         before = {i: self.envs[i].sim.max_x for i in active}
         for _ in range(self.action_repeat):
@@ -100,7 +102,7 @@ def run_episode(model, level: Level, ghosts: int, view, surface, title: str, sub
                 on_frame, speed: int = 2, max_seconds: float = 60.0, deterministic: bool = False):
     """Play one ghost episode, calling on_frame(surface) for every rendered frame."""
 
-    run = GhostRun(level, ghosts, getattr(model, "action_repeat", ACTION_REPEAT))
+    run = GhostRun(level, ghosts, **env_kwargs(model))
     frame = 0
     max_frames = int(max_seconds * 30)
     while not run.done() and frame < max_frames:
