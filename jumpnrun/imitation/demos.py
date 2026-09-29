@@ -181,6 +181,7 @@ def main() -> None:
     parser.add_argument("--procs", type=int, default=4)
     parser.add_argument("--tiers", type=int, nargs="*", help="only these tiers ...")
     parser.add_argument("--counts", type=int, nargs="*", help="... with this many levels each")
+    parser.add_argument("--resume", action="store_true", help="keep the demos already in --out")
     parser.add_argument("--merge-pool", help="pool.json whose entries are kept (e.g. the v2 pool)")
     args = parser.parse_args()
 
@@ -189,12 +190,27 @@ def main() -> None:
     per_tier = dict(zip(args.tiers, args.counts)) if args.tiers else dict(enumerate(LEVELS_PER_TIER))
     jobs = [(tier, seed, args.repeat) for tier, n in per_tier.items() for seed in range(int(n * args.scale))]
     random.Random(0).shuffle(jobs)  # mix easy and hard levels across processes
+    demo_file = out / "demos.jsonl"
+    done_before = []
+    if args.resume and demo_file.exists():  # continue after an interruption: keep finished demos
+        with open(demo_file, encoding="utf-8") as f:
+            for line in f:
+                try:
+                    done_before.append(json.loads(line))
+                except json.JSONDecodeError:
+                    pass  # a line cut off by the interruption
+        finished = {(d["tier"], d["seed"]) for d in done_before}
+        jobs = [j for j in jobs if (j[0], j[1]) not in finished]
+        print(f"resume: {len(done_before)} demos kept, {len(jobs)} levels to go", flush=True)
     pool: Dict[int, List[int]] = {}
     if args.merge_pool:
         pool = {int(t): list(v) for t, v in json.loads(Path(args.merge_pool).read_text()).items()
                 if int(t) not in per_tier}
-    solved = 0
-    with Pool(args.procs) as workers, open(out / "demos.jsonl", "w", encoding="utf-8") as f:
+    for demo in done_before:
+        pool.setdefault(demo["tier"], []).append(demo["seed"])
+    solved = len(done_before)
+    with Pool(args.procs) as workers, open(demo_file, "w", encoding="utf-8") as f:
+        f.writelines(json.dumps(d) + "\n" for d in done_before)
         for i, demo in enumerate(workers.imap_unordered(_work, jobs, chunksize=4)):
             if demo is not None:  # the level is solvable; labels before an unlucky nudge stay valid
                 f.write(json.dumps(demo) + "\n")
