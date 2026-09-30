@@ -520,6 +520,8 @@ def _chain(b: _Builder, cfg: TierConfig) -> None:
         new_row = max(TOP_ROW, min(GROUND - 1, row + change))
         change = new_row - row
         gap = rng.randint(1, 2) if change < 0 else rng.randint(1, 3)
+        if change < 0 and rng.random() < 0.3:
+            gap = 3  # far jump up onto the next stone (the exam's diagonals need it)
         width = rng.choice((1, 2, 2)) if gap < 3 else 2
         b.gap(gap)
         row = new_row
