@@ -138,6 +138,8 @@ def main() -> None:
     parser.add_argument("--timelapse", help="write a clip per checkpoint to this mp4")
     parser.add_argument("--clips", type=int, default=8, help="number of checkpoints in the timelapse")
     parser.add_argument("--deterministic", action="store_true")
+    parser.add_argument("--max-seconds", type=float, default=180.0,
+                        help="game time limit for --video (the exam level needs ~90 s)")
     parser.add_argument("--follow", action="store_true", help=argparse.SUPPRESS)
     args = parser.parse_args()
 
@@ -188,7 +190,8 @@ def main() -> None:
         model = load_model(model_path)
         with VideoWriter(args.video) as video:
             run = run_episode(model, level, args.ghosts, view, surface, Path(model_path).stem, level_label,
-                              video.add, args.speed, deterministic=args.deterministic)
+                              video.add, args.speed, deterministic=args.deterministic,
+                              max_seconds=args.max_seconds)
         wins = sum(1 for r in run.results if r and r["won"])
         print(f"{args.video}: {wins}/{args.ghosts} im Ziel")
 
