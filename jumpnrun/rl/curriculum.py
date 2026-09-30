@@ -37,7 +37,31 @@ def load_pool(pool_dir) -> dict:
     return {int(tier): seeds for tier, seeds in json.loads(path.read_text()).items() if len(seeds) >= 100}
 
 
+def load_pool_texts(pool_dir, min_count: int = 100) -> dict:
+    """Solver-verified levels as stored text ({tier: [level text, ...]}) from `<pool_dir>/demos*.jsonl`.
+
+    Using the stored text (instead of re-generating from the seed) means the pool can never drift
+    away from what the solver verified when the generator changes later.
+    """
+
+    import json
+    from pathlib import Path
+
+    texts: dict = {}
+    for path in sorted(Path(pool_dir).glob("demos*.jsonl")):
+        with open(path, encoding="utf-8") as f:
+            for line in f:
+                try:
+                    demo = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                if demo.get("level"):
+                    texts.setdefault(int(demo["tier"]), []).append(demo["level"])
+    return {tier: t for tier, t in texts.items() if len(t) >= min_count}
+
+
 MID_START_TIER = -2  # episodes that start in the middle of a level (not counted for the curriculum)
+REWIND_TIER = -3  # episodes restarted shortly before the bot's own last failure (not counted either)
 _START_CACHE: dict = {}
 
 
@@ -87,6 +111,8 @@ class CurriculumSource:
         self.handmade_prob = handmade_prob if self.handmade else 0.0
         # optional pool of solver-verified seeds per tier (tier -> list of seeds)
         self.pool = load_pool(pool_dir) if pool_dir else {}
+        self.pool_texts = load_pool_texts(pool_dir) if pool_dir else {}
+        self._parsed: dict = {}
         # "random start points": sometimes begin somewhere along a teacher's winning run
         self.starts = load_starts(start_dirs) if start_prob and start_dirs else []
         self.start_prob = start_prob if self.starts else 0.0
@@ -100,6 +126,14 @@ class CurriculumSource:
         if self.handmade_prob and rng.random() < self.handmade_prob:
             return rng.choice(self.handmade), -1
         tier = rng.choices(range(NUM_TIERS), weights=self.weights)[0]
+        texts = self.pool_texts.get(tier)
+        if texts:
+            text = rng.choice(texts)
+            if text not in self._parsed:
+                if len(self._parsed) > 4000:
+                    self._parsed.clear()
+                self._parsed[text] = Level.from_text(text)
+            return self._parsed[text], tier
         seeds = self.pool.get(tier)
         seed = rng.choice(seeds) if seeds else rng.randrange(EVAL_SEED_OFFSET)
         return generate(tier, seed), tier
