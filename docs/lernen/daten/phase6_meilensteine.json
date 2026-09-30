@@ -2387,5 +2387,252 @@
   },
   "seconds": 66,
   "checkpoint": "step_0028000120.zip"
+ },
+ "29000120": {
+  "validierung_v2": {
+   "won": 111,
+   "of": 120,
+   "tiers": {
+    "stufe_4": 20,
+    "stufe_5": 20,
+    "stufe_6": 19,
+    "stufe_7": 19,
+    "stufe_8": 15,
+    "stufe_9": 18
+   }
+  },
+  "validierung_v3": {
+   "won": 33,
+   "of": 40,
+   "tiers": {
+    "stufe_10": 18,
+    "stufe_11": 15
+   }
+  },
+  "test_serie": {
+   "berg": {
+    "won": 15,
+    "of": 16,
+    "progress": 0.996
+   },
+   "festung": {
+    "won": 11,
+    "of": 16,
+    "progress": 0.844
+   },
+   "hoehle": {
+    "won": 7,
+    "of": 16,
+    "progress": 0.769
+   },
+   "lange_reise": {
+    "won": 3,
+    "of": 16,
+    "progress": 0.669
+   },
+   "parcours": {
+    "won": 15,
+    "of": 16,
+    "progress": 0.994
+   },
+   "zwei_wege": {
+    "won": 15,
+    "of": 16,
+    "progress": 0.976
+   }
+  },
+  "pruefung": {
+   "original": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "ziel": 11,
+     "trittsteine": 18,
+     "diagonalen": 2,
+     "start_gegnerregen": 1
+    },
+    "best": 1.0,
+    "mean": 0.632
+   },
+   "entschaerft": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "trittsteine": 18,
+     "gabelung_oben": 2,
+     "ziel": 9,
+     "diagonalen": 3
+    },
+    "best": 1.0,
+    "mean": 0.6
+   }
+  },
+  "seconds": 64,
+  "checkpoint": "step_0029000120.zip"
+ },
+ "30000120": {
+  "validierung_v2": {
+   "won": 116,
+   "of": 120,
+   "tiers": {
+    "stufe_4": 20,
+    "stufe_5": 20,
+    "stufe_6": 20,
+    "stufe_7": 18,
+    "stufe_8": 19,
+    "stufe_9": 19
+   }
+  },
+  "validierung_v3": {
+   "won": 35,
+   "of": 40,
+   "tiers": {
+    "stufe_10": 19,
+    "stufe_11": 16
+   }
+  },
+  "test_serie": {
+   "berg": {
+    "won": 15,
+    "of": 16,
+    "progress": 0.987
+   },
+   "festung": {
+    "won": 10,
+    "of": 16,
+    "progress": 0.765
+   },
+   "hoehle": {
+    "won": 4,
+    "of": 16,
+    "progress": 0.803
+   },
+   "lange_reise": {
+    "won": 6,
+    "of": 16,
+    "progress": 0.6
+   },
+   "parcours": {
+    "won": 16,
+    "of": 16,
+    "progress": 1.0
+   },
+   "zwei_wege": {
+    "won": 15,
+    "of": 16,
+    "progress": 0.969
+   }
+  },
+  "pruefung": {
+   "original": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "ziel": 7,
+     "diagonalen": 8,
+     "start_gegnerregen": 12,
+     "trittsteine": 5
+    },
+    "best": 1.0,
+    "mean": 0.494
+   },
+   "entschaerft": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "diagonalen": 15,
+     "ziel": 5,
+     "trittsteine": 5,
+     "start_gegnerregen": 7
+    },
+    "best": 1.0,
+    "mean": 0.583
+   }
+  },
+  "seconds": 63,
+  "checkpoint": "step_0030000120.zip"
+ },
+ "31000120": {
+  "validierung_v2": {
+   "won": 113,
+   "of": 120,
+   "tiers": {
+    "stufe_4": 20,
+    "stufe_5": 20,
+    "stufe_6": 19,
+    "stufe_7": 19,
+    "stufe_8": 18,
+    "stufe_9": 17
+   }
+  },
+  "validierung_v3": {
+   "won": 36,
+   "of": 40,
+   "tiers": {
+    "stufe_10": 18,
+    "stufe_11": 18
+   }
+  },
+  "test_serie": {
+   "berg": {
+    "won": 13,
+    "of": 16,
+    "progress": 0.966
+   },
+   "festung": {
+    "won": 5,
+    "of": 16,
+    "progress": 0.594
+   },
+   "hoehle": {
+    "won": 6,
+    "of": 16,
+    "progress": 0.939
+   },
+   "lange_reise": {
+    "won": 7,
+    "of": 16,
+    "progress": 0.667
+   },
+   "parcours": {
+    "won": 16,
+    "of": 16,
+    "progress": 1.0
+   },
+   "zwei_wege": {
+    "won": 15,
+    "of": 16,
+    "progress": 0.973
+   }
+  },
+  "pruefung": {
+   "original": {
+    "won": 1,
+    "of": 32,
+    "ends": {
+     "start_gegnerregen": 3,
+     "ziel": 12,
+     "trittsteine": 10,
+     "diagonalen": 5,
+     "gabelung_oben": 1
+    },
+    "best": 1.0,
+    "mean": 0.596
+   },
+   "entschaerft": {
+    "won": 1,
+    "of": 32,
+    "ends": {
+     "diagonalen": 3,
+     "trittsteine": 17,
+     "ziel": 10,
+     "start_gegnerregen": 1
+    },
+    "best": 1.0,
+    "mean": 0.565
+   }
+  },
+  "seconds": 67,
+  "checkpoint": "step_0031000120.zip"
  }
 }

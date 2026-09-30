@@ -75,6 +75,8 @@ python -m jumpnrun.imitation.demos --out runs/demos3 --tiers 10 11 --counts 500 
 python -m jumpnrun.imitation.bc --demos runs/demos3 --init models/phase5.zip --grow --only-overview \
     --dagger-rounds 0 --out models/phase6_start.zip
 scripts/train_phase6.sh                                      # max. 16 h, danach oder bei bestandener Prüfung Schluss
+# bester Prüfungs-Bot bisher: models/phase6_durchbruch.zip (37 von 128 Versuchen auf dem Original-Level)
+python -m jumpnrun.rl.watch --model models/phase6_durchbruch.zip --level levels/exam/level.txt --video pruefung.mp4
 python -m jumpnrun.rl.milestones --run runs/phase6           # Meilensteine: Validierung, Test-Serie, Prüfung
 
 # Auswertung

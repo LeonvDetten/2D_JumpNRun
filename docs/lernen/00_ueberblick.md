@@ -78,6 +78,7 @@ docs/lernen/            dieses Lerntagebuch
 |---|---|---|
 | 0 | sauberer Spielkern, Physik, Tests, Löser | [01_phase0_spielkern.md](01_phase0_spielkern.md) |
 | 1 | erster Bot: laufen und über Lücken springen | [02_phase1_erster_bot.md](02_phase1_erster_bot.md) |
-| 2 | Gegner, Plattformen, Curriculum | folgt |
-| 3 | Generalist auf zufälligen Leveln | folgt |
-| 4 | Abschlussprüfung auf deinem Original-Level | folgt |
+| 2 | Gegner, Plattformen, Curriculum | [03_phase2_gegner.md](03_phase2_gegner.md) |
+| 3 | Generalist auf zufälligen Leveln, erste Prüfung | [04_phase3_pruefung.md](04_phase3_pruefung.md) |
+| 5 | Vom Löser abschauen, feinere Steuerung | [05_phase5_abschauen.md](05_phase5_abschauen.md) |
+| 6 | Übersichtskarte, lange Level, Startpunkte – **erste Prüfungssiege** | [06_phase6_generalist.md](06_phase6_generalist.md) |
