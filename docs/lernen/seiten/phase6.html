@@ -1,0 +1,456 @@
+<title>Weiter sehen, länger üben</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root {
+  --bg: #F3F4F9;
+  --surface: #FFFFFF;
+  --surface-2: #E9EBF4;
+  --ink: #181A31;
+  --muted: #5A5D78;
+  --line: #D6D9E7;
+  --accent: #0B84A0;
+  --accent-soft: #BFE6EF;
+  --gold: #A8700F;
+  --red: #C23F37;
+  --green: #2B8A52;
+  --grey: #8A8DA6;
+  --world-top: #241C55;
+  --world-bottom: #3A6DB0;
+  --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", sans-serif;
+  --body: "Literata", Georgia, "Times New Roman", serif;
+  --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0F1120;
+    --surface: #171A2C;
+    --surface-2: #20243A;
+    --ink: #E7E8F3;
+    --muted: #9B9EBA;
+    --line: #2B2F48;
+    --accent: #3CC2DA;
+    --accent-soft: #19485A;
+    --gold: #E3AA4B;
+    --red: #F06B60;
+    --green: #5CC98A;
+    --grey: #7B7F9C;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0F1120;
+  --surface: #171A2C;
+  --surface-2: #20243A;
+  --ink: #E7E8F3;
+  --muted: #9B9EBA;
+  --line: #2B2F48;
+  --accent: #3CC2DA;
+  --accent-soft: #19485A;
+  --gold: #E3AA4B;
+  --red: #F06B60;
+  --green: #5CC98A;
+  --grey: #7B7F9C;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 17px;
+  line-height: 1.62;
+  padding-inline: 18px;
+  padding-block: 0 64px;
+}
+.wrap { max-width: 1040px; margin: 0 auto; }
+.col { max-width: 680px; margin-inline: auto; }
+h1, h2, h3 { font-family: var(--display); line-height: 1.12; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2.3rem, 6vw, 4rem); font-weight: 800; letter-spacing: -0.02em; }
+h2 { font-size: clamp(1.6rem, 3.4vw, 2.2rem); font-weight: 700; letter-spacing: -0.01em; }
+h3 { font-size: 1.15rem; font-weight: 700; }
+p { margin: 0; }
+.stack { display: flex; flex-direction: column; gap: 1rem; }
+.eyebrow {
+  font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent);
+}
+.muted { color: var(--muted); }
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+section { padding-block: 56px 8px; }
+section > .col { display: flex; flex-direction: column; gap: 1rem; }
+a { color: var(--accent); }
+code, .term { font-family: var(--mono); font-size: 0.88em; background: var(--surface-2); padding: 0.05em 0.35em; border-radius: 4px; }
+
+/* hero */
+header.hero { padding-block: 48px 8px; display: grid; gap: 28px; }
+.hero-text { display: flex; flex-direction: column; gap: 14px; max-width: 760px; }
+.hero-text .lede { font-size: 1.2rem; color: var(--muted); max-width: 640px; }
+.video-frame { background: #0b0a1c; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); }
+.video-frame video { display: block; width: 100%; height: auto; }
+.facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.fact { border-top: 2px solid var(--ink); padding-top: 10px; display: flex; flex-direction: column; gap: 2px; }
+.fact .n { font-family: var(--display); font-weight: 800; font-size: 1.9rem; font-variant-numeric: tabular-nums; }
+.fact .l { font-size: 0.86rem; color: var(--muted); line-height: 1.35; }
+@media (max-width: 720px) { .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* figures */
+figure { margin: 0; }
+.figure {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 20px;
+  display: flex; flex-direction: column; gap: 14px; margin-block: 8px;
+}
+.figure figcaption { font-size: 0.9rem; color: var(--muted); }
+.controls { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; }
+.control { display: flex; flex-direction: column; gap: 4px; min-width: 150px; flex: 1 1 180px; }
+.control label { font-family: var(--mono); font-size: 0.78rem; color: var(--muted); display: flex; justify-content: space-between; gap: 8px; }
+.control label b { color: var(--ink); font-weight: 600; }
+input[type="range"] { width: 100%; accent-color: var(--accent); }
+button {
+  font-family: var(--mono); font-size: 0.85rem; border: 1px solid var(--ink); background: var(--ink); color: var(--bg);
+  border-radius: 6px; padding: 8px 14px; cursor: pointer;
+}
+button.ghost { background: transparent; color: var(--ink); }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.seg button { border: 0; border-radius: 0; background: transparent; color: var(--muted); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+
+/* loop diagram */
+.loop svg { width: 100%; height: auto; display: block; }
+
+/* bot view */
+.botview { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 18px; }
+@media (max-width: 820px) { .botview { grid-template-columns: minmax(0, 1fr); } }
+canvas { display: block; width: 100%; height: auto; border-radius: 6px; }
+.panel-title { font-family: var(--mono); font-size: 0.76rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 0.8rem; color: var(--muted); font-family: var(--mono); }
+.legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; background: var(--c); vertical-align: -1px; }
+.bars { display: grid; grid-template-columns: 8.5em minmax(0, 1fr); gap: 6px 10px; align-items: center; font-size: 0.86rem; }
+.bars .name { font-family: var(--mono); font-size: 0.78rem; }
+.bars .name.chosen { color: var(--accent); font-weight: 600; }
+.trio { display: flex; flex-direction: column; gap: 2px; }
+.bar { height: 7px; border-radius: 3px; background: var(--c); width: 0; transition: width 0.18s ease; min-width: 1px; }
+.readouts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.readout { background: var(--surface-2); border-radius: 8px; padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; }
+.readout .k { font-family: var(--mono); font-size: 0.72rem; color: var(--muted); }
+.readout .v { font-family: var(--display); font-weight: 700; font-size: 1.35rem; font-variant-numeric: tabular-nums; }
+.note { font-size: 0.92rem; background: var(--surface-2); border-left: 3px solid var(--accent); padding: 10px 14px; border-radius: 0 6px 6px 0; }
+
+/* charts */
+.chart svg { width: 100%; height: auto; display: block; overflow: visible; }
+.chart text { font-family: var(--mono); font-size: 11px; fill: var(--muted); }
+.two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+@media (max-width: 820px) { .two { grid-template-columns: minmax(0, 1fr); } }
+
+/* formula */
+.formula { font-family: var(--mono); font-size: 0.95rem; background: var(--surface-2); padding: 12px 14px; border-radius: 8px; overflow-x: auto; white-space: nowrap; }
+
+/* reward table */
+table { border-collapse: collapse; width: 100%; font-size: 0.95rem; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-family: var(--mono); font-size: 0.76rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 400; }
+td.num { font-family: var(--mono); white-space: nowrap; }
+.table-wrap { overflow-x: auto; }
+
+/* verdict */
+.verdict { font-family: var(--display); font-weight: 700; font-size: 1.2rem; }
+.verdict.good { color: var(--green); }
+.verdict.bad { color: var(--red); }
+.scen { display: grid; grid-template-columns: 11em minmax(0, 1fr) 4.5em; gap: 8px 12px; align-items: center; font-size: 0.9rem; }
+.scen .track { position: relative; height: 18px; background: var(--surface-2); border-radius: 4px; }
+.scen .zero { position: absolute; top: -3px; bottom: -3px; width: 1px; background: var(--muted); left: 50%; }
+.scen .fill { position: absolute; top: 3px; bottom: 3px; border-radius: 3px; }
+
+/* network */
+.net { display: flex; flex-wrap: wrap; align-items: stretch; gap: 8px; }
+.net .blk { flex: 1 1 120px; background: var(--surface-2); border-radius: 8px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; }
+.net .blk b { font-family: var(--display); font-size: 1rem; }
+.net .blk span { font-family: var(--mono); font-size: 0.74rem; color: var(--muted); }
+.net .arrow { align-self: center; color: var(--muted); font-family: var(--mono); }
+.net .blk.out { background: var(--accent-soft); }
+
+/* glossary */
+dl { display: grid; grid-template-columns: 9em minmax(0, 1fr); gap: 8px 16px; margin: 0; }
+dt { font-family: var(--display); font-weight: 700; }
+dd { margin: 0; color: var(--muted); }
+@media (max-width: 560px) { dl { grid-template-columns: minmax(0, 1fr); } dd { margin-bottom: 8px; } .scen { grid-template-columns: 7.5em minmax(0, 1fr) 4em; } .readouts { grid-template-columns: minmax(0,1fr) minmax(0,1fr); } }
+footer { margin-top: 56px; padding-top: 18px; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.9rem; }
+@media (prefers-reduced-motion: reduce) { .bar { transition: none; } }
+
+.chart svg text{font-size:12px}
+</style>
+<div class="wrap">
+  <header class="hero">
+    <div class="hero-text">
+      <span class="eyebrow">Lerntagebuch · Phase 6</span>
+      <h1>Weiter sehen, länger üben</h1>
+      <p class="lede">Der Bot bekommt eine grobe Karte der nächsten 120 Kacheln, übt auf Leveln mit über 300 Kacheln und startet oft mitten im Level. Nach 16 Stunden Training schafft er dein Level von 2023 zum ersten Mal: 37 von 128 Versuchen öffnen die Truhe.</p>
+    </div>
+    <div class="facts">
+      <div class="fact"><span class="n mono">0 → 37</span><span class="l">von 128 Versuchen auf deinem Original-Level (Phase 5 gegen Phase 6)</span></div>
+      <div class="fact"><span class="n mono">17 → 36</span><span class="l">von 40 langen Validierungsleveln (Stufen 10–11)</span></div>
+      <div class="fact"><span class="n mono">97 → 126</span><span class="l">von 192 Versuchen auf der handgebauten Test-Serie</span></div>
+      <div class="fact"><span class="n mono">16 h</span><span class="l">Training, 31,9 Mio. Entscheidungen, 32 Meilensteine</span></div>
+    </div>
+    <figure class="figure">
+      <div class="video-frame"><video src="phase6_pruefung_28mio.mp4" controls muted playsinline preload="metadata"></video></div>
+      <figcaption>32 Geister des besten Bots (Stand 28 Mio. Schritte) auf deinem Original-Level, dreifache Geschwindigkeit. 10 davon erreichen die Truhe.</figcaption>
+    </figure>
+  </header>
+
+  <section id="karte">
+    <div class="col">
+      <span class="eyebrow">Neue Beobachtung</span>
+      <h2>Eine Übersichtskarte für den Blick nach vorn</h2>
+      <p>Bisher sah der Bot 25 Kacheln: 5 hinter sich, 19 vor sich. Auf deinem Level beginnt am Start ein bequemer Boden, der erst bei Kachel 97 in einer Grube endet. Wer unten bleibt, merkt das viel zu spät.</p>
+      <p>Die neue Übersichtskarte ist grob, reicht aber weit: 32 Spalten mit je 4 Kacheln, von 8 Kacheln hinter bis 120 vor dem Bot. Jede Spalte meldet vier Dinge: wie viel Block darin steckt, ob man darauf stehen kann, ob ein Gegner da ist und ob die Truhe da ist. Schieb den Bot durch das Level und vergleich beide Blickfelder.</p>
+    </div>
+    <div class="figure" style="margin-top:14px">
+      <div class="control">
+        <label for="posSlider">Position des Bots <b id="posLabel">Kachel 2</b></label>
+        <input type="range" id="posSlider" min="2" max="296" value="2">
+      </div>
+      <canvas id="levelCanvas" width="2084" height="160" aria-label="Prüfungslevel mit Sichtfeldern"></canvas>
+      <div class="legend"><span style="--c:var(--accent)">bisherige Sicht (25 Kacheln)</span><span style="--c:var(--gold)">Übersichtskarte (128 Kacheln)</span></div>
+      <div class="two">
+        <div class="stack" style="gap:6px"><span class="panel-title">So sieht der Bot die Nähe (genau)</span><canvas id="nearCanvas" width="500" height="260"></canvas></div>
+        <div class="stack" style="gap:6px"><span class="panel-title">So sieht er die Ferne (Block-Anteil, grob)</span><canvas id="farCanvas" width="640" height="260"></canvas></div>
+      </div>
+      <figcaption>Links jede Kachel einzeln, rechts je 4 Kacheln zu einer Spalte zusammengefasst. Hellere Zellen enthalten mehr Block, goldene Punkte sind Gegner.</figcaption>
+    </div>
+  </section>
+
+  <section id="chirurgie">
+    <div class="col">
+      <span class="eyebrow">Netz-Chirurgie</span>
+      <h2>Ein neuer Sinn, ohne das Gelernte zu verlieren</h2>
+      <p>Das Netz aus Phase 5 konnte schon viel. Statt neu anzufangen, bekommt es einen dritten Eingangszweig für die Karte. Dessen letzte Schicht startet mit lauter Nullen. Das neue Netz rechnet am Anfang deshalb exakt dasselbe wie das alte: Die Abweichung war im Test 0,0. Erst durch das Training wachsen die Gewichte des neuen Zweigs, und der Bot beginnt, die Karte zu nutzen.</p>
+    </div>
+    <div class="col figure" style="margin-top:10px">
+      <div class="net">
+        <div class="blk"><b>Nahsicht</b><span>4 × 13 × 25 → CNN</span></div>
+        <div class="blk"><b>Zustand</b><span>15 Werte → MLP</span></div>
+        <div class="blk" style="background:var(--accent-soft)"><b>Übersichtskarte</b><span>4 × 13 × 32 → kleines CNN → × 0 am Start</span></div>
+        <span class="arrow">→</span>
+        <div class="blk out"><b>Summe → 256 Merkmale</b><span>→ 6 Aktionen · Wert</span></div>
+      </div>
+      <p class="note">Ein Versuch ging schief: Das Nachahmen nur für den neuen Zweig verbesserte die Übereinstimmung mit dem Löser, senkte aber die Erfolgsquote von 86 % auf 42 %. Das Skript behielt darum die alten Gewichte, und der Bot lernte die Karte allein durch PPO zu nutzen.</p>
+    </div>
+  </section>
+
+  <section id="verlauf">
+    <div class="col">
+      <span class="eyebrow">16 Stunden Training</span>
+      <h2>Der Verlauf, Meilenstein für Meilenstein</h2>
+      <p>Alle 1 Mio. Schritte wurde der Bot auf einem eigenen CPU-Kern geprüft. Die eingefrorenen Validierungslevel entscheiden, welches Modell als „bestes“ gilt. Test-Serie und Prüfung werden nur beobachtet. Die senkrechten Linien markieren die zwei Änderungen am Generator.</p>
+    </div>
+    <div class="figure" style="margin-top:14px">
+      <div class="seg" role="group" aria-label="Kennzahl">
+        <button type="button" data-metric="ex" aria-pressed="true">Prüfung</button>
+        <button type="button" data-metric="v3" aria-pressed="false">Validierung lang</button>
+        <button type="button" data-metric="v2" aria-pressed="false">Validierung Stufen 4–9</button>
+        <button type="button" data-metric="ts" aria-pressed="false">Test-Serie</button>
+      </div>
+      <div class="chart" id="progressChart"></div>
+      <figcaption id="progressCaption"></figcaption>
+    </div>
+  </section>
+
+  <section id="fehlersuche">
+    <div class="col">
+      <span class="eyebrow">Fehlersuche</span>
+      <h2>Wo die Versuche enden</h2>
+      <p>Das wichtigste Werkzeug war eine einfache Statistik: An welcher Stelle deines Levels hört jeder der 32 Versuche auf? Wähle einen Meilenstein, und die Karte zeigt, in welchem Abschnitt die Versuche gescheitert sind.</p>
+    </div>
+    <div class="figure" style="margin-top:14px">
+      <div class="control">
+        <label for="msSlider">Meilenstein <b id="msLabel"></b></label>
+        <input type="range" id="msSlider" min="0" max="31" value="28">
+      </div>
+      <canvas id="endsCanvas" width="2084" height="230" aria-label="Endpunkte der Versuche je Abschnitt"></canvas>
+      <div class="scen" id="endsBars"></div>
+      <figcaption>Abschnitte: Start mit Gegnerregen (Kachel 0–35), Gabelung mit Sackgasse unten (36–97), Trittsteine (98–159), Diagonalen (160–249), Ziel mit Tiefsprung (ab 250).</figcaption>
+    </div>
+    <div class="col stack" style="margin-top:18px">
+      <p>Dreimal zeigte die Statistik ein Muster, das es in keinem Trainingslevel gab. Ich habe es jeweils im Generator ergänzt, nur für die langen Stufen, damit die eingefrorene Validierung vergleichbar bleibt:</p>
+      <ol class="stack" style="padding-left:1.2em;margin:0;gap:0.6rem">
+        <li><strong>Tiefsprung</strong> (nach 16 Mio. Schritten): 22 von 64 Versuchen starben kurz vor dem Ziel beim Sprung über 4 Kacheln auf einen 8 Reihen tieferen Boden. Der Generator hatte nie tiefer als 4 Reihen gebaut.</li>
+        <li><strong>Truhe ohne Wand</strong> (16 Mio.): 6 Versuche sprangen über die Truhe und fielen aus dem Level. In jedem generierten Level stand eine Wand hinter der Truhe, und der Bot hatte sich darauf verlassen.</li>
+        <li><strong>Weiter Sprung nach oben</strong> (21 Mio.): Die eigentliche Todesstelle lag einen Sprung früher. Dort geht es 3 Kacheln weit und eine Reihe hoch. Steigende Steinketten hatten bisher nur 1–2 Kacheln Abstand.</li>
+      </ol>
+      <p>Sieben Millionen Schritte nach der letzten Änderung kam der Sprung von 1 auf 8 von 32 Versuchen.</p>
+    </div>
+  </section>
+
+  <section id="ergebnis">
+    <div class="col">
+      <span class="eyebrow">Endauswertung</span>
+      <h2>Das Ergebnis mit 128 frischen Versuchen</h2>
+      <p>Mit 32 Versuchen schwanken die Prüfungszahlen stark. Für das Endergebnis bekam jedes Modell deshalb 128 neue Versuche je Prüfungsversion und 32 je Test-Level.</p>
+    </div>
+    <div class="col figure" style="margin-top:10px">
+      <div class="table-wrap"><table id="finalTable"><thead><tr><th>Modell</th><th>Validierung 4–9</th><th>lang</th><th>Test-Serie</th><th>Prüfung</th><th>entschärft</th></tr></thead><tbody></tbody></table></div>
+      <figcaption>Validierung: 120 bzw. 40 Level, je ein Versuch. Test-Serie: 6 Level mit je 32 Versuchen. Prüfung: je 128 Versuche.</figcaption>
+    </div>
+    <div class="col stack" style="margin-top:14px">
+      <p><strong>So ist das zu lesen:</strong></p>
+      <ul class="stack" style="padding-left:1.2em;margin:0;gap:0.5rem">
+        <li>Das Stopp-Kriterium, mindestens 16 von 32 an zwei Meilensteinen hintereinander, wurde nicht erreicht. Das Training endete am 16-Stunden-Limit.</li>
+        <li>Das Modell mit 37/128 habe ich ausgesucht, weil es bei der Prüfung auffiel. Die 128 Versuche sind neu, aber die Auswahl war nicht blind. Die Zahl ist darum etwas zu optimistisch.</li>
+        <li>Das Modell mit der besten Validierung schafft nur 4/128. Wie schon in Phase 5 ist das beste Modell auf den Übungsleveln nicht das beste auf einem ungewöhnlichen Einzellevel.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="lektionen">
+    <div class="col">
+      <span class="eyebrow">Was bleibt</span>
+      <h2>Was wir gelernt haben</h2>
+      <ul class="stack" style="padding-left:1.2em;margin:0;gap:0.6rem">
+        <li><strong>Fehleranalyse schlägt Rechenzeit.</strong> Die großen Sprünge kamen nicht vom längeren Training, sondern von drei nachgerüsteten Mustern.</li>
+        <li><strong>Ein Bot lernt auch die zufälligen Regeln seiner Welt.</strong> „Hinter der Truhe steht immer eine Wand“ war nie gewollt, der Bot hat es trotzdem gelernt.</li>
+        <li><strong>Ein neuer Sinn braucht passende Übung.</strong> Die Karte allein half wenig. Nützlich wurde sie erst mit Leveln, in denen der Blick nach vorn den Unterschied macht.</li>
+        <li><strong>Lange Level verstärken kleine Schwächen.</strong> Wer jeden von acht schweren Abschnitten zu 95 % schafft, kommt nur in 66 % der Fälle durch das ganze Level.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer class="col">Space Pirate Jump'n'Run · Phase 6 · Daten aus <code>runs/phase6</code>, <code>docs/lernen/daten/phase6_*.json</code>; Modelle <code>models/phase6_durchbruch.zip</code> (28 Mio.), <code>models/phase6.zip</code> (beste Validierung), <code>models/phase6_ende.zip</code>.</footer>
+</div>
+
+<script>window.PAGE_DATA={"ms": [{"m": 0.0, "v2": 114, "v3": 17, "ts": 51, "ex": 0, "exe": 0, "ends": {"start_gegnerregen": 23, "trittsteine": 5, "gabelung_oben": 4}}, {"m": 1.0, "v2": 100, "v3": 18, "ts": 48, "ex": 0, "exe": 0, "ends": {"gabelung_oben": 10, "trittsteine": 13, "diagonalen": 4, "start_gegnerregen": 4, "ziel": 1}}, {"m": 2.0, "v2": 98, "v3": 23, "ts": 45, "ex": 0, "exe": 0, "ends": {"trittsteine": 18, "start_gegnerregen": 6, "gabelung_oben": 1, "ziel": 1, "diagonalen": 6}}, {"m": 3.0, "v2": 104, "v3": 27, "ts": 53, "ex": 0, "exe": 0, "ends": {"gabelung_oben": 5, "start_gegnerregen": 15, "diagonalen": 3, "trittsteine": 9}}, {"m": 4.0, "v2": 96, "v3": 23, "ts": 60, "ex": 2, "exe": 0, "ends": {"gabelung_oben": 15, "trittsteine": 2, "ziel": 6, "diagonalen": 6, "start_gegnerregen": 1}}, {"m": 5.0, "v2": 92, "v3": 25, "ts": 57, "ex": 0, "exe": 0, "ends": {"diagonalen": 10, "start_gegnerregen": 2, "gabelung_oben": 15, "trittsteine": 4, "ziel": 1}}, {"m": 6.0, "v2": 97, "v3": 23, "ts": 63, "ex": 1, "exe": 2, "ends": {"start_gegnerregen": 2, "diagonalen": 17, "ziel": 2, "trittsteine": 10}}, {"m": 7.0, "v2": 97, "v3": 27, "ts": 55, "ex": 0, "exe": 0, "ends": {"trittsteine": 10, "diagonalen": 5, "ziel": 6, "start_gegnerregen": 8, "gabelung_oben": 3}}, {"m": 8.0, "v2": 102, "v3": 25, "ts": 53, "ex": 0, "exe": 1, "ends": {"diagonalen": 16, "start_gegnerregen": 2, "gabelung_oben": 3, "trittsteine": 8, "ziel": 3}}, {"m": 9.0, "v2": 106, "v3": 27, "ts": 53, "ex": 0, "exe": 0, "ends": {"gabelung_oben": 7, "diagonalen": 11, "trittsteine": 11, "ziel": 1, "start_gegnerregen": 2}}, {"m": 10.0, "v2": 113, "v3": 30, "ts": 56, "ex": 0, "exe": 1, "ends": {"trittsteine": 6, "diagonalen": 14, "ziel": 8, "start_gegnerregen": 3, "gabelung_oben": 1}}, {"m": 11.0, "v2": 110, "v3": 31, "ts": 71, "ex": 1, "exe": 0, "ends": {"trittsteine": 5, "gabelung_oben": 4, "diagonalen": 18, "ziel": 3, "start_gegnerregen": 1}}, {"m": 12.0, "v2": 112, "v3": 28, "ts": 62, "ex": 1, "exe": 0, "ends": {"trittsteine": 13, "diagonalen": 10, "start_gegnerregen": 6, "ziel": 2}}, {"m": 13.0, "v2": 106, "v3": 29, "ts": 61, "ex": 0, "exe": 0, "ends": {"diagonalen": 18, "trittsteine": 6, "ziel": 5, "start_gegnerregen": 3}}, {"m": 14.0, "v2": 108, "v3": 28, "ts": 58, "ex": 0, "exe": 2, "ends": {"diagonalen": 9, "ziel": 9, "trittsteine": 9, "gabelung_oben": 2, "start_gegnerregen": 3}}, {"m": 15.0, "v2": 105, "v3": 29, "ts": 69, "ex": 0, "exe": 0, "ends": {"trittsteine": 7, "gabelung_oben": 9, "ziel": 2, "diagonalen": 13, "start_gegnerregen": 1}}, {"m": 16.0, "v2": 115, "v3": 31, "ts": 61, "ex": 1, "exe": 0, "ends": {"diagonalen": 10, "gabelung_oben": 3, "ziel": 14, "trittsteine": 4}}, {"m": 17.0, "v2": 105, "v3": 32, "ts": 50, "ex": 1, "exe": 0, "ends": {"diagonalen": 14, "trittsteine": 5, "ziel": 9, "start_gegnerregen": 2, "gabelung_oben": 1}}, {"m": 18.0, "v2": 104, "v3": 32, "ts": 51, "ex": 0, "exe": 2, "ends": {"gabelung_oben": 2, "ziel": 10, "diagonalen": 9, "trittsteine": 8, "start_gegnerregen": 3}}, {"m": 19.0, "v2": 112, "v3": 32, "ts": 46, "ex": 0, "exe": 0, "ends": {"diagonalen": 23, "trittsteine": 2, "ziel": 6, "start_gegnerregen": 1}}, {"m": 20.0, "v2": 107, "v3": 29, "ts": 43, "ex": 0, "exe": 1, "ends": {"gabelung_oben": 5, "diagonalen": 12, "trittsteine": 8, "start_gegnerregen": 6, "ziel": 1}}, {"m": 21.0, "v2": 115, "v3": 31, "ts": 46, "ex": 0, "exe": 0, "ends": {"diagonalen": 12, "ziel": 15, "start_gegnerregen": 3, "trittsteine": 2}}, {"m": 22.0, "v2": 108, "v3": 28, "ts": 54, "ex": 0, "exe": 0, "ends": {"start_gegnerregen": 4, "trittsteine": 10, "diagonalen": 14, "ziel": 3, "gabelung_oben": 1}}, {"m": 23.0, "v2": 104, "v3": 28, "ts": 74, "ex": 0, "exe": 0, "ends": {"diagonalen": 23, "trittsteine": 9}}, {"m": 24.0, "v2": 111, "v3": 34, "ts": 65, "ex": 0, "exe": 0, "ends": {"diagonalen": 16, "trittsteine": 9, "ziel": 4, "start_gegnerregen": 3}}, {"m": 25.0, "v2": 115, "v3": 31, "ts": 56, "ex": 0, "exe": 0, "ends": {"trittsteine": 18, "diagonalen": 8, "ziel": 2, "start_gegnerregen": 2, "gabelung_oben": 2}}, {"m": 26.0, "v2": 115, "v3": 34, "ts": 49, "ex": 0, "exe": 1, "ends": {"diagonalen": 14, "trittsteine": 11, "ziel": 7}}, {"m": 27.0, "v2": 109, "v3": 34, "ts": 53, "ex": 1, "exe": 0, "ends": {"diagonalen": 17, "ziel": 10, "start_gegnerregen": 1, "trittsteine": 3}}, {"m": 28.0, "v2": 114, "v3": 36, "ts": 61, "ex": 8, "exe": 12, "ends": {"ziel": 9, "diagonalen": 13, "trittsteine": 2}}, {"m": 29.0, "v2": 111, "v3": 33, "ts": 66, "ex": 0, "exe": 0, "ends": {"ziel": 11, "trittsteine": 18, "diagonalen": 2, "start_gegnerregen": 1}}, {"m": 30.0, "v2": 116, "v3": 35, "ts": 66, "ex": 0, "exe": 0, "ends": {"ziel": 7, "diagonalen": 8, "start_gegnerregen": 12, "trittsteine": 5}}, {"m": 31.0, "v2": 113, "v3": 36, "ts": 62, "ex": 1, "exe": 1, "ends": {"start_gegnerregen": 3, "ziel": 12, "trittsteine": 10, "diagonalen": 5, "gabelung_oben": 1}}], "final": {"phase5": {"validierung_v2": 114, "validierung_v3": 17, "test_serie": {"berg": 32, "festung": 8, "hoehle": 2, "lange_reise": 2, "parcours": 30, "zwei_wege": 23}, "pruefung_original": {"won": 0, "of": 128, "ends": {"gabelung_oben": 25, "trittsteine": 17, "start_gegnerregen": 86}}, "pruefung_entschaerft": {"won": 0, "of": 128, "ends": {"trittsteine": 49, "gabelung_oben": 31, "start_gegnerregen": 48}}}, "p6_bestval": {"validierung_v2": 116, "validierung_v3": 35, "test_serie": {"berg": 24, "festung": 15, "hoehle": 8, "lange_reise": 2, "parcours": 31, "zwei_wege": 31}, "pruefung_original": {"won": 4, "of": 128, "ends": {"ziel": 27, "start_gegnerregen": 32, "diagonalen": 30, "trittsteine": 35}}, "pruefung_entschaerft": {"won": 4, "of": 128, "ends": {"diagonalen": 41, "ziel": 25, "start_gegnerregen": 31, "trittsteine": 27}}}, "p6_28mio": {"validierung_v2": 114, "validierung_v3": 36, "test_serie": {"berg": 30, "festung": 20, "hoehle": 16, "lange_reise": 3, "parcours": 31, "zwei_wege": 26}, "pruefung_original": {"won": 37, "of": 128, "ends": {"ziel": 35, "diagonalen": 40, "trittsteine": 11, "start_gegnerregen": 3, "gabelung_oben": 2}}, "pruefung_entschaerft": {"won": 40, "of": 128, "ends": {"diagonalen": 39, "ziel": 26, "trittsteine": 23}}}, "p6_ende": {"validierung_v2": 105, "validierung_v3": 32, "test_serie": {"berg": 30, "festung": 4, "hoehle": 18, "lange_reise": 6, "parcours": 32, "zwei_wege": 30}, "pruefung_original": {"won": 19, "of": 128, "ends": {"ziel": 32, "diagonalen": 63, "trittsteine": 12, "gabelung_oben": 1, "start_gegnerregen": 1}}, "pruefung_entschaerft": {"won": 21, "of": 128, "ends": {"diagonalen": 57, "ziel": 28, "trittsteine": 18, "gabelung_oben": 4}}}}, "exam": ["         E E E E E E E E E E E E                                                                                                                                                 E E E E B                                                                                                                                                                                            ", "                                                                                 B                                                                                                BBBBBBBB                                                                                                                    ", "                                                                                 B                     B   B   B  BB   B   B   B   BBB   B   B   B   B                                                        BB BB                                                                                                                                     ", "                                                                    B   BE E EB  B                 B  B       E       B                                                                                     BB        BB BB                                    BB BB                                                                              ", "                                       BBBB   B   B   B   B      B      BBBBBBB  B          BBBB  B              BBBBB                                   B                                              BB                  BB BB                      BB BB                                          ", "                                 BBBB                         B      B                   B        E           B                                                               BBBBB                  BB                                         BB BB                                                                                                                                                                                                                                                                                    ", "    E          E               B B                                                  B   B   B               B                                               B              BB       BB           BB                                      BB BB                                                                                                  ", "                          BBBBB                  E                              B  B      E                 B                                                            BB             B      BB                                    BB BB                                                                                                  ", "                    BBBB            EEE                                                                    B                                                  B       BB                   BBB                                                                                                                                          ", "               BBB                                               E                            B        B                                                         B B                                                                                                                                                                                                                                                                                ", "         BBBB                                                                                          B                                                                                                                                                                                                 C                                                                                                          ", "      B                                BBB         B                                                 B   B                                                                                                                                                              BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB                                                                                                            ", "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"]};</script>
+<script>
+(function () {
+  const D = window.PAGE_DATA;
+  const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  const LEVEL = D.exam.map((r) => r.padEnd(521, " "));
+  const COLS = 300, ROWS = 13;
+  const SECTIONS = [[0, 36, "start_gegnerregen", "Start"], [36, 98, "gabelung_oben", "Gabelung"], [98, 160, "trittsteine", "Trittsteine"], [160, 250, "diagonalen", "Diagonalen"], [250, 300, "ziel", "Ziel"]];
+  const cell = (c, r) => (r >= 0 && r < ROWS && c >= 0 && c < LEVEL[0].length ? LEVEL[r][c] : c < 0 ? "B" : " ");
+
+  function drawLevel(ctx, w, h, top) {
+    const t = w / COLS, th = (h - top) / ROWS;
+    ctx.fillStyle = css("--surface-2"); ctx.fillRect(0, top, w, h - top);
+    for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
+      const ch = LEVEL[r][c];
+      if (ch === "B") { ctx.fillStyle = css("--ink"); ctx.fillRect(c * t, top + r * th, Math.ceil(t), Math.ceil(th)); }
+      else if (ch === "E") { ctx.fillStyle = css("--gold"); ctx.beginPath(); ctx.arc((c + 0.5) * t, top + (r + 0.5) * th, Math.min(t, th) * 0.45, 0, 7); ctx.fill(); }
+      else if (ch === "C") { ctx.fillStyle = css("--green"); ctx.fillRect(c * t, top + r * th, Math.ceil(t), Math.ceil(th)); }
+    }
+    return { t, th };
+  }
+
+  // ---------------------------------------------------------------- overview map
+  const lc = document.getElementById("levelCanvas"), nc = document.getElementById("nearCanvas"), fc = document.getElementById("farCanvas");
+  const slider = document.getElementById("posSlider"), posLabel = document.getElementById("posLabel");
+  function drawMap() {
+    const p = +slider.value;
+    posLabel.textContent = "Kachel " + p;
+    const ctx = lc.getContext("2d"); ctx.clearRect(0, 0, lc.width, lc.height);
+    const { t, th } = drawLevel(ctx, lc.width, lc.height, 0);
+    const box = (a, b, color) => { ctx.strokeStyle = color; ctx.lineWidth = 5; ctx.strokeRect(Math.max(0, a) * t + 2, 2, (Math.min(COLS, b) - Math.max(0, a)) * t - 4, lc.height - 4); };
+    box(p - 8, p + 120, css("--gold"));
+    box(p - 5, p + 20, css("--accent"));
+    ctx.fillStyle = css("--red"); ctx.fillRect((p + 0.2) * t, 0, t * 0.6, lc.height);
+    // near view: 25 x 13 exact tiles
+    const n = nc.getContext("2d"), nw = nc.width / 25, nh = nc.height / ROWS;
+    n.fillStyle = css("--surface-2"); n.fillRect(0, 0, nc.width, nc.height);
+    for (let r = 0; r < ROWS; r++) for (let i = 0; i < 25; i++) {
+      const ch = cell(p - 5 + i, r);
+      if (ch === "B") { n.fillStyle = css("--ink"); n.fillRect(i * nw, r * nh, nw - 1, nh - 1); }
+      if (ch === "E") { n.fillStyle = css("--gold"); n.beginPath(); n.arc((i + 0.5) * nw, (r + 0.5) * nh, nh * 0.35, 0, 7); n.fill(); }
+      if (ch === "C") { n.fillStyle = css("--green"); n.fillRect(i * nw, r * nh, nw - 1, nh - 1); }
+    }
+    n.strokeStyle = css("--red"); n.lineWidth = 3; n.strokeRect(5 * nw + 1, 0, nw - 2, nc.height);
+    // far view: 32 columns of 4 tiles, share of solid blocks
+    const f = fc.getContext("2d"), fw = fc.width / 32, fh = fc.height / ROWS;
+    f.fillStyle = css("--surface-2"); f.fillRect(0, 0, fc.width, fc.height);
+    const ink = css("--ink");
+    for (let j = 0; j < 32; j++) for (let r = 0; r < ROWS; r++) {
+      let solid = 0, enemy = false, chest = false;
+      for (let k = 0; k < 4; k++) { const ch = cell(p - 8 + 4 * j + k, r); if (ch === "B") solid++; if (ch === "E") enemy = true; if (ch === "C") chest = true; }
+      if (solid) { f.globalAlpha = solid / 4; f.fillStyle = ink; f.fillRect(j * fw, r * fh, fw - 1, fh - 1); f.globalAlpha = 1; }
+      if (enemy) { f.fillStyle = css("--gold"); f.beginPath(); f.arc((j + 0.5) * fw, (r + 0.5) * fh, fh * 0.28, 0, 7); f.fill(); }
+      if (chest) { f.fillStyle = css("--green"); f.fillRect(j * fw + 3, r * fh + 3, fw - 7, fh - 7); }
+    }
+    f.strokeStyle = css("--accent"); f.lineWidth = 3; f.strokeRect(fw * 3 / 4 + 1, 1, fw * 25 / 4, fc.height - 2);
+  }
+  slider.addEventListener("input", drawMap);
+
+  // ---------------------------------------------------------------- progress chart
+  const METRICS = {
+    ex: { max: 32, label: "gewonnene Versuche auf dem Original-Level (von 32)", keys: [["ex", "--accent", "original"], ["exe", "--gold", "entschärft"]] },
+    v3: { max: 40, label: "gewonnene lange Validierungslevel (von 40)", keys: [["v3", "--accent", "lang"]] },
+    v2: { max: 120, label: "gewonnene Validierungslevel der Stufen 4–9 (von 120)", keys: [["v2", "--accent", "Stufen 4–9"]] },
+    ts: { max: 96, label: "gewonnene Versuche der Test-Serie (von 96)", keys: [["ts", "--accent", "Test-Serie"]] },
+  };
+  let metric = "ex";
+  function drawChart() {
+    const m = METRICS[metric], W = 760, H = 280, L = 40, R = 70, T = 14, B = 34;
+    const x = (v) => L + (v / 32) * (W - L - R), y = (v) => T + (1 - v / m.max) * (H - T - B);
+    let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${m.label}">`;
+    for (let i = 0; i <= 4; i++) { const v = (m.max * i) / 4; s += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${L - 6}" y="${y(v) + 4}" text-anchor="end">${Math.round(v)}</text>`; }
+    for (let v = 0; v <= 32; v += 4) s += `<text x="${x(v)}" y="${H - 12}" text-anchor="middle">${v}</text>`;
+    s += `<text x="${W - R}" y="${H - 0}" text-anchor="end">Mio. Schritte</text>`;
+    for (const [at, txt, dy] of [[16.3, "Tiefsprung, Truhe ohne Wand", 10], [21.6, "weiter Sprung nach oben", 26]]) {
+      s += `<line x1="${x(at)}" x2="${x(at)}" y1="${T}" y2="${H - B}" stroke="var(--muted)" stroke-dasharray="4 4"/><text x="${x(at) + 4}" y="${T + dy}">${txt}</text>`;
+    }
+    m.keys.forEach(([key, color, name], idx) => {
+      const pts = D.ms.map((d) => `${x(d.m).toFixed(1)},${y(d[key]).toFixed(1)}`).join(" ");
+      s += `<polyline points="${pts}" fill="none" stroke="var(${color})" stroke-width="2.2" stroke-linejoin="round"/>`;
+      const last = D.ms[D.ms.length - 1];
+      s += `<circle cx="${x(last.m)}" cy="${y(last[key])}" r="4" fill="var(${color})"/><text x="${x(last.m) + 8}" y="${y(last[key]) + 4 - idx * 14}" style="fill:var(${color})">${name}</text>`;
+      const best = D.ms.reduce((a, b) => (b[key] > a[key] ? b : a));
+      s += `<circle cx="${x(best.m)}" cy="${y(best[key])}" r="4.5" fill="var(--surface)" stroke="var(${color})" stroke-width="2"/><text x="${x(best.m) + (idx ? 12 : -12)}" y="${y(best[key]) - 9}" text-anchor="middle" style="fill:var(${color})">${best[key]}</text>`;
+    });
+    document.getElementById("progressChart").innerHTML = s + "</svg>";
+    document.getElementById("progressCaption").textContent = "Y-Achse: " + m.label + ". Offener Kreis = bester Meilenstein.";
+  }
+  document.querySelectorAll("[data-metric]").forEach((b) => b.addEventListener("click", () => {
+    metric = b.dataset.metric;
+    document.querySelectorAll("[data-metric]").forEach((o) => o.setAttribute("aria-pressed", String(o === b)));
+    drawChart();
+  }));
+
+  // ---------------------------------------------------------------- where attempts end
+  const ec = document.getElementById("endsCanvas"), ms = document.getElementById("msSlider");
+  ms.max = D.ms.length - 1;
+  function drawEnds() {
+    const d = D.ms[+ms.value];
+    document.getElementById("msLabel").textContent = `${d.m.toLocaleString("de-DE")} Mio. Schritte · ${d.ex} von 32 gewonnen`;
+    const ctx = ec.getContext("2d"); ctx.clearRect(0, 0, ec.width, ec.height);
+    const top = 50, { t } = drawLevel(ctx, ec.width, ec.height, top);
+    ctx.font = `600 26px ${css("--mono")}`; ctx.textAlign = "center";
+    for (const [a, b, key, name] of SECTIONS) {
+      const n = d.ends[key] || 0;
+      ctx.fillStyle = css("--red"); ctx.globalAlpha = Math.min(0.55, n / 32 * 1.6); ctx.fillRect(a * t, top, (b - a) * t, ec.height - top); ctx.globalAlpha = 1;
+      ctx.strokeStyle = css("--line"); ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(a * t, 0); ctx.lineTo(a * t, ec.height); ctx.stroke();
+      ctx.fillStyle = n ? css("--red") : css("--muted"); ctx.fillText(`${name}: ${n}`, ((a + b) / 2) * t, 32);
+    }
+    let bars = "";
+    for (const [, , key, name] of SECTIONS) {
+      const n = d.ends[key] || 0;
+      bars += `<span>${name}</span><div class="track"><div class="fill" style="left:0;width:${(n / 32) * 100}%;background:var(--red)"></div></div><span class="mono">${n}</span>`;
+    }
+    bars += `<span><b>im Ziel</b></span><div class="track"><div class="fill" style="left:0;width:${(d.ex / 32) * 100}%;background:var(--green)"></div></div><span class="mono">${d.ex}</span>`;
+    document.getElementById("endsBars").innerHTML = bars;
+  }
+  ms.addEventListener("input", drawEnds);
+
+  // ---------------------------------------------------------------- final table
+  const NAMES = { phase5: "Phase 5 (vorher)", p6_bestval: "Phase 6 · beste Validierung (30 Mio.)", p6_28mio: "Phase 6 · 28 Mio.", p6_ende: "Phase 6 · Ende (31,9 Mio.)" };
+  const tb = document.querySelector("#finalTable tbody");
+  for (const [k, name] of Object.entries(NAMES)) {
+    const r = D.final[k], ts = Object.values(r.test_serie).reduce((a, b) => a + b, 0);
+    const strong = k === "p6_28mio" ? ' style="font-weight:600"' : "";
+    tb.insertAdjacentHTML("beforeend", `<tr${strong}><td>${name}</td><td class="num">${r.validierung_v2}/120</td><td class="num">${r.validierung_v3}/40</td><td class="num">${ts}/192</td><td class="num">${r.pruefung_original.won}/128</td><td class="num">${r.pruefung_entschaerft.won}/128</td></tr>`);
+  }
+
+  function all() { drawMap(); drawChart(); drawEnds(); }
+  all();
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", all);
+  new MutationObserver(all).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+})();
+</script>
