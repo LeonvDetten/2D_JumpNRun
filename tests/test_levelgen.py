@@ -12,6 +12,13 @@ from jumpnrun.core.sim import Status
 def test_generated_levels_are_solvable_for_the_bot(tier):
     for seed in range(3):
         level = generate(tier, seed)
+        if tier >= 12:  # jump catalogue levels are built for the fine control (action repeat 2)
+            from jumpnrun.levelgen.solver import solve_auto
+
+            result = solve_auto(level, 60_000, action_repeat=2, weight=1.2)
+            assert result.solved, f"tier {tier} seed {seed} not solvable"
+            assert replay(level, result.actions, 2).status == Status.WON
+            continue
         result = solve(level, max_expansions=40_000)
         assert result.solved, f"tier {tier} seed {seed} not solvable"
         # the solution is a real action list: replaying it wins

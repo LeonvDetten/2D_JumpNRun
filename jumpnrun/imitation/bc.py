@@ -56,6 +56,25 @@ def build_student(init_model: str, repeat: int, grow: bool = False):
     return model
 
 
+def build_fresh_student(arch: str, repeat: int, separate_vf: bool = True):
+    """A new, untrained network with the overview map (phase 7 run B)."""
+
+    from stable_baselines3 import PPO
+    from stable_baselines3.common.vec_env import DummyVecEnv
+
+    from jumpnrun.rl.curriculum import CurriculumSource
+    from jumpnrun.rl.policy import GridFeatures, ImpalaFeatures
+
+    env = DummyVecEnv([lambda: JumpNRunEnv(CurriculumSource(0, NUM_TIERS - 1), action_repeat=repeat, overview=True)])
+    extractor = ImpalaFeatures if arch == "impala" else GridFeatures
+    model = PPO("MultiInputPolicy", env, n_steps=512, batch_size=1024, n_epochs=4, gamma=0.995, gae_lambda=0.975,
+                vf_coef=0.5, ent_coef=0.003, device="cpu", verbose=0,
+                policy_kwargs=dict(features_extractor_class=extractor, net_arch=dict(pi=[128], vf=[128]),
+                                   share_features_extractor=not separate_vf))
+    model.action_repeat = repeat
+    return model
+
+
 def _obs_tensors(data: Dict[str, np.ndarray], idx: np.ndarray):
     obs = {"grid": torch.as_tensor(data["grid"][idx], dtype=torch.float32),
            "vec": torch.as_tensor(data["vec"][idx], dtype=torch.float32)}
@@ -224,6 +243,9 @@ def value_warmup(model, pool, steps: int, gamma: float, repeat: int, epochs: int
         data["overview"] = np.stack(overviews)
     policy = model.policy
     params = list(policy.mlp_extractor.value_net.parameters()) + list(policy.value_net.parameters())
+    separate = not policy.share_features_extractor
+    if separate:  # an own value network (phase 7): its feature layers learn here too
+        params += list(policy.vf_features_extractor.parameters())
     optimizer = torch.optim.Adam(params, lr=1e-3)
     n = len(data["ret"])
     for epoch in range(epochs):
@@ -231,7 +253,7 @@ def value_warmup(model, pool, steps: int, gamma: float, repeat: int, epochs: int
         losses = []
         for i in range(0, n, 1024):
             idx = order[i:i + 1024]
-            with torch.no_grad():
+            with torch.set_grad_enabled(separate):
                 features = policy.extract_features(_obs_tensors(data, idx), policy.vf_features_extractor)
             value = policy.value_net(policy.mlp_extractor.forward_critic(features)).squeeze(1)
             loss = torch.nn.functional.mse_loss(value, torch.as_tensor(data["ret"][idx]))
@@ -260,6 +282,7 @@ def main() -> None:
     parser.add_argument("--only-overview", action="store_true", help="imitation trains only the new branch")
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--val-per-tier", type=int, default=8)
+    parser.add_argument("--arch", choices=("grid", "impala"), help="start from a fresh network of this kind")
     args = parser.parse_args()
 
     torch.set_num_threads(args.threads)
@@ -273,16 +296,17 @@ def main() -> None:
         print(msg, flush=True)
         log_lines.append(msg)
 
-    model = build_student(args.init, args.repeat, grow=args.grow)
+    model = build_fresh_student(args.arch, args.repeat) if args.arch else build_student(args.init, args.repeat,
+                                                                                      grow=args.grow)
     overview = "overview" in model.observation_space.spaces
     start_score = win_rate(model, val)
-    log(f"start ({args.init}): validation win rate {start_score:.1%} on {len(val)} levels")
+    log(f"start ({args.arch or args.init}): validation win rate {start_score:.1%} on {len(val)} levels")
     files = sorted(demo_dir.glob("demos*.jsonl")) + sorted(demo_dir.glob("dagger_*.jsonl"))
     cache = demo_dir / ("dataset_ov.npz" if overview else "dataset.npz")
     data = cached_dataset(files, cache, max_samples=args.max_samples, overview=overview, shuffle=overview)
     log(f"imitation data: {len(data['action']):,} samples from {len(files)} files")
     best = train_bc(model, data, epochs=args.epochs, lr=args.lr, val_levels=val, log=log,
-                    only_overview=args.only_overview, start_score=start_score)
+                    only_overview=args.only_overview, start_score=None if args.arch else start_score)
     log(f"after imitation: validation win rate {best:.1%}")
 
     for round_ in range(args.dagger_rounds):
@@ -303,8 +327,8 @@ def main() -> None:
     model.save(args.out)
     from jumpnrun.rl.modelinfo import write_model_config
 
-    write_model_config(args.out, action_repeat=args.repeat, source="behaviour cloning", init=args.init,
-                       overview=overview)
+    write_model_config(args.out, action_repeat=args.repeat, source="behaviour cloning",
+                       init=args.arch or args.init, overview=overview)
     Path(args.out).with_suffix(".log").write_text("\n".join(log_lines) + "\n")
     log(f"saved {args.out}")
 

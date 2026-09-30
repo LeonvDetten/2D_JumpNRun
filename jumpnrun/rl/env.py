@@ -30,6 +30,7 @@ progress (truncated).
 from __future__ import annotations
 
 import random
+from collections import deque
 from typing import Callable, Optional
 
 import gymnasium as gym
@@ -39,6 +40,8 @@ from jumpnrun.core.actions import ACTION_REPEAT, BOT_ACTIONS
 from jumpnrun.core.constants import MAX_FALL_SPEED, ROWS, SHOOT_COOLDOWN, TILE
 from jumpnrun.core.level import Level
 from jumpnrun.core.sim import Simulation, Status
+
+REWIND_TIER = -3  # same value as jumpnrun.rl.curriculum.REWIND_TIER
 
 VIEW_BEHIND = 5
 VIEW_AHEAD = 19
@@ -79,6 +82,9 @@ class JumpNRunEnv(gym.Env):
         max_frames_per_tile: float = 12.0,
         action_repeat: int = ACTION_REPEAT,
         overview: bool = False,
+        rewind_prob: float = 0.0,
+        rewind_every: int = 20,
+        rewind_budget: int = 2,
     ):
         super().__init__()
         self.level_source = level_source
@@ -98,6 +104,14 @@ class JumpNRunEnv(gym.Env):
         self.sim: Optional[Simulation] = None
         self.tier = -1
         self.actions_taken: list = []
+        # rewind starts: after a failure, sometimes restart shortly before it (practise the weak spot)
+        self.rewind_prob = float(rewind_prob)
+        self.rewind_every = int(rewind_every)
+        self.rewind_budget = int(rewind_budget)
+        self._snapshots: deque = deque(maxlen=8)
+        self._pending = None  # (simulation snapshot, origin tier, depth)
+        self.origin_tier = -1
+        self.rewind_depth = 0
 
     # ---------------------------------------------------------------- gym api
     def reset(self, *, seed: Optional[int] = None, options: Optional[dict] = None):
@@ -105,11 +119,22 @@ class JumpNRunEnv(gym.Env):
         if seed is not None:
             self.rng = random.Random(seed)
         prefix = None
+        self._snapshots.clear()
+        pending, self._pending = self._pending, None
+        if pending is not None and not options and self.rng.random() < self.rewind_prob:
+            snapshot, self.origin_tier, self.rewind_depth = pending
+            self.tier = REWIND_TIER
+            self.sim = snapshot.clone()
+            self.start_col = self.sim.player.x // TILE
+            self._begin_episode(self.level)
+            return self._observe(), {}
+        self.rewind_depth = 0
         if options and "level" in options:
             level, self.tier = options["level"], options.get("tier", -1)
         else:
             level, self.tier, *rest = self.level_source(self.rng)
             prefix = rest[0] if rest else None
+        self.origin_tier = self.tier
         self._set_level(level)
         self.sim = Simulation(level)
         self.start_col = 0
@@ -120,11 +145,16 @@ class JumpNRunEnv(gym.Env):
             if self.sim.status != Status.RUNNING:  # should not happen (won demos), fall back to the start
                 self.sim = Simulation(level)
             self.start_col = self.sim.player.x // TILE
+        self._begin_episode(level)
+        return self._observe(), {}
+
+    def _begin_episode(self, level: Level) -> None:
         self.steps = 0
         self.steps_since_progress = 0
         self.max_steps = int(level.cols * self.max_steps_per_tile) + 200 // self.action_repeat
         self.actions_taken = []
-        return self._observe(), {}
+        if self.rewind_prob and self.sim.player.on_ground:
+            self._snapshots.append(self.sim.clone())
 
     def step(self, action: int):
         before = self.sim.max_x
@@ -155,6 +185,14 @@ class JumpNRunEnv(gym.Env):
             self.steps_since_progress >= self.no_progress_steps or self.steps >= self.max_steps
         )
 
+        if self.rewind_prob:
+            if status == Status.RUNNING and self.steps % self.rewind_every == 0 and sim.player.on_ground:
+                self._snapshots.append(sim.clone())
+            if (terminated or truncated) and status != Status.WON and self._snapshots \
+                    and self.rewind_depth < self.rewind_budget:
+                back = min(len(self._snapshots), self.rng.randint(2, 4))
+                self._pending = (self._snapshots[-back], self.origin_tier, self.rewind_depth + 1)
+
         info = {}
         if terminated or truncated:
             info["episode_end"] = {
@@ -167,6 +205,8 @@ class JumpNRunEnv(gym.Env):
                 "kills": sim.kills_stomp + sim.kills_shot,
                 "blocks": sorted(getattr(sim.level, "building_blocks", {})),
                 "start_col": self.start_col,
+                "origin_tier": self.origin_tier,
+                "rewind_depth": self.rewind_depth,
             }
         return self._observe(), float(reward), terminated, truncated, info
 

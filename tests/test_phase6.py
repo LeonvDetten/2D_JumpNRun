@@ -71,7 +71,7 @@ def test_network_surgery_keeps_phase5_behaviour():
 
 
 def test_generator_v3_long_tiers_solvable_with_waypoints():
-    assert NUM_TIERS == 12
+    assert NUM_TIERS >= 12
     for tier in (10, 11):
         level = generate(tier, 0)
         assert level.cols >= 200 and level.waypoints

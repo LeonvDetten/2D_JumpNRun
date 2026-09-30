@@ -73,3 +73,54 @@ class GridFeatures(BaseFeaturesExtractor):
         pre = self.head[0](torch.cat([grid, vec], dim=1))
         pre = pre + self.ov_head(self.ov_mlp(self.ov_cnn(observations["overview"])))
         return torch.relu(pre)
+
+
+class _Residual(nn.Module):
+    def __init__(self, channels: int):
+        super().__init__()
+        self.conv1 = nn.Conv2d(channels, channels, 3, padding=1)
+        self.conv2 = nn.Conv2d(channels, channels, 3, padding=1)
+
+    def forward(self, x):
+        return x + self.conv2(torch.relu(self.conv1(torch.relu(x))))
+
+
+def _impala_stack(in_channels: int, channels) -> nn.Sequential:
+    layers, c = [], in_channels
+    for out in channels:
+        layers += [nn.Conv2d(c, out, 3, padding=1), nn.MaxPool2d(3, stride=2, padding=1), _Residual(out), _Residual(out)]
+        c = out
+    return nn.Sequential(*layers, nn.ReLU(), nn.Flatten())
+
+
+class ImpalaFeatures(BaseFeaturesExtractor):
+    """Phase 7 network: IMPALA-style residual CNN (Espeholt et al. 2018) for near view and overview.
+
+    Deeper than GridFeatures (2 residual blocks per stage) but cheaper to train on a CPU thanks to
+    the max-pooling after each stage.
+    """
+
+    def __init__(self, observation_space: gym.spaces.Dict, features_dim: int = 256,
+                 channels=(16, 32, 32), overview_channels=(16, 32)):
+        super().__init__(observation_space, features_dim)
+        grid = observation_space["grid"].shape
+        self.cnn = _impala_stack(grid[0], channels)
+        with torch.no_grad():
+            cnn_out = self.cnn(torch.zeros(1, *grid)).shape[1]
+        self.vec_mlp = nn.Sequential(nn.Linear(observation_space["vec"].shape[0], 64), nn.ReLU())
+        total = cnn_out + 64
+        self.has_overview = "overview" in observation_space.spaces
+        if self.has_overview:
+            ov = observation_space["overview"].shape
+            self.ov_cnn = _impala_stack(ov[0], overview_channels)
+            with torch.no_grad():
+                ov_out = self.ov_cnn(torch.zeros(1, *ov)).shape[1]
+            self.ov_mlp = nn.Sequential(nn.Linear(ov_out, 128), nn.ReLU())
+            total += 128
+        self.head = nn.Sequential(nn.Linear(total, features_dim), nn.ReLU())
+
+    def forward(self, observations):
+        parts = [self.cnn(observations["grid"]), self.vec_mlp(observations["vec"])]
+        if self.has_overview:
+            parts.append(self.ov_mlp(self.ov_cnn(observations["overview"])))
+        return self.head(torch.cat(parts, dim=1))

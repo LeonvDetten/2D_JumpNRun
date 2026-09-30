@@ -13,7 +13,7 @@ from stable_baselines3.common.callbacks import BaseCallback
 
 from jumpnrun.core.level import Level
 from jumpnrun.levelgen.generator import NUM_TIERS
-from jumpnrun.rl.curriculum import MID_START_TIER, CurriculumTracker
+from jumpnrun.rl.curriculum import MID_START_TIER, REWIND_TIER, CurriculumTracker
 
 
 class TrainingMonitor(BaseCallback):
@@ -33,6 +33,7 @@ class TrainingMonitor(BaseCallback):
         self.run_dir = run_dir
         self.recent: deque = deque(maxlen=200)
         self.mid_starts: deque = deque(maxlen=200)  # episodes started in the middle of a level
+        self.rewinds: deque = deque(maxlen=200)  # episodes restarted shortly before a failure
         self.start_time = time.time()
         self.history_path = run_dir / "episodes.jsonl"
         self._history = None
@@ -47,7 +48,12 @@ class TrainingMonitor(BaseCallback):
             if end is None:
                 continue
             self.tracker.record(end["tier"], end["won"])
-            (self.mid_starts if end["tier"] == MID_START_TIER else self.recent).append(end)
+            if end["tier"] == MID_START_TIER:
+                self.mid_starts.append(end)
+            elif end["tier"] == REWIND_TIER:
+                self.rewinds.append(end)
+            else:
+                self.recent.append(end)
             end = dict(end, timesteps=self.num_timesteps)
             self._history.write(json.dumps(end) + "\n")
         return True
@@ -66,6 +72,8 @@ class TrainingMonitor(BaseCallback):
         if self.mid_starts:
             self.logger.record("episoden/start_mitte_erfolg",
                                float(np.mean([e["won"] for e in self.mid_starts])))
+        if self.rewinds:
+            self.logger.record("episoden/rueckspul_erfolg", float(np.mean([e["won"] for e in self.rewinds])))
         self.logger.record("curriculum/stufe", self.tracker.unlocked)
         for tier in range(self.tracker.min_tier, self.tracker.unlocked + 1):
             self.logger.record(f"curriculum/erfolg_stufe_{tier}", self.tracker.success[tier])
@@ -172,3 +180,67 @@ class TimeLimit(BaseCallback):
             (self.path.parent / "STOP").write_text(f"time limit of {self.limit / 3600:.0f} h reached\n")
             return False
         return True
+
+
+class EmaWeights(BaseCallback):
+    """Keeps an exponential moving average of the policy weights and saves it next to the checkpoints.
+
+    PPO's policy drifts a little with every update; on long levels that shows as big swings between
+    milestones. The average of the recent weights is often steadier. Saved as ema_step_*.zip every
+    `every` steps (same format as normal checkpoints, so every tool can load it).
+    """
+
+    def __init__(self, run_dir: Path, every: int = 1_000_000, decay: float = 0.99):
+        super().__init__()
+        self.dir = run_dir / "checkpoints"
+        self.path = run_dir / "ema_weights.pt"
+        self.every = every
+        self.decay = decay
+        self.ema = None
+        self._next = 0
+
+    def _on_training_start(self) -> None:
+        import torch
+
+        params = self.model.policy.state_dict()
+        if self.path.exists():
+            saved = torch.load(self.path, map_location="cpu")
+            if saved.keys() == params.keys():
+                self.ema = saved
+        if self.ema is None:
+            self.ema = {k: v.detach().clone().float() for k, v in params.items()}
+        self._next = (self.num_timesteps // self.every + 1) * self.every
+
+    def _on_rollout_start(self) -> None:  # called after every PPO update
+        import torch
+
+        if self.ema is None:
+            return
+        with torch.no_grad():
+            for k, v in self.model.policy.state_dict().items():
+                if v.dtype.is_floating_point:
+                    self.ema[k].mul_(self.decay).add_(v.float(), alpha=1 - self.decay)
+                else:
+                    self.ema[k].copy_(v)
+
+    def _on_step(self) -> bool:
+        if self.num_timesteps >= self._next:
+            self._next += self.every
+            self.save()
+        return True
+
+    def save(self) -> None:
+        import torch
+
+        policy = self.model.policy
+        current = {k: v.detach().clone() for k, v in policy.state_dict().items()}
+        policy.load_state_dict(self.ema)
+        self.model.save(str(self.dir / f"ema_step_{self.num_timesteps:010d}.zip"))
+        policy.load_state_dict(current)
+        torch.save(self.ema, self.path)
+
+    def _on_training_end(self) -> None:
+        import torch
+
+        if self.ema is not None:
+            torch.save(self.ema, self.path)

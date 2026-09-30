@@ -33,26 +33,41 @@ from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv, VecMoni
 from jumpnrun.core.actions import DEFAULT_REPEAT
 from jumpnrun.core.level import Level
 from jumpnrun.levelgen.generator import NUM_TIERS
-from jumpnrun.rl.callbacks import CheckpointSaver, Evaluator, TimeLimit, TrainingMonitor
+from jumpnrun.rl.callbacks import CheckpointSaver, EmaWeights, Evaluator, TimeLimit, TrainingMonitor
 from jumpnrun.rl.curriculum import CurriculumSource, CurriculumTracker
 from jumpnrun.rl.env import JumpNRunEnv
 from jumpnrun.rl.evaluate import eval_level_set
-from jumpnrun.rl.policy import GridFeatures
+from jumpnrun.rl.policy import GridFeatures, ImpalaFeatures
 
 
 def make_env(rank: int, seed: int, min_tier: int, max_tier: int, handmade_paths, handmade_prob: float,
-             action_repeat: int, pool_dir=None, overview: bool = False, start_prob: float = 0.0, start_dirs=()):
+             action_repeat: int, pool_dir=None, overview: bool = False, start_prob: float = 0.0, start_dirs=(),
+             rewind_prob: float = 0.0):
     def _init():
         handmade = [Level.from_file(p) for p in handmade_paths]
         source = CurriculumSource(min_tier, max_tier, handmade, handmade_prob, pool_dir=pool_dir,
                                   start_prob=start_prob, start_dirs=start_dirs)
-        return JumpNRunEnv(source, seed=seed * 1000 + rank, action_repeat=action_repeat, overview=overview)
+        return JumpNRunEnv(source, seed=seed * 1000 + rank, action_repeat=action_repeat, overview=overview,
+                           rewind_prob=rewind_prob)
 
     return _init
 
 
-def linear_schedule(start: float, end_fraction: float = 0.1):
-    return lambda progress_remaining: start * (end_fraction + (1 - end_fraction) * progress_remaining)
+def linear_schedule(start: float, end_fraction: float = 0.1, target: int = 0, phase_start: int = 0):
+    """Linear decay from `start` to `end_fraction * start`.
+
+    SB3 passes progress_remaining = 1 - num_timesteps / target (absolute step counts, also after a
+    resume). With target/phase_start the decay runs over this phase only, so a model that already
+    has 28M steps from an earlier phase starts again at the full learning rate.
+    """
+
+    def schedule(progress_remaining: float) -> float:
+        if target and target > phase_start:
+            done = (1.0 - progress_remaining) * target
+            progress_remaining = 1.0 - min(1.0, max(0.0, (done - phase_start) / (target - phase_start)))
+        return start * (end_fraction + (1 - end_fraction) * progress_remaining)
+
+    return schedule
 
 
 def main() -> None:
@@ -100,6 +115,11 @@ def main() -> None:
                         help="delete older checkpoints except multiples of this step count (0 = keep all)")
     parser.add_argument("--time-limit-hours", type=float, default=0,
                         help="stop after this much training time, summed over restarts (0 = no limit)")
+    parser.add_argument("--rewind-prob", type=float, default=0.0,
+                        help="after a failure, restart shortly before it with this probability (phase 7)")
+    parser.add_argument("--arch", choices=("grid", "impala"), default="grid", help="network for a new model")
+    parser.add_argument("--separate-vf", action="store_true", help="separate feature networks for policy and value")
+    parser.add_argument("--ema-every", type=int, default=0, help="save an EMA copy of the weights every N steps")
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--watch", action="store_true", help="open the live ghost view next to training")
     parser.add_argument("--watch-level", help="level for --watch (default: a generated one)")
@@ -112,7 +132,8 @@ def main() -> None:
     handmade_paths = sorted(p for pattern in args.handmade for p in glob.glob(pattern))
     env_fns = [
         make_env(i, args.seed, args.min_tier, args.max_tier, handmade_paths, args.handmade_prob,
-                 args.action_repeat, args.pool, args.overview, args.start_prob, tuple(args.start_dirs))
+                 args.action_repeat, args.pool, args.overview, args.start_prob, tuple(args.start_dirs),
+                 args.rewind_prob)
         for i in range(args.envs)
     ]
     # the game is so fast that the network update dominates; one process is usually best
@@ -122,8 +143,8 @@ def main() -> None:
     tracker = CurriculumTracker(args.min_tier, args.max_tier)
     if args.unlock_all:
         tracker.unlocked = args.max_tier
-    (run_dir / "config.json").write_text(json.dumps({"action_repeat": args.action_repeat, "overview": args.overview},
-                                                   indent=2) + "\n")
+    config_path = run_dir / "config.json"
+    old_config = json.loads(config_path.read_text()) if config_path.exists() else {}
     if args.target:
         checkpoints = sorted((run_dir / "checkpoints").glob("step_*.zip"))
         if checkpoints:
@@ -139,10 +160,16 @@ def main() -> None:
         else:
             done = int(PPO.load(args.resume, device="cpu").num_timesteps) if args.resume else 0
         args.steps = args.target - done
+        # the step count at which this run (phase) began, kept across restarts for the LR schedule
+        phase_start = old_config.get("phase_start", done)
         if args.steps <= 0:
             print(f"Target {args.target:,} already reached ({done:,}).")
             return
         print(f"Auto-resume: {done:,} steps done, {args.steps:,} to go (from {args.resume or 'scratch'})")
+    else:
+        phase_start = 0
+    config_path.write_text(json.dumps({"action_repeat": args.action_repeat, "overview": args.overview,
+                                       "arch": args.arch, "phase_start": phase_start}, indent=2) + "\n")
     eval_levels = eval_level_set(range(args.min_tier, args.max_tier + 1), args.eval_per_tier)
     # hand-made training levels are "practice grades"; --test-levels are never trained on
     eval_levels += [("training_handgebaut", Level.from_file(p)) for p in handmade_paths]
@@ -157,7 +184,7 @@ def main() -> None:
         algo = PPOWithDemos
         extra = dict(demo_path=args.demos, bc_coef=args.bc_coef, bc_decay=args.bc_decay, bc_min=args.bc_min)
     hyper = dict(
-        learning_rate=linear_schedule(args.lr),
+        learning_rate=linear_schedule(args.lr, target=args.target, phase_start=phase_start),
         n_steps=args.n_steps,
         batch_size=args.batch,
         gamma=args.gamma,
@@ -177,7 +204,8 @@ def main() -> None:
             vf_coef=0.5,
             **hyper,
             **extra,
-            policy_kwargs=dict(features_extractor_class=GridFeatures, net_arch=dict(pi=[128], vf=[128])),
+            policy_kwargs=dict(features_extractor_class=ImpalaFeatures if args.arch == "impala" else GridFeatures,
+                               net_arch=dict(pi=[128], vf=[128]), share_features_extractor=not args.separate_vf),
             tensorboard_log=str(run_dir / "tb"),
             seed=args.seed,
             device="cpu",
@@ -201,6 +229,8 @@ def main() -> None:
     ]
     if args.time_limit_hours:
         callbacks.append(TimeLimit(run_dir, args.time_limit_hours))
+    if args.ema_every:
+        callbacks.append(EmaWeights(run_dir, args.ema_every))
     print(f"Training {args.steps:,} steps, tiers {args.min_tier}-{args.max_tier}, "
           f"{args.envs} envs, {len(handmade_paths)} hand-made levels -> {run_dir}")
     try:
