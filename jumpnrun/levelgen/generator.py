@@ -35,7 +35,7 @@ from typing import List
 from jumpnrun.core.constants import ROWS
 from jumpnrun.core.level import Level
 
-GENERATOR_VERSION = 3
+GENERATOR_VERSION = 4
 GROUND = ROWS - 1  # surface row of the lowest possible ground
 HIGHEST_SURFACE = 5  # never build terrain higher than this row (headroom for jumps)
 
@@ -63,6 +63,8 @@ class TierConfig:
     rain_stairs: float = 0.0  # floating stairs up, enemies dropping from above (v3)
     chains: float = 0.0  # long chains of stepping stones with height changes (v3)
     trenches: float = 0.0  # enemies trapped in a trench on a high floating plateau (v3)
+    jumps: float = 0.0  # sequences of single jumps drawn evenly from the jump catalogue (v4)
+    start_enemies: bool = False  # enemies near the start, walking or dropping (v4)
 
 
 TIERS = (
@@ -95,6 +97,11 @@ TIERS = (
                platform_enemies=True, free_enemies=0.45, climbs=1.5, enemy_groups=True,
                rain=0.6, high_roads=2.0, stones=1.2, tunnels=1.0, ceilings=1.0, shafts=1.0,
                two_routes=1.0, hard=3, rain_stairs=1.5, chains=2.0, trenches=1.3),        # 11 long journey
+    TierConfig(length=250, max_gap=3, steps=True, max_drop=4, valleys=1.5, platforms=1.0,
+               platform_enemies=True, free_enemies=0.4, climbs=1.0, enemy_groups=True,
+               rain=0.5, high_roads=1.0, stones=0.5, tunnels=1.0, ceilings=1.0, shafts=0.8,
+               two_routes=0.8, hard=3, rain_stairs=1.0, chains=1.0, trenches=1.0,
+               jumps=4.0, start_enemies=True),                                           # 12 jump catalogue
 )
 NUM_TIERS = len(TIERS)
 
@@ -164,6 +171,7 @@ def _style(rng: random.Random, cfg: TierConfig) -> dict:
         "rain_stairs": cfg.rain_stairs,
         "chain": cfg.chains,
         "trench": cfg.trenches,
+        "jump_seq": cfg.jumps,
     }
     return {kind: w * (0.3 + rng.gammavariate(1.0, 1.0)) for kind, w in base.items() if w > 0}
 
@@ -250,6 +258,9 @@ def _segment(b: _Builder, cfg: TierConfig) -> None:
 
     elif kind == "trench":
         _trench(b, cfg)
+
+    elif kind == "jump_seq":
+        _jump_sequence(b, cfg)
 
     elif kind == "stones":
         # single blocks over a pit, 3 tiles apart at the same height (the exam's hardest jumps)
@@ -567,6 +578,57 @@ def _trench(b: _Builder, cfg: TierConfig) -> None:
     b.waypoints.append((len(b.columns) - 1, b.surface))
 
 
+_CATALOG = None
+_TIGHT = {(4, 0), (5, 2)}  # borderline jumps; the solver cannot build them into chains reliably
+
+
+def _jump_catalog() -> list:
+    global _CATALOG
+    if _CATALOG is None:
+        from jumpnrun.levelgen.jump_catalog import load_catalog
+
+        _CATALOG = load_catalog()
+    return _CATALOG
+
+
+def _jump_sequence(b: _Builder, cfg: TierConfig) -> None:
+    """4-10 single jumps between floating platforms, each drawn evenly from the jump catalogue.
+
+    The height drifts up and down; the next takeoff platform is the previous landing platform.
+    """
+
+    rng = b.rng
+    row, width = b.surface, 3
+    b.flat(2)
+    for _ in range(rng.randint(4, 10)):
+        options, weights = [], []
+        for e in _jump_catalog():
+            land = row + e["drop"]
+            if e["takeoff"] > width or not TOP_ROW <= land <= GROUND:
+                continue
+            if (e["gap"], e["drop"]) in _TIGHT:
+                continue  # the widest jump for its height: only works from some sub-tile positions
+            w = 1.0
+            if e["drop"] > 0 and land >= 9:
+                w = 0.3  # do not sink to the bottom too fast
+            options.append(e)
+            weights.append(w)
+        e = rng.choices(options, weights=weights)[0]
+        b.gap(e["gap"])
+        row += e["drop"]
+        width = e["landing"]
+        first = len(b.columns)
+        for _ in range(width):
+            b.column(None, {row: "B"})
+        if cfg.platform_enemies and width == 3 and rng.random() < 0.15:
+            b.columns[first + 1][row - 1] = "E"
+        b.waypoints.append((len(b.columns) - 1, row))
+    b.gap(rng.randint(1, 2))
+    b.surface = max(row, min(GROUND, row + rng.randint(0, 2)))
+    b.flat(rng.randint(2, 4))
+    b.waypoints.append((len(b.columns) - 1, b.surface))
+
+
 def generate(tier: int, seed: int) -> Level:
     """Build a level of the given difficulty tier (0 .. NUM_TIERS-1)."""
 
@@ -576,6 +638,10 @@ def generate(tier: int, seed: int) -> Level:
     b.style = _style(rng, cfg)
     b.flat(5)
     b.columns[1][b.surface - 1] = "P"
+    if cfg.start_enemies and rng.random() < 0.4:
+        # an enemy right at the start: walking towards the player, or dropping from the sky
+        b.flat(3)
+        b.columns[-1][rng.choice((b.surface - 1, 0, 1))] = "E"
     while len(b.columns) < cfg.length:
         _segment(b, cfg)
         top = b.columns[-1]
