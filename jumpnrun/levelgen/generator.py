@@ -525,8 +525,14 @@ def _chain(b: _Builder, cfg: TierConfig) -> None:
         row = new_row
         _floating(b, row, width)
     b.waypoints.append((len(b.columns) - 1, row))
-    b.gap(rng.randint(1, 2))
-    b.surface = max(row, min(GROUND, row + rng.randint(0, 2)))
+    if row <= 6 and rng.random() < 0.4:
+        # a leap into the depth: wide gap, landing far below (like the end of the exam level)
+        landing = rng.randint(max(row + 5, GROUND - 2), GROUND)
+        b.gap(rng.randint(3, 4) if landing - row >= 7 else 3)
+        b.surface = landing
+    else:
+        b.gap(rng.randint(1, 2))
+        b.surface = max(row, min(GROUND, row + rng.randint(0, 2)))
     b.flat(rng.randint(2, 4))
     b.waypoints.append((len(b.columns) - 1, b.surface))
 
@@ -575,7 +581,10 @@ def generate(tier: int, seed: int) -> Level:
             b.waypoints.append((len(b.columns) - 1, b.surface))
     b.flat(4)
     b.columns[-2][b.surface - 1] = "C"
-    b.column(b.surface - 3)  # wall behind the chest
+    if cfg.hard >= 3 and rng.random() < 0.5:
+        pass  # v3: no wall behind the chest - jumping over it means falling off the level
+    else:
+        b.column(b.surface - 3)  # wall behind the chest
 
     lines = ["".join(col[r] for col in b.columns).rstrip() for r in range(ROWS)]
     level = Level(lines, name=f"gen_t{tier}_s{seed}")
