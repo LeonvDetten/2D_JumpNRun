@@ -65,6 +65,7 @@ class TierConfig:
     trenches: float = 0.0  # enemies trapped in a trench on a high floating plateau (v3)
     jumps: float = 0.0  # sequences of single jumps drawn evenly from the jump catalogue (v4)
     start_enemies: bool = False  # enemies near the start, walking or dropping (v4)
+    hard_jumps: float = 1.0  # weight of the widest robust jump per height change in jump sequences
 
 
 TIERS = (
@@ -582,6 +583,16 @@ _CATALOG = None
 _TIGHT = {(4, 0), (5, 2)}  # borderline jumps; the solver cannot build them into chains reliably
 
 
+def _widest_gaps() -> dict:
+    """Widest robust gap per height change (the hardest jump of each height)."""
+
+    widest = {}
+    for e in _jump_catalog():
+        if (e["gap"], e["drop"]) not in _TIGHT:
+            widest[e["drop"]] = max(widest.get(e["drop"], 0), e["gap"])
+    return widest
+
+
 def _jump_catalog() -> list:
     global _CATALOG
     if _CATALOG is None:
@@ -608,7 +619,7 @@ def _jump_sequence(b: _Builder, cfg: TierConfig) -> None:
                 continue
             if (e["gap"], e["drop"]) in _TIGHT:
                 continue  # the widest jump for its height: only works from some sub-tile positions
-            w = 1.0
+            w = cfg.hard_jumps if e["gap"] == _widest_gaps()[e["drop"]] else 1.0
             if e["drop"] > 0 and land >= 9:
                 w = 0.3  # do not sink to the bottom too fast
             options.append(e)
