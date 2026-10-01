@@ -9,9 +9,15 @@ Prüfungslevel (`levels/exam/level.txt`, wird nie trainiert) sicher schafft.
 
 - Training per idempotentem Skript starten (`scripts/train_phaseN.sh`, mit `--target` und `--time-limit-hours`),
   gepinnt auf Kerne 0–2; Auswertungen laufen auf Kern 3 (`OMP_NUM_THREADS=1 taskset -c 3`).
-- Der Container schläft ein, sobald die Sitzung untätig ist. Darum durchgehend in Beobachtungsrunden
-  (~9,5 min) arbeiten und als Sicherheitsnetz alle 20–30 min einen Check-in per `send_later` planen;
-  jeder Check-in plant den nächsten, bis `runs/<lauf>/STOP` existiert.
+- Der Container wird abgeräumt, sobald die Sitzung untätig ist – auch wenn sie nur auf eine offene
+  Freigabe-Anfrage wartet (dann sterben die Trainingsprozesse). Darum:
+  - durchgehend in Beobachtungsrunden arbeiten (je ~9,5 min Bash, z. B. `bash scripts/phase7.sh`);
+  - in den Runden keine Werkzeuge, die nachfragen können (`send_later`, `create_trigger`,
+    `list_triggers`, `delete_trigger` …);
+  - als Sicherheitsnetz eine stündliche Wächter-Routine pro Phase, einmal zu Beginn angelegt.
+- Kommt der Planmodus nur durch einen Neustart zurück und ist der Plan schon freigegeben: Plan nicht neu
+  aufrollen, einmal ExitPlanMode mit dem Vermerk „unverändert, nur Neustart“, dann weiter.
+
 - Meilenstein-Auswertung: `python -m jumpnrun.rl.milestones --run runs/<lauf>` (Validierung, Test-Serie,
   Prüfung inkl. „wo enden die Versuche“).
 
