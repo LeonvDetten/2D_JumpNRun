@@ -35,7 +35,7 @@ from typing import List
 from jumpnrun.core.constants import ROWS
 from jumpnrun.core.level import Level
 
-GENERATOR_VERSION = 5  # 5: tier 12 more free enemies + widest jumps x3 (phase 7 plateau step 1)
+GENERATOR_VERSION = 6  # 5: tier 12 more free enemies + widest jumps x3; 6: tier 12 chest on the edge
 GROUND = ROWS - 1  # surface row of the lowest possible ground
 HIGHEST_SURFACE = 5  # never build terrain higher than this row (headroom for jumps)
 
@@ -662,7 +662,11 @@ def generate(tier: int, seed: int) -> Level:
     b.flat(4)
     b.columns[-2][b.surface - 1] = "C"
     if cfg.hard >= 3 and rng.random() < 0.5:
-        pass  # v3: no wall behind the chest - jumping over it means falling off the level
+        # v3: no wall behind the chest - jumping over it means falling off the level
+        if cfg.jumps and rng.random() < 0.5:
+            # v6: chest on the very last floor tile, the void right behind it (as in the exam)
+            b.columns[-2][b.surface - 1] = " "
+            b.columns[-1][b.surface - 1] = "C"
     else:
         b.column(b.surface - 3)  # wall behind the chest
 
