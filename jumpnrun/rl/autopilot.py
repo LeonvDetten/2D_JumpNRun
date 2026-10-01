@@ -21,6 +21,7 @@ State lives in runs/phase7/state.json. Order of work:
 from __future__ import annotations
 
 import json
+import shutil
 import os
 import signal
 import subprocess
@@ -86,13 +87,23 @@ def bc_start_model(state: dict) -> bool:
     if running("jumpnrun.imitation.bc --demos runs/demos4"):
         return False
     log = ROOT / "runs/bc7.log"
-    lr = "1e-3" if state["bc_attempts"] == 0 else "3e-4"
     if state["bc_attempts"] >= 2:
-        return True  # handled in check_bc: B starts without imitation
+        first = ROOT / "models/phase7b_bc_first.zip"
+        if first.exists():  # second attempt was killed (container restart): keep the first model
+            note(state, "Zweiter Nachahm-Versuch abgebrochen (Container-Neustart): B startet vom ersten BC-Modell")
+            for suffix in (".zip", ".json"):
+                shutil.copy(first.with_suffix(suffix), target.with_suffix(suffix))
+            return True
+        state["b_fresh"] = True
+        return True
     state["bc_attempts"] += 1
-    note(state, f"Starte Nachahmen für Lauf B (Versuch {state['bc_attempts']}, Lernrate {lr})")
-    spawn([sys.executable, "-m", "jumpnrun.imitation.bc", "--demos", "runs/demos4", "--arch", "impala",
-           "--dagger-rounds", "0", "--epochs", "3", "--lr", lr, "--max-samples", "700000", "--value-steps", "300000",
+    if state["bc_attempts"] == 1:
+        start = ["--arch", "impala", "--lr", "1e-3"]
+    else:  # second attempt: continue the first model (its curve was still rising) with a smaller rate
+        start = ["--init", "models/phase7b_bc_first.zip", "--lr", "5e-4"]
+    note(state, f"Starte Nachahmen für Lauf B (Versuch {state['bc_attempts']}: {' '.join(start)})")
+    spawn([sys.executable, "-m", "jumpnrun.imitation.bc", "--demos", "runs/demos4", *start,
+           "--dagger-rounds", "0", "--epochs", "3", "--max-samples", "700000", "--value-steps", "300000",
            "--threads", "4", "--out", "models/phase7b_bc_try.zip"], log)
     return False
 
@@ -108,16 +119,15 @@ def check_bc(state: dict) -> None:
              if l.startswith("after imitation")]
     rate = rates[-1] if rates else 0.0
     if rate >= 40.0 or state["bc_attempts"] >= 2:
-        if rate >= 40.0:
-            note(state, f"Nachahmen für B angenommen: {rate:.1f} % Validierung")
-            for suffix in (".zip", ".json"):
-                os.replace(trial.with_suffix(suffix), START_MODELS["B"].with_suffix(suffix))
-        else:
-            note(state, f"Nachahmen für B zweimal zu schwach ({rate:.1f} %): B startet ohne Vorbild-Start")
-            state["b_fresh"] = True
+        # after the second attempt the better imitation model is used either way (better than none)
+        note(state, f"Nachahmen für B angenommen: {rate:.1f} % Validierung (Versuch {state['bc_attempts']})")
+        for suffix in (".zip", ".json"):
+            os.replace(trial.with_suffix(suffix), START_MODELS["B"].with_suffix(suffix))
     else:
-        note(state, f"Nachahmen für B zu schwach ({rate:.1f} %), zweiter Versuch mit kleinerer Lernrate")
-        trial.unlink()
+        note(state, f"Nachahmen für B noch zu schwach ({rate:.1f} %), zweiter Versuch: weitertrainieren")
+        for suffix in (".zip", ".json"):
+            os.replace(trial.with_suffix(suffix), (ROOT / "models/phase7b_bc_first").with_suffix(suffix))
+        os.replace(ROOT / "runs/bc7.log", ROOT / "runs/bc7_first.log")
 
 
 def train_cmd(name: str, state: dict) -> list:
