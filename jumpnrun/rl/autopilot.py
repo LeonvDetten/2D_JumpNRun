@@ -58,7 +58,9 @@ def note(state: dict, text: str) -> None:
 
 def running(pattern: str) -> int | None:
     out = subprocess.run(["pgrep", "-f", pattern], capture_output=True, text=True).stdout.split()
-    return int(out[0]) if out else None
+    own = {os.getpid(), os.getppid()}
+    pids = [int(p) for p in out if int(p) not in own]
+    return pids[0] if pids else None
 
 
 def spawn(cmd: list, log: Path, cores=None) -> None:

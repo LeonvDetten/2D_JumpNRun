@@ -70,7 +70,10 @@ def build_fresh_student(arch: str, repeat: int, separate_vf: bool = True):
     model = PPO("MultiInputPolicy", env, n_steps=512, batch_size=1024, n_epochs=4, gamma=0.995, gae_lambda=0.975,
                 vf_coef=0.5, ent_coef=0.003, device="cpu", verbose=0,
                 policy_kwargs=dict(features_extractor_class=extractor, net_arch=dict(pi=[128], vf=[128]),
-                                   share_features_extractor=not separate_vf))
+                                   share_features_extractor=not separate_vf,
+                                   # SB3's default Tanh heads saturate on fresh features (orthogonal init):
+                                   # the network then sticks to one constant action. ReLU learns normally.
+                                   activation_fn=torch.nn.ReLU))
     model.action_repeat = repeat
     return model
 
@@ -208,6 +211,8 @@ def dagger_round(model, pool: Dict[int, List[int]], n_levels: int, repeat: int, 
 def value_warmup(model, pool, steps: int, gamma: float, repeat: int, epochs: int = 3, log=print) -> None:
     """Fit only the value head on discounted returns of the student's own play."""
 
+    from stable_baselines3.common.policies import BaseModel
+
     from jumpnrun.rl.curriculum import CurriculumSource
 
     source = CurriculumSource(0, NUM_TIERS - 1)
@@ -254,7 +259,9 @@ def value_warmup(model, pool, steps: int, gamma: float, repeat: int, epochs: int
         for i in range(0, n, 1024):
             idx = order[i:i + 1024]
             with torch.set_grad_enabled(separate):
-                features = policy.extract_features(_obs_tensors(data, idx), policy.vf_features_extractor)
+                # BaseModel.extract_features: one extractor only (the actor-critic version returns a tuple
+                # when policy and value have separate networks)
+                features = BaseModel.extract_features(policy, _obs_tensors(data, idx), policy.vf_features_extractor)
             value = policy.value_net(policy.mlp_extractor.forward_critic(features)).squeeze(1)
             loss = torch.nn.functional.mse_loss(value, torch.as_tensor(data["ret"][idx]))
             optimizer.zero_grad()
