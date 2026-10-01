@@ -35,7 +35,7 @@ from typing import List
 from jumpnrun.core.constants import ROWS
 from jumpnrun.core.level import Level
 
-GENERATOR_VERSION = 4
+GENERATOR_VERSION = 5  # 5: tier 12 more free enemies + widest jumps x3 (phase 7 plateau step 1)
 GROUND = ROWS - 1  # surface row of the lowest possible ground
 HIGHEST_SURFACE = 5  # never build terrain higher than this row (headroom for jumps)
 
@@ -99,10 +99,11 @@ TIERS = (
                rain=0.6, high_roads=2.0, stones=1.2, tunnels=1.0, ceilings=1.0, shafts=1.0,
                two_routes=1.0, hard=3, rain_stairs=1.5, chains=2.0, trenches=1.3),        # 11 long journey
     TierConfig(length=250, max_gap=3, steps=True, max_drop=4, valleys=1.5, platforms=1.0,
-               platform_enemies=True, free_enemies=0.4, climbs=1.0, enemy_groups=True,
+               platform_enemies=True, free_enemies=0.8, climbs=1.0, enemy_groups=True,
                rain=0.5, high_roads=1.0, stones=0.5, tunnels=1.0, ceilings=1.0, shafts=0.8,
                two_routes=0.8, hard=3, rain_stairs=1.0, chains=1.0, trenches=1.0,
-               jumps=4.0, start_enemies=True),                                           # 12 jump catalogue
+               jumps=4.0, start_enemies=True, hard_jumps=3.0),                           # 12 jump catalogue
+               # phase 7 plateau step 1: free enemies 0.4 -> 0.8, widest jumps x3 (failure catalogue)
 )
 NUM_TIERS = len(TIERS)
 
