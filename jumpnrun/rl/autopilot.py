@@ -32,8 +32,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent.parent
 STATE_DIR = ROOT / "runs/phase7"
 STATE = STATE_DIR / "state.json"
-RUNS = {"A": ROOT / "runs/phase7a", "B": ROOT / "runs/phase7b"}
-START_MODELS = {"A": ROOT / "models/phase6_durchbruch.zip", "B": ROOT / "models/phase7b_start.zip"}
+RUNS = {"A": ROOT / "runs/phase7a", "B": ROOT / "runs/phase7b", "C": ROOT / "runs/phase7c"}
+START_MODELS = {"A": ROOT / "models/phase6_durchbruch.zip", "B": ROOT / "models/phase7b_start.zip",
+                # C (Leon's decision 02.10.): fork of A from its best exam milestone (EMA 34M), generator v7
+                "C": ROOT / "runs/phase7a/checkpoints/ema_step_0034000000.zip"}
+C_HOURS_LIMIT = 23.5  # A had used 24.4 h when C forked off: together at most 48 h
 GOAL_EXAM, GOAL_SERIES = 64 / 128, 144 / 192
 HOURS_LIMIT = 48
 COMPARE_AT = (12, 24)
@@ -144,6 +147,9 @@ def train_cmd(name: str, state: dict) -> list:
     if state["calm"].get(name):  # second plateau: calm fine-tune
         cmd[cmd.index("--lr") + 1] = "3e-5"
         cmd[cmd.index("--ent") + 1] = "0.0"
+    if name == "C":  # calm, but keeps the small entropy bonus
+        cmd[cmd.index("--lr") + 1] = "3e-5"
+        cmd[cmd.index("--time-limit-hours") + 1] = str(C_HOURS_LIMIT)
     if name == "B" and state.get("b_fresh"):
         cmd += ["--arch", "impala", "--separate-vf"]
     else:
