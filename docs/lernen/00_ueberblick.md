@@ -82,3 +82,4 @@ docs/lernen/            dieses Lerntagebuch
 | 3 | Generalist auf zufälligen Leveln, erste Prüfung | [04_phase3_pruefung.md](04_phase3_pruefung.md) |
 | 5 | Vom Löser abschauen, feinere Steuerung | [05_phase5_abschauen.md](05_phase5_abschauen.md) |
 | 6 | Übersichtskarte, lange Level, Startpunkte – **erste Prüfungssiege** | [06_phase6_generalist.md](06_phase6_generalist.md) |
+| 7 | Zwei Netze im Vergleich, EMA, Abzweige – Prüfung 85/128 (Ziel erreicht), Test-Serie 138/192 (Ziel 144 verfehlt), geheime exam2 49/128 – **Ziel insgesamt verfehlt** | [07_phase7_zwei_wege.md](07_phase7_zwei_wege.md) |
