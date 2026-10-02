@@ -3,7 +3,7 @@
 cd "$(dirname "$0")/.."
 python3 -m jumpnrun.rl.autopilot tick
 if [ -f runs/phase7/smoke_ok ] && [ ! -f runs/phase7/DONE ]; then
-    OMP_NUM_THREADS=1 nice -n 5 timeout 560 python3 -m jumpnrun.rl.milestones --run runs/phase7a --run runs/phase7b --run runs/phase7c \
+    OMP_NUM_THREADS=1 nice -n 5 timeout 560 python3 -m jumpnrun.rl.milestones --run runs/phase7a --run runs/phase7b --run runs/phase7c --run runs/phase7d \
         --seconds 520 --exam-attempts 64 --validations v2 v3 v4 --exam2 \
         --stop-exam 0.5625 --stop-series 0.75 --stop-file CANDIDATE 2>&1 | grep -v Warn
     python3 -m jumpnrun.rl.autopilot tick
