@@ -11,6 +11,7 @@ from jumpnrun.core.constants import (
     BULLET_H,
     BULLET_SPEED,
     BULLET_W,
+    ENEMY_ACTIVATION_DIST,
     ENEMY_H,
     ENEMY_SPEED,
     ENEMY_W,
@@ -112,13 +113,14 @@ class Player(Body):
 class Enemy(Body):
     """Walks left/right, turns at walls, walks off ledges (and may fall into pits)."""
 
-    __slots__ = ("direction", "active", "alive")
+    __slots__ = ("direction", "active", "alive", "wake")
 
-    def __init__(self, x: int, y: int):
+    def __init__(self, x: int, y: int, direction: int = 1, wake: int = ENEMY_ACTIVATION_DIST):
         super().__init__(x, y, ENEMY_W, ENEMY_H)
-        self.direction = 1
+        self.direction = direction
         self.active = False
         self.alive = True
+        self.wake = wake  # horizontal distance (px) to the player at which the enemy starts walking
 
     def update(self, level: Level) -> None:
         self.vx = self.direction * ENEMY_SPEED
@@ -129,9 +131,8 @@ class Enemy(Body):
             self.alive = False
 
     def clone(self) -> "Enemy":
-        other = Enemy(self.x, self.y)
+        other = Enemy(self.x, self.y, self.direction, self.wake)
         self._copy_body_into(other)
-        other.direction = self.direction
         other.active = self.active
         other.alive = self.alive
         return other

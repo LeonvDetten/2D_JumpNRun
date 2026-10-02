@@ -33,7 +33,8 @@ def env_kwargs(model) -> dict:
     """JumpNRunEnv arguments that match a loaded model (decision rate, overview map yes/no)."""
 
     return dict(action_repeat=getattr(model, "action_repeat", ACTION_REPEAT),
-                overview="overview" in model.observation_space.spaces)
+                overview="overview" in model.observation_space.spaces,
+                obs_v2=model.observation_space["vec"].shape[0] > 15)
 
 
 def load_model(model_path):
@@ -67,5 +68,41 @@ def grow_overview(old_model_path, env, algo=None, **kwargs):
     for extractor in {model.policy.features_extractor, model.policy.pi_features_extractor,
                       model.policy.vf_features_extractor}:
         extractor.zero_overview_output()
+    model.action_repeat = action_repeat_for(old_model_path)
+    return model
+
+
+def grow_vec(old_model_path, env, algo=None, **kwargs):
+    """Network surgery for phase 8 (--obs-v2): the vector input grows from 15 to 21 values.
+
+    Every weight is copied; the new input columns of the first vector layer start at zero, so at first the
+    new model acts exactly like the old one.
+    """
+
+    import torch
+    from stable_baselines3 import PPO
+
+    old = (algo or PPO).load(str(old_model_path), device="cpu")
+    params = dict(policy_kwargs=old.policy_kwargs, n_steps=old.n_steps, batch_size=old.batch_size,
+                  n_epochs=old.n_epochs, gamma=old.gamma, gae_lambda=old.gae_lambda, vf_coef=old.vf_coef,
+                  ent_coef=old.ent_coef, device="cpu", verbose=0)
+    params.update(kwargs)
+    model = (algo or PPO)("MultiInputPolicy", env, **params)
+    new_state = model.policy.state_dict()
+    old_state = old.policy.state_dict()
+    with torch.no_grad():
+        for key, value in new_state.items():
+            src = old_state[key]
+            if src.shape == value.shape:
+                value.copy_(src)
+            else:
+                assert key.endswith("vec_mlp.0.weight"), key
+                value.zero_()
+                value[:, :src.shape[1]] = src
+    model.policy.load_state_dict(new_state)
+    model.num_timesteps = old.num_timesteps
+    model._num_timesteps_at_start = old.num_timesteps
+    if hasattr(old, "bc_updates"):
+        model.bc_updates = old.bc_updates
     model.action_repeat = action_repeat_for(old_model_path)
     return model

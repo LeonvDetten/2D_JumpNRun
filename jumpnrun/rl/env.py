@@ -48,6 +48,7 @@ VIEW_AHEAD = 19
 VIEW_COLS = VIEW_BEHIND + 1 + VIEW_AHEAD
 GRID_CHANNELS = 4
 VEC_SIZE = 15
+VEC_SIZE_V2 = 21  # phase 8 (--obs-v2): + distance behind the furthest point, no-progress and time budget, enemy fall speeds
 NEAREST_ENEMIES = 3
 OV_BEHIND = 8  # tiles
 OV_COLS = 32
@@ -85,6 +86,8 @@ class JumpNRunEnv(gym.Env):
         rewind_prob: float = 0.0,
         rewind_every: int = 20,
         rewind_budget: int = 2,
+        obs_v2: bool = False,
+        stuck_death: bool = False,
     ):
         super().__init__()
         self.level_source = level_source
@@ -94,9 +97,12 @@ class JumpNRunEnv(gym.Env):
         self.no_progress_steps = NO_PROGRESS_FRAMES // self.action_repeat
         self.action_space = gym.spaces.Discrete(len(BOT_ACTIONS))
         self.overview = bool(overview)
+        self.obs_v2 = bool(obs_v2)
+        # phase 8: getting stuck (no new progress for NO_PROGRESS_FRAMES) ends the episode like a death
+        self.stuck_death = bool(stuck_death)
         spaces = {
             "grid": gym.spaces.Box(-1.0, 1.0, (GRID_CHANNELS, ROWS, VIEW_COLS), np.float32),
-            "vec": gym.spaces.Box(-1.0, 1.0, (VEC_SIZE,), np.float32),
+            "vec": gym.spaces.Box(-1.0, 1.0, (VEC_SIZE_V2 if self.obs_v2 else VEC_SIZE,), np.float32),
         }
         if self.overview:
             spaces["overview"] = gym.spaces.Box(0.0, 1.0, (OV_CHANNELS, ROWS, OV_COLS), np.float32)
@@ -181,9 +187,11 @@ class JumpNRunEnv(gym.Env):
             reward += REWARD_WIN
         elif terminated:
             reward += REWARD_DEATH
-        truncated = not terminated and (
-            self.steps_since_progress >= self.no_progress_steps or self.steps >= self.max_steps
-        )
+        stuck = not terminated and self.steps_since_progress >= self.no_progress_steps
+        if stuck and self.stuck_death:
+            terminated = True
+            reward += REWARD_DEATH
+        truncated = not terminated and (stuck or self.steps >= self.max_steps)
 
         if self.rewind_prob:
             if status == Status.RUNNING and self.steps % self.rewind_every == 0 and sim.player.on_ground:
@@ -195,8 +203,11 @@ class JumpNRunEnv(gym.Env):
 
         info = {}
         if terminated or truncated:
+            feedback = getattr(self.level_source, "feedback", None)
+            if feedback is not None:
+                feedback(sim.level, self.origin_tier, status == Status.WON)
             info["episode_end"] = {
-                "outcome": status.value if terminated else "timeout",
+                "outcome": status.value if status != Status.RUNNING else ("stuck" if stuck else "timeout"),
                 "won": status == Status.WON,
                 "tier": self.tier,
                 "level": sim.level.name,
@@ -207,6 +218,8 @@ class JumpNRunEnv(gym.Env):
                 "start_col": self.start_col,
                 "origin_tier": self.origin_tier,
                 "rewind_depth": self.rewind_depth,
+                "source": getattr(sim.level, "source", None),
+                "aug": getattr(sim.level, "augmentations", None) or [],
             }
         return self._observe(), float(reward), terminated, truncated, info
 
@@ -278,7 +291,7 @@ class JumpNRunEnv(gym.Env):
             nearest.append((abs(e.x - p.x) + abs(e.y - p.y), e))
         nearest.sort(key=lambda item: item[0])
 
-        vec = np.zeros(VEC_SIZE, np.float32)
+        vec = np.zeros(VEC_SIZE_V2 if self.obs_v2 else VEC_SIZE, np.float32)
         vec[0] = p.vy / MAX_FALL_SPEED
         vec[1] = 1.0 if p.on_ground else 0.0
         vec[2] = float(p.facing)
@@ -289,6 +302,12 @@ class JumpNRunEnv(gym.Env):
             vec[6 + 3 * i] = np.clip((e.x - p.x) / 600.0, -1.0, 1.0)
             vec[7 + 3 * i] = np.clip((e.y - p.y) / 400.0, -1.0, 1.0)
             vec[8 + 3 * i] = 1.0
+        if self.obs_v2:
+            vec[15] = (p.x - sim.max_x) / 600.0  # how far behind the furthest point reached (turning back)
+            vec[16] = self.steps_since_progress / max(1, self.no_progress_steps)
+            vec[17] = 1.0 - self.steps / max(1, self.max_steps)
+            for i, (_, e) in enumerate(nearest[:NEAREST_ENEMIES]):
+                vec[18 + i] = e.vy / MAX_FALL_SPEED
         obs = {"grid": grid, "vec": np.clip(vec, -1.0, 1.0)}
         if self.overview:
             obs["overview"] = self._observe_overview(pcol)

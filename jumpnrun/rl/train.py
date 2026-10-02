@@ -42,15 +42,33 @@ from jumpnrun.rl.policy import GridFeatures, ImpalaFeatures
 
 def make_env(rank: int, seed: int, min_tier: int, max_tier: int, handmade_paths, handmade_prob: float,
              action_repeat: int, pool_dir=None, overview: bool = False, start_prob: float = 0.0, start_dirs=(),
-             rewind_prob: float = 0.0):
+             rewind_prob: float = 0.0, pool_share: float = 1.0, augment_prob: float = 0.0, obs_v2: bool = False,
+             stuck_death: bool = False, plr: float = 0.0):
     def _init():
         handmade = [Level.from_file(p) for p in handmade_paths]
         source = CurriculumSource(min_tier, max_tier, handmade, handmade_prob, pool_dir=pool_dir,
-                                  start_prob=start_prob, start_dirs=start_dirs)
+                                  start_prob=start_prob, start_dirs=start_dirs, pool_share=pool_share,
+                                  augment_prob=augment_prob, plr=plr)
         return JumpNRunEnv(source, seed=seed * 1000 + rank, action_repeat=action_repeat, overview=overview,
-                           rewind_prob=rewind_prob)
+                           rewind_prob=rewind_prob, obs_v2=obs_v2, stuck_death=stuck_death)
 
     return _init
+
+
+def cosine_schedule(start: float, decay_steps: int, target: int, phase_start: int, end_fraction: float = 0.1):
+    """Phase 8: cosine decay from `start` to `end_fraction * start` within `decay_steps` after phase_start.
+
+    Phase 7's linear schedule ran towards the 400M target and was still at 92 % after 34M steps.
+    """
+
+    import math
+
+    def schedule(progress_remaining: float) -> float:
+        done = (1.0 - progress_remaining) * target - phase_start
+        x = min(1.0, max(0.0, done / max(1, decay_steps)))
+        return start * (end_fraction + (1 - end_fraction) * 0.5 * (1 + math.cos(math.pi * x)))
+
+    return schedule
 
 
 def linear_schedule(start: float, end_fraction: float = 0.1, target: int = 0, phase_start: int = 0):
@@ -111,6 +129,15 @@ def main() -> None:
     parser.add_argument("--start-prob", type=float, default=0.0,
                         help="share of episodes that start in the middle of a teacher's winning run")
     parser.add_argument("--start-dirs", nargs="*", default=[], help="demo directories for --start-prob")
+    parser.add_argument("--pool-share", type=float, default=1.0,
+                        help="phase 8: probability to draw a stored pool level for tiers with a pool (rest: fresh)")
+    parser.add_argument("--obs-v2", action="store_true",
+                        help="phase 8: 6 more vector inputs (network surgery on the first start, new inputs at zero)")
+    parser.add_argument("--stuck-death", action="store_true", help="phase 8: getting stuck counts as a death (-1)")
+    parser.add_argument("--plr", type=float, default=0.0,
+                        help="phase 8: share of episodes replayed from the Prioritized Level Replay buffer")
+    parser.add_argument("--augment", type=float, default=0.0,
+                        help="phase 8: share of episodes with an augmented level (jumpnrun/levelgen/augment.py)")
     parser.add_argument("--keep-every", type=int, default=0,
                         help="delete older checkpoints except multiples of this step count (0 = keep all)")
     parser.add_argument("--time-limit-hours", type=float, default=0,
@@ -120,6 +147,10 @@ def main() -> None:
     parser.add_argument("--arch", choices=("grid", "impala"), default="grid", help="network for a new model")
     parser.add_argument("--separate-vf", action="store_true", help="separate feature networks for policy and value")
     parser.add_argument("--ema-every", type=int, default=0, help="save an EMA copy of the weights every N steps")
+    parser.add_argument("--ema2-decay", type=float, default=0.0,
+                        help="phase 8: a second, slower EMA (e.g. 0.998), saved as ema2_step_*.zip")
+    parser.add_argument("--lr-decay-steps", type=int, default=0,
+                        help="phase 8: cosine learning rate decay to 10%% over this many steps of the phase")
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--watch", action="store_true", help="open the live ghost view next to training")
     parser.add_argument("--watch-level", help="level for --watch (default: a generated one)")
@@ -133,7 +164,7 @@ def main() -> None:
     env_fns = [
         make_env(i, args.seed, args.min_tier, args.max_tier, handmade_paths, args.handmade_prob,
                  args.action_repeat, args.pool, args.overview, args.start_prob, tuple(args.start_dirs),
-                 args.rewind_prob)
+                 args.rewind_prob, args.pool_share, args.augment, args.obs_v2, args.stuck_death, args.plr)
         for i in range(args.envs)
     ]
     # the game is so fast that the network update dominates; one process is usually best
@@ -169,7 +200,8 @@ def main() -> None:
     else:
         phase_start = 0
     config_path.write_text(json.dumps({"action_repeat": args.action_repeat, "overview": args.overview,
-                                       "arch": args.arch, "phase_start": phase_start}, indent=2) + "\n")
+                                       "arch": args.arch, "phase_start": phase_start, "obs_v2": args.obs_v2},
+                                      indent=2) + "\n")
     eval_levels = eval_level_set(range(args.min_tier, args.max_tier + 1), args.eval_per_tier)
     # hand-made training levels are "practice grades"; --test-levels are never trained on
     eval_levels += [("training_handgebaut", Level.from_file(p)) for p in handmade_paths]
@@ -184,7 +216,8 @@ def main() -> None:
         algo = PPOWithDemos
         extra = dict(demo_path=args.demos, bc_coef=args.bc_coef, bc_decay=args.bc_decay, bc_min=args.bc_min)
     hyper = dict(
-        learning_rate=linear_schedule(args.lr, target=args.target, phase_start=phase_start),
+        learning_rate=(cosine_schedule(args.lr, args.lr_decay_steps, args.target, phase_start)
+                       if args.lr_decay_steps else linear_schedule(args.lr, target=args.target, phase_start=phase_start)),
         n_steps=args.n_steps,
         batch_size=args.batch,
         gamma=args.gamma,
@@ -193,7 +226,12 @@ def main() -> None:
         ent_coef=args.ent,
         target_kl=args.target_kl,
     )
-    if args.resume:
+    if args.resume and args.obs_v2 and PPO.load(args.resume, device="cpu").observation_space["vec"].shape[0] < 21:
+        from jumpnrun.rl.modelinfo import grow_vec
+
+        model = grow_vec(args.resume, vec_env, algo, tensorboard_log=str(run_dir / "tb"), **hyper, **extra)
+        print(f"Network surgery: vector input 15 -> 21 (new inputs start at zero), from {args.resume}")
+    elif args.resume:
         model = algo.load(args.resume, env=vec_env, device="cpu", tensorboard_log=str(run_dir / "tb"),
                           **hyper, **extra)
     else:
@@ -232,6 +270,8 @@ def main() -> None:
         callbacks.append(TimeLimit(run_dir, args.time_limit_hours))
     if args.ema_every:
         callbacks.append(EmaWeights(run_dir, args.ema_every))
+        if args.ema2_decay:
+            callbacks.append(EmaWeights(run_dir, args.ema_every, decay=args.ema2_decay, prefix="ema2"))
     print(f"Training {args.steps:,} steps, tiers {args.min_tier}-{args.max_tier}, "
           f"{args.envs} envs, {len(handmade_paths)} hand-made levels -> {run_dir}")
     try:

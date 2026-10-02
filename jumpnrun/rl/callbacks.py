@@ -190,10 +190,11 @@ class EmaWeights(BaseCallback):
     `every` steps (same format as normal checkpoints, so every tool can load it).
     """
 
-    def __init__(self, run_dir: Path, every: int = 1_000_000, decay: float = 0.99):
+    def __init__(self, run_dir: Path, every: int = 1_000_000, decay: float = 0.99, prefix: str = "ema"):
         super().__init__()
         self.dir = run_dir / "checkpoints"
-        self.path = run_dir / "ema_weights.pt"
+        self.prefix = prefix
+        self.path = run_dir / f"{prefix}_weights.pt"
         self.every = every
         self.decay = decay
         self.ema = None
@@ -235,7 +236,7 @@ class EmaWeights(BaseCallback):
         policy = self.model.policy
         current = {k: v.detach().clone() for k, v in policy.state_dict().items()}
         policy.load_state_dict(self.ema)
-        self.model.save(str(self.dir / f"ema_step_{self.num_timesteps:010d}.zip"))
+        self.model.save(str(self.dir / f"{self.prefix}_step_{self.num_timesteps:010d}.zip"))
         policy.load_state_dict(current)
         torch.save(self.ema, self.path)
 

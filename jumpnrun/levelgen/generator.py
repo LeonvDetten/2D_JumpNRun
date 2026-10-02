@@ -35,7 +35,7 @@ from typing import List
 from jumpnrun.core.constants import ROWS
 from jumpnrun.core.level import Level
 
-GENERATOR_VERSION = 8  # 8: enemy ramps in tiers 10-12, tier 12 upper roads x2; 5: widest jumps x3; 6: chest on the edge; 7: edge chest in tiers 10-12 (~30 %), no extra enemies
+GENERATOR_VERSION = 9  # 9: bait forks (upper road dead-ends) in tiers 10-12; 8: enemy ramps in tiers 10-12, tier 12 upper roads x2; 5: widest jumps x3; 6: chest on the edge; 7: edge chest in tiers 10-12 (~30 %), no extra enemies
 GROUND = ROWS - 1  # surface row of the lowest possible ground
 HIGHEST_SURFACE = 5  # never build terrain higher than this row (headroom for jumps)
 
@@ -67,6 +67,7 @@ class TierConfig:
     start_enemies: bool = False  # enemies near the start, walking or dropping (v4)
     hard_jumps: float = 1.0  # weight of the widest robust jump per height change in jump sequences
     enemy_ramps: float = 0.0  # solid staircase up with enemies walking down from the top (v8)
+    bait_forks: float = 0.0  # tempting upper road that dead-ends at a wall; the floor is the way (v9)
 
 
 TIERS = (
@@ -95,17 +96,17 @@ TIERS = (
                platform_enemies=True, free_enemies=0.4, climbs=1.5, enemy_groups=True,
                rain=0.5, high_roads=1.5, stones=1.0, tunnels=1.0, ceilings=1.0, shafts=1.0,
                two_routes=1.0, hard=3, rain_stairs=1.2, chains=1.5, trenches=1.0,
-               enemy_ramps=1.0),                                                         # 10 exam patterns
+               enemy_ramps=1.0, bait_forks=1.0),                                         # 10 exam patterns
     TierConfig(length=320, max_gap=3, steps=True, max_drop=4, valleys=2.0, platforms=2.0,
                platform_enemies=True, free_enemies=0.45, climbs=1.5, enemy_groups=True,
                rain=0.6, high_roads=2.0, stones=1.2, tunnels=1.0, ceilings=1.0, shafts=1.0,
                two_routes=1.0, hard=3, rain_stairs=1.5, chains=2.0, trenches=1.3,
-               enemy_ramps=1.2),                                                         # 11 long journey
+               enemy_ramps=1.2, bait_forks=1.2),                                         # 11 long journey
     TierConfig(length=250, max_gap=3, steps=True, max_drop=4, valleys=1.5, platforms=1.0,
                platform_enemies=True, free_enemies=0.4, climbs=1.0, enemy_groups=True,
                rain=0.5, high_roads=2.0, stones=0.5, tunnels=1.0, ceilings=1.0, shafts=0.8,
                two_routes=0.8, hard=3, rain_stairs=1.0, chains=1.0, trenches=1.0,
-               jumps=4.0, start_enemies=True, hard_jumps=3.0, enemy_ramps=1.0),                           # 12 jump catalogue
+               jumps=4.0, start_enemies=True, hard_jumps=3.0, enemy_ramps=1.0, bait_forks=1.0),                           # 12 jump catalogue
                # phase 7: widest jumps x3 (v5; the extra free enemies of v5 were taken back in v7)
 )
 NUM_TIERS = len(TIERS)
@@ -178,6 +179,7 @@ def _style(rng: random.Random, cfg: TierConfig) -> dict:
         "trench": cfg.trenches,
         "jump_seq": cfg.jumps,
         "enemy_ramp": cfg.enemy_ramps,
+        "bait_fork": cfg.bait_forks,
     }
     return {kind: w * (0.3 + rng.gammavariate(1.0, 1.0)) for kind, w in base.items() if w > 0}
 
@@ -194,6 +196,7 @@ def _segment(b: _Builder, cfg: TierConfig) -> None:
         "rain_stairs": b.surface >= GROUND - 1,
         "trench": b.surface >= 6,
         "enemy_ramp": b.surface >= HIGHEST_SURFACE + 3,
+        "bait_fork": b.surface == GROUND,
     }
     choices = [(kind, w) for kind, w in b.style.items() if allowed.get(kind, True)]
     kind = rng.choices([c[0] for c in choices], weights=[c[1] for c in choices])[0]
@@ -271,6 +274,9 @@ def _segment(b: _Builder, cfg: TierConfig) -> None:
 
     elif kind == "enemy_ramp":
         _enemy_ramp(b, cfg)
+
+    elif kind == "bait_fork":
+        _bait_fork(b, cfg)
 
     elif kind == "stones":
         # single blocks over a pit, 3 tiles apart at the same height (the exam's hardest jumps)
@@ -520,6 +526,51 @@ def _rain_stairs(b: _Builder, cfg: TierConfig) -> None:
     b.surface = row
     b.waypoints.append((len(b.columns) - 1, row))
     b.flat(rng.randint(2, 4))
+    b.waypoints.append((len(b.columns) - 1, b.surface))
+
+
+def _bait_fork(b: _Builder, cfg: TierConfig) -> None:
+    """The mirror image of _high_road: a tempting stair up to an upper road that dead-ends at a wall.
+
+    The floor below runs on (with a short pit right under the road's end), so the right choice is to stay
+    low - or to turn back and drop down early. Seeing the wall early needs the overview map; in phase 7 the
+    upper road was always right, so the overview was hardly used.
+    """
+
+    rng = b.rng
+    b.flat(2)
+    start = len(b.columns)
+    road_row = GROUND
+    items = []
+    for _ in range(3):  # floating stairs up, one row per hop
+        road_row -= 1
+        items.append((1, None))
+        items.append((rng.randint(1, 2), road_row))
+    length = rng.randint(14, 30)
+    placed = 0
+    while placed < length:
+        gap = rng.randint(1, 2)
+        change = rng.choice((-1, 0, 0)) if gap == 1 else 0
+        road_row = max(5, min(GROUND - 3, road_row - change))
+        width = rng.randint(2, 4)
+        items.append((gap, None))
+        items.append((width, road_row))
+        placed += gap + width
+    for count, row in items:
+        for _ in range(count):
+            b.column(None, {row: "B"} if row is not None else None)
+    end = len(b.columns)
+    for r in range(max(0, road_row - 3), road_row):  # the wall at the road's end
+        b.columns[end - 1][r] = "B"
+    pit = (end - 2, end - 1)
+    for c in range(start, end):
+        if c not in pit:
+            b.columns[c][GROUND] = "B"
+    if rng.random() < cfg.free_enemies:
+        b.columns[start + rng.randint(3, 8)][GROUND - 1] = "E"
+    b.waypoints.append((pit[0] - 1, GROUND))
+    b.surface = GROUND
+    b.flat(rng.randint(3, 5))
     b.waypoints.append((len(b.columns) - 1, b.surface))
 
 

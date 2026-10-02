@@ -50,7 +50,10 @@ class Simulation:
         self.frame = 0
         self.status = Status.RUNNING
         self.player = Player(*self.level.spawn)
-        self.enemies: List[Enemy] = [Enemy(x, y) for (x, y) in self.level.enemy_spawns]
+        # optional per-enemy start direction / wake distance (training augmentation; the game uses the defaults)
+        dirs = getattr(self.level, "enemy_directions", None) or [1] * len(self.level.enemy_spawns)
+        wakes = getattr(self.level, "enemy_wakes", None) or [ENEMY_ACTIVATION_DIST] * len(self.level.enemy_spawns)
+        self.enemies: List[Enemy] = [Enemy(x, y, d, w) for (x, y), d, w in zip(self.level.enemy_spawns, dirs, wakes)]
         self.bullets: List[Bullet] = []
         self.kills_stomp = 0
         self.kills_shot = 0
@@ -130,7 +133,7 @@ class Simulation:
         prev_enemy_tops = {}
         for enemy in self.enemies:
             if not enemy.active:
-                if abs(enemy.x - player.x) >= ENEMY_ACTIVATION_DIST:
+                if abs(enemy.x - player.x) >= enemy.wake:
                     continue
                 enemy.active = True
             prev_enemy_tops[id(enemy)] = enemy.y

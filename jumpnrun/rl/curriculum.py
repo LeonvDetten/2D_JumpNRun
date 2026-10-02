@@ -90,6 +90,15 @@ def load_starts(demo_dirs, min_tier: int = 4) -> list:
     return _START_CACHE[key]
 
 
+PLR_SIZE = 400  # levels kept per env
+PLR_MIN = 50  # replay starts once the buffer holds this many levels
+
+
+def _plr_score(item: dict) -> float:
+    p = (item["wins"] + 1) / (item["n"] + 2)
+    return p * (1 - p)
+
+
 class CurriculumSource:
     """Level source for JumpNRunEnv. Lives inside each (sub-process) env."""
 
@@ -102,8 +111,20 @@ class CurriculumSource:
         pool_dir=None,
         start_prob: float = 0.0,
         start_dirs=(),
+        pool_share: float = 1.0,
+        augment_prob: float = 0.0,
+        plr: float = 0.0,
     ):
         self.min_tier = min_tier
+        # phase 8: tiers with a stored pool draw a stored level only with this probability, otherwise a
+        # fresh one from the current generator (phase 7 bug: with 1.0 generator changes never arrived)
+        self.pool_share = pool_share
+        # phase 8: share of episodes whose level gets augmented (jumpnrun/levelgen/augment.py)
+        self.augment_prob = augment_prob
+        # phase 8 round 3: Prioritized Level Replay - replay generated levels with the highest learning
+        # potential (score p * (1 - p), p = estimated win rate), filled from the outcomes reported by the env
+        self.plr = plr
+        self._plr: dict = {}
         self.max_tier = max_tier
         self.weights: List[float] = [0.0] * NUM_TIERS
         self.weights[min_tier] = 1.0
@@ -121,22 +142,58 @@ class CurriculumSource:
         if self.start_prob and rng.random() < self.start_prob:
             tier, seed, text, repeat, actions = rng.choice(self.starts)
             level = Level.from_text(text) if text else generate(tier, seed)
+            level.source, level.augmentations = "midstart", []
             cut = rng.randrange(len(actions) // 10, len(actions) - 30)
             return level, MID_START_TIER, (repeat, actions[:cut])
         if self.handmade_prob and rng.random() < self.handmade_prob:
-            return rng.choice(self.handmade), -1
+            return self._augmented(rng.choice(self.handmade), rng, "handmade"), -1
+        if self.plr and len(self._plr) >= PLR_MIN and rng.random() < self.plr:
+            return self._replay(rng)
         tier = rng.choices(range(NUM_TIERS), weights=self.weights)[0]
         texts = self.pool_texts.get(tier)
-        if texts:
+        if texts and (self.pool_share >= 1.0 or rng.random() < self.pool_share):
             text = rng.choice(texts)
             if text not in self._parsed:
                 if len(self._parsed) > 4000:
                     self._parsed.clear()
                 self._parsed[text] = Level.from_text(text)
-            return self._parsed[text], tier
-        seeds = self.pool.get(tier)
+            return self._augmented(self._parsed[text], rng, "pool"), tier
+        seeds = self.pool.get(tier) if not texts else None
         seed = rng.choice(seeds) if seeds else rng.randrange(EVAL_SEED_OFFSET)
-        return generate(tier, seed), tier
+        return self._augmented(generate(tier, seed), rng, "fresh"), tier
+
+    def _replay(self, rng: random.Random):
+        keys = list(self._plr)
+        weights = [_plr_score(self._plr[k]) + 0.02 for k in keys]
+        key = rng.choices(keys, weights=weights)[0]
+        item = self._plr[key]
+        item["level"].source = "plr"
+        return item["level"], item["tier"]
+
+    def feedback(self, level: Level, tier: int, won: bool) -> None:
+        """Outcome of an episode (called by the env); feeds the PLR buffer."""
+
+        if not self.plr or tier < 6 or getattr(level, "source", None) not in ("fresh", "pool", "plr"):
+            return
+        key = id(level)
+        item = self._plr.get(key)
+        if item is None:
+            if len(self._plr) >= PLR_SIZE:
+                worst = min(self._plr, key=lambda k: _plr_score(self._plr[k]))
+                del self._plr[worst]
+            item = self._plr[key] = {"level": level, "tier": tier, "n": 0, "wins": 0}
+        item["n"] += 1
+        item["wins"] += int(won)
+
+    def _augmented(self, level: Level, rng: random.Random, source: str) -> Level:
+        if self.augment_prob and rng.random() < self.augment_prob:
+            from jumpnrun.levelgen.augment import augment
+
+            level, _ = augment(level, rng)
+        else:
+            level.augmentations = getattr(level, "augmentations", None) or []
+        level.source = source
+        return level
 
 
 class CurriculumTracker:

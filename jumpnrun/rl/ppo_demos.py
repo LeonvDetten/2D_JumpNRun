@@ -42,6 +42,11 @@ class PPOWithDemos(PPO):
             cache = folder / ("dataset_ppo_ov.npz" if overview else "dataset_ppo.npz")
             self._demos = cached_dataset(files, cache, max_samples=300_000, overview=overview, shuffle=overview)
             self._demo_allowed = torch.as_tensor(self._demos["allowed"].astype(np.int64))
+            want = self.observation_space["vec"].shape[0]
+            have = self._demos["vec"].shape[1]
+            if have < want:  # phase 8 --obs-v2: old demos lack the new values; they stay zero
+                self._demos = dict(self._demos)
+                self._demos["vec"] = np.pad(self._demos["vec"], ((0, 0), (0, want - have)))
         return self._demos
 
     def train(self) -> None:
