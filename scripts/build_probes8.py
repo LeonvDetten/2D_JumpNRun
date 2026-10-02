@@ -51,12 +51,14 @@ def candidate(args):
         return None
     if not solve_auto(lv, 80_000, action_repeat=2, weight=1.2).solved:
         return None
-    return dict(skill=skill, tier=tier, name=lv.name, text=lv.to_text(),
+    # full-width lines: to_text() would strip the empty columns behind the chest (the void would become a wall)
+    return dict(skill=skill, tier=tier, name=lv.name, text="\n".join(lv._lines) + "\n",
                 enemy_directions=getattr(lv, "enemy_directions", None), enemy_wakes=getattr(lv, "enemy_wakes", None))
 
 
 def main():
-    jobs = [(s, i) for s in SKILLS for i in range(70)]
+    tries = {"koeder": 360, "hohe_steine": 160}  # rarer situations need more candidates
+    jobs = [(s, i) for s in SKILLS for i in range(tries.get(s, 70))]
     with Pool(4) as p:
         found = [r for r in p.map(candidate, jobs, chunksize=1) if r]
     out = []

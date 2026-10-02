@@ -118,6 +118,11 @@ def test_probes_cover_every_skill():
     for item in data["levels"]:
         skills[item["skill"]] = skills.get(item["skill"], 0) + 1
     assert len(skills) == 7 and min(skills.values()) >= 10
+    for item in data["levels"]:
+        if item["skill"] == "truhe_abgrund":  # the void must survive storing the level
+            lv = Level.from_text(item["text"])
+            cx = max(c[0] for c in lv.chests) // TILE
+            assert lv.cols > cx + 1 and not any(lv.solid[r][c] for r in range(lv.rows) for c in range(cx + 1, lv.cols))
 
 
 def test_obs_v2_surgery_keeps_behaviour():
@@ -170,3 +175,38 @@ def test_plr_buffer_fills_and_replays():
         source.feedback(level, tier, won=i % 3 == 0)
     replayed = sum(source(rng)[0].source == "plr" for _ in range(200))
     assert len(source._plr) >= 50 and 60 < replayed < 140
+
+
+def _fake_round(tmp_path, monkeypatch, neu, kontrolle, schutz=(70, 70), start=35_000_008):
+    import jumpnrun.rl.autopilot8 as ap
+
+    monkeypatch.setattr(ap, "ROOT", tmp_path)
+    monkeypatch.setattr(ap, "stop", lambda run: None)
+    for arm, values, sch in (("neu", neu, schutz[0]), ("kontrolle", kontrolle, schutz[1])):
+        run = tmp_path / f"runs/phase8_r1_{arm}"
+        run.mkdir(parents=True)
+        ms = {f"{start + (i + 1) * 1_000_000 - 8}:ema": {"dev_mean": [v, v - 0.1, v + 0.1], "schutz": {"won": sch}}
+              for i, v in enumerate(values)}
+        (run / "milestones8.json").write_text(json.dumps(ms))
+    state = {"rounds": {"1": {"start_steps": start, "baseline": 0.68, "stopped": []}}, "log": []}
+    return ap, state
+
+
+def test_judging_rule_new_arm_needs_three_points(tmp_path, monkeypatch):
+    ap, state = _fake_round(tmp_path, monkeypatch, [0.70] * 6, [0.66] * 6)
+    assert ap.judge(state, 1) == "neu"
+
+
+def test_judging_rule_small_gain_keeps_the_control(tmp_path, monkeypatch):
+    ap, state = _fake_round(tmp_path, monkeypatch, [0.68] * 6, [0.67] * 6)
+    assert ap.judge(state, 1) == "kontrolle"
+
+
+def test_judging_rule_waits_for_six_million_steps(tmp_path, monkeypatch):
+    ap, state = _fake_round(tmp_path, monkeypatch, [0.9] * 4, [0.6] * 4)
+    assert ap.judge(state, 1) is None
+
+
+def test_regression_stops_an_arm(tmp_path, monkeypatch):
+    ap, state = _fake_round(tmp_path, monkeypatch, [0.55] * 3, [0.68] * 3)
+    assert ap.judge(state, 1) is None and state["rounds"]["1"]["stopped"] == ["neu"]

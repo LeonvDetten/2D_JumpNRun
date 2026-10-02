@@ -143,7 +143,7 @@ def judge(state: dict, rnd: int):
     """'neu' / 'kontrolle' when the round can be judged, else None. Also applies the regression stop."""
 
     info = state["rounds"][str(rnd)]
-    end = info["start_steps"] + JUDGE_STEPS
+    end = info["start_steps"] + JUDGE_STEPS - 50_000  # EMA copies land at whole millions (+ a few steps)
     series = {arm: ema_series(run_dir(rnd, arm)) for arm in ("neu", "kontrolle")}
     for arm, s in series.items():
         if arm in info["stopped"]:
