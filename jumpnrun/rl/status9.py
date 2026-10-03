@@ -117,7 +117,7 @@ def main() -> None:
         ax.set_xlabel("Mio. Schritte seit Rundenstart")
         ax.legend(frameon=False, fontsize=8, loc="lower left")
     axes[0, 0].set_title("Dev-Mittel (15 Level) in %", loc="left")
-    axes[0, 1].set_title("Dev alt (Phase-8-Level) und neu (Phase-9-Level) in %", loc="left")
+    axes[0, 1].set_title("Dev alt (11) und neu (4 Phase-9-Level) in %", loc="left")
     axes[0, 2].set_title("Test H und Schutz-Validierung in %", loc="left")
     axes[1, 0].set_title("Fähigkeits-Proben (letzter EMA-Stand) in %", loc="left")
     axes[1, 0].legend(frameon=False, fontsize=8)
