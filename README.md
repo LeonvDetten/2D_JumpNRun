@@ -108,3 +108,12 @@ Die verwendeten Bilder (Sprites) sind lizenzfrei und dürfen frei verwendet werd
 - Enemy Sprites: [Pipoya](https://pipoya.itch.io/pipoya-free-rpg-character-sprites-32x32)
 - Block (Ground) Sprites: [PNG Wing](https://www.pngwing.com/en/free-png-zoola/download)
 - Chest Sprites: [Admurin](https://admurin.itch.io/free-chest-animations)
+
+## Älterer RL-Ansatz (`legacy/`)
+
+Auf `main` gab es vor dem Neubau einen eigenen RL-Versuch (Aug. 2025 – Feb. 2026, Autor „MararatscherCode“):
+`GameSession`, Gym-Umgebung `rl/pirate_game_env.py`, PPO-Training `train_ppo.py` mit Checkpoint-Belohnungen,
+Curriculum easy → medium → full und eigenen Trainingsleveln. Beim Zusammenführen mit dem neuen Spielkern
+(`jumpnrun/`) ist er vollständig erhalten geblieben und liegt jetzt unverändert in `legacy/`
+(inkl. der alten `game.py`, `object.py`, `player.py`, `world.py` und seiner README unter `legacy/README.md`).
+Der aktuelle Bot und sein Lerntagebuch: `jumpnrun/rl/` und `docs/lernen/`.
