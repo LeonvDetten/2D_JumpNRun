@@ -87,8 +87,8 @@ def evaluate_checkpoint(path: Path, full: bool) -> dict:
             schutz += sum(r["won"] for r in evaluate_levels(model, [l for _, l in lv]))
             total += len(lv)
         out["schutz"] = {"won": schutz, "of": total}
-        probes = probe_levels()
-        res = evaluate_levels(model, [lv for _, lv in probes])
+        probes = probe_levels() if PROBES.exists() else []  # (built in parallel to the first milestones)
+        res = evaluate_levels(model, [lv for _, lv in probes]) if probes else []
         per = {}
         for (skill, _), r in zip(probes, res):
             o = per.setdefault(skill, {"won": 0, "of": 0})
