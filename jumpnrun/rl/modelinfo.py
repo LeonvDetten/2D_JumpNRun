@@ -34,7 +34,8 @@ def env_kwargs(model) -> dict:
 
     return dict(action_repeat=getattr(model, "action_repeat", ACTION_REPEAT),
                 overview="overview" in model.observation_space.spaces,
-                obs_v2=model.observation_space["vec"].shape[0] > 15)
+                obs_v2=model.observation_space["vec"].shape[0] > 15,
+                obs_v3=model.observation_space["vec"].shape[0] > 21)
 
 
 def load_model(model_path):
@@ -99,6 +100,82 @@ def grow_vec(old_model_path, env, algo=None, **kwargs):
                 assert key.endswith("vec_mlp.0.weight"), key
                 value.zero_()
                 value[:, :src.shape[1]] = src
+    model.policy.load_state_dict(new_state)
+    model.num_timesteps = old.num_timesteps
+    model._num_timesteps_at_start = old.num_timesteps
+    if hasattr(old, "bc_updates"):
+        model.bc_updates = old.bc_updates
+    model.action_repeat = action_repeat_for(old_model_path)
+    return model
+
+
+def grow_v3(old_model_path, env, algo=None, **kwargs):
+    """Network surgery for phase 9 (--obs-v3): wider view behind, longer overview behind, chest compass.
+
+    The grid gains 8 columns on the left (5 -> 13 behind) and the overview 8 columns (32 more tiles behind).
+    Both CNNs keep their filters; after the two stride-2 layers the old feature columns sit 2 (grid) or
+    4 (overview) places further right, so the first dense layer gets its old weights there and zero weights for
+    the new columns. The vector grows to 23 (new inputs start at zero). Apart from the old view's left edge,
+    which now sees real tiles instead of padding, the new model starts out acting like the old one.
+    The policy gets a 7th action (left+jump), initialised like "left" but about 50 times less likely.
+    """
+
+    import torch
+    from stable_baselines3 import PPO
+
+    old = (algo or PPO).load(str(old_model_path), device="cpu")
+    params = dict(policy_kwargs=old.policy_kwargs, n_steps=old.n_steps, batch_size=old.batch_size,
+                  n_epochs=old.n_epochs, gamma=old.gamma, gae_lambda=old.gae_lambda, vf_coef=old.vf_coef,
+                  ent_coef=old.ent_coef, device="cpu", verbose=0)
+    params.update(kwargs)
+    model = (algo or PPO)("MultiInputPolicy", env, **params)
+    new_state = model.policy.state_dict()
+    old_state = old.policy.state_dict()
+    old_ext = old.policy.features_extractor
+    new_ext = model.policy.features_extractor
+
+    with torch.no_grad():
+        og, oo = (old_ext.cnn[:-1](torch.zeros(1, *old.observation_space["grid"].shape)).shape,
+                  old_ext.ov_cnn[:-1](torch.zeros(1, *old.observation_space["overview"].shape)).shape
+                  if old_ext.has_overview else None)
+        ng, no = (new_ext.cnn[:-1](torch.zeros(1, *model.observation_space["grid"].shape)).shape,
+                  new_ext.ov_cnn[:-1](torch.zeros(1, *model.observation_space["overview"].shape)).shape
+                  if new_ext.has_overview else None)
+
+    def remap(src, dst, old_shape, new_shape, extra_cols=0):
+        """Copy dense weights over flattened (C, H, W) features whose columns moved right by the width growth."""
+
+        _, c, h, w = old_shape
+        _, c2, h2, w2 = new_shape
+        assert c == c2 and h == h2 and w2 >= w
+        n_old, n_new = c * h * w, c2 * h2 * w2
+        dst.zero_()
+        a = src[:, :n_old].reshape(-1, c, h, w)
+        b = dst[:, :n_new].reshape(-1, c, h, w2)
+        b[:, :, :, w2 - w:] = a
+        dst[:, :n_new] = b.reshape(dst.shape[0], n_new)
+        if extra_cols:  # the vector features behind the CNN features
+            dst[:, n_new:n_new + extra_cols] = src[:, n_old:n_old + extra_cols]
+
+    with torch.no_grad():
+        for key, value in new_state.items():
+            src = old_state[key]
+            if src.shape == value.shape:
+                value.copy_(src)
+            elif key.endswith("vec_mlp.0.weight"):
+                value.zero_()
+                value[:, :src.shape[1]] = src
+            elif key.endswith("head.0.weight"):
+                remap(src, value, og, ng, extra_cols=64)
+            elif key.endswith("ov_mlp.0.weight"):
+                remap(src, value, oo, no)
+            elif key in ("action_net.weight", "action_net.bias"):  # 7th action left+jump: like "left", but rare
+                value[:src.shape[0]] = src
+                value[src.shape[0]:] = src[1:2]
+                if key.endswith("bias"):
+                    value[src.shape[0]:] -= 4.0
+            else:
+                raise AssertionError(key)
     model.policy.load_state_dict(new_state)
     model.num_timesteps = old.num_timesteps
     model._num_timesteps_at_start = old.num_timesteps

@@ -35,7 +35,7 @@ from typing import List
 from jumpnrun.core.constants import ROWS
 from jumpnrun.core.level import Level
 
-GENERATOR_VERSION = 9  # 9: bait forks (upper road dead-ends) in tiers 10-12; 8: enemy ramps in tiers 10-12, tier 12 upper roads x2; 5: widest jumps x3; 6: chest on the edge; 7: edge chest in tiers 10-12 (~30 %), no extra enemies
+GENERATOR_VERSION = 10  # 10 (phase 9, only with variant "v10" / tier 13): repaired forks, channels, Mario-inspired blocks; 9: bait forks (upper road dead-ends) in tiers 10-12; 8: enemy ramps in tiers 10-12, tier 12 upper roads x2; 5: widest jumps x3; 6: chest on the edge; 7: edge chest in tiers 10-12 (~30 %), no extra enemies
 GROUND = ROWS - 1  # surface row of the lowest possible ground
 HIGHEST_SURFACE = 5  # never build terrain higher than this row (headroom for jumps)
 
@@ -68,6 +68,13 @@ class TierConfig:
     hard_jumps: float = 1.0  # weight of the widest robust jump per height change in jump sequences
     enemy_ramps: float = 0.0  # solid staircase up with enemies walking down from the top (v8)
     bait_forks: float = 0.0  # tempting upper road that dead-ends at a wall; the floor is the way (v9)
+    # phase 9 (generator v10) - only used with variant "v10" (tier 13 always):
+    channels: float = 0.0  # serpentine: along the floor to the right, stairs up, left, stairs up, right
+    pipes: float = 0.0  # Mario-inspired: 2-wide pipes of 1-2 rows, enemies trapped between them
+    pyramids: float = 0.0  # Mario-inspired: block staircase up and down, often a pit at the top
+    bridges: float = 0.0  # Mario-inspired: floating brick steps up to a bridge over a wide pit, enemies on it
+    groups: float = 0.0  # Mario-inspired: a group of 2-3 enemies close together on flat ground
+    channel_end: float = 0.0  # probability that the level ends in a channel with the chest on the left
 
 
 TIERS = (
@@ -108,7 +115,15 @@ TIERS = (
                two_routes=0.8, hard=3, rain_stairs=1.0, chains=1.0, trenches=1.0,
                jumps=4.0, start_enemies=True, hard_jumps=3.0, enemy_ramps=1.0, bait_forks=1.0),                           # 12 jump catalogue
                # phase 7: widest jumps x3 (v5; the extra free enemies of v5 were taken back in v7)
+    TierConfig(length=260, max_gap=3, steps=True, max_drop=4, valleys=1.0, platforms=1.0,
+               platform_enemies=True, free_enemies=0.35, climbs=0.8, enemy_groups=True,
+               rain=0.4, high_roads=0.8, stones=0.6, tunnels=0.6, ceilings=0.6, shafts=0.5,
+               two_routes=0.8, hard=3, rain_stairs=0.6, chains=0.8, trenches=0.5, jumps=1.0,
+               enemy_ramps=0.6, bait_forks=2.0, channels=2.0, pipes=1.0, pyramids=1.0, bridges=1.0,
+               groups=1.0, channel_end=0.4),                                               # 13 channels & forks (v10)
 )
+V10_EXTRA = dict(channels=0.6, pipes=0.4, pyramids=0.4, bridges=0.4, groups=0.4, channel_end=0.15)  # tiers 10-12
+VARIANTS = ("v9", "gabel", "v10")  # gabel = v9 with the repaired fork only (phase 9 round 1)
 NUM_TIERS = len(TIERS)
 
 
@@ -120,6 +135,8 @@ class _Builder:
         self.style: dict = {}
         self.stats: dict = {}  # how often each building block was used
         self.waypoints: list = []  # (col, row) tiles on the right route (for the solver)
+        self.variant = "v9"
+        self.needs_path = False  # the way is not simply "to the right" (solver: use the distance map)
 
     def column(self, surface=None, extra=None) -> List[str]:
         """Append a column with terrain from `surface` down (None = pit)."""
@@ -154,7 +171,7 @@ class _Builder:
         self.surface = min(GROUND, self.surface + rows)
 
 
-def _style(rng: random.Random, cfg: TierConfig) -> dict:
+def _style(rng: random.Random, cfg: TierConfig, variant: str = "v9") -> dict:
     """Per-level mix of building blocks: tier weights x random factors (Dirichlet-like).
 
     Each level gets its own character (gap-heavy, enemy-heavy, vertical, ...) while
@@ -181,6 +198,9 @@ def _style(rng: random.Random, cfg: TierConfig) -> dict:
         "enemy_ramp": cfg.enemy_ramps,
         "bait_fork": cfg.bait_forks,
     }
+    if variant == "v10":
+        base.update(channel=cfg.channels, pipes=cfg.pipes, pyramid=cfg.pyramids, bridge=cfg.bridges,
+                    group=cfg.groups)
     return {kind: w * (0.3 + rng.gammavariate(1.0, 1.0)) for kind, w in base.items() if w > 0}
 
 
@@ -197,6 +217,10 @@ def _segment(b: _Builder, cfg: TierConfig) -> None:
         "trench": b.surface >= 6,
         "enemy_ramp": b.surface >= HIGHEST_SURFACE + 3,
         "bait_fork": b.surface == GROUND,
+        "channel": b.surface == GROUND,
+        "pipes": b.surface >= HIGHEST_SURFACE + 2,
+        "pyramid": b.surface >= HIGHEST_SURFACE + 4,
+        "bridge": b.surface >= HIGHEST_SURFACE + 3,
     }
     choices = [(kind, w) for kind, w in b.style.items() if allowed.get(kind, True)]
     kind = rng.choices([c[0] for c in choices], weights=[c[1] for c in choices])[0]
@@ -276,7 +300,31 @@ def _segment(b: _Builder, cfg: TierConfig) -> None:
         _enemy_ramp(b, cfg)
 
     elif kind == "bait_fork":
-        _bait_fork(b, cfg)
+        if b.variant == "v9":
+            _bait_fork(b, cfg)
+        else:
+            _fork_v10(b, cfg)
+
+    elif kind == "channel":
+        _channel(b, cfg)
+
+    elif kind == "pipes":
+        _pipes(b, cfg)
+
+    elif kind == "pyramid":
+        _pyramid(b, cfg)
+
+    elif kind == "bridge":
+        _bridge(b, cfg)
+
+    elif kind == "group":
+        b.flat(2)
+        start = len(b.columns)
+        width = rng.randint(6, 9)
+        b.flat(width)
+        for offset in rng.sample(range(1, width - 1), k=rng.randint(2, 3)):
+            b.columns[start + offset][b.surface - 1] = "E"
+        b.flat(2)
 
     elif kind == "stones":
         # single blocks over a pit, 3 tiles apart at the same height (the exam's hardest jumps)
@@ -574,6 +622,190 @@ def _bait_fork(b: _Builder, cfg: TierConfig) -> None:
     b.waypoints.append((len(b.columns) - 1, b.surface))
 
 
+def _fork_v10(b: _Builder, cfg: TierConfig, kind: str = "") -> None:
+    """Phase 9 (v10): the repaired fork. Stairs up to an upper road over a floor - which branch goes on is random.
+
+    unten     the road dead-ends at a wall, the floor goes on (no deadly pit under the road's end any more,
+              dropping down through a gap of the road is fine)
+    umkehren  like unten, but the road has no gaps: the only way back down is to walk back to the stairs
+    oben      the road goes on, the floor ends in a pit too wide to cross: back to the stairs and up
+    v9's pit right under the road's end taught "never drop down there" - in phase 8 the bot always got stuck
+    at the dead-end wall and never turned back.
+    """
+
+    rng = b.rng
+    kind = kind or rng.choice(("unten", "unten", "umkehren", "oben"))
+    b.flat(2)
+    start = len(b.columns)
+    road_row = GROUND
+    items = []
+    for _ in range(3):  # floating stairs up, one row per hop
+        road_row -= 1
+        items.append((1, None))
+        items.append((rng.randint(1, 2), road_row))
+    length = rng.randint(14, 30)
+    placed = 0
+    while placed < length:
+        gap = 0 if kind == "umkehren" else rng.randint(1, 2)
+        change = rng.choice((-1, 0, 0)) if gap == 1 else 0
+        road_row = max(5, min(GROUND - 3, road_row - change))
+        width = rng.randint(2, 4)
+        if gap:
+            items.append((gap, None))
+        items.append((width, road_row))
+        placed += gap + width
+    for count, row in items:
+        for _ in range(count):
+            b.column(None, {row: "B"} if row is not None else None)
+    end = len(b.columns)
+    if kind == "oben":
+        floor_end = end - rng.randint(6, 8)  # the floor stops: a pit that cannot be crossed down there
+    else:
+        floor_end = end
+        for r in range(max(0, road_row - 3), road_row):  # the wall at the road's end
+            b.columns[end - 1][r] = "B"
+    for c in range(start, floor_end):
+        b.columns[c][GROUND] = "B"
+    if rng.random() < cfg.free_enemies:
+        b.columns[start + rng.randint(3, 8)][GROUND - 1] = "E"
+    b.needs_path = True
+    b.stats["gabel_" + kind] = b.stats.get("gabel_" + kind, 0) + 1
+    if kind == "oben":
+        b.waypoints.append((end - 1, road_row))
+        b.surface = road_row
+        b.flat(rng.randint(3, 5))
+        b.waypoints.append((len(b.columns) - 1, b.surface))
+        return
+    b.waypoints.append((end - 1, GROUND - 1))
+    b.surface = GROUND
+    b.flat(rng.randint(3, 5))
+    b.waypoints.append((len(b.columns) - 1, b.surface))
+
+
+def _channel(b: _Builder, cfg: TierConfig, final: bool = False) -> None:
+    """Phase 9 (v10): a serpentine in the 13 rows. Needs b.surface == GROUND.
+
+        row 3   ##########>  (3rd layer: to the right, out of the channel; final: missing)
+        row 4   #  ##########
+        rows 5-7 #<---------    2nd layer: back to the left (final: the chest at its left end)
+        row 8   ##########  #
+        rows 9-11 -------->  #  bottom: to the right, stairs up at the end
+        row 12  ##############
+
+    Each layer change is a 3-step staircase plus a jump up and back over the stair's opening (needs left+jump
+    for the way back). Optional enemies in every layer and a hole in the 2nd layer that drops back down.
+    """
+
+    rng = b.rng
+    w = rng.randint(18, 30)
+    s = len(b.columns)
+    cols = [[" "] * ROWS for _ in range(w)]
+    for c in range(w):
+        cols[c][GROUND] = "B"
+    for r in range(0, 9):  # left wall above the entrance (rows 9-11 stay open)
+        cols[0][r] = "B"
+    for c in range(0, w - 4):  # floor of the 2nd layer, opening on the right
+        cols[c][8] = "B"
+    for c, top in ((w - 4, 11), (w - 3, 10), (w - 2, 9)):  # stairs up on the right (bottom -> 2nd layer)
+        for r in range(top, GROUND):
+            cols[c][r] = "B"
+    right_top = 0 if final else 4
+    for r in range(right_top, ROWS):  # right wall (final: closed to the top)
+        cols[w - 1][r] = "B"
+    enemies = cfg.free_enemies
+    if rng.random() < enemies:
+        cols[rng.randint(3, w - 7)][GROUND - 1] = "E"
+    if final:
+        chest = rng.randint(1, 3)
+        cols[chest][7] = "C"
+        if rng.random() < enemies:
+            cols[rng.randint(chest + 4, w - 6)][7] = "E"
+        b.stats["channel_end"] = b.stats.get("channel_end", 0) + 1
+    else:
+        for c in range(4, w - 1):  # floor of the 3rd layer, opening on the left
+            cols[c][4] = "B"
+        for c, top in ((3, 7), (2, 6), (1, 5)):  # stairs up on the left (2nd -> 3rd layer)
+            for r in range(top, 8):
+                cols[c][r] = "B"
+        if rng.random() < enemies:
+            cols[rng.randint(6, w - 6)][7] = "E"
+        if rng.random() < enemies:
+            cols[rng.randint(6, w - 3)][3] = "E"
+        if w >= 22 and rng.random() < 0.4:  # a hole in the 2nd layer: falling back to the bottom
+            h = rng.randint(8, w - 10)
+            cols[h][8] = " "
+            if rng.random() < 0.5:
+                cols[h + 1][8] = " "
+    b.columns += cols
+    b.needs_path = True
+    b.waypoints += [(s + w - 2, 8), (s + 4, 7)]
+    if final:
+        return
+    b.waypoints.append((s + w - 2, 3))
+    b.surface = HIGHEST_SURFACE  # out at the top right, one row down
+    b.flat(rng.randint(3, 5))
+    b.waypoints.append((len(b.columns) - 1, b.surface))
+
+
+def _pipes(b: _Builder, cfg: TierConfig) -> None:
+    """Phase 9 (v10), Mario-inspired: 2-wide pipes, 1 row (or 2 with a step) high; enemies walk between them."""
+
+    rng = b.rng
+    base = b.surface
+    for i in range(rng.randint(2, 4)):
+        width = rng.randint(2, 4)
+        start = len(b.columns)
+        b.flat(width)
+        if i and width >= 3 and rng.random() < cfg.free_enemies + 0.2:
+            b.columns[start + width // 2][base - 1] = "E"
+        height = 2 if base - 2 >= HIGHEST_SURFACE and rng.random() < 0.4 else 1
+        if height == 2:
+            b.column(base - 1)  # a step in front of the tall pipe
+        for _ in range(2):
+            b.column(base - height)
+    b.flat(rng.randint(2, 4))
+
+
+def _pyramid(b: _Builder, cfg: TierConfig) -> None:
+    """Phase 9 (v10), Mario-inspired: a block staircase up and down again, often with a pit at the top."""
+
+    rng = b.rng
+    base = b.surface
+    n = rng.randint(2, min(4, base - HIGHEST_SURFACE))
+    b.flat(2)
+    for k in range(1, n + 1):
+        b.column(base - k)
+    b.column(base - n)
+    if rng.random() < 0.7:
+        b.gap(rng.randint(1, 2))
+    for k in range(n, 0, -1):
+        b.column(base - k)
+    b.flat(rng.randint(2, 4), enemy=rng.random() < cfg.free_enemies)
+
+
+def _bridge(b: _Builder, cfg: TierConfig) -> None:
+    """Phase 9 (v10), Mario-inspired: floating bricks up to a bridge over a wide pit, enemies on the bridge."""
+
+    rng = b.rng
+    base = b.surface
+    b.flat(2)
+    row = base
+    for _ in range(3):  # floating steps, one row up per hop
+        row -= 1
+        b.gap(1)
+        b.column(None, {row: "B"})
+    length = rng.randint(6, 12)
+    start = len(b.columns)
+    for _ in range(length):
+        b.column(None, {row: "B"})
+    for offset in rng.sample(range(2, length - 1), k=rng.randint(1, 2)):
+        b.columns[start + offset][row - 1] = "E"
+    b.waypoints.append((len(b.columns) - 1, row))
+    b.gap(1)
+    b.surface = min(GROUND, row + rng.randint(1, 3))
+    b.flat(rng.randint(3, 5))
+
+
 def _enemy_ramp(b: _Builder, cfg: TierConfig) -> None:
     """A solid staircase up to a plateau; enemies on the top walk down towards the player.
 
@@ -728,13 +960,27 @@ def _jump_sequence(b: _Builder, cfg: TierConfig) -> None:
     b.waypoints.append((len(b.columns) - 1, b.surface))
 
 
-def generate(tier: int, seed: int) -> Level:
-    """Build a level of the given difficulty tier (0 .. NUM_TIERS-1)."""
+def generate(tier: int, seed: int, variant: str = "v9") -> Level:
+    """Build a level of the given difficulty tier (0 .. NUM_TIERS-1).
+
+    variant (phase 9): "v9" = the phase-8 generator (default, unchanged); "gabel" = v9 with the repaired fork;
+    "v10" = repaired fork + channels + Mario-inspired blocks in tiers 10-12. Tier 13 is always v10.
+    Tiers 0-9 are the same in every variant.
+    """
 
     cfg = TIERS[max(0, min(tier, NUM_TIERS - 1))]
+    if tier >= 13:
+        variant = "v10"
+    elif tier < 10:
+        variant = "v9"
+    elif variant == "v10":
+        from dataclasses import replace
+
+        cfg = replace(cfg, **V10_EXTRA)
     rng = random.Random(f"{tier}:{seed}")
     b = _Builder(rng)
-    b.style = _style(rng, cfg)
+    b.variant = variant
+    b.style = _style(rng, cfg, variant)
     b.flat(5)
     b.columns[1][b.surface - 1] = "P"
     if cfg.start_enemies and rng.random() < 0.4:
@@ -746,22 +992,31 @@ def generate(tier: int, seed: int) -> Level:
         top = b.columns[-1]
         if top[b.surface] == "B" and b.surface > 0 and top[b.surface - 1] == " ":
             b.waypoints.append((len(b.columns) - 1, b.surface))
-    b.flat(4)
-    b.columns[-2][b.surface - 1] = "C"
-    if cfg.hard >= 3 and rng.random() < 0.5:
-        # v3: no wall behind the chest - jumping over it means falling off the level
-        if rng.random() < 0.6:
-            # v6/v7: chest on the very last floor tile, the void right behind it (as in the exam)
-            b.columns[-2][b.surface - 1] = " "
-            b.columns[-1][b.surface - 1] = "C"
+    if variant == "v10" and rng.random() < cfg.channel_end:
+        # v10: the level ends in a channel - along the floor to the right, stairs up, back left to the chest
+        if b.surface != GROUND:
+            b.drop(GROUND - b.surface)
+            b.flat(3)
+        _channel(b, cfg, final=True)
     else:
-        b.column(b.surface - 3)  # wall behind the chest
+        b.flat(4)
+        b.columns[-2][b.surface - 1] = "C"
+        if cfg.hard >= 3 and rng.random() < 0.5:
+            # v3: no wall behind the chest - jumping over it means falling off the level
+            if rng.random() < 0.6:
+                # v6/v7: chest on the very last floor tile, the void right behind it (as in the exam)
+                b.columns[-2][b.surface - 1] = " "
+                b.columns[-1][b.surface - 1] = "C"
+        else:
+            b.column(b.surface - 3)  # wall behind the chest
 
     lines = ["".join(col[r] for col in b.columns).rstrip() for r in range(ROWS)]
     level = Level(lines, name=f"gen_t{tier}_s{seed}")
     level.building_blocks = dict(b.stats)  # which blocks this level contains (for statistics)
     level.waypoints = sorted(set(b.waypoints))
     level.tier = tier
+    level.variant = variant
+    level.needs_path = b.needs_path
     return level
 
 

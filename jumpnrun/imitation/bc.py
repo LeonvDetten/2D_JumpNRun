@@ -24,7 +24,7 @@ from typing import Dict, List, Sequence
 import numpy as np
 import torch
 
-from jumpnrun.core.actions import BOT_ACTIONS, DEFAULT_REPEAT
+from jumpnrun.core.actions import BOT_ACTIONS, BOT_ACTIONS_V3, DEFAULT_REPEAT
 from jumpnrun.core.sim import Simulation, Status
 from jumpnrun.imitation.demos import SOLVER_WEIGHT, cached_dataset, load_dataset
 from jumpnrun.levelgen.generator import NUM_TIERS, generate
@@ -160,7 +160,7 @@ def _rescue(job):
     level = generate(tier, seed)
     sim = Simulation(level)
     for action in prefix:
-        sim.step(BOT_ACTIONS[action], frames=repeat)
+        sim.step(BOT_ACTIONS_V3[action], frames=repeat)
     if sim.status != Status.RUNNING:
         return None
     result = solve_auto(level, 30_000, action_repeat=repeat, weight=SOLVER_WEIGHT, start=sim)

@@ -1,0 +1,34 @@
+{
+ "dev": [
+  "gabel_drei",
+  "kreuzung",
+  "serpentine",
+  "spiegelweg"
+ ],
+ "test": [
+  "hin_und_zurueck",
+  "kanal_links",
+  "pyramiden",
+  "roehrenwald"
+ ],
+ "sealed": [
+  "burg",
+  "langer_marsch",
+  "spiegelgabel",
+  "turm"
+ ],
+ "sha256": {
+  "gabel_drei": "c012cc2556e1a4c9735cdacda675f543bd98a076bb5018a995267359bffb80c2",
+  "kreuzung": "10affe4e7a439900ba6428cf404ec6a98bb336f14bb35a047067d1c260dfd3ad",
+  "spiegelgabel": "88e12db94c0ca68370aeee8b9a4ec3430b25201722f8a35f393e34b03d75a820",
+  "serpentine": "2c94fe670d82e6d3ab55e4a479960270e87ee7ece71c80c4828d687720e23d07",
+  "kanal_links": "07c5e0901d92ca714c3f7a8abcf4eb2074408bf305e7ef1ce14a3fb29c8349a3",
+  "turm": "d6896817a308f8652458350b8aef057988be87cc86fa648944db3dc6b1d6119d",
+  "roehrenwald": "887b6b1d143254fe71d3f2e187fd99de1172da5b748a02005891fb088e108c1e",
+  "pyramiden": "eb02483bcb11967a79337e01f642d437c7f678020733fd42a20033fbe3999884",
+  "burg": "9a5035754aad7557bd37e0ca84282740372b07ce49b3d2acafe88c9c9e711694",
+  "spiegelweg": "56c077e01f7cc133ef12c07fbfd05a841c2160e958730afa8bf8f076aa6a7533",
+  "langer_marsch": "ba7cdc48c277f8a891875dc593b488dd934ec6c5d208ab291913c56103706956",
+  "hin_und_zurueck": "3f9053efa0b6e86838113879c83dc0cafef569be69853833203bb703ae331e59"
+ }
+}

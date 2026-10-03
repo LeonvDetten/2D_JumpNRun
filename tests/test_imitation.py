@@ -99,6 +99,6 @@ def test_generator_v2_uses_the_new_building_blocks():
 
 
 def test_new_tiers_are_solvable_with_fine_control():
-    for tier in range(5, NUM_TIERS):
+    for tier in range(5, min(NUM_TIERS, 13)):  # tier 13 (phase 9) needs the distance map: tests/test_phase9.py
         for seed in range(2):
             assert solve(generate(tier, seed), 60_000, action_repeat=2, weight=1.2).solved, (tier, seed)

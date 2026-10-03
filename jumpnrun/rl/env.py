@@ -18,7 +18,7 @@ Observation (what the bot "sees" - roughly the human's screen, as tiles):
             3 chest
           It lets the bot notice a dead end or the chest long before it is on screen.
 
-Actions: 6 discrete (see core.actions.BOT_ACTIONS), each held for `action_repeat` frames
+Actions: 6 discrete (see core.actions.BOT_ACTIONS; 7 with obs_v3: + left+jump), each held for `action_repeat` frames
 (4 for models up to phase 3, 2 from phase 5 on).
 
 Reward (deliberately minimal):
@@ -36,7 +36,7 @@ from typing import Callable, Optional
 import gymnasium as gym
 import numpy as np
 
-from jumpnrun.core.actions import ACTION_REPEAT, BOT_ACTIONS
+from jumpnrun.core.actions import ACTION_REPEAT, BOT_ACTIONS, BOT_ACTIONS_V3
 from jumpnrun.core.constants import MAX_FALL_SPEED, ROWS, SHOOT_COOLDOWN, TILE
 from jumpnrun.core.level import Level
 from jumpnrun.core.sim import Simulation, Status
@@ -49,6 +49,10 @@ VIEW_COLS = VIEW_BEHIND + 1 + VIEW_AHEAD
 GRID_CHANNELS = 4
 VEC_SIZE = 15
 VEC_SIZE_V2 = 21  # phase 8 (--obs-v2): + distance behind the furthest point, no-progress and time budget, enemy fall speeds
+VEC_SIZE_V3 = 23  # phase 9 (--obs-v3): + direction to the chest (dx, dy) - a compass, not a way map
+VIEW_BEHIND_V3 = 13  # phase 9: the grid shows 13 tiles behind (turning back, channels going left)
+OV_BEHIND_V3 = 40  # phase 9: the overview reaches 40 tiles behind ...
+OV_COLS_V3 = 40  # ... with 8 more columns (the part ahead stays the same)
 NEAREST_ENEMIES = 3
 OV_BEHIND = 8  # tiles
 OV_COLS = 32
@@ -88,6 +92,8 @@ class JumpNRunEnv(gym.Env):
         rewind_budget: int = 2,
         obs_v2: bool = False,
         stuck_death: bool = False,
+        obs_v3: bool = False,
+        path_reward: bool = False,
     ):
         super().__init__()
         self.level_source = level_source
@@ -95,17 +101,27 @@ class JumpNRunEnv(gym.Env):
         self.action_repeat = int(action_repeat)
         self.max_steps_per_tile = max_frames_per_tile / self.action_repeat
         self.no_progress_steps = NO_PROGRESS_FRAMES // self.action_repeat
-        self.action_space = gym.spaces.Discrete(len(BOT_ACTIONS))
+        self.action_space = gym.spaces.Discrete(len(BOT_ACTIONS_V3) if obs_v3 else len(BOT_ACTIONS))
         self.overview = bool(overview)
-        self.obs_v2 = bool(obs_v2)
+        self.obs_v3 = bool(obs_v3)
+        self.obs_v2 = bool(obs_v2) or self.obs_v3
+        self.view_behind = VIEW_BEHIND_V3 if self.obs_v3 else VIEW_BEHIND
+        self.view_cols = self.view_behind + 1 + VIEW_AHEAD
+        self.ov_behind = OV_BEHIND_V3 if self.obs_v3 else OV_BEHIND
+        self.ov_cols = OV_COLS_V3 if self.obs_v3 else OV_COLS
+        vec_size = VEC_SIZE_V3 if self.obs_v3 else VEC_SIZE_V2 if self.obs_v2 else VEC_SIZE
+        # phase 9: reward progress along the way to the chest (distance map) instead of new rightmost x
+        self.path_reward = bool(path_reward)
+        self.dm = None
+        self.best_dist = None
         # phase 8: getting stuck (no new progress for NO_PROGRESS_FRAMES) ends the episode like a death
         self.stuck_death = bool(stuck_death)
         spaces = {
-            "grid": gym.spaces.Box(-1.0, 1.0, (GRID_CHANNELS, ROWS, VIEW_COLS), np.float32),
-            "vec": gym.spaces.Box(-1.0, 1.0, (VEC_SIZE_V2 if self.obs_v2 else VEC_SIZE,), np.float32),
+            "grid": gym.spaces.Box(-1.0, 1.0, (GRID_CHANNELS, ROWS, self.view_cols), np.float32),
+            "vec": gym.spaces.Box(-1.0, 1.0, (vec_size,), np.float32),
         }
         if self.overview:
-            spaces["overview"] = gym.spaces.Box(0.0, 1.0, (OV_CHANNELS, ROWS, OV_COLS), np.float32)
+            spaces["overview"] = gym.spaces.Box(0.0, 1.0, (OV_CHANNELS, ROWS, self.ov_cols), np.float32)
         self.observation_space = gym.spaces.Dict(spaces)
         self.sim: Optional[Simulation] = None
         self.tier = -1
@@ -147,7 +163,7 @@ class JumpNRunEnv(gym.Env):
         if prefix is not None:  # start in the middle: replay the first part of a teacher's run
             repeat, actions = prefix
             for action in actions:
-                self.sim.step(BOT_ACTIONS[action], frames=repeat)
+                self.sim.step(BOT_ACTIONS_V3[action], frames=repeat)
             if self.sim.status != Status.RUNNING:  # should not happen (won demos), fall back to the start
                 self.sim = Simulation(level)
             self.start_col = self.sim.player.x // TILE
@@ -161,10 +177,21 @@ class JumpNRunEnv(gym.Env):
         self.actions_taken = []
         if self.rewind_prob and self.sim.player.on_ground:
             self._snapshots.append(self.sim.clone())
+        if self.path_reward:
+            from jumpnrun.levelgen.distmap import DistanceMap
+
+            if self.dm is None or self.dm.level is not level:
+                self.dm = DistanceMap(level)
+            p = self.sim.player
+            here = self.dm.at_xy(p.x, p.y, p.w, p.h) if self.dm.reachable else None
+            if here is None and self.dm.reachable:
+                here = self.dm.start
+            self.best_dist = here  # None: no way known - this episode falls back to the x reward
+            self.start_dist = here
 
     def step(self, action: int):
         before = self.sim.max_x
-        self.sim.step(BOT_ACTIONS[int(action)], frames=self.action_repeat)
+        self.sim.step(BOT_ACTIONS_V3[int(action)], frames=self.action_repeat)
         return self.finish_step(int(action), before)
 
     def finish_step(self, action: int, max_x_before: int):
@@ -178,8 +205,15 @@ class JumpNRunEnv(gym.Env):
         self.steps += 1
         self.actions_taken.append(action)
 
-        gained = sim.max_x - max_x_before
-        reward = REWARD_PER_TILE * gained / TILE
+        if self.best_dist is not None:
+            gained = 0.0
+            here = self.dm.at_player(sim.player)
+            if here is not None and here < self.best_dist:
+                gained, self.best_dist = self.best_dist - here, here
+            reward = REWARD_PER_TILE * gained
+        else:
+            gained = sim.max_x - max_x_before
+            reward = REWARD_PER_TILE * gained / TILE
         self.steps_since_progress = 0 if gained > 0 else self.steps_since_progress + 1
 
         terminated = status != Status.RUNNING
@@ -211,7 +245,8 @@ class JumpNRunEnv(gym.Env):
                 "won": status == Status.WON,
                 "tier": self.tier,
                 "level": sim.level.name,
-                "progress": min(1.0, sim.max_x / max(1, sim.level.goal_x)),
+                "progress": self._progress(),
+                "path": self.best_dist is not None,
                 "steps": self.steps,
                 "kills": sim.kills_stomp + sim.kills_shot,
                 "blocks": sorted(getattr(sim.level, "building_blocks", {})),
@@ -222,6 +257,13 @@ class JumpNRunEnv(gym.Env):
                 "aug": getattr(sim.level, "augmentations", None) or [],
             }
         return self._observe(), float(reward), terminated, truncated, info
+
+    def _progress(self) -> float:
+        if self.sim.status == Status.WON:
+            return 1.0
+        if self.best_dist is not None and self.start_dist:
+            return max(0.0, min(1.0, 1.0 - self.best_dist / self.start_dist))
+        return min(1.0, self.sim.max_x / max(1, self.sim.level.goal_x))
 
     def set_tier_weights(self, weights) -> None:
         """Called by the curriculum (training process) to steer level difficulty."""
@@ -237,7 +279,7 @@ class JumpNRunEnv(gym.Env):
         """Precompute the padded static grid (blocks + chests) for fast slicing."""
 
         self.level = level
-        pad_l, pad_r = VIEW_BEHIND + 1, VIEW_AHEAD + 1
+        pad_l, pad_r = self.view_behind + 1, VIEW_AHEAD + 1
         static = np.zeros((2, ROWS, level.cols + pad_l + pad_r), np.float32)
         static[0, :, :pad_l] = 1.0  # left border
         static[0, :, pad_l + level.cols:] = 1.0  # right border
@@ -252,7 +294,7 @@ class JumpNRunEnv(gym.Env):
     def _set_overview(self, level: Level) -> None:
         """Window sums over 4 tiles for every start column, so observing is just an index lookup."""
 
-        pad_l, pad_r = OV_BEHIND + 1, OV_AHEAD + OV_SCALE + 1
+        pad_l, pad_r = self.ov_behind + 1, self.ov_cols * OV_SCALE - self.ov_behind + OV_SCALE + 1
         width = level.cols + pad_l + pad_r
         solid = np.ones((ROWS, width), np.float32)  # outside the level counts as wall
         solid[:, pad_l:pad_l + level.cols] = np.array([list(row) for row in level.solid], np.float32)
@@ -274,24 +316,24 @@ class JumpNRunEnv(gym.Env):
         sim = self.sim
         p = sim.player
         pcol = (p.x + p.w // 2) // TILE
-        c0 = pcol - VIEW_BEHIND  # level column shown in grid column 0
+        c0 = pcol - self.view_behind  # level column shown in grid column 0
 
-        grid = np.zeros((GRID_CHANNELS, ROWS, VIEW_COLS), np.float32)
-        grid[0:2] = self._static[:, :, c0 + self._pad_l: c0 + self._pad_l + VIEW_COLS]
+        grid = np.zeros((GRID_CHANNELS, ROWS, self.view_cols), np.float32)
+        grid[0:2] = self._static[:, :, c0 + self._pad_l: c0 + self._pad_l + self.view_cols]
         prow = (p.y + p.h // 2) // TILE
         if 0 <= prow < ROWS:
-            grid[3, prow, VIEW_BEHIND] = 1.0
+            grid[3, prow, self.view_behind] = 1.0
 
         nearest = []
         for e in sim.enemies:
             ecol = (e.x + e.w // 2) // TILE - c0
             erow = (e.y + e.h // 2) // TILE
-            if 0 <= ecol < VIEW_COLS and 0 <= erow < ROWS:
+            if 0 <= ecol < self.view_cols and 0 <= erow < ROWS:
                 grid[2, erow, ecol] = float(e.direction)
             nearest.append((abs(e.x - p.x) + abs(e.y - p.y), e))
         nearest.sort(key=lambda item: item[0])
 
-        vec = np.zeros(VEC_SIZE_V2 if self.obs_v2 else VEC_SIZE, np.float32)
+        vec = np.zeros(self.observation_space["vec"].shape[0], np.float32)
         vec[0] = p.vy / MAX_FALL_SPEED
         vec[1] = 1.0 if p.on_ground else 0.0
         vec[2] = float(p.facing)
@@ -308,21 +350,25 @@ class JumpNRunEnv(gym.Env):
             vec[17] = 1.0 - self.steps / max(1, self.max_steps)
             for i, (_, e) in enumerate(nearest[:NEAREST_ENEMIES]):
                 vec[18 + i] = e.vy / MAX_FALL_SPEED
+        if self.obs_v3:
+            cx, cy, cw, ch = min(sim.level.chests, key=lambda c: abs(c[0] - p.x) + abs(c[1] - p.y))
+            vec[21] = (cx + cw // 2 - p.x - p.w // 2) / 3000.0
+            vec[22] = (cy + ch - p.y - p.h) / (ROWS * TILE)
         obs = {"grid": grid, "vec": np.clip(vec, -1.0, 1.0)}
         if self.overview:
             obs["overview"] = self._observe_overview(pcol)
         return obs
 
     def _observe_overview(self, pcol: int) -> np.ndarray:
-        start = pcol - OV_BEHIND  # level column where overview column 0 begins
-        idx = start + self._ov_pad + OV_SCALE * np.arange(OV_COLS)
-        ov = np.zeros((OV_CHANNELS, ROWS, OV_COLS), np.float32)
+        start = pcol - self.ov_behind  # level column where overview column 0 begins
+        idx = start + self._ov_pad + OV_SCALE * np.arange(self.ov_cols)
+        ov = np.zeros((OV_CHANNELS, ROWS, self.ov_cols), np.float32)
         ov[0] = self._ov_static[0][:, idx]
         ov[1] = self._ov_static[1][:, idx]
         ov[3] = self._ov_static[2][:, idx]
         for e in self.sim.enemies:
             j = ((e.x + e.w // 2) // TILE - start) // OV_SCALE
             row = (e.y + e.h // 2) // TILE
-            if 0 <= j < OV_COLS and 0 <= row < ROWS:
+            if 0 <= j < self.ov_cols and 0 <= row < ROWS:
                 ov[2, row, j] = 1.0
         return ov
