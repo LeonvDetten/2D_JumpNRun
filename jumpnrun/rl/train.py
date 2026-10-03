@@ -140,6 +140,8 @@ def main() -> None:
                         help="phase 9: generator variant for fresh levels (gabel = repaired fork; v10 = + channels, Mario)")
     parser.add_argument("--augment-v2", action="store_true",
                         help="phase 9: augmentation V2 (mirror, enemy density, noise, concatenated levels)")
+    parser.add_argument("--path-delta", action="store_true",
+                        help="phase 9: way reward as potential difference (closer +, further away -)")
     parser.add_argument("--path-reward", action="store_true",
                         help="phase 9: reward progress along the way to the chest (distance map) instead of new max x")
     parser.add_argument("--plr", type=float, default=0.0,
@@ -173,7 +175,7 @@ def main() -> None:
         make_env(i, args.seed, args.min_tier, args.max_tier, handmade_paths, args.handmade_prob,
                  args.action_repeat, args.pool, args.overview, args.start_prob, tuple(args.start_dirs),
                  args.rewind_prob, args.pool_share, args.augment, args.obs_v2, args.stuck_death, args.plr,
-                 env_extra=dict(obs_v3=args.obs_v3, path_reward=args.path_reward),
+                 env_extra=dict(obs_v3=args.obs_v3, path_reward=args.path_reward, path_delta=args.path_delta),
                  source_extra=dict(gen_variant=args.generator, augment_v2=args.augment_v2))
         for i in range(args.envs)
     ]
@@ -212,6 +214,7 @@ def main() -> None:
     config_path.write_text(json.dumps({"action_repeat": args.action_repeat, "overview": args.overview,
                                        "arch": args.arch, "phase_start": phase_start, "obs_v2": args.obs_v2,
                                        "obs_v3": args.obs_v3, "path_reward": args.path_reward,
+                                       "path_delta": args.path_delta,
                                        "generator": args.generator, "augment_v2": args.augment_v2},
                                       indent=2) + "\n")
     eval_levels = eval_level_set(range(args.min_tier, args.max_tier + 1), args.eval_per_tier)

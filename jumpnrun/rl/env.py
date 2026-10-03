@@ -94,6 +94,7 @@ class JumpNRunEnv(gym.Env):
         stuck_death: bool = False,
         obs_v3: bool = False,
         path_reward: bool = False,
+        path_delta: bool = False,
     ):
         super().__init__()
         self.level_source = level_source
@@ -111,7 +112,11 @@ class JumpNRunEnv(gym.Env):
         self.ov_cols = OV_COLS_V3 if self.obs_v3 else OV_COLS
         vec_size = VEC_SIZE_V3 if self.obs_v3 else VEC_SIZE_V2 if self.obs_v2 else VEC_SIZE
         # phase 9: reward progress along the way to the chest (distance map) instead of new rightmost x
-        self.path_reward = bool(path_reward)
+        self.path_reward = bool(path_reward) or bool(path_delta)
+        # path_delta: potential-based shaping - every tile closer to the chest +0.1, every tile further away
+        # -0.1 (walking onto a dead end costs, turning back pays at once; loops sum to zero)
+        self.path_delta = bool(path_delta)
+        self.cur_dist = None
         self.dm = None
         self.best_dist = None
         # phase 8: getting stuck (no new progress for NO_PROGRESS_FRAMES) ends the episode like a death
@@ -187,6 +192,7 @@ class JumpNRunEnv(gym.Env):
             if here is None and self.dm.reachable:
                 here = self.dm.start
             self.best_dist = here  # None: no way known - this episode falls back to the x reward
+            self.cur_dist = here
             self.start_dist = here
 
     def step(self, action: int):
@@ -211,6 +217,11 @@ class JumpNRunEnv(gym.Env):
             if here is not None and here < self.best_dist:
                 gained, self.best_dist = self.best_dist - here, here
             reward = REWARD_PER_TILE * gained
+            if self.path_delta:
+                reward = 0.0
+                if here is not None:
+                    reward = REWARD_PER_TILE * (self.cur_dist - here)
+                    self.cur_dist = here
         else:
             gained = sim.max_x - max_x_before
             reward = REWARD_PER_TILE * gained / TILE
