@@ -83,3 +83,4 @@ docs/lernen/            dieses Lerntagebuch
 | 5 | Vom Löser abschauen, feinere Steuerung | [05_phase5_abschauen.md](05_phase5_abschauen.md) |
 | 6 | Übersichtskarte, lange Level, Startpunkte – **erste Prüfungssiege** | [06_phase6_generalist.md](06_phase6_generalist.md) |
 | 7 | Zwei Netze im Vergleich, EMA, Abzweige – Prüfung 85/128 (Ziel erreicht), Test-Serie 138/192 (Ziel 144 verfehlt), geheime exam2 49/128 – **Ziel insgesamt verfehlt** | [07_phase7_zwei_wege.md](07_phase7_zwei_wege.md) |
+| 8 | Ehrlich messen: vier Messgruppen, Fähigkeits-Proben, 12 neue Level, Datenweg + Augmentierung, Runden gegen Kontrolle – versiegelt 208/256 (untere 95-%-Grenze 76 %), exam2 85/128, Test-Serie 153/192 – **Merge-Kriterium erfüllt**; Gabelungen bleiben offen | [08_phase8_ehrlich_messen.md](08_phase8_ehrlich_messen.md) |
