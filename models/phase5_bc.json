@@ -1,0 +1,5 @@
+{
+  "action_repeat": 2,
+  "source": "behaviour cloning",
+  "init": "models/phase3.zip"
+}

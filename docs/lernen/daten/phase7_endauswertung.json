@@ -1,0 +1,51 @@
+{
+ "checkpoint": "runs/phase7c/checkpoints/ema_step_0035000008.zip",
+ "pruefung_original": 85,
+ "pruefung_entschaerft": 83,
+ "test_serie": {
+  "berg": 26,
+  "festung": 25,
+  "hoehle": 9,
+  "lange_reise": 18,
+  "parcours": 31,
+  "zwei_wege": 29
+ },
+ "validierung_v2": 114,
+ "validierung_v3": 38,
+ "validierung_v4": 31,
+ "exam2": {
+  "checkpoint": "runs/phase7c/checkpoints/ema_step_0035000008.zip",
+  "exam2_won": 49,
+  "of": 128
+ },
+ "autopilot_log": [
+  "2026-10-01 05:49 Starte Nachahmen f\u00fcr Lauf B (Versuch 1, Lernrate 1e-3)",
+  "BC-Versuch 1 verworfen: Tanh-K\u00f6pfe ges\u00e4ttigt (Fehler gefunden, auf ReLU umgestellt)",
+  "2026-10-01 06:37 Starte Nachahmen f\u00fcr Lauf B (Versuch 1, Lernrate 1e-3)",
+  "2026-10-01 07:06 Nachahmen f\u00fcr B noch zu schwach (34.7 %), zweiter Versuch: weitertrainieren",
+  "2026-10-01 07:06 Starte Nachahmen f\u00fcr Lauf B (Versuch 2: --init models/phase7b_bc_first.zip --lr 5e-4)",
+  "2026-10-01 08:15 Zweiter Nachahm-Versuch abgebrochen (Container-Neustart): B startet vom ersten BC-Modell",
+  "2026-10-01 08:15 Training A gestartet/fortgesetzt auf Kernen [0, 1]",
+  "2026-10-01 08:15 Training B gestartet/fortgesetzt auf Kernen [2, 3]",
+  "2026-10-01 08:28 Probelauf: A ~430, B ~100-130 Schritte/s (IMPALA mit getrennten Netzen 3-5x teurer als gemessen). Abweichung von der Tempo-Regel: Kerne bleiben 2/2 (B auf 1 Kern waere wertlos); Vergleich nach 12 h entscheidet ueber die Kerne.",
+  "2026-10-01 08:50 Training A gestartet/fortgesetzt auf Kernen [0, 1]",
+  "2026-10-01 08:50 Training B gestartet/fortgesetzt auf Kernen [2, 3]",
+  "2026-10-01 18:56 Lauf A: Plateau (1.) -> Fehlerkatalog auswerten, fehlende Muster erg\u00e4nzen",
+  "2026-10-01 19:02 Lauf A: Plateau-Stufe 1 bearbeitet: Generator v5 (Stufe 12: freie Gegner 0.4->0.8, weiteste Spruenge x3), Neustart von A",
+  "2026-10-01 19:02 Training A gestartet/fortgesetzt auf Kernen [0, 1]",
+  "2026-10-01 20:24 Vergleich nach 12 h: A Pr\u00fcfung 26% / Test-Serie 64%, B 0% / 36% -> B pausiert",
+  "2026-10-01 20:24 Training A gestartet/fortgesetzt auf Kernen [0, 1, 2, 3]",
+  "2026-10-01 22:36 Training A gestartet/fortgesetzt auf Kernen [0, 1, 2, 3]",
+  "2026-10-01 22:52 Lauf A: Fehlerkatalog Pruefung: 17/27 Fehlversuche springen ueber die Truhe am Levelrand -> Generator v6 (Truhe auf letzter Kachel), Neustart von A",
+  "2026-10-01 22:52 Training A gestartet/fortgesetzt auf Kernen [0, 1, 2, 3]",
+  "2026-10-01 23:01 Lauf A: Plateau (2.) -> ruhiger Feinschliff (lr 3e-5, kein Zufallsbonus)",
+  "2026-10-01 23:01 Training A gestartet/fortgesetzt auf Kernen [0, 1, 2, 3]",
+  "2026-10-01 23:03 Training A gestartet/fortgesetzt auf Kernen [0, 1, 2, 3]",
+  "2026-10-02 08:56 Training A gestartet/fortgesetzt auf Kernen [0, 1, 2, 3]",
+  "2026-10-02 09:07 Leon: 'Ja, ab 34' -> Lauf A pausiert, Lauf C = Abzweig von A (EMA 34 Mio.), Generator v7, lr 3e-5, Zufallsbonus 0.003, max. 23.5 h",
+  "2026-10-02 09:07 Training C gestartet/fortgesetzt auf Kernen [0, 1, 2, 3]",
+  "2026-10-02 13:02 Leon: 'Muster ergaenzen ab EMA 36' -> Lauf C pausiert, Lauf D = Abzweig von C (EMA 36 Mio.), Generator v8, lr 3e-5, max. 19.6 h",
+  "2026-10-02 13:02 Training D gestartet/fortgesetzt auf Kernen [0, 1, 2, 3]",
+  "2026-10-02 17:31 Phase 7 beendet. Bestes Modell C ema_step_0035000008.zip: 85/128, Test-Serie 138/192"
+ ]
+}

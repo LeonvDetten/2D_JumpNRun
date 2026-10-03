@@ -1,0 +1,129 @@
+{
+ "phase5": {
+  "validierung_v2": 114,
+  "validierung_v3": 17,
+  "test_serie": {
+   "berg": 32,
+   "festung": 8,
+   "hoehle": 2,
+   "lange_reise": 2,
+   "parcours": 30,
+   "zwei_wege": 23
+  },
+  "pruefung_original": {
+   "won": 0,
+   "of": 128,
+   "ends": {
+    "gabelung_oben": 25,
+    "trittsteine": 17,
+    "start_gegnerregen": 86
+   }
+  },
+  "pruefung_entschaerft": {
+   "won": 0,
+   "of": 128,
+   "ends": {
+    "trittsteine": 49,
+    "gabelung_oben": 31,
+    "start_gegnerregen": 48
+   }
+  }
+ },
+ "p6_bestval": {
+  "validierung_v2": 116,
+  "validierung_v3": 35,
+  "test_serie": {
+   "berg": 24,
+   "festung": 15,
+   "hoehle": 8,
+   "lange_reise": 2,
+   "parcours": 31,
+   "zwei_wege": 31
+  },
+  "pruefung_original": {
+   "won": 4,
+   "of": 128,
+   "ends": {
+    "ziel": 27,
+    "start_gegnerregen": 32,
+    "diagonalen": 30,
+    "trittsteine": 35
+   }
+  },
+  "pruefung_entschaerft": {
+   "won": 4,
+   "of": 128,
+   "ends": {
+    "diagonalen": 41,
+    "ziel": 25,
+    "start_gegnerregen": 31,
+    "trittsteine": 27
+   }
+  }
+ },
+ "p6_28mio": {
+  "validierung_v2": 114,
+  "validierung_v3": 36,
+  "test_serie": {
+   "berg": 30,
+   "festung": 20,
+   "hoehle": 16,
+   "lange_reise": 3,
+   "parcours": 31,
+   "zwei_wege": 26
+  },
+  "pruefung_original": {
+   "won": 37,
+   "of": 128,
+   "ends": {
+    "ziel": 35,
+    "diagonalen": 40,
+    "trittsteine": 11,
+    "start_gegnerregen": 3,
+    "gabelung_oben": 2
+   }
+  },
+  "pruefung_entschaerft": {
+   "won": 40,
+   "of": 128,
+   "ends": {
+    "diagonalen": 39,
+    "ziel": 26,
+    "trittsteine": 23
+   }
+  }
+ },
+ "p6_ende": {
+  "validierung_v2": 105,
+  "validierung_v3": 32,
+  "test_serie": {
+   "berg": 30,
+   "festung": 4,
+   "hoehle": 18,
+   "lange_reise": 6,
+   "parcours": 32,
+   "zwei_wege": 30
+  },
+  "pruefung_original": {
+   "won": 19,
+   "of": 128,
+   "ends": {
+    "ziel": 32,
+    "diagonalen": 63,
+    "trittsteine": 12,
+    "gabelung_oben": 1,
+    "start_gegnerregen": 1
+   }
+  },
+  "pruefung_entschaerft": {
+   "won": 21,
+   "of": 128,
+   "ends": {
+    "diagonalen": 57,
+    "ziel": 28,
+    "trittsteine": 18,
+    "gabelung_oben": 4
+   }
+  }
+ }
+}

@@ -1,0 +1,2631 @@
+{
+"A": [
+{
+"steps": 28000128,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 114,
+"validierung_v3": 36,
+"validierung_v4": 21
+},
+"test_serie": {
+"berg": 16,
+"festung": 12,
+"hoehle": 5,
+"lange_reise": 2,
+"parcours": 16,
+"zwei_wege": 13
+},
+"pruefung": 21,
+"pruefung_entschaerft": 19,
+"enden": {
+"diagonalen": 24,
+"ziel": 8,
+"trittsteine": 11
+}
+},
+{
+"steps": 29000136,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 114,
+"validierung_v3": 36,
+"validierung_v4": 31
+},
+"test_serie": {
+"berg": 15,
+"festung": 7,
+"hoehle": 5,
+"lange_reise": 4,
+"parcours": 16,
+"zwei_wege": 14
+},
+"pruefung": 5,
+"pruefung_entschaerft": 3,
+"enden": {
+"ziel": 27,
+"start_gegnerregen": 2,
+"trittsteine": 19,
+"diagonalen": 10,
+"gabelung_oben": 1
+}
+},
+{
+"steps": 29000136,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 115,
+"validierung_v3": 34,
+"validierung_v4": 17
+},
+"test_serie": {
+"berg": 16,
+"festung": 7,
+"hoehle": 7,
+"lange_reise": 5,
+"parcours": 16,
+"zwei_wege": 15
+},
+"pruefung": 5,
+"pruefung_entschaerft": 6,
+"enden": {
+"ziel": 32,
+"diagonalen": 10,
+"trittsteine": 12,
+"start_gegnerregen": 2,
+"gabelung_oben": 3
+}
+},
+{
+"steps": 30000136,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 115,
+"validierung_v3": 34,
+"validierung_v4": 33
+},
+"test_serie": {
+"berg": 15,
+"festung": 11,
+"hoehle": 6,
+"lange_reise": 4,
+"parcours": 16,
+"zwei_wege": 15
+},
+"pruefung": 2,
+"pruefung_entschaerft": 5,
+"enden": {
+"diagonalen": 23,
+"ziel": 23,
+"gabelung_oben": 4,
+"trittsteine": 11,
+"start_gegnerregen": 1
+}
+},
+{
+"steps": 30000136,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 105,
+"validierung_v3": 34,
+"validierung_v4": 19
+},
+"test_serie": {
+"berg": 13,
+"festung": 10,
+"hoehle": 2,
+"lange_reise": 3,
+"parcours": 16,
+"zwei_wege": 12
+},
+"pruefung": 3,
+"pruefung_entschaerft": 4,
+"enden": {
+"trittsteine": 13,
+"ziel": 23,
+"start_gegnerregen": 11,
+"diagonalen": 11,
+"gabelung_oben": 3
+}
+},
+{
+"steps": 31000136,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 110,
+"validierung_v3": 33,
+"validierung_v4": 32
+},
+"test_serie": {
+"berg": 12,
+"festung": 10,
+"hoehle": 5,
+"lange_reise": 9,
+"parcours": 16,
+"zwei_wege": 16
+},
+"pruefung": 36,
+"pruefung_entschaerft": 23,
+"enden": {
+"trittsteine": 12,
+"ziel": 7,
+"start_gegnerregen": 7,
+"diagonalen": 1,
+"gabelung_oben": 1
+}
+},
+{
+"steps": 31000136,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 112,
+"validierung_v3": 30,
+"validierung_v4": 32
+},
+"test_serie": {
+"berg": 13,
+"festung": 4,
+"hoehle": 11,
+"lange_reise": 7,
+"parcours": 16,
+"zwei_wege": 11
+},
+"pruefung": 17,
+"pruefung_entschaerft": 9,
+"enden": {
+"ziel": 4,
+"trittsteine": 18,
+"diagonalen": 8,
+"start_gegnerregen": 15,
+"gabelung_oben": 2
+}
+},
+{
+"steps": 32000136,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 117,
+"validierung_v3": 34,
+"validierung_v4": 34
+},
+"test_serie": {
+"berg": 13,
+"festung": 10,
+"hoehle": 5,
+"lange_reise": 3,
+"parcours": 15,
+"zwei_wege": 13
+},
+"pruefung": 36,
+"pruefung_entschaerft": 43,
+"enden": {
+"diagonalen": 9,
+"ziel": 11,
+"trittsteine": 5,
+"start_gegnerregen": 2,
+"gabelung_oben": 1
+}
+},
+{
+"steps": 32000136,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 113,
+"validierung_v3": 36,
+"validierung_v4": 35
+},
+"test_serie": {
+"berg": 12,
+"festung": 7,
+"hoehle": 7,
+"lange_reise": 3,
+"parcours": 16,
+"zwei_wege": 11
+},
+"pruefung": 11,
+"pruefung_entschaerft": 8,
+"enden": {
+"start_gegnerregen": 4,
+"ziel": 12,
+"diagonalen": 26,
+"trittsteine": 9,
+"gabelung_oben": 2
+}
+},
+{
+"steps": 33000136,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 114,
+"validierung_v3": 37,
+"validierung_v4": 36
+},
+"test_serie": {
+"berg": 13,
+"festung": 12,
+"hoehle": 8,
+"lange_reise": 3,
+"parcours": 14,
+"zwei_wege": 12
+},
+"pruefung": 41,
+"pruefung_entschaerft": 49,
+"enden": {
+"diagonalen": 3,
+"ziel": 11,
+"start_gegnerregen": 1,
+"trittsteine": 8
+}
+},
+{
+"steps": 33000136,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 112,
+"validierung_v3": 36,
+"validierung_v4": 28
+},
+"test_serie": {
+"berg": 10,
+"festung": 9,
+"hoehle": 3,
+"lange_reise": 0,
+"parcours": 16,
+"zwei_wege": 10
+},
+"pruefung": 7,
+"pruefung_entschaerft": 13,
+"enden": {
+"ziel": 24,
+"trittsteine": 24,
+"start_gegnerregen": 5,
+"gabelung_oben": 1,
+"diagonalen": 3
+}
+},
+{
+"steps": 34000136,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 113,
+"validierung_v3": 39,
+"validierung_v4": 35
+},
+"test_serie": {
+"berg": 13,
+"festung": 4,
+"hoehle": 7,
+"lange_reise": 2,
+"parcours": 16,
+"zwei_wege": 13
+},
+"pruefung": 43,
+"pruefung_entschaerft": 49,
+"enden": {
+"trittsteine": 11,
+"diagonalen": 8,
+"ziel": 2
+}
+},
+{
+"steps": 34000136,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 112,
+"validierung_v3": 36,
+"validierung_v4": 29
+},
+"test_serie": {
+"berg": 13,
+"festung": 2,
+"hoehle": 9,
+"lange_reise": 1,
+"parcours": 13,
+"zwei_wege": 14
+},
+"pruefung": 38,
+"pruefung_entschaerft": 39,
+"enden": {
+"trittsteine": 14,
+"ziel": 5,
+"diagonalen": 3,
+"start_gegnerregen": 4
+}
+},
+{
+"steps": 35000136,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 112,
+"validierung_v3": 34,
+"validierung_v4": 34
+},
+"test_serie": {
+"berg": 13,
+"festung": 5,
+"hoehle": 2,
+"lange_reise": 8,
+"parcours": 16,
+"zwei_wege": 16
+},
+"pruefung": 42,
+"pruefung_entschaerft": 33,
+"enden": {
+"gabelung_oben": 9,
+"trittsteine": 7,
+"ziel": 2,
+"start_gegnerregen": 3,
+"diagonalen": 1
+}
+},
+{
+"steps": 35000136,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 115,
+"validierung_v3": 36,
+"validierung_v4": 25
+},
+"test_serie": {
+"berg": 15,
+"festung": 5,
+"hoehle": 4,
+"lange_reise": 7,
+"parcours": 16,
+"zwei_wege": 16
+},
+"pruefung": 15,
+"pruefung_entschaerft": 20,
+"enden": {
+"gabelung_oben": 34,
+"trittsteine": 3,
+"ziel": 10,
+"diagonalen": 1,
+"start_gegnerregen": 1
+}
+},
+{
+"steps": 36000136,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 117,
+"validierung_v3": 34,
+"validierung_v4": 36
+},
+"test_serie": {
+"berg": 15,
+"festung": 12,
+"hoehle": 5,
+"lange_reise": 11,
+"parcours": 16,
+"zwei_wege": 15
+},
+"pruefung": 35,
+"pruefung_entschaerft": 28,
+"enden": {
+"diagonalen": 6,
+"ziel": 11,
+"start_gegnerregen": 3,
+"trittsteine": 9
+}
+},
+{
+"steps": 36000136,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 116,
+"validierung_v3": 35,
+"validierung_v4": 35
+},
+"test_serie": {
+"berg": 14,
+"festung": 8,
+"hoehle": 4,
+"lange_reise": 5,
+"parcours": 16,
+"zwei_wege": 13
+},
+"pruefung": 13,
+"pruefung_entschaerft": 16,
+"enden": {
+"diagonalen": 7,
+"ziel": 24,
+"trittsteine": 19,
+"start_gegnerregen": 1
+}
+},
+{
+"steps": 37000136,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 116,
+"validierung_v3": 38,
+"validierung_v4": 34
+},
+"test_serie": {
+"berg": 14,
+"festung": 7,
+"hoehle": 2,
+"lange_reise": 5,
+"parcours": 16,
+"zwei_wege": 14
+},
+"pruefung": 14,
+"pruefung_entschaerft": 8,
+"enden": {
+"diagonalen": 6,
+"ziel": 24,
+"start_gegnerregen": 2,
+"trittsteine": 18
+}
+},
+{
+"steps": 37000136,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 113,
+"validierung_v3": 35,
+"validierung_v4": 28
+},
+"test_serie": {
+"berg": 13,
+"festung": 9,
+"hoehle": 3,
+"lange_reise": 1,
+"parcours": 16,
+"zwei_wege": 14
+},
+"pruefung": 8,
+"pruefung_entschaerft": 6,
+"enden": {
+"trittsteine": 34,
+"diagonalen": 1,
+"gabelung_oben": 4,
+"ziel": 17
+}
+},
+{
+"steps": 38000136,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 117,
+"validierung_v3": 37,
+"validierung_v4": 28
+},
+"test_serie": {
+"berg": 12,
+"festung": 7,
+"hoehle": 5,
+"lange_reise": 7,
+"parcours": 15,
+"zwei_wege": 14
+},
+"pruefung": 8,
+"pruefung_entschaerft": 6,
+"enden": {
+"trittsteine": 17,
+"ziel": 31,
+"diagonalen": 6,
+"start_gegnerregen": 2
+}
+},
+{
+"steps": 38000136,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 103,
+"validierung_v3": 29,
+"validierung_v4": 12
+},
+"test_serie": {
+"berg": 10,
+"festung": 9,
+"hoehle": 2,
+"lange_reise": 4,
+"parcours": 16,
+"zwei_wege": 15
+},
+"pruefung": 8,
+"pruefung_entschaerft": 10,
+"enden": {
+"trittsteine": 37,
+"ziel": 7,
+"start_gegnerregen": 7,
+"diagonalen": 5
+}
+},
+{
+"steps": 39000136,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 117,
+"validierung_v3": 36,
+"validierung_v4": 30
+},
+"test_serie": {
+"berg": 11,
+"festung": 9,
+"hoehle": 4,
+"lange_reise": 1,
+"parcours": 16,
+"zwei_wege": 16
+},
+"pruefung": 24,
+"pruefung_entschaerft": 28,
+"enden": {
+"diagonalen": 19,
+"ziel": 7,
+"trittsteine": 12,
+"start_gegnerregen": 2
+}
+},
+{
+"steps": 39000136,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 115,
+"validierung_v3": 34,
+"validierung_v4": 27
+},
+"test_serie": {
+"berg": 14,
+"festung": 8,
+"hoehle": 2,
+"lange_reise": 2,
+"parcours": 13,
+"zwei_wege": 12
+},
+"pruefung": 27,
+"pruefung_entschaerft": 22,
+"enden": {
+"trittsteine": 19,
+"diagonalen": 6,
+"start_gegnerregen": 5,
+"ziel": 6,
+"gabelung_oben": 1
+}
+},
+{
+"steps": 40000144,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 114,
+"validierung_v3": 39,
+"validierung_v4": 37
+},
+"test_serie": {
+"berg": 16,
+"festung": 11,
+"hoehle": 2,
+"lange_reise": 8,
+"parcours": 16,
+"zwei_wege": 15
+},
+"pruefung": 27,
+"pruefung_entschaerft": 28,
+"enden": {
+"trittsteine": 8,
+"ziel": 15,
+"diagonalen": 10,
+"start_gegnerregen": 3,
+"gabelung_oben": 1
+}
+},
+{
+"steps": 40000144,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 117,
+"validierung_v3": 37,
+"validierung_v4": 35
+},
+"test_serie": {
+"berg": 16,
+"festung": 16,
+"hoehle": 4,
+"lange_reise": 8,
+"parcours": 15,
+"zwei_wege": 16
+},
+"pruefung": 24,
+"pruefung_entschaerft": 28,
+"enden": {
+"start_gegnerregen": 3,
+"trittsteine": 13,
+"diagonalen": 14,
+"ziel": 9,
+"gabelung_oben": 1
+}
+},
+{
+"steps": 41000144,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 119,
+"validierung_v3": 35,
+"validierung_v4": 33
+},
+"test_serie": {
+"berg": 15,
+"festung": 11,
+"hoehle": 5,
+"lange_reise": 9,
+"parcours": 15,
+"zwei_wege": 14
+},
+"pruefung": 18,
+"pruefung_entschaerft": 13,
+"enden": {
+"ziel": 16,
+"start_gegnerregen": 2,
+"gabelung_oben": 13,
+"trittsteine": 12,
+"diagonalen": 3
+}
+},
+{
+"steps": 41000144,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 119,
+"validierung_v3": 34,
+"validierung_v4": 24
+},
+"test_serie": {
+"berg": 8,
+"festung": 10,
+"hoehle": 3,
+"lange_reise": 0,
+"parcours": 16,
+"zwei_wege": 14
+},
+"pruefung": 1,
+"pruefung_entschaerft": 3,
+"enden": {
+"start_gegnerregen": 12,
+"trittsteine": 13,
+"diagonalen": 7,
+"ziel": 22,
+"gabelung_oben": 9
+}
+},
+{
+"steps": 42000228,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 116,
+"validierung_v3": 35,
+"validierung_v4": 37
+},
+"test_serie": {
+"berg": 8,
+"festung": 11,
+"hoehle": 7,
+"lange_reise": 6,
+"parcours": 16,
+"zwei_wege": 16
+},
+"pruefung": 28,
+"pruefung_entschaerft": 23,
+"enden": {
+"start_gegnerregen": 3,
+"ziel": 15,
+"gabelung_oben": 1,
+"trittsteine": 9,
+"diagonalen": 8
+}
+},
+{
+"steps": 42000228,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 115,
+"validierung_v3": 35,
+"validierung_v4": 27
+},
+"test_serie": {
+"berg": 14,
+"festung": 9,
+"hoehle": 3,
+"lange_reise": 0,
+"parcours": 16,
+"zwei_wege": 16
+},
+"pruefung": 22,
+"pruefung_entschaerft": 22,
+"enden": {
+"diagonalen": 5,
+"ziel": 13,
+"trittsteine": 14,
+"start_gegnerregen": 8,
+"gabelung_oben": 2
+}
+},
+{
+"steps": 43000308,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 117,
+"validierung_v3": 34,
+"validierung_v4": 34
+},
+"test_serie": {
+"berg": 10,
+"festung": 15,
+"hoehle": 3,
+"lange_reise": 2,
+"parcours": 16,
+"zwei_wege": 14
+},
+"pruefung": 25,
+"pruefung_entschaerft": 18,
+"enden": {
+"ziel": 11,
+"start_gegnerregen": 14,
+"diagonalen": 3,
+"trittsteine": 11
+}
+},
+{
+"steps": 43000308,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 115,
+"validierung_v3": 35,
+"validierung_v4": 25
+},
+"test_serie": {
+"berg": 7,
+"festung": 9,
+"hoehle": 1,
+"lange_reise": 0,
+"parcours": 16,
+"zwei_wege": 15
+},
+"pruefung": 7,
+"pruefung_entschaerft": 4,
+"enden": {
+"ziel": 11,
+"start_gegnerregen": 25,
+"gabelung_oben": 3,
+"trittsteine": 17,
+"diagonalen": 1
+}
+},
+{
+"steps": 44000388,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 116,
+"validierung_v3": 38,
+"validierung_v4": 37
+},
+"test_serie": {
+"berg": 12,
+"festung": 11,
+"hoehle": 2,
+"lange_reise": 3,
+"parcours": 16,
+"zwei_wege": 16
+},
+"pruefung": 15,
+"pruefung_entschaerft": 8,
+"enden": {
+"ziel": 24,
+"diagonalen": 3,
+"trittsteine": 18,
+"start_gegnerregen": 3,
+"gabelung_oben": 1
+}
+},
+{
+"steps": 44000388,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 115,
+"validierung_v3": 35,
+"validierung_v4": 35
+},
+"test_serie": {
+"berg": 15,
+"festung": 14,
+"hoehle": 0,
+"lange_reise": 1,
+"parcours": 16,
+"zwei_wege": 13
+},
+"pruefung": 21,
+"pruefung_entschaerft": 23,
+"enden": {
+"ziel": 25,
+"trittsteine": 11,
+"diagonalen": 6,
+"gabelung_oben": 1
+}
+},
+{
+"steps": 45000468,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 117,
+"validierung_v3": 35,
+"validierung_v4": 35
+},
+"test_serie": {
+"berg": 11,
+"festung": 11,
+"hoehle": 7,
+"lange_reise": 7,
+"parcours": 16,
+"zwei_wege": 16
+},
+"pruefung": 10,
+"pruefung_entschaerft": 13,
+"enden": {
+"trittsteine": 10,
+"ziel": 41,
+"diagonalen": 2,
+"start_gegnerregen": 1
+}
+},
+{
+"steps": 45000468,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 114,
+"validierung_v3": 38,
+"validierung_v4": 33
+},
+"test_serie": {
+"berg": 14,
+"festung": 7,
+"hoehle": 6,
+"lange_reise": 13,
+"parcours": 14,
+"zwei_wege": 15
+},
+"pruefung": 22,
+"pruefung_entschaerft": 13,
+"enden": {
+"diagonalen": 19,
+"ziel": 18,
+"trittsteine": 5
+}
+},
+{
+"steps": 46000596,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 119,
+"validierung_v3": 36,
+"validierung_v4": 35
+},
+"test_serie": {
+"berg": 12,
+"festung": 10,
+"hoehle": 5,
+"lange_reise": 12,
+"parcours": 16,
+"zwei_wege": 16
+},
+"pruefung": 8,
+"pruefung_entschaerft": 9,
+"enden": {
+"trittsteine": 10,
+"start_gegnerregen": 2,
+"ziel": 43,
+"diagonalen": 1
+}
+},
+{
+"steps": 46000596,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 116,
+"validierung_v3": 35,
+"validierung_v4": 35
+},
+"test_serie": {
+"berg": 15,
+"festung": 10,
+"hoehle": 5,
+"lange_reise": 5,
+"parcours": 16,
+"zwei_wege": 15
+},
+"pruefung": 2,
+"pruefung_entschaerft": 2,
+"enden": {
+"ziel": 25,
+"start_gegnerregen": 21,
+"diagonalen": 3,
+"trittsteine": 12,
+"gabelung_oben": 1
+}
+},
+{
+"steps": 47000676,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 116,
+"validierung_v3": 35,
+"validierung_v4": 37
+},
+"test_serie": {
+"berg": 13,
+"festung": 12,
+"hoehle": 5,
+"lange_reise": 1,
+"parcours": 16,
+"zwei_wege": 13
+},
+"pruefung": 9,
+"pruefung_entschaerft": 12,
+"enden": {
+"start_gegnerregen": 6,
+"trittsteine": 9,
+"ziel": 35,
+"diagonalen": 4,
+"gabelung_oben": 1
+}
+},
+{
+"steps": 47000676,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 115,
+"validierung_v3": 35,
+"validierung_v4": 38
+},
+"test_serie": {
+"berg": 15,
+"festung": 11,
+"hoehle": 4,
+"lange_reise": 1,
+"parcours": 15,
+"zwei_wege": 14
+},
+"pruefung": 6,
+"pruefung_entschaerft": 16,
+"enden": {
+"start_gegnerregen": 14,
+"ziel": 19,
+"trittsteine": 16,
+"diagonalen": 9
+}
+},
+{
+"steps": 48000756,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 117,
+"validierung_v3": 38,
+"validierung_v4": 36
+},
+"test_serie": {
+"berg": 15,
+"festung": 7,
+"hoehle": 6,
+"lange_reise": 3,
+"parcours": 15,
+"zwei_wege": 14
+},
+"pruefung": 2,
+"pruefung_entschaerft": 7,
+"enden": {
+"trittsteine": 20,
+"ziel": 13,
+"start_gegnerregen": 25,
+"gabelung_oben": 3,
+"diagonalen": 1
+}
+},
+{
+"steps": 48000756,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 114,
+"validierung_v3": 36,
+"validierung_v4": 32
+},
+"test_serie": {
+"berg": 15,
+"festung": 11,
+"hoehle": 6,
+"lange_reise": 4,
+"parcours": 16,
+"zwei_wege": 16
+},
+"pruefung": 0,
+"pruefung_entschaerft": 2,
+"enden": {
+"start_gegnerregen": 39,
+"ziel": 8,
+"trittsteine": 13,
+"gabelung_oben": 4
+}
+},
+{
+"steps": 49000836,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 117,
+"validierung_v3": 35,
+"validierung_v4": 37
+},
+"test_serie": {
+"berg": 10,
+"festung": 5,
+"hoehle": 6,
+"lange_reise": 9,
+"parcours": 16,
+"zwei_wege": 16
+},
+"pruefung": 1,
+"pruefung_entschaerft": 4,
+"enden": {
+"start_gegnerregen": 29,
+"trittsteine": 14,
+"diagonalen": 6,
+"ziel": 9,
+"gabelung_oben": 5
+}
+},
+{
+"steps": 49000836,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 117,
+"validierung_v3": 34,
+"validierung_v4": 38
+},
+"test_serie": {
+"berg": 14,
+"festung": 8,
+"hoehle": 6,
+"lange_reise": 4,
+"parcours": 16,
+"zwei_wege": 16
+},
+"pruefung": 0,
+"pruefung_entschaerft": 1,
+"enden": {
+"ziel": 21,
+"trittsteine": 20,
+"gabelung_oben": 3,
+"start_gegnerregen": 19,
+"diagonalen": 1
+}
+},
+{
+"steps": 50000916,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 117,
+"validierung_v3": 37,
+"validierung_v4": 39
+},
+"test_serie": {
+"berg": 12,
+"festung": 7,
+"hoehle": 6,
+"lange_reise": 8,
+"parcours": 16,
+"zwei_wege": 15
+},
+"pruefung": 4,
+"pruefung_entschaerft": 6,
+"enden": {
+"diagonalen": 1,
+"trittsteine": 20,
+"start_gegnerregen": 20,
+"ziel": 17,
+"gabelung_oben": 2
+}
+},
+{
+"steps": 50000916,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 115,
+"validierung_v3": 36,
+"validierung_v4": 38
+},
+"test_serie": {
+"berg": 13,
+"festung": 8,
+"hoehle": 9,
+"lange_reise": 7,
+"parcours": 15,
+"zwei_wege": 16
+},
+"pruefung": 7,
+"pruefung_entschaerft": 4,
+"enden": {
+"trittsteine": 18,
+"ziel": 20,
+"start_gegnerregen": 16,
+"diagonalen": 3
+}
+},
+{
+"steps": 51000996,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 116,
+"validierung_v3": 36,
+"validierung_v4": 36
+},
+"test_serie": {
+"berg": 14,
+"festung": 8,
+"hoehle": 9,
+"lange_reise": 8,
+"parcours": 15,
+"zwei_wege": 16
+},
+"pruefung": 4,
+"pruefung_entschaerft": 4,
+"enden": {
+"start_gegnerregen": 11,
+"trittsteine": 18,
+"diagonalen": 2,
+"ziel": 29
+}
+},
+{
+"steps": 51000996,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 116,
+"validierung_v3": 36,
+"validierung_v4": 37
+},
+"test_serie": {
+"berg": 13,
+"festung": 7,
+"hoehle": 3,
+"lange_reise": 11,
+"parcours": 15,
+"zwei_wege": 16
+},
+"pruefung": 13,
+"pruefung_entschaerft": 9,
+"enden": {
+"ziel": 29,
+"trittsteine": 12,
+"diagonalen": 8,
+"start_gegnerregen": 2
+}
+},
+{
+"steps": 52001076,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 116,
+"validierung_v3": 37,
+"validierung_v4": 36
+},
+"test_serie": {
+"berg": 14,
+"festung": 10,
+"hoehle": 4,
+"lange_reise": 11,
+"parcours": 16,
+"zwei_wege": 16
+},
+"pruefung": 4,
+"pruefung_entschaerft": 4,
+"enden": {
+"ziel": 30,
+"trittsteine": 19,
+"start_gegnerregen": 11
+}
+},
+{
+"steps": 52001076,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 116,
+"validierung_v3": 38,
+"validierung_v4": 38
+},
+"test_serie": {
+"berg": 11,
+"festung": 4,
+"hoehle": 3,
+"lange_reise": 1,
+"parcours": 16,
+"zwei_wege": 16
+},
+"pruefung": 4,
+"pruefung_entschaerft": 3,
+"enden": {
+"trittsteine": 12,
+"start_gegnerregen": 17,
+"ziel": 26,
+"diagonalen": 5
+}
+},
+{
+"steps": 53001156,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 116,
+"validierung_v3": 39,
+"validierung_v4": 39
+},
+"test_serie": {
+"berg": 15,
+"festung": 4,
+"hoehle": 4,
+"lange_reise": 8,
+"parcours": 16,
+"zwei_wege": 15
+},
+"pruefung": 3,
+"pruefung_entschaerft": 9,
+"enden": {
+"trittsteine": 23,
+"ziel": 20,
+"start_gegnerregen": 17,
+"diagonalen": 1
+}
+},
+{
+"steps": 53001156,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 115,
+"validierung_v3": 39,
+"validierung_v4": 37
+},
+"test_serie": {
+"berg": 16,
+"festung": 7,
+"hoehle": 7,
+"lange_reise": 5,
+"parcours": 16,
+"zwei_wege": 16
+},
+"pruefung": 4,
+"pruefung_entschaerft": 3,
+"enden": {
+"ziel": 21,
+"trittsteine": 19,
+"start_gegnerregen": 16,
+"diagonalen": 3,
+"gabelung_oben": 1
+}
+},
+{
+"steps": 54001236,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 119,
+"validierung_v3": 37,
+"validierung_v4": 38
+},
+"test_serie": {
+"berg": 15,
+"festung": 4,
+"hoehle": 5,
+"lange_reise": 6,
+"parcours": 16,
+"zwei_wege": 16
+},
+"pruefung": 11,
+"pruefung_entschaerft": 5,
+"enden": {
+"diagonalen": 7,
+"trittsteine": 23,
+"ziel": 17,
+"start_gegnerregen": 6
+}
+},
+{
+"steps": 54001236,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 115,
+"validierung_v3": 39,
+"validierung_v4": 38
+},
+"test_serie": {
+"berg": 15,
+"festung": 4,
+"hoehle": 7,
+"lange_reise": 8,
+"parcours": 16,
+"zwei_wege": 16
+},
+"pruefung": 7,
+"pruefung_entschaerft": 11,
+"enden": {
+"ziel": 25,
+"diagonalen": 11,
+"trittsteine": 17,
+"start_gegnerregen": 3,
+"gabelung_oben": 1
+}
+},
+{
+"steps": 55001316,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 118,
+"validierung_v3": 39,
+"validierung_v4": 39
+},
+"test_serie": {
+"berg": 14,
+"festung": 2,
+"hoehle": 6,
+"lange_reise": 5,
+"parcours": 16,
+"zwei_wege": 15
+},
+"pruefung": 8,
+"pruefung_entschaerft": 6,
+"enden": {
+"ziel": 24,
+"start_gegnerregen": 8,
+"trittsteine": 21,
+"diagonalen": 3
+}
+},
+{
+"steps": 55001316,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 116,
+"validierung_v3": 38,
+"validierung_v4": 33
+},
+"test_serie": {
+"berg": 16,
+"festung": 2,
+"hoehle": 7,
+"lange_reise": 6,
+"parcours": 15,
+"zwei_wege": 16
+},
+"pruefung": 4,
+"pruefung_entschaerft": 6,
+"enden": {
+"ziel": 29,
+"trittsteine": 21,
+"diagonalen": 3,
+"start_gegnerregen": 7
+}
+},
+{
+"steps": 56001396,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 118,
+"validierung_v3": 37,
+"validierung_v4": 39
+},
+"test_serie": {
+"berg": 14,
+"festung": 4,
+"hoehle": 2,
+"lange_reise": 6,
+"parcours": 14,
+"zwei_wege": 16
+},
+"pruefung": 4,
+"pruefung_entschaerft": 9,
+"enden": {
+"start_gegnerregen": 13,
+"ziel": 31,
+"trittsteine": 13,
+"gabelung_oben": 2,
+"diagonalen": 1
+}
+},
+{
+"steps": 56001396,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 119,
+"validierung_v3": 38,
+"validierung_v4": 39
+},
+"test_serie": {
+"berg": 16,
+"festung": 8,
+"hoehle": 10,
+"lange_reise": 6,
+"parcours": 16,
+"zwei_wege": 16
+},
+"pruefung": 6,
+"pruefung_entschaerft": 8,
+"enden": {
+"start_gegnerregen": 19,
+"trittsteine": 14,
+"gabelung_oben": 9,
+"diagonalen": 1,
+"ziel": 15
+}
+},
+{
+"steps": 57001476,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 118,
+"validierung_v3": 39,
+"validierung_v4": 40
+},
+"test_serie": {
+"berg": 16,
+"festung": 5,
+"hoehle": 3,
+"lange_reise": 9,
+"parcours": 15,
+"zwei_wege": 16
+},
+"pruefung": 10,
+"pruefung_entschaerft": 7,
+"enden": {
+"ziel": 18,
+"gabelung_oben": 3,
+"trittsteine": 15,
+"start_gegnerregen": 17,
+"diagonalen": 1
+}
+},
+{
+"steps": 57001476,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 115,
+"validierung_v3": 36,
+"validierung_v4": 39
+},
+"test_serie": {
+"berg": 16,
+"festung": 9,
+"hoehle": 6,
+"lange_reise": 10,
+"parcours": 16,
+"zwei_wege": 16
+},
+"pruefung": 8,
+"pruefung_entschaerft": 8,
+"enden": {
+"ziel": 35,
+"start_gegnerregen": 8,
+"trittsteine": 8,
+"diagonalen": 4,
+"gabelung_oben": 1
+}
+},
+{
+"steps": 58001556,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 118,
+"validierung_v3": 38,
+"validierung_v4": 39
+},
+"test_serie": {
+"berg": 16,
+"festung": 8,
+"hoehle": 6,
+"lange_reise": 7,
+"parcours": 14,
+"zwei_wege": 16
+},
+"pruefung": 5,
+"pruefung_entschaerft": 5,
+"enden": {
+"trittsteine": 19,
+"ziel": 16,
+"start_gegnerregen": 17,
+"gabelung_oben": 6,
+"diagonalen": 1
+}
+},
+{
+"steps": 58001556,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 117,
+"validierung_v3": 37,
+"validierung_v4": 37
+},
+"test_serie": {
+"berg": 15,
+"festung": 7,
+"hoehle": 2,
+"lange_reise": 8,
+"parcours": 16,
+"zwei_wege": 15
+},
+"pruefung": 11,
+"pruefung_entschaerft": 1,
+"enden": {
+"gabelung_oben": 5,
+"trittsteine": 16,
+"ziel": 16,
+"start_gegnerregen": 16
+}
+},
+{
+"steps": 59001636,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 119,
+"validierung_v3": 37,
+"validierung_v4": 37
+},
+"test_serie": {
+"berg": 16,
+"festung": 5,
+"hoehle": 4,
+"lange_reise": 13,
+"parcours": 16,
+"zwei_wege": 16
+},
+"pruefung": 4,
+"pruefung_entschaerft": 4,
+"enden": {
+"ziel": 9,
+"start_gegnerregen": 21,
+"trittsteine": 18,
+"gabelung_oben": 11,
+"diagonalen": 1
+}
+},
+{
+"steps": 59001636,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 118,
+"validierung_v3": 37,
+"validierung_v4": 35
+},
+"test_serie": {
+"berg": 16,
+"festung": 6,
+"hoehle": 1,
+"lange_reise": 9,
+"parcours": 16,
+"zwei_wege": 14
+},
+"pruefung": 0,
+"pruefung_entschaerft": 4,
+"enden": {
+"trittsteine": 25,
+"gabelung_oben": 9,
+"start_gegnerregen": 28,
+"ziel": 2
+}
+},
+{
+"steps": 60001716,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 120,
+"validierung_v3": 39,
+"validierung_v4": 39
+},
+"test_serie": {
+"berg": 14,
+"festung": 6,
+"hoehle": 4,
+"lange_reise": 14,
+"parcours": 16,
+"zwei_wege": 16
+},
+"pruefung": 2,
+"pruefung_entschaerft": 0,
+"enden": {
+"trittsteine": 18,
+"start_gegnerregen": 30,
+"ziel": 7,
+"gabelung_oben": 7
+}
+},
+{
+"steps": 60001716,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 113,
+"validierung_v3": 33,
+"validierung_v4": 30
+},
+"test_serie": {
+"berg": 16,
+"festung": 3,
+"hoehle": 6,
+"lange_reise": 8,
+"parcours": 16,
+"zwei_wege": 15
+},
+"pruefung": 3,
+"pruefung_entschaerft": 1,
+"enden": {
+"gabelung_oben": 8,
+"trittsteine": 26,
+"start_gegnerregen": 24,
+"ziel": 3
+}
+},
+{
+"steps": 61001796,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 120,
+"validierung_v3": 40,
+"validierung_v4": 40
+},
+"test_serie": {
+"berg": 16,
+"festung": 8,
+"hoehle": 5,
+"lange_reise": 6,
+"parcours": 16,
+"zwei_wege": 16
+},
+"pruefung": 7,
+"pruefung_entschaerft": 4,
+"enden": {
+"trittsteine": 19,
+"ziel": 15,
+"start_gegnerregen": 20,
+"gabelung_oben": 3
+}
+},
+{
+"steps": 61001796,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 117,
+"validierung_v3": 38,
+"validierung_v4": 40
+},
+"test_serie": {
+"berg": 16,
+"festung": 9,
+"hoehle": 1,
+"lange_reise": 13,
+"parcours": 16,
+"zwei_wege": 16
+},
+"pruefung": 2,
+"pruefung_entschaerft": 1,
+"enden": {
+"trittsteine": 17,
+"start_gegnerregen": 20,
+"ziel": 13,
+"gabelung_oben": 10,
+"diagonalen": 2
+}
+},
+{
+"steps": 62001876,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 118,
+"validierung_v3": 38,
+"validierung_v4": 39
+},
+"test_serie": {
+"berg": 14,
+"festung": 4,
+"hoehle": 6,
+"lange_reise": 11,
+"parcours": 16,
+"zwei_wege": 16
+},
+"pruefung": 1,
+"pruefung_entschaerft": 4,
+"enden": {
+"ziel": 12,
+"gabelung_oben": 9,
+"start_gegnerregen": 18,
+"trittsteine": 24
+}
+},
+{
+"steps": 62001876,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 119,
+"validierung_v3": 40,
+"validierung_v4": 36
+},
+"test_serie": {
+"berg": 14,
+"festung": 4,
+"hoehle": 4,
+"lange_reise": 6,
+"parcours": 16,
+"zwei_wege": 16
+},
+"pruefung": 1,
+"pruefung_entschaerft": 2,
+"enden": {
+"trittsteine": 23,
+"start_gegnerregen": 19,
+"ziel": 13,
+"gabelung_oben": 8
+}
+}
+],
+"B": [
+{
+"steps": 8,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 53,
+"validierung_v3": 3,
+"validierung_v4": 1
+},
+"test_serie": {
+"berg": 1,
+"festung": 0,
+"hoehle": 0,
+"lange_reise": 0,
+"parcours": 4,
+"zwei_wege": 2
+},
+"pruefung": 0,
+"pruefung_entschaerft": 0,
+"enden": {
+"start_gegnerregen": 53,
+"gabelung_oben": 11
+}
+},
+{
+"steps": 1000016,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 82,
+"validierung_v3": 10,
+"validierung_v4": 2
+},
+"test_serie": {
+"berg": 0,
+"festung": 1,
+"hoehle": 1,
+"lange_reise": 0,
+"parcours": 7,
+"zwei_wege": 5
+},
+"pruefung": 0,
+"pruefung_entschaerft": 0,
+"enden": {
+"gabelung_oben": 8,
+"start_gegnerregen": 56
+}
+},
+{
+"steps": 1000016,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 87,
+"validierung_v3": 8,
+"validierung_v4": 1
+},
+"test_serie": {
+"berg": 1,
+"festung": 1,
+"hoehle": 2,
+"lange_reise": 0,
+"parcours": 7,
+"zwei_wege": 5
+},
+"pruefung": 0,
+"pruefung_entschaerft": 0,
+"enden": {
+"start_gegnerregen": 56,
+"gabelung_oben": 8
+}
+},
+{
+"steps": 2000016,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 94,
+"validierung_v3": 18,
+"validierung_v4": 6
+},
+"test_serie": {
+"berg": 3,
+"festung": 0,
+"hoehle": 2,
+"lange_reise": 1,
+"parcours": 7,
+"zwei_wege": 5
+},
+"pruefung": 0,
+"pruefung_entschaerft": 0,
+"enden": {
+"start_gegnerregen": 44,
+"gabelung_oben": 19,
+"trittsteine": 1
+}
+},
+{
+"steps": 2000016,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 96,
+"validierung_v3": 17,
+"validierung_v4": 2
+},
+"test_serie": {
+"berg": 2,
+"festung": 1,
+"hoehle": 3,
+"lange_reise": 0,
+"parcours": 10,
+"zwei_wege": 1
+},
+"pruefung": 0,
+"pruefung_entschaerft": 0,
+"enden": {
+"start_gegnerregen": 53,
+"trittsteine": 1,
+"gabelung_oben": 10
+}
+},
+{
+"steps": 3000016,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 96,
+"validierung_v3": 23,
+"validierung_v4": 7
+},
+"test_serie": {
+"berg": 5,
+"festung": 3,
+"hoehle": 4,
+"lange_reise": 0,
+"parcours": 12,
+"zwei_wege": 8
+},
+"pruefung": 0,
+"pruefung_entschaerft": 0,
+"enden": {
+"start_gegnerregen": 42,
+"gabelung_oben": 11,
+"trittsteine": 11
+}
+},
+{
+"steps": 3000016,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 90,
+"validierung_v3": 10,
+"validierung_v4": 9
+},
+"test_serie": {
+"berg": 9,
+"festung": 3,
+"hoehle": 2,
+"lange_reise": 0,
+"parcours": 9,
+"zwei_wege": 1
+},
+"pruefung": 0,
+"pruefung_entschaerft": 0,
+"enden": {
+"trittsteine": 16,
+"start_gegnerregen": 47,
+"gabelung_oben": 1
+}
+},
+{
+"steps": 4000016,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 98,
+"validierung_v3": 23,
+"validierung_v4": 10
+},
+"test_serie": {
+"berg": 7,
+"festung": 0,
+"hoehle": 3,
+"lange_reise": 0,
+"parcours": 13,
+"zwei_wege": 8
+},
+"pruefung": 0,
+"pruefung_entschaerft": 0,
+"enden": {
+"trittsteine": 24,
+"start_gegnerregen": 38,
+"gabelung_oben": 2
+}
+},
+{
+"steps": 4000016,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 96,
+"validierung_v3": 20,
+"validierung_v4": 7
+},
+"test_serie": {
+"berg": 6,
+"festung": 1,
+"hoehle": 3,
+"lange_reise": 2,
+"parcours": 7,
+"zwei_wege": 3
+},
+"pruefung": 0,
+"pruefung_entschaerft": 0,
+"enden": {
+"trittsteine": 20,
+"start_gegnerregen": 43,
+"gabelung_oben": 1
+}
+},
+{
+"steps": 5000016,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 103,
+"validierung_v3": 28,
+"validierung_v4": 11
+},
+"test_serie": {
+"berg": 6,
+"festung": 1,
+"hoehle": 7,
+"lange_reise": 1,
+"parcours": 15,
+"zwei_wege": 12
+},
+"pruefung": 0,
+"pruefung_entschaerft": 0,
+"enden": {
+"start_gegnerregen": 33,
+"trittsteine": 30,
+"gabelung_oben": 1
+}
+},
+{
+"steps": 5000016,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 100,
+"validierung_v3": 24,
+"validierung_v4": 8
+},
+"test_serie": {
+"berg": 5,
+"festung": 2,
+"hoehle": 3,
+"lange_reise": 0,
+"parcours": 12,
+"zwei_wege": 12
+},
+"pruefung": 0,
+"pruefung_entschaerft": 0,
+"enden": {
+"trittsteine": 32,
+"start_gegnerregen": 27,
+"gabelung_oben": 5
+}
+}
+],
+"C": [
+{
+"steps": 34000012,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 113,
+"validierung_v3": 39,
+"validierung_v4": 35
+},
+"test_serie": {
+"berg": 13,
+"festung": 7,
+"hoehle": 3,
+"lange_reise": 5,
+"parcours": 16,
+"zwei_wege": 14
+},
+"pruefung": 43,
+"pruefung_entschaerft": 42,
+"enden": {
+"diagonalen": 5,
+"trittsteine": 15,
+"ziel": 1
+}
+},
+{
+"steps": 35000092,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 114,
+"validierung_v3": 38,
+"validierung_v4": 31
+},
+"test_serie": {
+"berg": 11,
+"festung": 8,
+"hoehle": 4,
+"lange_reise": 10,
+"parcours": 15,
+"zwei_wege": 14
+},
+"pruefung": 42,
+"pruefung_entschaerft": 43,
+"enden": {
+"trittsteine": 8,
+"ziel": 7,
+"diagonalen": 6,
+"start_gegnerregen": 1
+}
+},
+{
+"steps": 35000092,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 114,
+"validierung_v3": 38,
+"validierung_v4": 31
+},
+"test_serie": {
+"berg": 10,
+"festung": 8,
+"hoehle": 6,
+"lange_reise": 6,
+"parcours": 16,
+"zwei_wege": 14
+},
+"pruefung": 35,
+"pruefung_entschaerft": 38,
+"enden": {
+"ziel": 19,
+"trittsteine": 7,
+"diagonalen": 2,
+"start_gegnerregen": 1
+}
+},
+{
+"steps": 36000172,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 115,
+"validierung_v3": 39,
+"validierung_v4": 33
+},
+"test_serie": {
+"berg": 11,
+"festung": 7,
+"hoehle": 8,
+"lange_reise": 5,
+"parcours": 15,
+"zwei_wege": 14
+},
+"pruefung": 43,
+"pruefung_entschaerft": 34,
+"enden": {
+"ziel": 9,
+"diagonalen": 5,
+"trittsteine": 7
+}
+},
+{
+"steps": 36000172,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 115,
+"validierung_v3": 37,
+"validierung_v4": 33
+},
+"test_serie": {
+"berg": 11,
+"festung": 7,
+"hoehle": 6,
+"lange_reise": 4,
+"parcours": 15,
+"zwei_wege": 16
+},
+"pruefung": 29,
+"pruefung_entschaerft": 34,
+"enden": {
+"start_gegnerregen": 7,
+"ziel": 10,
+"trittsteine": 15,
+"gabelung_oben": 1,
+"diagonalen": 2
+}
+},
+{
+"steps": 37000252,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 115,
+"validierung_v3": 37,
+"validierung_v4": 34
+},
+"test_serie": {
+"berg": 11,
+"festung": 7,
+"hoehle": 10,
+"lange_reise": 4,
+"parcours": 14,
+"zwei_wege": 12
+},
+"pruefung": 35,
+"pruefung_entschaerft": 32,
+"enden": {
+"trittsteine": 16,
+"ziel": 7,
+"start_gegnerregen": 5,
+"diagonalen": 1
+}
+},
+{
+"steps": 37000252,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 116,
+"validierung_v3": 38,
+"validierung_v4": 33
+},
+"test_serie": {
+"berg": 12,
+"festung": 11,
+"hoehle": 7,
+"lange_reise": 6,
+"parcours": 16,
+"zwei_wege": 14
+},
+"pruefung": 27,
+"pruefung_entschaerft": 30,
+"enden": {
+"diagonalen": 5,
+"trittsteine": 21,
+"ziel": 8,
+"start_gegnerregen": 3
+}
+},
+{
+"steps": 38000332,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 118,
+"validierung_v3": 39,
+"validierung_v4": 34
+},
+"test_serie": {
+"berg": 12,
+"festung": 7,
+"hoehle": 7,
+"lange_reise": 2,
+"parcours": 16,
+"zwei_wege": 14
+},
+"pruefung": 28,
+"pruefung_entschaerft": 29,
+"enden": {
+"ziel": 11,
+"trittsteine": 17,
+"start_gegnerregen": 4,
+"diagonalen": 4
+}
+},
+{
+"steps": 38000332,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 117,
+"validierung_v3": 38,
+"validierung_v4": 34
+},
+"test_serie": {
+"berg": 15,
+"festung": 7,
+"hoehle": 1,
+"lange_reise": 6,
+"parcours": 16,
+"zwei_wege": 16
+},
+"pruefung": 29,
+"pruefung_entschaerft": 32,
+"enden": {
+"start_gegnerregen": 5,
+"ziel": 16,
+"trittsteine": 11,
+"diagonalen": 1,
+"gabelung_oben": 2
+}
+},
+{
+"steps": 39000412,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 117,
+"validierung_v3": 38,
+"validierung_v4": 35
+},
+"test_serie": {
+"berg": 15,
+"festung": 5,
+"hoehle": 6,
+"lange_reise": 5,
+"parcours": 16,
+"zwei_wege": 16
+},
+"pruefung": 31,
+"pruefung_entschaerft": 24,
+"enden": {
+"trittsteine": 17,
+"ziel": 11,
+"start_gegnerregen": 4,
+"diagonalen": 1
+}
+},
+{
+"steps": 39000412,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 116,
+"validierung_v3": 34,
+"validierung_v4": 32
+},
+"test_serie": {
+"berg": 13,
+"festung": 9,
+"hoehle": 9,
+"lange_reise": 7,
+"parcours": 15,
+"zwei_wege": 15
+},
+"pruefung": 27,
+"pruefung_entschaerft": 20,
+"enden": {
+"trittsteine": 18,
+"gabelung_oben": 3,
+"diagonalen": 2,
+"start_gegnerregen": 7,
+"ziel": 7
+}
+}
+],
+"D": [
+{
+"steps": 36000016,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 115,
+"validierung_v3": 39,
+"validierung_v4": 33
+},
+"test_serie": {
+"berg": 13,
+"festung": 10,
+"hoehle": 6,
+"lange_reise": 3,
+"parcours": 16,
+"zwei_wege": 15
+},
+"pruefung": 31,
+"pruefung_entschaerft": 33,
+"enden": {
+"ziel": 13,
+"diagonalen": 1,
+"trittsteine": 15,
+"start_gegnerregen": 2,
+"gabelung_oben": 2
+}
+},
+{
+"steps": 37000096,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 116,
+"validierung_v3": 39,
+"validierung_v4": 35
+},
+"test_serie": {
+"berg": 13,
+"festung": 12,
+"hoehle": 5,
+"lange_reise": 5,
+"parcours": 15,
+"zwei_wege": 16
+},
+"pruefung": 38,
+"pruefung_entschaerft": 40,
+"enden": {
+"trittsteine": 14,
+"ziel": 6,
+"diagonalen": 6
+}
+},
+{
+"steps": 37000096,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 116,
+"validierung_v3": 37,
+"validierung_v4": 32
+},
+"test_serie": {
+"berg": 15,
+"festung": 10,
+"hoehle": 1,
+"lange_reise": 8,
+"parcours": 15,
+"zwei_wege": 13
+},
+"pruefung": 32,
+"pruefung_entschaerft": 36,
+"enden": {
+"diagonalen": 2,
+"trittsteine": 25,
+"ziel": 5
+}
+},
+{
+"steps": 38000176,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 114,
+"validierung_v3": 39,
+"validierung_v4": 32
+},
+"test_serie": {
+"berg": 15,
+"festung": 11,
+"hoehle": 6,
+"lange_reise": 4,
+"parcours": 16,
+"zwei_wege": 14
+},
+"pruefung": 29,
+"pruefung_entschaerft": 25,
+"enden": {
+"trittsteine": 20,
+"start_gegnerregen": 4,
+"diagonalen": 2,
+"gabelung_oben": 2,
+"ziel": 7
+}
+},
+{
+"steps": 38000176,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 115,
+"validierung_v3": 39,
+"validierung_v4": 32
+},
+"test_serie": {
+"berg": 12,
+"festung": 10,
+"hoehle": 2,
+"lange_reise": 4,
+"parcours": 15,
+"zwei_wege": 14
+},
+"pruefung": 23,
+"pruefung_entschaerft": 23,
+"enden": {
+"diagonalen": 4,
+"ziel": 16,
+"trittsteine": 20,
+"start_gegnerregen": 1
+}
+},
+{
+"steps": 39000256,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 115,
+"validierung_v3": 37,
+"validierung_v4": 33
+},
+"test_serie": {
+"berg": 15,
+"festung": 12,
+"hoehle": 4,
+"lange_reise": 8,
+"parcours": 15,
+"zwei_wege": 14
+},
+"pruefung": 27,
+"pruefung_entschaerft": 26,
+"enden": {
+"trittsteine": 20,
+"ziel": 12,
+"start_gegnerregen": 3,
+"diagonalen": 2
+}
+},
+{
+"steps": 39000256,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 114,
+"validierung_v3": 37,
+"validierung_v4": 33
+},
+"test_serie": {
+"berg": 16,
+"festung": 11,
+"hoehle": 2,
+"lange_reise": 5,
+"parcours": 14,
+"zwei_wege": 15
+},
+"pruefung": 34,
+"pruefung_entschaerft": 34,
+"enden": {
+"trittsteine": 14,
+"diagonalen": 3,
+"ziel": 9,
+"start_gegnerregen": 3,
+"gabelung_oben": 1
+}
+},
+{
+"steps": 40000336,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 115,
+"validierung_v3": 37,
+"validierung_v4": 33
+},
+"test_serie": {
+"berg": 16,
+"festung": 7,
+"hoehle": 3,
+"lange_reise": 6,
+"parcours": 16,
+"zwei_wege": 15
+},
+"pruefung": 29,
+"pruefung_entschaerft": 27,
+"enden": {
+"ziel": 17,
+"trittsteine": 14,
+"start_gegnerregen": 4
+}
+},
+{
+"steps": 40000336,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 115,
+"validierung_v3": 36,
+"validierung_v4": 33
+},
+"test_serie": {
+"berg": 14,
+"festung": 7,
+"hoehle": 4,
+"lange_reise": 2,
+"parcours": 16,
+"zwei_wege": 15
+},
+"pruefung": 27,
+"pruefung_entschaerft": 20,
+"enden": {
+"gabelung_oben": 2,
+"trittsteine": 19,
+"start_gegnerregen": 11,
+"ziel": 4,
+"diagonalen": 1
+}
+},
+{
+"steps": 41000416,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 116,
+"validierung_v3": 38,
+"validierung_v4": 34
+},
+"test_serie": {
+"berg": 15,
+"festung": 12,
+"hoehle": 0,
+"lange_reise": 6,
+"parcours": 16,
+"zwei_wege": 13
+},
+"pruefung": 31,
+"pruefung_entschaerft": 26,
+"enden": {
+"trittsteine": 17,
+"ziel": 7,
+"diagonalen": 4,
+"start_gegnerregen": 4,
+"gabelung_oben": 1
+}
+},
+{
+"steps": 41000416,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 116,
+"validierung_v3": 39,
+"validierung_v4": 36
+},
+"test_serie": {
+"berg": 16,
+"festung": 7,
+"hoehle": 0,
+"lange_reise": 8,
+"parcours": 16,
+"zwei_wege": 14
+},
+"pruefung": 24,
+"pruefung_entschaerft": 28,
+"enden": {
+"trittsteine": 14,
+"ziel": 20,
+"diagonalen": 3,
+"start_gegnerregen": 3
+}
+},
+{
+"steps": 42000496,
+"kind": "ema",
+"validierung": {
+"validierung_v2": 116,
+"validierung_v3": 38,
+"validierung_v4": 33
+},
+"test_serie": {
+"berg": 15,
+"festung": 6,
+"hoehle": 0,
+"lange_reise": 3,
+"parcours": 14,
+"zwei_wege": 15
+},
+"pruefung": 32,
+"pruefung_entschaerft": 35,
+"enden": {
+"trittsteine": 13,
+"ziel": 13,
+"diagonalen": 5,
+"start_gegnerregen": 1
+}
+},
+{
+"steps": 42000496,
+"kind": "raw",
+"validierung": {
+"validierung_v2": 117,
+"validierung_v3": 39,
+"validierung_v4": 34
+},
+"test_serie": {
+"berg": 14,
+"festung": 2,
+"hoehle": 5,
+"lange_reise": 6,
+"parcours": 16,
+"zwei_wege": 16
+},
+"pruefung": 28,
+"pruefung_entschaerft": 35,
+"enden": {
+"trittsteine": 11,
+"ziel": 21,
+"diagonalen": 2,
+"gabelung_oben": 1,
+"start_gegnerregen": 1
+}
+}
+]
+}

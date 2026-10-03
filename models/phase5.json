@@ -1,0 +1,5 @@
+{
+  "action_repeat": 2,
+  "source": "BC + PPO with teacher loss",
+  "init": "models/phase5_bc.zip"
+}

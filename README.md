@@ -1,178 +1,119 @@
-# Space Pirate 2D Jump'n'Run + PPO Agent
+# 2D_JumpNRun – Space Pirate + lernender Bot
 
-This repository contains a custom 2D platformer written with Pygame and an integrated PPO training pipeline (Gymnasium + Stable-Baselines3).
+## Spielbeschreibung
+Das Spiel Space Pirate ist ein 2D-Spiel, in welchem ein Pirat gesteuert wird. Der Pirat muss sich durch ein Level kämpfen und dabei Gegner besiegen und Hindernisse überwinden. Gegner können durch einen Sprung auf den Kopf oder durch einen Revolverschuss besiegt werden. Das Ziel ist es, das Level zu beenden, indem die Kiste am Ende des Levels geöffnet wird. Sobald das Level beendet ist, wird die benötigte Zeit ausgegeben.
 
-The current codebase is focused on **one RL approach (PPO)**. Legacy DQN code and old generated artifacts were removed to keep the project easier to understand and maintain.
-
-## Core Idea
-
-- `game.py` runs the manual game loop (keyboard control).
-- `rl/game_session.py` wraps the existing game objects into a `reset/step/observation` API.
-- `rl/pirate_game_env.py` exposes the game as a Gymnasium environment.
-- `train_ppo.py` trains PPO agents (single-level or curriculum).
-- `GameWithBot.py` loads a PPO model and lets you watch it play.
-
-## Project Structure
-
-```text
-2D_JumpNRun/
-├── game.py                    # Manual game (Pygame loop)
-├── player.py                  # Player logic and controls
-├── world.py                   # World loading/collision/chunks
-├── enemy.py                   # Enemy behavior
-├── object.py                  # Chest/bullet objects
-├── level.txt                  # Full/original level
-├── level_medium.txt           # Medium curriculum level
-├── level_easy.txt             # Easy curriculum level
-├── rl/
-│   ├── game_types.py          # RL dataclasses (action/status)
-│   ├── game_session.py        # Game wrapper for RL stepping
-│   ├── pirate_game_env.py     # Gymnasium env + reward shaping
-│   └── training_metrics.py    # CSV + TensorBoard metrics callback
-├── train_ppo.py               # Training entrypoint
-├── GameWithBot.py             # Visual bot playback entrypoint
-├── export_metrics.py          # Export plots from episode CSV
-└── requirements-rl.txt        # Dependencies for game + RL
-```
+Neu seit 2026: Ein **Bot lernt das Spiel per Reinforcement Learning (PPO)** – und man kann ihm dabei zusehen
+(Geister-Ansicht: viele Bots gleichzeitig im selben Level). Wie das funktioniert, erklärt das
+**Lerntagebuch** in [`docs/lernen/`](docs/lernen/00_ueberblick.md).
 
 ## Installation
+Python 3.9 oder neuer.
 
-Recommended Python: `3.9+`
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements-rl.txt
+```
+pip install -r requirements.txt
 ```
 
-## Run the Game (manual)
+Für das Training reicht die CPU-Version von PyTorch (kleiner Download):
+`pip install torch --index-url https://download.pytorch.org/whl/cpu`
 
-```bash
-python3 game.py
+## Selbst spielen
+
+```
+python game.py                                   # Prüfungslevel (das Original-Level)
+python game.py levels/phase1/p1_luecken_01.txt   # beliebiges anderes Level
 ```
 
-Controls:
-- `A` left
-- `D` right
-- `W` or `SPACE` jump
-- `ENTER` shoot
+| Taste | Aktion |
+|---|---|
+| `A` / `D` oder Pfeiltasten | laufen |
+| `W`, Leertaste oder Pfeil hoch | springen |
+| Enter | schießen |
+| `R` | Neustart |
+| Esc | beenden |
 
-## Train PPO
+## Level
+Level sind Textdateien mit 13 Zeilen: `B` = Block, `E` = Gegner, `C` = Kiste (Ziel), `P` = Startpunkt (optional).
+Mehrere Kisten sind erlaubt, jede ist ein Ziel.
 
-### Simple run
+| Ordner | Inhalt |
+|---|---|
+| `levels/exam/` | Prüfungslevel – der Bot trainiert **nie** darauf |
+| `levels/phase1/`, `phase2/`, … | handgebaute Trainingslevel je Phase |
+| `levels/showcase/` | feste Level für Videos / Geister-Ansicht |
+| `levels/test_serie/` | 6 handgebaute schwere Test-Level (nie trainiert, mit geprüfter Lösung) |
+| `levels/validierung/` | eingefrorene Validierungs-Level (v2: Stufen 4–9, v3: Stufen 10–11) |
 
-```bash
-python3 train_ppo.py \
-  --run-name ppo_baseline \
-  --level-path level_medium.txt \
-  --timesteps 200000 \
-  --action-preset simple \
-  --obs-profile balanced \
-  --game-log-level WARNING \
-  --progress-bar
+Werkzeuge:
+
+```
+python -m jumpnrun.levelgen.solver mein_level.txt          # ist das Level für den Bot schaffbar?
+python -m jumpnrun.levelgen.solver mein_level.txt --map    # wo kann man überall stehen?
+python -m jumpnrun.levelgen.generator --tier 4 --seed 7 --out mein_level.txt   # Level erzeugen
 ```
 
-### Curriculum run (easy -> medium -> full)
+## Bot trainieren und zuschauen
 
-```bash
-python3 train_ppo.py \
-  --run-name ppo_curriculum \
-  --curriculum \
-  --easy-level-path level_easy.txt \
-  --curriculum-easy-steps 100000 \
-  --medium-level-path level_medium.txt \
-  --curriculum-medium-steps 120000 \
-  --level-path level.txt \
-  --timesteps 420000 \
-  --action-preset simple \
-  --obs-profile balanced \
-  --game-log-level WARNING \
-  --progress-bar
+```
+# Phase 1: laufen und springen lernen
+python -m jumpnrun.rl.train --run runs/phase1 --max-tier 2 --steps 1500000 --handmade "levels/phase1/*.txt"
+
+# live zuschauen (zweites Terminal, braucht einen Bildschirm)
+python -m jumpnrun.rl.watch --run runs/phase1 --live --level levels/showcase/luecken.txt
+
+# oder beides in einem: Training mit Live-Fenster
+python -m jumpnrun.rl.train --run runs/phase1 --max-tier 2 --watch --watch-level levels/showcase/luecken.txt
+
+# Phase 5: vom Löser abschauen, dann selbst üben (Entscheidung alle 2 Frames)
+python -m jumpnrun.imitation.demos --out runs/demos          # Musterlösungen + geprüfter Level-Pool
+python -m jumpnrun.imitation.bc --demos runs/demos --init models/phase3.zip --out models/phase5_bc.zip
+scripts/train_phase5.sh main                                 # PPO mit Vorbild-Bremse
+scripts/train_phase5.sh control                              # Vergleich ohne Vorbild
+
+# Phase 6: Übersichtskarte, lange Level (Stufen 10-11), Startpunkte mitten im Level
+python -m jumpnrun.imitation.demos --out runs/demos3 --tiers 10 11 --counts 500 400 --merge-pool runs/demos/pool.json
+python -m jumpnrun.imitation.bc --demos runs/demos3 --init models/phase5.zip --grow --only-overview \
+    --dagger-rounds 0 --out models/phase6_start.zip
+scripts/train_phase6.sh                                      # max. 16 h, danach oder bei bestandener Prüfung Schluss
+# bester Prüfungs-Bot bisher: models/phase6_durchbruch.zip (37 von 128 Versuchen auf dem Original-Level)
+python -m jumpnrun.rl.watch --model models/phase6_durchbruch.zip --level levels/exam/level.txt --video pruefung.mp4
+python -m jumpnrun.rl.milestones --run runs/phase6           # Meilensteine: Validierung, Test-Serie, Prüfung
+
+# Auswertung
+tensorboard --logdir runs                         # Dashboard im Browser
+python -m jumpnrun.rl.report runs/phase1 --png lernkurve.png
+python -m jumpnrun.rl.evaluate --model models/phase1.zip --tiers 0 1 2
+python -m jumpnrun.rl.watch --run runs/phase1 --timelapse zeitraffer.mp4 --level levels/showcase/luecken.txt
 ```
 
-### Training-level curriculum (very easy -> mixed)
+## Projektaufbau
 
-For faster, more stable early learning you can use the new handcrafted training levels:
-
-- `level_train_01_runway.txt`
-- `level_train_02_gaps.txt`
-- `level_train_03_enemies.txt`
-- `level_train_04_mixed.txt`
-- `level_train_05_bridge.txt`
-
-Example run (forward-only action set + parallel envs):
-
-```bash
-python3 train_ppo.py \
-  --run-name ppo_train_levels_v1 \
-  --curriculum \
-  --easy-level-path level_train_01_runway.txt \
-  --medium-level-path level_train_04_mixed.txt \
-  --level-path level_train_05_bridge.txt \
-  --curriculum-easy-steps 60000 \
-  --curriculum-medium-steps 60000 \
-  --timesteps 120000 \
-  --action-preset forward \
-  --num-envs 4 \
-  --ent-coef 0.002 \
-  --ent-coef-easy 0.01 \
-  --ent-coef-medium 0.003
+```
+game.py              selbst spielen
+jumpnrun/core/       deterministische Spielsimulation (ohne Grafik, ohne Uhr)
+jumpnrun/render/     Grafik: Spiel, Geister-Ansicht, Video-Export
+jumpnrun/levelgen/   Level-Generator und Löser
+jumpnrun/rl/         Gymnasium-Umgebung, Netz, Curriculum, Training (PPO, PPO mit Vorbild), Auswertung
+jumpnrun/imitation/  Musterlösungen vom Löser, Behavior Cloning, DAgger
+levels/              Level-Dateien
+models/              trainierte Bots
+tests/               python -m pytest tests
+docs/lernen/         Lerntagebuch
+UML/                 UML-Diagramm des Originalspiels (2023)
 ```
 
-### Continue from checkpoint
+## Lizenzen
+Die verwendeten Bilder (Sprites) sind lizenzfrei und dürfen frei verwendet werden. Die Bilder können auf folgenden Seiten heruntergeladen werden:
+- Player Sprites: [Craftpix](https://craftpix.net/freebies/free-2d-pirate-character-sprites/)
+- Enemy Sprites: [Pipoya](https://pipoya.itch.io/pipoya-free-rpg-character-sprites-32x32)
+- Block (Ground) Sprites: [PNG Wing](https://www.pngwing.com/en/free-png-zoola/download)
+- Chest Sprites: [Admurin](https://admurin.itch.io/free-chest-animations)
 
-```bash
-python3 train_ppo.py \
-  --run-name ppo_resume \
-  --load-model runs/ppo_curriculum/checkpoints/best_model.zip \
-  --level-path level_medium.txt \
-  --timesteps 120000
-```
+## Älterer RL-Ansatz (`legacy/`)
 
-## Watch the Bot Play
-
-```bash
-python3 GameWithBot.py \
-  --model-path runs/ppo_curriculum/checkpoints/best_model.zip \
-  --level-path level_medium.txt \
-  --action-preset simple \
-  --obs-profile balanced \
-  --loop
-```
-
-> Important: `--obs-profile` should match the profile used during training (`balanced` or `legacy`).
-
-## Metrics
-
-### TensorBoard
-
-```bash
-tensorboard --logdir runs
-```
-
-### PNG export
-
-```bash
-python3 export_metrics.py --run-dir runs/ppo_curriculum --window 50
-```
-
-## Observation Vector (shape = 16)
-
-`0..9, 14, 15` are stable base features. `10..13` depend on profile:
-
-- `legacy`: old features (enemy ahead, gap ahead, enemy close, safe ground distance)
-- `balanced`: hazard-focused features (short/mid hazard + threat ahead/behind)
-
-This keeps model input shape stable while allowing safer feature experiments.
-
-## What to Tune Next
-
-- Reward weights in `rl/pirate_game_env.py`
-- Hazard feature thresholds in `rl/game_session.py`
-- Curriculum step split in `train_ppo.py`
-- Action set (`simple` vs `full`)
-- `frame_skip` (default is `2` for more reactive control)
-
-## Assets / Licenses
-
-Sprites and art assets are stored in `img/` and remain under their original source licenses.
+Auf `main` gab es vor dem Neubau einen eigenen RL-Versuch (Aug. 2025 – Feb. 2026, Autor „MararatscherCode“):
+`GameSession`, Gym-Umgebung `rl/pirate_game_env.py`, PPO-Training `train_ppo.py` mit Checkpoint-Belohnungen,
+Curriculum easy → medium → full und eigenen Trainingsleveln. Beim Zusammenführen mit dem neuen Spielkern
+(`jumpnrun/`) ist er vollständig erhalten geblieben und liegt jetzt unverändert in `legacy/`
+(inkl. der alten `game.py`, `object.py`, `player.py`, `world.py` und seiner README unter `legacy/README.md`).
+Der aktuelle Bot und sein Lerntagebuch: `jumpnrun/rl/` und `docs/lernen/`.

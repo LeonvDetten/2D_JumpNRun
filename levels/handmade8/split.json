@@ -1,0 +1,34 @@
+{
+ "dev": [
+  "abgrund",
+  "doppelgabel",
+  "hoehlendach",
+  "lange_tour"
+ ],
+ "test": [
+  "hochsteine",
+  "koeder",
+  "pruefungsstil",
+  "stollen"
+ ],
+ "sealed": [
+  "gegnertreppe",
+  "regenstart",
+  "turm",
+  "zickzack"
+ ],
+ "sha256": {
+  "hoehlendach": "e68b9852eab363340f8373782572c8104bb8c3509174295172f839931fcf4e79",
+  "koeder": "49d42a2d812f032bdaf62120149ca77b2e1b6d0aba7bf05c13ac196d46a79e82",
+  "abgrund": "d7fea8b02edfc06921c58980646253c2fe40f97cb6d884836d3ee95fc0aebd14",
+  "gegnertreppe": "36b941222810b37782159b6a2b4625ff4f0f9af442ecace178d55553ecdbb401",
+  "hochsteine": "eece14ddc409a5c62ab361f1305de274ab9d6f0a5e38df81aa15a8ad955bd47d",
+  "regenstart": "51321cd06c343ad78a843da15bd6eb6630f1180a1ae521c4060c852e845e3f21",
+  "turm": "7a7a7e188b24214c5747042c8bddf14eff75f33f8038313f934fc811a74594b2",
+  "zickzack": "4c471c69e0874f7d9635a1cd1298bad39640cf85e213b5e59e99a4c5a2f905e9",
+  "lange_tour": "d72b7cdd9d8c5c93bcaa6fcbd975277d7f4ca6263e958b85d7e09f702d3addea",
+  "stollen": "c805379b6d6064707f03a1d1bcf240e91156fa0e7b51a3d3e1d4e6397247ace6",
+  "pruefungsstil": "c2021eeaf9374e6bca742d5c3bc2dac918b914360a3f381d3729015de3f5fdd7",
+  "doppelgabel": "1c1af9b9ea45411e9657d502eea93bfd7914a4db760057ef8489270a9b265550"
+ }
+}

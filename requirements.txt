@@ -1,0 +1,15 @@
+# game
+pygame>=2.1
+numpy>=1.23
+
+# bot training (PyTorch CPU build is enough, see README)
+torch>=2.0
+stable-baselines3>=2.3
+gymnasium>=0.29
+tensorboard>=2.14
+
+# videos, charts, tests
+imageio>=2.31
+imageio-ffmpeg>=0.4
+matplotlib>=3.7
+pytest>=7

@@ -1,0 +1,2638 @@
+{
+ "8": {
+  "validierung_v2": {
+   "won": 114,
+   "of": 120,
+   "tiers": {
+    "stufe_4": 20,
+    "stufe_5": 19,
+    "stufe_6": 20,
+    "stufe_7": 20,
+    "stufe_8": 16,
+    "stufe_9": 19
+   }
+  },
+  "validierung_v3": {
+   "won": 17,
+   "of": 40,
+   "tiers": {
+    "stufe_10": 10,
+    "stufe_11": 7
+   }
+  },
+  "test_serie": {
+   "berg": {
+    "won": 15,
+    "of": 16,
+    "progress": 0.982
+   },
+   "festung": {
+    "won": 7,
+    "of": 16,
+    "progress": 0.687
+   },
+   "hoehle": {
+    "won": 0,
+    "of": 16,
+    "progress": 0.723
+   },
+   "lange_reise": {
+    "won": 0,
+    "of": 16,
+    "progress": 0.374
+   },
+   "parcours": {
+    "won": 15,
+    "of": 16,
+    "progress": 0.947
+   },
+   "zwei_wege": {
+    "won": 14,
+    "of": 16,
+    "progress": 0.938
+   }
+  },
+  "pruefung": {
+   "original": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "start_gegnerregen": 23,
+     "trittsteine": 5,
+     "gabelung_oben": 4
+    },
+    "best": 0.348,
+    "mean": 0.151
+   },
+   "entschaerft": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "gabelung_oben": 10,
+     "trittsteine": 13,
+     "start_gegnerregen": 9
+    },
+    "best": 0.348,
+    "mean": 0.238
+   }
+  },
+  "seconds": 57,
+  "checkpoint": "step_0000000008.zip"
+ },
+ "1000016": {
+  "validierung_v2": {
+   "won": 100,
+   "of": 120,
+   "tiers": {
+    "stufe_4": 20,
+    "stufe_5": 20,
+    "stufe_6": 19,
+    "stufe_7": 19,
+    "stufe_8": 11,
+    "stufe_9": 11
+   }
+  },
+  "validierung_v3": {
+   "won": 18,
+   "of": 40,
+   "tiers": {
+    "stufe_10": 11,
+    "stufe_11": 7
+   }
+  },
+  "test_serie": {
+   "berg": {
+    "won": 13,
+    "of": 16,
+    "progress": 0.902
+   },
+   "festung": {
+    "won": 5,
+    "of": 16,
+    "progress": 0.676
+   },
+   "hoehle": {
+    "won": 7,
+    "of": 16,
+    "progress": 0.827
+   },
+   "lange_reise": {
+    "won": 0,
+    "of": 16,
+    "progress": 0.397
+   },
+   "parcours": {
+    "won": 14,
+    "of": 16,
+    "progress": 0.921
+   },
+   "zwei_wege": {
+    "won": 9,
+    "of": 16,
+    "progress": 0.823
+   }
+  },
+  "pruefung": {
+   "original": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "gabelung_oben": 10,
+     "trittsteine": 13,
+     "diagonalen": 4,
+     "start_gegnerregen": 4,
+     "ziel": 1
+    },
+    "best": 0.873,
+    "mean": 0.339
+   },
+   "entschaerft": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "start_gegnerregen": 8,
+     "trittsteine": 11,
+     "ziel": 1,
+     "gabelung_oben": 12
+    },
+    "best": 0.87,
+    "mean": 0.268
+   }
+  },
+  "seconds": 64,
+  "checkpoint": "step_0001000016.zip"
+ },
+ "2000040": {
+  "validierung_v2": {
+   "won": 98,
+   "of": 120,
+   "tiers": {
+    "stufe_4": 20,
+    "stufe_5": 20,
+    "stufe_6": 18,
+    "stufe_7": 19,
+    "stufe_8": 10,
+    "stufe_9": 11
+   }
+  },
+  "validierung_v3": {
+   "won": 23,
+   "of": 40,
+   "tiers": {
+    "stufe_10": 12,
+    "stufe_11": 11
+   }
+  },
+  "test_serie": {
+   "berg": {
+    "won": 14,
+    "of": 16,
+    "progress": 0.947
+   },
+   "festung": {
+    "won": 5,
+    "of": 16,
+    "progress": 0.613
+   },
+   "hoehle": {
+    "won": 5,
+    "of": 16,
+    "progress": 0.583
+   },
+   "lange_reise": {
+    "won": 1,
+    "of": 16,
+    "progress": 0.476
+   },
+   "parcours": {
+    "won": 14,
+    "of": 16,
+    "progress": 0.931
+   },
+   "zwei_wege": {
+    "won": 6,
+    "of": 16,
+    "progress": 0.767
+   }
+  },
+  "pruefung": {
+   "original": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "trittsteine": 18,
+     "start_gegnerregen": 6,
+     "gabelung_oben": 1,
+     "ziel": 1,
+     "diagonalen": 6
+    },
+    "best": 0.872,
+    "mean": 0.357
+   },
+   "entschaerft": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "trittsteine": 19,
+     "diagonalen": 4,
+     "gabelung_oben": 1,
+     "start_gegnerregen": 8
+    },
+    "best": 0.635,
+    "mean": 0.327
+   }
+  },
+  "seconds": 55,
+  "checkpoint": "step_0002000040.zip"
+ },
+ "3000040": {
+  "validierung_v2": {
+   "won": 104,
+   "of": 120,
+   "tiers": {
+    "stufe_4": 20,
+    "stufe_5": 20,
+    "stufe_6": 19,
+    "stufe_7": 19,
+    "stufe_8": 13,
+    "stufe_9": 13
+   }
+  },
+  "validierung_v3": {
+   "won": 27,
+   "of": 40,
+   "tiers": {
+    "stufe_10": 16,
+    "stufe_11": 11
+   }
+  },
+  "test_serie": {
+   "berg": {
+    "won": 10,
+    "of": 16,
+    "progress": 0.969
+   },
+   "festung": {
+    "won": 8,
+    "of": 16,
+    "progress": 0.783
+   },
+   "hoehle": {
+    "won": 13,
+    "of": 16,
+    "progress": 0.954
+   },
+   "lange_reise": {
+    "won": 0,
+    "of": 16,
+    "progress": 0.502
+   },
+   "parcours": {
+    "won": 14,
+    "of": 16,
+    "progress": 0.929
+   },
+   "zwei_wege": {
+    "won": 8,
+    "of": 16,
+    "progress": 0.791
+   }
+  },
+  "pruefung": {
+   "original": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "gabelung_oben": 5,
+     "start_gegnerregen": 15,
+     "diagonalen": 3,
+     "trittsteine": 9
+    },
+    "best": 0.769,
+    "mean": 0.227
+   },
+   "entschaerft": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "trittsteine": 14,
+     "start_gegnerregen": 17,
+     "gabelung_oben": 1
+    },
+    "best": 0.348,
+    "mean": 0.212
+   }
+  },
+  "seconds": 53,
+  "checkpoint": "step_0003000040.zip"
+ },
+ "4000040": {
+  "validierung_v2": {
+   "won": 96,
+   "of": 120,
+   "tiers": {
+    "stufe_4": 20,
+    "stufe_5": 20,
+    "stufe_6": 16,
+    "stufe_7": 17,
+    "stufe_8": 11,
+    "stufe_9": 12
+   }
+  },
+  "validierung_v3": {
+   "won": 23,
+   "of": 40,
+   "tiers": {
+    "stufe_10": 13,
+    "stufe_11": 10
+   }
+  },
+  "test_serie": {
+   "berg": {
+    "won": 14,
+    "of": 16,
+    "progress": 0.94
+   },
+   "festung": {
+    "won": 3,
+    "of": 16,
+    "progress": 0.559
+   },
+   "hoehle": {
+    "won": 13,
+    "of": 16,
+    "progress": 0.939
+   },
+   "lange_reise": {
+    "won": 1,
+    "of": 16,
+    "progress": 0.566
+   },
+   "parcours": {
+    "won": 15,
+    "of": 16,
+    "progress": 0.99
+   },
+   "zwei_wege": {
+    "won": 14,
+    "of": 16,
+    "progress": 0.946
+   }
+  },
+  "pruefung": {
+   "original": {
+    "won": 2,
+    "of": 32,
+    "ends": {
+     "gabelung_oben": 15,
+     "trittsteine": 2,
+     "ziel": 6,
+     "diagonalen": 6,
+     "start_gegnerregen": 1
+    },
+    "best": 1.0,
+    "mean": 0.528
+   },
+   "entschaerft": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "gabelung_oben": 15,
+     "ziel": 7,
+     "trittsteine": 4,
+     "diagonalen": 5,
+     "start_gegnerregen": 1
+    },
+    "best": 0.873,
+    "mean": 0.485
+   }
+  },
+  "seconds": 63,
+  "checkpoint": "step_0004000040.zip"
+ },
+ "5000040": {
+  "validierung_v2": {
+   "won": 92,
+   "of": 120,
+   "tiers": {
+    "stufe_4": 20,
+    "stufe_5": 20,
+    "stufe_6": 15,
+    "stufe_7": 16,
+    "stufe_8": 10,
+    "stufe_9": 11
+   }
+  },
+  "validierung_v3": {
+   "won": 25,
+   "of": 40,
+   "tiers": {
+    "stufe_10": 11,
+    "stufe_11": 14
+   }
+  },
+  "test_serie": {
+   "berg": {
+    "won": 15,
+    "of": 16,
+    "progress": 0.995
+   },
+   "festung": {
+    "won": 3,
+    "of": 16,
+    "progress": 0.486
+   },
+   "hoehle": {
+    "won": 10,
+    "of": 16,
+    "progress": 0.826
+   },
+   "lange_reise": {
+    "won": 0,
+    "of": 16,
+    "progress": 0.468
+   },
+   "parcours": {
+    "won": 16,
+    "of": 16,
+    "progress": 1.0
+   },
+   "zwei_wege": {
+    "won": 13,
+    "of": 16,
+    "progress": 0.921
+   }
+  },
+  "pruefung": {
+   "original": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "diagonalen": 10,
+     "start_gegnerregen": 2,
+     "gabelung_oben": 15,
+     "trittsteine": 4,
+     "ziel": 1
+    },
+    "best": 0.872,
+    "mean": 0.41
+   },
+   "entschaerft": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "trittsteine": 8,
+     "diagonalen": 6,
+     "gabelung_oben": 12,
+     "ziel": 2,
+     "start_gegnerregen": 4
+    },
+    "best": 1.0,
+    "mean": 0.397
+   }
+  },
+  "seconds": 60,
+  "checkpoint": "step_0005000040.zip"
+ },
+ "6000040": {
+  "validierung_v2": {
+   "won": 97,
+   "of": 120,
+   "tiers": {
+    "stufe_4": 20,
+    "stufe_5": 20,
+    "stufe_6": 18,
+    "stufe_7": 19,
+    "stufe_8": 10,
+    "stufe_9": 10
+   }
+  },
+  "validierung_v3": {
+   "won": 23,
+   "of": 40,
+   "tiers": {
+    "stufe_10": 14,
+    "stufe_11": 9
+   }
+  },
+  "test_serie": {
+   "berg": {
+    "won": 15,
+    "of": 16,
+    "progress": 0.996
+   },
+   "festung": {
+    "won": 2,
+    "of": 16,
+    "progress": 0.493
+   },
+   "hoehle": {
+    "won": 13,
+    "of": 16,
+    "progress": 0.952
+   },
+   "lange_reise": {
+    "won": 1,
+    "of": 16,
+    "progress": 0.531
+   },
+   "parcours": {
+    "won": 16,
+    "of": 16,
+    "progress": 0.999
+   },
+   "zwei_wege": {
+    "won": 16,
+    "of": 16,
+    "progress": 0.998
+   }
+  },
+  "pruefung": {
+   "original": {
+    "won": 1,
+    "of": 32,
+    "ends": {
+     "start_gegnerregen": 2,
+     "diagonalen": 17,
+     "ziel": 2,
+     "trittsteine": 10
+    },
+    "best": 1.0,
+    "mean": 0.575
+   },
+   "entschaerft": {
+    "won": 2,
+    "of": 32,
+    "ends": {
+     "trittsteine": 15,
+     "diagonalen": 14,
+     "ziel": 1
+    },
+    "best": 0.998,
+    "mean": 0.539
+   }
+  },
+  "seconds": 61,
+  "checkpoint": "step_0006000040.zip"
+ },
+ "7000040": {
+  "validierung_v2": {
+   "won": 97,
+   "of": 120,
+   "tiers": {
+    "stufe_4": 20,
+    "stufe_5": 20,
+    "stufe_6": 17,
+    "stufe_7": 20,
+    "stufe_8": 9,
+    "stufe_9": 11
+   }
+  },
+  "validierung_v3": {
+   "won": 27,
+   "of": 40,
+   "tiers": {
+    "stufe_10": 15,
+    "stufe_11": 12
+   }
+  },
+  "test_serie": {
+   "berg": {
+    "won": 16,
+    "of": 16,
+    "progress": 0.999
+   },
+   "festung": {
+    "won": 0,
+    "of": 16,
+    "progress": 0.399
+   },
+   "hoehle": {
+    "won": 9,
+    "of": 16,
+    "progress": 0.837
+   },
+   "lange_reise": {
+    "won": 1,
+    "of": 16,
+    "progress": 0.529
+   },
+   "parcours": {
+    "won": 16,
+    "of": 16,
+    "progress": 1.0
+   },
+   "zwei_wege": {
+    "won": 13,
+    "of": 16,
+    "progress": 0.926
+   }
+  },
+  "pruefung": {
+   "original": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "trittsteine": 10,
+     "diagonalen": 5,
+     "ziel": 6,
+     "start_gegnerregen": 8,
+     "gabelung_oben": 3
+    },
+    "best": 0.873,
+    "mean": 0.414
+   },
+   "entschaerft": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "start_gegnerregen": 9,
+     "trittsteine": 12,
+     "ziel": 1,
+     "diagonalen": 9,
+     "gabelung_oben": 1
+    },
+    "best": 0.87,
+    "mean": 0.386
+   }
+  },
+  "seconds": 54,
+  "checkpoint": "step_0007000040.zip"
+ },
+ "8000040": {
+  "validierung_v2": {
+   "won": 102,
+   "of": 120,
+   "tiers": {
+    "stufe_4": 20,
+    "stufe_5": 20,
+    "stufe_6": 17,
+    "stufe_7": 19,
+    "stufe_8": 12,
+    "stufe_9": 14
+   }
+  },
+  "validierung_v3": {
+   "won": 25,
+   "of": 40,
+   "tiers": {
+    "stufe_10": 16,
+    "stufe_11": 9
+   }
+  },
+  "test_serie": {
+   "berg": {
+    "won": 13,
+    "of": 16,
+    "progress": 0.936
+   },
+   "festung": {
+    "won": 1,
+    "of": 16,
+    "progress": 0.437
+   },
+   "hoehle": {
+    "won": 9,
+    "of": 16,
+    "progress": 0.906
+   },
+   "lange_reise": {
+    "won": 1,
+    "of": 16,
+    "progress": 0.445
+   },
+   "parcours": {
+    "won": 16,
+    "of": 16,
+    "progress": 1.0
+   },
+   "zwei_wege": {
+    "won": 13,
+    "of": 16,
+    "progress": 0.838
+   }
+  },
+  "pruefung": {
+   "original": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "diagonalen": 16,
+     "start_gegnerregen": 2,
+     "gabelung_oben": 3,
+     "trittsteine": 8,
+     "ziel": 3
+    },
+    "best": 0.871,
+    "mean": 0.53
+   },
+   "entschaerft": {
+    "won": 1,
+    "of": 32,
+    "ends": {
+     "trittsteine": 16,
+     "diagonalen": 8,
+     "ziel": 5,
+     "gabelung_oben": 1,
+     "start_gegnerregen": 1
+    },
+    "best": 1.0,
+    "mean": 0.548
+   }
+  },
+  "seconds": 54,
+  "checkpoint": "step_0008000040.zip"
+ },
+ "9000040": {
+  "validierung_v2": {
+   "won": 106,
+   "of": 120,
+   "tiers": {
+    "stufe_4": 20,
+    "stufe_5": 20,
+    "stufe_6": 19,
+    "stufe_7": 19,
+    "stufe_8": 14,
+    "stufe_9": 14
+   }
+  },
+  "validierung_v3": {
+   "won": 27,
+   "of": 40,
+   "tiers": {
+    "stufe_10": 15,
+    "stufe_11": 12
+   }
+  },
+  "test_serie": {
+   "berg": {
+    "won": 12,
+    "of": 16,
+    "progress": 0.89
+   },
+   "festung": {
+    "won": 2,
+    "of": 16,
+    "progress": 0.467
+   },
+   "hoehle": {
+    "won": 9,
+    "of": 16,
+    "progress": 0.917
+   },
+   "lange_reise": {
+    "won": 1,
+    "of": 16,
+    "progress": 0.529
+   },
+   "parcours": {
+    "won": 16,
+    "of": 16,
+    "progress": 1.0
+   },
+   "zwei_wege": {
+    "won": 13,
+    "of": 16,
+    "progress": 0.939
+   }
+  },
+  "pruefung": {
+   "original": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "gabelung_oben": 7,
+     "diagonalen": 11,
+     "trittsteine": 11,
+     "ziel": 1,
+     "start_gegnerregen": 2
+    },
+    "best": 0.872,
+    "mean": 0.474
+   },
+   "entschaerft": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "start_gegnerregen": 1,
+     "diagonalen": 7,
+     "gabelung_oben": 10,
+     "trittsteine": 11,
+     "ziel": 3
+    },
+    "best": 1.0,
+    "mean": 0.456
+   }
+  },
+  "seconds": 57,
+  "checkpoint": "step_0009000040.zip"
+ },
+ "10000040": {
+  "validierung_v2": {
+   "won": 113,
+   "of": 120,
+   "tiers": {
+    "stufe_4": 20,
+    "stufe_5": 20,
+    "stufe_6": 20,
+    "stufe_7": 20,
+    "stufe_8": 15,
+    "stufe_9": 18
+   }
+  },
+  "validierung_v3": {
+   "won": 30,
+   "of": 40,
+   "tiers": {
+    "stufe_10": 16,
+    "stufe_11": 14
+   }
+  },
+  "test_serie": {
+   "berg": {
+    "won": 14,
+    "of": 16,
+    "progress": 0.969
+   },
+   "festung": {
+    "won": 5,
+    "of": 16,
+    "progress": 0.61
+   },
+   "hoehle": {
+    "won": 10,
+    "of": 16,
+    "progress": 0.922
+   },
+   "lange_reise": {
+    "won": 0,
+    "of": 16,
+    "progress": 0.494
+   },
+   "parcours": {
+    "won": 15,
+    "of": 16,
+    "progress": 0.967
+   },
+   "zwei_wege": {
+    "won": 12,
+    "of": 16,
+    "progress": 0.915
+   }
+  },
+  "pruefung": {
+   "original": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "trittsteine": 6,
+     "diagonalen": 14,
+     "ziel": 8,
+     "start_gegnerregen": 3,
+     "gabelung_oben": 1
+    },
+    "best": 0.873,
+    "mean": 0.579
+   },
+   "entschaerft": {
+    "won": 1,
+    "of": 32,
+    "ends": {
+     "ziel": 9,
+     "diagonalen": 19,
+     "trittsteine": 3
+    },
+    "best": 1.0,
+    "mean": 0.693
+   }
+  },
+  "seconds": 54,
+  "checkpoint": "step_0010000040.zip"
+ },
+ "11000048": {
+  "validierung_v2": {
+   "won": 110,
+   "of": 120,
+   "tiers": {
+    "stufe_4": 20,
+    "stufe_5": 20,
+    "stufe_6": 20,
+    "stufe_7": 20,
+    "stufe_8": 14,
+    "stufe_9": 16
+   }
+  },
+  "validierung_v3": {
+   "won": 31,
+   "of": 40,
+   "tiers": {
+    "stufe_10": 17,
+    "stufe_11": 14
+   }
+  },
+  "test_serie": {
+   "berg": {
+    "won": 14,
+    "of": 16,
+    "progress": 0.969
+   },
+   "festung": {
+    "won": 10,
+    "of": 16,
+    "progress": 0.757
+   },
+   "hoehle": {
+    "won": 16,
+    "of": 16,
+    "progress": 0.995
+   },
+   "lange_reise": {
+    "won": 2,
+    "of": 16,
+    "progress": 0.698
+   },
+   "parcours": {
+    "won": 16,
+    "of": 16,
+    "progress": 0.999
+   },
+   "zwei_wege": {
+    "won": 13,
+    "of": 16,
+    "progress": 0.91
+   }
+  },
+  "pruefung": {
+   "original": {
+    "won": 1,
+    "of": 32,
+    "ends": {
+     "trittsteine": 5,
+     "gabelung_oben": 4,
+     "diagonalen": 18,
+     "ziel": 3,
+     "start_gegnerregen": 1
+    },
+    "best": 1.0,
+    "mean": 0.642
+   },
+   "entschaerft": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "gabelung_oben": 8,
+     "diagonalen": 21,
+     "trittsteine": 2,
+     "ziel": 1
+    },
+    "best": 0.871,
+    "mean": 0.613
+   }
+  },
+  "seconds": 73,
+  "checkpoint": "step_0011000048.zip"
+ },
+ "12000048": {
+  "validierung_v2": {
+   "won": 112,
+   "of": 120,
+   "tiers": {
+    "stufe_4": 20,
+    "stufe_5": 20,
+    "stufe_6": 20,
+    "stufe_7": 19,
+    "stufe_8": 16,
+    "stufe_9": 17
+   }
+  },
+  "validierung_v3": {
+   "won": 28,
+   "of": 40,
+   "tiers": {
+    "stufe_10": 14,
+    "stufe_11": 14
+   }
+  },
+  "test_serie": {
+   "berg": {
+    "won": 16,
+    "of": 16,
+    "progress": 1.0
+   },
+   "festung": {
+    "won": 9,
+    "of": 16,
+    "progress": 0.762
+   },
+   "hoehle": {
+    "won": 6,
+    "of": 16,
+    "progress": 0.796
+   },
+   "lange_reise": {
+    "won": 1,
+    "of": 16,
+    "progress": 0.507
+   },
+   "parcours": {
+    "won": 16,
+    "of": 16,
+    "progress": 1.0
+   },
+   "zwei_wege": {
+    "won": 14,
+    "of": 16,
+    "progress": 0.952
+   }
+  },
+  "pruefung": {
+   "original": {
+    "won": 1,
+    "of": 32,
+    "ends": {
+     "trittsteine": 13,
+     "diagonalen": 10,
+     "start_gegnerregen": 6,
+     "ziel": 2
+    },
+    "best": 1.0,
+    "mean": 0.487
+   },
+   "entschaerft": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "trittsteine": 22,
+     "diagonalen": 9,
+     "start_gegnerregen": 1
+    },
+    "best": 0.776,
+    "mean": 0.484
+   }
+  },
+  "seconds": 59,
+  "checkpoint": "step_0012000048.zip"
+ },
+ "13000056": {
+  "validierung_v2": {
+   "won": 106,
+   "of": 120,
+   "tiers": {
+    "stufe_4": 20,
+    "stufe_5": 20,
+    "stufe_6": 19,
+    "stufe_7": 19,
+    "stufe_8": 13,
+    "stufe_9": 15
+   }
+  },
+  "validierung_v3": {
+   "won": 29,
+   "of": 40,
+   "tiers": {
+    "stufe_10": 15,
+    "stufe_11": 14
+   }
+  },
+  "test_serie": {
+   "berg": {
+    "won": 16,
+    "of": 16,
+    "progress": 1.0
+   },
+   "festung": {
+    "won": 8,
+    "of": 16,
+    "progress": 0.756
+   },
+   "hoehle": {
+    "won": 8,
+    "of": 16,
+    "progress": 0.785
+   },
+   "lange_reise": {
+    "won": 0,
+    "of": 16,
+    "progress": 0.579
+   },
+   "parcours": {
+    "won": 16,
+    "of": 16,
+    "progress": 1.0
+   },
+   "zwei_wege": {
+    "won": 13,
+    "of": 16,
+    "progress": 0.942
+   }
+  },
+  "pruefung": {
+   "original": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "diagonalen": 18,
+     "trittsteine": 6,
+     "ziel": 5,
+     "start_gegnerregen": 3
+    },
+    "best": 1.0,
+    "mean": 0.639
+   },
+   "entschaerft": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "diagonalen": 20,
+     "start_gegnerregen": 1,
+     "trittsteine": 5,
+     "ziel": 6
+    },
+    "best": 1.0,
+    "mean": 0.709
+   }
+  },
+  "seconds": 69,
+  "checkpoint": "step_0013000056.zip"
+ },
+ "14000072": {
+  "validierung_v2": {
+   "won": 108,
+   "of": 120,
+   "tiers": {
+    "stufe_4": 20,
+    "stufe_5": 20,
+    "stufe_6": 20,
+    "stufe_7": 20,
+    "stufe_8": 12,
+    "stufe_9": 16
+   }
+  },
+  "validierung_v3": {
+   "won": 28,
+   "of": 40,
+   "tiers": {
+    "stufe_10": 15,
+    "stufe_11": 13
+   }
+  },
+  "test_serie": {
+   "berg": {
+    "won": 13,
+    "of": 16,
+    "progress": 0.932
+   },
+   "festung": {
+    "won": 9,
+    "of": 16,
+    "progress": 0.777
+   },
+   "hoehle": {
+    "won": 10,
+    "of": 16,
+    "progress": 0.993
+   },
+   "lange_reise": {
+    "won": 0,
+    "of": 16,
+    "progress": 0.462
+   },
+   "parcours": {
+    "won": 13,
+    "of": 16,
+    "progress": 0.876
+   },
+   "zwei_wege": {
+    "won": 13,
+    "of": 16,
+    "progress": 0.942
+   }
+  },
+  "pruefung": {
+   "original": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "diagonalen": 9,
+     "ziel": 9,
+     "trittsteine": 9,
+     "gabelung_oben": 2,
+     "start_gegnerregen": 3
+    },
+    "best": 0.873,
+    "mean": 0.573
+   },
+   "entschaerft": {
+    "won": 2,
+    "of": 32,
+    "ends": {
+     "diagonalen": 11,
+     "trittsteine": 11,
+     "ziel": 7,
+     "start_gegnerregen": 1
+    },
+    "best": 1.0,
+    "mean": 0.658
+   }
+  },
+  "seconds": 66,
+  "checkpoint": "step_0014000072.zip"
+ },
+ "15000080": {
+  "validierung_v2": {
+   "won": 105,
+   "of": 120,
+   "tiers": {
+    "stufe_4": 20,
+    "stufe_5": 20,
+    "stufe_6": 19,
+    "stufe_7": 16,
+    "stufe_8": 15,
+    "stufe_9": 15
+   }
+  },
+  "validierung_v3": {
+   "won": 29,
+   "of": 40,
+   "tiers": {
+    "stufe_10": 15,
+    "stufe_11": 14
+   }
+  },
+  "test_serie": {
+   "berg": {
+    "won": 14,
+    "of": 16,
+    "progress": 0.936
+   },
+   "festung": {
+    "won": 10,
+    "of": 16,
+    "progress": 0.83
+   },
+   "hoehle": {
+    "won": 10,
+    "of": 16,
+    "progress": 0.825
+   },
+   "lange_reise": {
+    "won": 4,
+    "of": 16,
+    "progress": 0.599
+   },
+   "parcours": {
+    "won": 16,
+    "of": 16,
+    "progress": 1.0
+   },
+   "zwei_wege": {
+    "won": 15,
+    "of": 16,
+    "progress": 0.989
+   }
+  },
+  "pruefung": {
+   "original": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "trittsteine": 7,
+     "gabelung_oben": 9,
+     "ziel": 2,
+     "diagonalen": 13,
+     "start_gegnerregen": 1
+    },
+    "best": 0.872,
+    "mean": 0.52
+   },
+   "entschaerft": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "diagonalen": 7,
+     "trittsteine": 8,
+     "gabelung_oben": 15,
+     "ziel": 2
+    },
+    "best": 0.873,
+    "mean": 0.45
+   }
+  },
+  "seconds": 75,
+  "checkpoint": "step_0015000080.zip"
+ },
+ "16000088": {
+  "validierung_v2": {
+   "won": 115,
+   "of": 120,
+   "tiers": {
+    "stufe_4": 20,
+    "stufe_5": 20,
+    "stufe_6": 20,
+    "stufe_7": 20,
+    "stufe_8": 17,
+    "stufe_9": 18
+   }
+  },
+  "validierung_v3": {
+   "won": 31,
+   "of": 40,
+   "tiers": {
+    "stufe_10": 18,
+    "stufe_11": 13
+   }
+  },
+  "test_serie": {
+   "berg": {
+    "won": 15,
+    "of": 16,
+    "progress": 0.997
+   },
+   "festung": {
+    "won": 6,
+    "of": 16,
+    "progress": 0.592
+   },
+   "hoehle": {
+    "won": 9,
+    "of": 16,
+    "progress": 0.982
+   },
+   "lange_reise": {
+    "won": 1,
+    "of": 16,
+    "progress": 0.567
+   },
+   "parcours": {
+    "won": 16,
+    "of": 16,
+    "progress": 1.0
+   },
+   "zwei_wege": {
+    "won": 14,
+    "of": 16,
+    "progress": 0.941
+   }
+  },
+  "pruefung": {
+   "original": {
+    "won": 1,
+    "of": 32,
+    "ends": {
+     "diagonalen": 10,
+     "gabelung_oben": 3,
+     "ziel": 14,
+     "trittsteine": 4
+    },
+    "best": 0.998,
+    "mean": 0.704
+   },
+   "entschaerft": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "diagonalen": 12,
+     "ziel": 13,
+     "start_gegnerregen": 2,
+     "trittsteine": 5
+    },
+    "best": 0.873,
+    "mean": 0.667
+   }
+  },
+  "seconds": 77,
+  "checkpoint": "step_0016000088.zip"
+ },
+ "17000104": {
+  "validierung_v2": {
+   "won": 105,
+   "of": 120,
+   "tiers": {
+    "stufe_4": 20,
+    "stufe_5": 20,
+    "stufe_6": 19,
+    "stufe_7": 18,
+    "stufe_8": 13,
+    "stufe_9": 15
+   }
+  },
+  "validierung_v3": {
+   "won": 32,
+   "of": 40,
+   "tiers": {
+    "stufe_10": 16,
+    "stufe_11": 16
+   }
+  },
+  "test_serie": {
+   "berg": {
+    "won": 13,
+    "of": 16,
+    "progress": 0.933
+   },
+   "festung": {
+    "won": 3,
+    "of": 16,
+    "progress": 0.509
+   },
+   "hoehle": {
+    "won": 3,
+    "of": 16,
+    "progress": 0.839
+   },
+   "lange_reise": {
+    "won": 3,
+    "of": 16,
+    "progress": 0.601
+   },
+   "parcours": {
+    "won": 16,
+    "of": 16,
+    "progress": 1.0
+   },
+   "zwei_wege": {
+    "won": 12,
+    "of": 16,
+    "progress": 0.899
+   }
+  },
+  "pruefung": {
+   "original": {
+    "won": 1,
+    "of": 32,
+    "ends": {
+     "diagonalen": 14,
+     "trittsteine": 5,
+     "ziel": 9,
+     "start_gegnerregen": 2,
+     "gabelung_oben": 1
+    },
+    "best": 0.998,
+    "mean": 0.666
+   },
+   "entschaerft": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "diagonalen": 10,
+     "gabelung_oben": 3,
+     "ziel": 8,
+     "trittsteine": 11
+    },
+    "best": 1.0,
+    "mean": 0.595
+   }
+  },
+  "seconds": 73,
+  "checkpoint": "step_0017000104.zip"
+ },
+ "18000104": {
+  "validierung_v2": {
+   "won": 104,
+   "of": 120,
+   "tiers": {
+    "stufe_4": 20,
+    "stufe_5": 20,
+    "stufe_6": 19,
+    "stufe_7": 19,
+    "stufe_8": 10,
+    "stufe_9": 16
+   }
+  },
+  "validierung_v3": {
+   "won": 32,
+   "of": 40,
+   "tiers": {
+    "stufe_10": 16,
+    "stufe_11": 16
+   }
+  },
+  "test_serie": {
+   "berg": {
+    "won": 14,
+    "of": 16,
+    "progress": 0.964
+   },
+   "festung": {
+    "won": 9,
+    "of": 16,
+    "progress": 0.735
+   },
+   "hoehle": {
+    "won": 0,
+    "of": 16,
+    "progress": 0.326
+   },
+   "lange_reise": {
+    "won": 0,
+    "of": 16,
+    "progress": 0.473
+   },
+   "parcours": {
+    "won": 15,
+    "of": 16,
+    "progress": 0.984
+   },
+   "zwei_wege": {
+    "won": 13,
+    "of": 16,
+    "progress": 0.921
+   }
+  },
+  "pruefung": {
+   "original": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "gabelung_oben": 2,
+     "ziel": 10,
+     "diagonalen": 9,
+     "trittsteine": 8,
+     "start_gegnerregen": 3
+    },
+    "best": 0.873,
+    "mean": 0.601
+   },
+   "entschaerft": {
+    "won": 2,
+    "of": 32,
+    "ends": {
+     "diagonalen": 7,
+     "trittsteine": 12,
+     "ziel": 9,
+     "gabelung_oben": 1,
+     "start_gegnerregen": 1
+    },
+    "best": 1.0,
+    "mean": 0.622
+   }
+  },
+  "seconds": 71,
+  "checkpoint": "step_0018000104.zip"
+ },
+ "19000104": {
+  "validierung_v2": {
+   "won": 112,
+   "of": 120,
+   "tiers": {
+    "stufe_4": 20,
+    "stufe_5": 19,
+    "stufe_6": 19,
+    "stufe_7": 18,
+    "stufe_8": 18,
+    "stufe_9": 18
+   }
+  },
+  "validierung_v3": {
+   "won": 32,
+   "of": 40,
+   "tiers": {
+    "stufe_10": 19,
+    "stufe_11": 13
+   }
+  },
+  "test_serie": {
+   "berg": {
+    "won": 11,
+    "of": 16,
+    "progress": 0.879
+   },
+   "festung": {
+    "won": 6,
+    "of": 16,
+    "progress": 0.687
+   },
+   "hoehle": {
+    "won": 0,
+    "of": 16,
+    "progress": 0.347
+   },
+   "lange_reise": {
+    "won": 1,
+    "of": 16,
+    "progress": 0.546
+   },
+   "parcours": {
+    "won": 15,
+    "of": 16,
+    "progress": 0.953
+   },
+   "zwei_wege": {
+    "won": 13,
+    "of": 16,
+    "progress": 0.928
+   }
+  },
+  "pruefung": {
+   "original": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "diagonalen": 23,
+     "trittsteine": 2,
+     "ziel": 6,
+     "start_gegnerregen": 1
+    },
+    "best": 1.0,
+    "mean": 0.741
+   },
+   "entschaerft": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "ziel": 5,
+     "trittsteine": 6,
+     "diagonalen": 20,
+     "gabelung_oben": 1
+    },
+    "best": 0.873,
+    "mean": 0.685
+   }
+  },
+  "seconds": 77,
+  "checkpoint": "step_0019000104.zip"
+ },
+ "20000112": {
+  "validierung_v2": {
+   "won": 107,
+   "of": 120,
+   "tiers": {
+    "stufe_4": 20,
+    "stufe_5": 20,
+    "stufe_6": 19,
+    "stufe_7": 19,
+    "stufe_8": 14,
+    "stufe_9": 15
+   }
+  },
+  "validierung_v3": {
+   "won": 29,
+   "of": 40,
+   "tiers": {
+    "stufe_10": 17,
+    "stufe_11": 12
+   }
+  },
+  "test_serie": {
+   "berg": {
+    "won": 12,
+    "of": 16,
+    "progress": 0.94
+   },
+   "festung": {
+    "won": 4,
+    "of": 16,
+    "progress": 0.543
+   },
+   "hoehle": {
+    "won": 0,
+    "of": 16,
+    "progress": 0.322
+   },
+   "lange_reise": {
+    "won": 1,
+    "of": 16,
+    "progress": 0.51
+   },
+   "parcours": {
+    "won": 14,
+    "of": 16,
+    "progress": 0.891
+   },
+   "zwei_wege": {
+    "won": 12,
+    "of": 16,
+    "progress": 0.903
+   }
+  },
+  "pruefung": {
+   "original": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "gabelung_oben": 5,
+     "diagonalen": 12,
+     "trittsteine": 8,
+     "start_gegnerregen": 6,
+     "ziel": 1
+    },
+    "best": 0.871,
+    "mean": 0.437
+   },
+   "entschaerft": {
+    "won": 1,
+    "of": 32,
+    "ends": {
+     "diagonalen": 10,
+     "trittsteine": 14,
+     "start_gegnerregen": 4,
+     "ziel": 1,
+     "gabelung_oben": 2
+    },
+    "best": 1.0,
+    "mean": 0.479
+   }
+  },
+  "seconds": 55,
+  "checkpoint": "step_0020000112.zip"
+ },
+ "21000112": {
+  "validierung_v2": {
+   "won": 115,
+   "of": 120,
+   "tiers": {
+    "stufe_4": 20,
+    "stufe_5": 20,
+    "stufe_6": 20,
+    "stufe_7": 20,
+    "stufe_8": 16,
+    "stufe_9": 19
+   }
+  },
+  "validierung_v3": {
+   "won": 31,
+   "of": 40,
+   "tiers": {
+    "stufe_10": 16,
+    "stufe_11": 15
+   }
+  },
+  "test_serie": {
+   "berg": {
+    "won": 11,
+    "of": 16,
+    "progress": 0.918
+   },
+   "festung": {
+    "won": 4,
+    "of": 16,
+    "progress": 0.549
+   },
+   "hoehle": {
+    "won": 2,
+    "of": 16,
+    "progress": 0.464
+   },
+   "lange_reise": {
+    "won": 2,
+    "of": 16,
+    "progress": 0.61
+   },
+   "parcours": {
+    "won": 14,
+    "of": 16,
+    "progress": 0.92
+   },
+   "zwei_wege": {
+    "won": 13,
+    "of": 16,
+    "progress": 0.927
+   }
+  },
+  "pruefung": {
+   "original": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "diagonalen": 12,
+     "ziel": 15,
+     "start_gegnerregen": 3,
+     "trittsteine": 2
+    },
+    "best": 1.0,
+    "mean": 0.728
+   },
+   "entschaerft": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "ziel": 16,
+     "diagonalen": 12,
+     "trittsteine": 3,
+     "start_gegnerregen": 1
+    },
+    "best": 1.0,
+    "mean": 0.763
+   }
+  },
+  "seconds": 61,
+  "checkpoint": "step_0021000112.zip"
+ },
+ "22000120": {
+  "validierung_v2": {
+   "won": 108,
+   "of": 120,
+   "tiers": {
+    "stufe_4": 20,
+    "stufe_5": 20,
+    "stufe_6": 18,
+    "stufe_7": 19,
+    "stufe_8": 15,
+    "stufe_9": 16
+   }
+  },
+  "validierung_v3": {
+   "won": 28,
+   "of": 40,
+   "tiers": {
+    "stufe_10": 13,
+    "stufe_11": 15
+   }
+  },
+  "test_serie": {
+   "berg": {
+    "won": 15,
+    "of": 16,
+    "progress": 0.982
+   },
+   "festung": {
+    "won": 0,
+    "of": 16,
+    "progress": 0.376
+   },
+   "hoehle": {
+    "won": 11,
+    "of": 16,
+    "progress": 0.862
+   },
+   "lange_reise": {
+    "won": 0,
+    "of": 16,
+    "progress": 0.447
+   },
+   "parcours": {
+    "won": 16,
+    "of": 16,
+    "progress": 1.0
+   },
+   "zwei_wege": {
+    "won": 12,
+    "of": 16,
+    "progress": 0.903
+   }
+  },
+  "pruefung": {
+   "original": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "start_gegnerregen": 4,
+     "trittsteine": 10,
+     "diagonalen": 14,
+     "ziel": 3,
+     "gabelung_oben": 1
+    },
+    "best": 1.0,
+    "mean": 0.583
+   },
+   "entschaerft": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "diagonalen": 14,
+     "ziel": 2,
+     "trittsteine": 14,
+     "start_gegnerregen": 2
+    },
+    "best": 0.871,
+    "mean": 0.574
+   }
+  },
+  "seconds": 61,
+  "checkpoint": "step_0022000120.zip"
+ },
+ "23000120": {
+  "validierung_v2": {
+   "won": 104,
+   "of": 120,
+   "tiers": {
+    "stufe_4": 20,
+    "stufe_5": 20,
+    "stufe_6": 20,
+    "stufe_7": 18,
+    "stufe_8": 14,
+    "stufe_9": 12
+   }
+  },
+  "validierung_v3": {
+   "won": 28,
+   "of": 40,
+   "tiers": {
+    "stufe_10": 16,
+    "stufe_11": 12
+   }
+  },
+  "test_serie": {
+   "berg": {
+    "won": 15,
+    "of": 16,
+    "progress": 0.983
+   },
+   "festung": {
+    "won": 7,
+    "of": 16,
+    "progress": 0.69
+   },
+   "hoehle": {
+    "won": 13,
+    "of": 16,
+    "progress": 0.99
+   },
+   "lange_reise": {
+    "won": 8,
+    "of": 16,
+    "progress": 0.807
+   },
+   "parcours": {
+    "won": 16,
+    "of": 16,
+    "progress": 1.0
+   },
+   "zwei_wege": {
+    "won": 15,
+    "of": 16,
+    "progress": 0.976
+   }
+  },
+  "pruefung": {
+   "original": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "diagonalen": 23,
+     "trittsteine": 9
+    },
+    "best": 0.778,
+    "mean": 0.663
+   },
+   "entschaerft": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "diagonalen": 20,
+     "trittsteine": 10,
+     "gabelung_oben": 1,
+     "start_gegnerregen": 1
+    },
+    "best": 0.778,
+    "mean": 0.615
+   }
+  },
+  "seconds": 69,
+  "checkpoint": "step_0023000120.zip"
+ },
+ "24000120": {
+  "validierung_v2": {
+   "won": 111,
+   "of": 120,
+   "tiers": {
+    "stufe_4": 20,
+    "stufe_5": 20,
+    "stufe_6": 20,
+    "stufe_7": 18,
+    "stufe_8": 17,
+    "stufe_9": 16
+   }
+  },
+  "validierung_v3": {
+   "won": 34,
+   "of": 40,
+   "tiers": {
+    "stufe_10": 19,
+    "stufe_11": 15
+   }
+  },
+  "test_serie": {
+   "berg": {
+    "won": 11,
+    "of": 16,
+    "progress": 0.921
+   },
+   "festung": {
+    "won": 9,
+    "of": 16,
+    "progress": 0.737
+   },
+   "hoehle": {
+    "won": 12,
+    "of": 16,
+    "progress": 0.882
+   },
+   "lange_reise": {
+    "won": 4,
+    "of": 16,
+    "progress": 0.676
+   },
+   "parcours": {
+    "won": 16,
+    "of": 16,
+    "progress": 1.0
+   },
+   "zwei_wege": {
+    "won": 13,
+    "of": 16,
+    "progress": 0.875
+   }
+  },
+  "pruefung": {
+   "original": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "diagonalen": 16,
+     "trittsteine": 9,
+     "ziel": 4,
+     "start_gegnerregen": 3
+    },
+    "best": 0.873,
+    "mean": 0.614
+   },
+   "entschaerft": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "diagonalen": 18,
+     "gabelung_oben": 2,
+     "trittsteine": 8,
+     "start_gegnerregen": 3,
+     "ziel": 1
+    },
+    "best": 0.873,
+    "mean": 0.606
+   }
+  },
+  "seconds": 67,
+  "checkpoint": "step_0024000120.zip"
+ },
+ "25000120": {
+  "validierung_v2": {
+   "won": 115,
+   "of": 120,
+   "tiers": {
+    "stufe_4": 20,
+    "stufe_5": 20,
+    "stufe_6": 20,
+    "stufe_7": 18,
+    "stufe_8": 19,
+    "stufe_9": 18
+   }
+  },
+  "validierung_v3": {
+   "won": 31,
+   "of": 40,
+   "tiers": {
+    "stufe_10": 19,
+    "stufe_11": 12
+   }
+  },
+  "test_serie": {
+   "berg": {
+    "won": 11,
+    "of": 16,
+    "progress": 0.92
+   },
+   "festung": {
+    "won": 8,
+    "of": 16,
+    "progress": 0.683
+   },
+   "hoehle": {
+    "won": 9,
+    "of": 16,
+    "progress": 0.924
+   },
+   "lange_reise": {
+    "won": 0,
+    "of": 16,
+    "progress": 0.419
+   },
+   "parcours": {
+    "won": 16,
+    "of": 16,
+    "progress": 1.0
+   },
+   "zwei_wege": {
+    "won": 12,
+    "of": 16,
+    "progress": 0.901
+   }
+  },
+  "pruefung": {
+   "original": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "trittsteine": 18,
+     "diagonalen": 8,
+     "ziel": 2,
+     "start_gegnerregen": 2,
+     "gabelung_oben": 2
+    },
+    "best": 0.873,
+    "mean": 0.509
+   },
+   "entschaerft": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "gabelung_oben": 5,
+     "diagonalen": 14,
+     "trittsteine": 13
+    },
+    "best": 0.778,
+    "mean": 0.546
+   }
+  },
+  "seconds": 64,
+  "checkpoint": "step_0025000120.zip"
+ },
+ "26000120": {
+  "validierung_v2": {
+   "won": 115,
+   "of": 120,
+   "tiers": {
+    "stufe_4": 20,
+    "stufe_5": 20,
+    "stufe_6": 20,
+    "stufe_7": 18,
+    "stufe_8": 19,
+    "stufe_9": 18
+   }
+  },
+  "validierung_v3": {
+   "won": 34,
+   "of": 40,
+   "tiers": {
+    "stufe_10": 19,
+    "stufe_11": 15
+   }
+  },
+  "test_serie": {
+   "berg": {
+    "won": 14,
+    "of": 16,
+    "progress": 0.966
+   },
+   "festung": {
+    "won": 3,
+    "of": 16,
+    "progress": 0.588
+   },
+   "hoehle": {
+    "won": 4,
+    "of": 16,
+    "progress": 0.539
+   },
+   "lange_reise": {
+    "won": 0,
+    "of": 16,
+    "progress": 0.503
+   },
+   "parcours": {
+    "won": 15,
+    "of": 16,
+    "progress": 0.941
+   },
+   "zwei_wege": {
+    "won": 13,
+    "of": 16,
+    "progress": 0.926
+   }
+  },
+  "pruefung": {
+   "original": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "diagonalen": 14,
+     "trittsteine": 11,
+     "ziel": 7
+    },
+    "best": 1.0,
+    "mean": 0.659
+   },
+   "entschaerft": {
+    "won": 1,
+    "of": 32,
+    "ends": {
+     "trittsteine": 6,
+     "ziel": 1,
+     "diagonalen": 22,
+     "start_gegnerregen": 2
+    },
+    "best": 1.0,
+    "mean": 0.641
+   }
+  },
+  "seconds": 61,
+  "checkpoint": "step_0026000120.zip"
+ },
+ "27000120": {
+  "validierung_v2": {
+   "won": 109,
+   "of": 120,
+   "tiers": {
+    "stufe_4": 20,
+    "stufe_5": 19,
+    "stufe_6": 20,
+    "stufe_7": 18,
+    "stufe_8": 16,
+    "stufe_9": 16
+   }
+  },
+  "validierung_v3": {
+   "won": 34,
+   "of": 40,
+   "tiers": {
+    "stufe_10": 20,
+    "stufe_11": 14
+   }
+  },
+  "test_serie": {
+   "berg": {
+    "won": 16,
+    "of": 16,
+    "progress": 1.0
+   },
+   "festung": {
+    "won": 2,
+    "of": 16,
+    "progress": 0.477
+   },
+   "hoehle": {
+    "won": 8,
+    "of": 16,
+    "progress": 0.732
+   },
+   "lange_reise": {
+    "won": 1,
+    "of": 16,
+    "progress": 0.573
+   },
+   "parcours": {
+    "won": 14,
+    "of": 16,
+    "progress": 0.919
+   },
+   "zwei_wege": {
+    "won": 12,
+    "of": 16,
+    "progress": 0.889
+   }
+  },
+  "pruefung": {
+   "original": {
+    "won": 1,
+    "of": 32,
+    "ends": {
+     "diagonalen": 17,
+     "ziel": 10,
+     "start_gegnerregen": 1,
+     "trittsteine": 3
+    },
+    "best": 1.0,
+    "mean": 0.74
+   },
+   "entschaerft": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "ziel": 13,
+     "diagonalen": 10,
+     "trittsteine": 9
+    },
+    "best": 1.0,
+    "mean": 0.701
+   }
+  },
+  "seconds": 66,
+  "checkpoint": "step_0027000120.zip"
+ },
+ "28000120": {
+  "validierung_v2": {
+   "won": 114,
+   "of": 120,
+   "tiers": {
+    "stufe_4": 20,
+    "stufe_5": 20,
+    "stufe_6": 20,
+    "stufe_7": 19,
+    "stufe_8": 19,
+    "stufe_9": 16
+   }
+  },
+  "validierung_v3": {
+   "won": 36,
+   "of": 40,
+   "tiers": {
+    "stufe_10": 19,
+    "stufe_11": 17
+   }
+  },
+  "test_serie": {
+   "berg": {
+    "won": 15,
+    "of": 16,
+    "progress": 0.982
+   },
+   "festung": {
+    "won": 8,
+    "of": 16,
+    "progress": 0.683
+   },
+   "hoehle": {
+    "won": 5,
+    "of": 16,
+    "progress": 0.619
+   },
+   "lange_reise": {
+    "won": 1,
+    "of": 16,
+    "progress": 0.494
+   },
+   "parcours": {
+    "won": 16,
+    "of": 16,
+    "progress": 1.0
+   },
+   "zwei_wege": {
+    "won": 16,
+    "of": 16,
+    "progress": 1.0
+   }
+  },
+  "pruefung": {
+   "original": {
+    "won": 8,
+    "of": 32,
+    "ends": {
+     "ziel": 9,
+     "diagonalen": 13,
+     "trittsteine": 2
+    },
+    "best": 1.0,
+    "mean": 0.84
+   },
+   "entschaerft": {
+    "won": 12,
+    "of": 32,
+    "ends": {
+     "ziel": 5,
+     "diagonalen": 8,
+     "trittsteine": 7
+    },
+    "best": 1.0,
+    "mean": 0.801
+   }
+  },
+  "seconds": 66,
+  "checkpoint": "step_0028000120.zip"
+ },
+ "29000120": {
+  "validierung_v2": {
+   "won": 111,
+   "of": 120,
+   "tiers": {
+    "stufe_4": 20,
+    "stufe_5": 20,
+    "stufe_6": 19,
+    "stufe_7": 19,
+    "stufe_8": 15,
+    "stufe_9": 18
+   }
+  },
+  "validierung_v3": {
+   "won": 33,
+   "of": 40,
+   "tiers": {
+    "stufe_10": 18,
+    "stufe_11": 15
+   }
+  },
+  "test_serie": {
+   "berg": {
+    "won": 15,
+    "of": 16,
+    "progress": 0.996
+   },
+   "festung": {
+    "won": 11,
+    "of": 16,
+    "progress": 0.844
+   },
+   "hoehle": {
+    "won": 7,
+    "of": 16,
+    "progress": 0.769
+   },
+   "lange_reise": {
+    "won": 3,
+    "of": 16,
+    "progress": 0.669
+   },
+   "parcours": {
+    "won": 15,
+    "of": 16,
+    "progress": 0.994
+   },
+   "zwei_wege": {
+    "won": 15,
+    "of": 16,
+    "progress": 0.976
+   }
+  },
+  "pruefung": {
+   "original": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "ziel": 11,
+     "trittsteine": 18,
+     "diagonalen": 2,
+     "start_gegnerregen": 1
+    },
+    "best": 1.0,
+    "mean": 0.632
+   },
+   "entschaerft": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "trittsteine": 18,
+     "gabelung_oben": 2,
+     "ziel": 9,
+     "diagonalen": 3
+    },
+    "best": 1.0,
+    "mean": 0.6
+   }
+  },
+  "seconds": 64,
+  "checkpoint": "step_0029000120.zip"
+ },
+ "30000120": {
+  "validierung_v2": {
+   "won": 116,
+   "of": 120,
+   "tiers": {
+    "stufe_4": 20,
+    "stufe_5": 20,
+    "stufe_6": 20,
+    "stufe_7": 18,
+    "stufe_8": 19,
+    "stufe_9": 19
+   }
+  },
+  "validierung_v3": {
+   "won": 35,
+   "of": 40,
+   "tiers": {
+    "stufe_10": 19,
+    "stufe_11": 16
+   }
+  },
+  "test_serie": {
+   "berg": {
+    "won": 15,
+    "of": 16,
+    "progress": 0.987
+   },
+   "festung": {
+    "won": 10,
+    "of": 16,
+    "progress": 0.765
+   },
+   "hoehle": {
+    "won": 4,
+    "of": 16,
+    "progress": 0.803
+   },
+   "lange_reise": {
+    "won": 6,
+    "of": 16,
+    "progress": 0.6
+   },
+   "parcours": {
+    "won": 16,
+    "of": 16,
+    "progress": 1.0
+   },
+   "zwei_wege": {
+    "won": 15,
+    "of": 16,
+    "progress": 0.969
+   }
+  },
+  "pruefung": {
+   "original": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "ziel": 7,
+     "diagonalen": 8,
+     "start_gegnerregen": 12,
+     "trittsteine": 5
+    },
+    "best": 1.0,
+    "mean": 0.494
+   },
+   "entschaerft": {
+    "won": 0,
+    "of": 32,
+    "ends": {
+     "diagonalen": 15,
+     "ziel": 5,
+     "trittsteine": 5,
+     "start_gegnerregen": 7
+    },
+    "best": 1.0,
+    "mean": 0.583
+   }
+  },
+  "seconds": 63,
+  "checkpoint": "step_0030000120.zip"
+ },
+ "31000120": {
+  "validierung_v2": {
+   "won": 113,
+   "of": 120,
+   "tiers": {
+    "stufe_4": 20,
+    "stufe_5": 20,
+    "stufe_6": 19,
+    "stufe_7": 19,
+    "stufe_8": 18,
+    "stufe_9": 17
+   }
+  },
+  "validierung_v3": {
+   "won": 36,
+   "of": 40,
+   "tiers": {
+    "stufe_10": 18,
+    "stufe_11": 18
+   }
+  },
+  "test_serie": {
+   "berg": {
+    "won": 13,
+    "of": 16,
+    "progress": 0.966
+   },
+   "festung": {
+    "won": 5,
+    "of": 16,
+    "progress": 0.594
+   },
+   "hoehle": {
+    "won": 6,
+    "of": 16,
+    "progress": 0.939
+   },
+   "lange_reise": {
+    "won": 7,
+    "of": 16,
+    "progress": 0.667
+   },
+   "parcours": {
+    "won": 16,
+    "of": 16,
+    "progress": 1.0
+   },
+   "zwei_wege": {
+    "won": 15,
+    "of": 16,
+    "progress": 0.973
+   }
+  },
+  "pruefung": {
+   "original": {
+    "won": 1,
+    "of": 32,
+    "ends": {
+     "start_gegnerregen": 3,
+     "ziel": 12,
+     "trittsteine": 10,
+     "diagonalen": 5,
+     "gabelung_oben": 1
+    },
+    "best": 1.0,
+    "mean": 0.596
+   },
+   "entschaerft": {
+    "won": 1,
+    "of": 32,
+    "ends": {
+     "diagonalen": 3,
+     "trittsteine": 17,
+     "ziel": 10,
+     "start_gegnerregen": 1
+    },
+    "best": 1.0,
+    "mean": 0.565
+   }
+  },
+  "seconds": 67,
+  "checkpoint": "step_0031000120.zip"
+ }
+}

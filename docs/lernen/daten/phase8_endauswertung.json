@@ -1,0 +1,348 @@
+{
+ "checkpoint": "runs/phase8_r3_neu/checkpoints/ema2_step_0050000000.zip",
+ "dev": {
+  "pruefung": {
+   "won": 183,
+   "of": 256
+  },
+  "serie_berg": {
+   "won": 26,
+   "of": 32
+  },
+  "serie_festung": {
+   "won": 29,
+   "of": 32
+  },
+  "serie_hoehle": {
+   "won": 17,
+   "of": 32
+  },
+  "serie_lange_reise": {
+   "won": 18,
+   "of": 32
+  },
+  "serie_parcours": {
+   "won": 32,
+   "of": 32
+  },
+  "serie_zwei_wege": {
+   "won": 31,
+   "of": 32
+  },
+  "hand_abgrund": {
+   "won": 31,
+   "of": 32
+  },
+  "hand_doppelgabel": {
+   "won": 0,
+   "of": 32
+  },
+  "hand_hoehlendach": {
+   "won": 31,
+   "of": 32
+  },
+  "hand_lange_tour": {
+   "won": 0,
+   "of": 32
+  }
+ },
+ "test": {
+  "hand_hochsteine": {
+   "won": 31,
+   "of": 32
+  },
+  "hand_koeder": {
+   "won": 0,
+   "of": 32
+  },
+  "hand_pruefungsstil": {
+   "won": 27,
+   "of": 32
+  },
+  "hand_stollen": {
+   "won": 32,
+   "of": 32
+  }
+ },
+ "sealed": {
+  "exam2": {
+   "won": 85,
+   "of": 128
+  },
+  "gegnertreppe": {
+   "won": 27,
+   "of": 32
+  },
+  "regenstart": {
+   "won": 32,
+   "of": 32
+  },
+  "turm": {
+   "won": 32,
+   "of": 32
+  },
+  "zickzack": {
+   "won": 32,
+   "of": 32
+  }
+ },
+ "dev_mean": 0.6758,
+ "sealed_total": {
+  "won": 208,
+  "of": 256,
+  "rate": 0.8125,
+  "low95": 0.7602,
+  "high95": 0.8556
+ },
+ "goal_met": true,
+ "autopilot_log": [
+  "2026-10-02 20:51 Runde 1 startet von runs/phase7c/checkpoints/ema_step_0035000008.zip (Dev-Mittel Start 50.3%); neu: --pool-share 0.4 --augment 0.7",
+  "2026-10-02 20:51 Runde 1, Arm neu: Training gestartet/fortgesetzt auf Kernen [0, 1]",
+  "2026-10-02 20:51 Runde 1, Arm kontrolle: Training gestartet/fortgesetzt auf Kernen [2, 3]",
+  "2026-10-02 23:59 Runde 1, Arm neu: Training gestartet/fortgesetzt auf Kernen [0, 1]",
+  "2026-10-02 23:59 Runde 1, Arm kontrolle: Training gestartet/fortgesetzt auf Kernen [2, 3]",
+  "2026-10-03 01:36 Runde 1 entschieden: neu 59.6% vs Kontrolle 42.6% (Schutz 70 vs 73) -> neu",
+  "2026-10-03 01:36 Weiter mit Runde 2 ab runs/phase8_r1_neu/checkpoints/ema_step_0041000000.zip",
+  "2026-10-03 01:37 Runde 2 startet von runs/phase8_r1_neu/checkpoints/ema_step_0041000000.zip (Dev-Mittel Start 68.3%); neu: --pool-share 0.4 --augment 0.7 --obs-v2 --stuck-death",
+  "2026-10-03 01:37 Runde 2, Arm neu: Training gestartet/fortgesetzt auf Kernen [0, 1]",
+  "2026-10-03 01:37 Runde 2, Arm kontrolle: Training gestartet/fortgesetzt auf Kernen [2, 3]",
+  "2026-10-03 06:19 Runde 2 entschieden: neu 62.6% vs Kontrolle 66.2% (Schutz 79 vs 76) -> kontrolle",
+  "2026-10-03 06:19 Weiter mit Runde 3 ab runs/phase8_r2_kontrolle/checkpoints/ema_step_0047000000.zip",
+  "2026-10-03 06:20 Runde 3 startet von runs/phase8_r2_kontrolle/checkpoints/ema_step_0047000000.zip (Dev-Mittel Start 63.2%); neu: --pool-share 0.4 --augment 0.7 --plr",
+  "2026-10-03 06:20 Runde 3, Arm neu: Training gestartet/fortgesetzt auf Kernen [0, 1]",
+  "2026-10-03 06:20 Runde 3, Arm kontrolle: Training gestartet/fortgesetzt auf Kernen [2, 3]",
+  "2026-10-03 06:23 Runde 3, Arm neu: Training gestartet/fortgesetzt auf Kernen [0, 1]",
+  "2026-10-03 06:25 Korrektur: --plr ohne Wert -> --plr 0.3 (Arm neu Runde 3 konnte nicht starten)",
+  "2026-10-03 06:23 Runde 3, Arm neu: Training gestartet/fortgesetzt auf Kernen [0, 1]",
+  "2026-10-03 10:48 Runde 3 entschieden: neu 68.0% vs Kontrolle 64.0% (Schutz 78 vs 75) -> neu",
+  "2026-10-03 10:48 Endmodell nach fester Regel: runs/phase8_r3_neu/checkpoints/ema2_step_0050000000.zip (Dev-Fenster 69.7%) -> Endauswertung",
+  "2026-10-03 10:51 Endauswertung fertig: versiegelt 208/256 (untere 95-%-Grenze 76.0%) -> Ziel erreicht"
+ ],
+ "rounds": {
+  "1": {
+   "start": "runs/phase7c/checkpoints/ema_step_0035000008.zip",
+   "flags": {
+    "neu": [
+     "--pool-share",
+     "0.4",
+     "--augment",
+     "0.7"
+    ],
+    "kontrolle": []
+   },
+   "started": 1790974234.097517,
+   "stopped": [],
+   "start_steps": 35000008,
+   "baseline": 0.5028,
+   "judged": {
+    "mean": {
+     "neu": 0.5956333333333333,
+     "kontrolle": 0.4261333333333333
+    },
+    "schutz": {
+     "neu": 70,
+     "kontrolle": 73
+    },
+    "winner": "neu"
+   }
+  },
+  "2": {
+   "start": "runs/phase8_r1_neu/checkpoints/ema_step_0041000000.zip",
+   "flags": {
+    "neu": [
+     "--pool-share",
+     "0.4",
+     "--augment",
+     "0.7",
+     "--obs-v2",
+     "--stuck-death"
+    ],
+    "kontrolle": [
+     "--pool-share",
+     "0.4",
+     "--augment",
+     "0.7"
+    ]
+   },
+   "started": 1790991378.628423,
+   "stopped": [],
+   "start_steps": 41000000,
+   "baseline": 0.6832,
+   "judged": {
+    "mean": {
+     "neu": 0.6259333333333333,
+     "kontrolle": 0.6624
+    },
+    "schutz": {
+     "neu": 79,
+     "kontrolle": 76
+    },
+    "winner": "kontrolle"
+   }
+  },
+  "3": {
+   "start": "runs/phase8_r2_kontrolle/checkpoints/ema_step_0047000000.zip",
+   "flags": {
+    "neu": [
+     "--pool-share",
+     "0.4",
+     "--augment",
+     "0.7",
+     "--plr",
+     "0.3"
+    ],
+    "kontrolle": [
+     "--pool-share",
+     "0.4",
+     "--augment",
+     "0.7"
+    ]
+   },
+   "started": 1791008364.034087,
+   "stopped": [],
+   "start_steps": 47000000,
+   "baseline": 0.6321,
+   "judged": {
+    "mean": {
+     "neu": 0.6804,
+     "kontrolle": 0.6401666666666667
+    },
+    "schutz": {
+     "neu": 78,
+     "kontrolle": 75
+    },
+    "winner": "neu"
+   }
+  }
+ },
+ "probes_step1": {
+  "abyss": {
+   "chest_col": 297,
+   "orig": 81,
+   "wall": 98,
+   "sticky": 13,
+   "n": 128,
+   "route_lower": 3,
+   "route_upper": 124,
+   "stones_fail_lower": 3,
+   "stones_fail_upper": 20,
+   "ends_orig": [
+    24,
+    98,
+    102,
+    103,
+    103,
+    103,
+    103,
+    103,
+    103,
+    103,
+    103,
+    103,
+    103,
+    103,
+    103,
+    103,
+    103,
+    103,
+    127,
+    135,
+    139,
+    145,
+    148,
+    149,
+    174,
+    175,
+    175,
+    175,
+    175,
+    176,
+    188,
+    259,
+    259,
+    259,
+    259,
+    259,
+    297,
+    297,
+    297,
+    297,
+    297,
+    297,
+    297,
+    297,
+    297,
+    297,
+    297
+   ]
+  },
+  "A34": {
+   "checkpoint": "runs/phase7a/checkpoints/ema_step_0034000000.zip",
+   "exam": 167,
+   "exam_of": 256,
+   "test_serie": {
+    "berg": 28,
+    "festung": 16,
+    "hoehle": 6,
+    "lange_reise": 7,
+    "parcours": 30,
+    "zwei_wege": 29
+   },
+   "dev_mean": 0.611
+  },
+  "C35": {
+   "checkpoint": "runs/phase7c/checkpoints/ema_step_0035000008.zip",
+   "exam": 164,
+   "exam_of": 256,
+   "test_serie": {
+    "berg": 22,
+    "festung": 19,
+    "hoehle": 16,
+    "lange_reise": 17,
+    "parcours": 30,
+    "zwei_wege": 28
+   },
+   "dev_mean": 0.6808
+  },
+  "C36": {
+   "checkpoint": "runs/phase7c/checkpoints/ema_step_0036000004.zip",
+   "exam": 145,
+   "exam_of": 256,
+   "test_serie": {
+    "berg": 22,
+    "festung": 18,
+    "hoehle": 14,
+    "lange_reise": 16,
+    "parcours": 30,
+    "zwei_wege": 30
+   },
+   "dev_mean": 0.6613
+  }
+ },
+ "aug_solvable": {
+  "none": {
+   "applied": 30,
+   "solved": 30
+  },
+  "void": {
+   "applied": 30,
+   "solved": 30
+  },
+  "raise": {
+   "applied": 19,
+   "solved": 19
+  },
+  "ceiling": {
+   "applied": 30,
+   "solved": 30
+  },
+  "air": {
+   "applied": 30,
+   "solved": 30
+  },
+  "enemies": {
+   "applied": 30,
+   "solved": 30
+  }
+ }
+}

@@ -1,0 +1,880 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mehr Siege, ehrliche Gegenprobe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+
+:root {
+  --bg: #F3F4F9;
+  --surface: #FFFFFF;
+  --surface-2: #E9EBF4;
+  --ink: #181A31;
+  --muted: #5A5D78;
+  --line: #D6D9E7;
+  --accent: #0B84A0;
+  --accent-soft: #BFE6EF;
+  --gold: #A8700F;
+  --red: #C23F37;
+  --green: #2B8A52;
+  --grey: #8A8DA6;
+  --world-top: #241C55;
+  --world-bottom: #3A6DB0;
+  --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", sans-serif;
+  --body: "Literata", Georgia, "Times New Roman", serif;
+  --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0F1120;
+    --surface: #171A2C;
+    --surface-2: #20243A;
+    --ink: #E7E8F3;
+    --muted: #9B9EBA;
+    --line: #2B2F48;
+    --accent: #3CC2DA;
+    --accent-soft: #19485A;
+    --gold: #E3AA4B;
+    --red: #F06B60;
+    --green: #5CC98A;
+    --grey: #7B7F9C;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0F1120;
+  --surface: #171A2C;
+  --surface-2: #20243A;
+  --ink: #E7E8F3;
+  --muted: #9B9EBA;
+  --line: #2B2F48;
+  --accent: #3CC2DA;
+  --accent-soft: #19485A;
+  --gold: #E3AA4B;
+  --red: #F06B60;
+  --green: #5CC98A;
+  --grey: #7B7F9C;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 17px;
+  line-height: 1.62;
+  padding-inline: 18px;
+  padding-block: 0 64px;
+}
+.wrap { max-width: 1040px; margin: 0 auto; }
+.col { max-width: 680px; margin-inline: auto; }
+h1, h2, h3 { font-family: var(--display); line-height: 1.12; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2.3rem, 6vw, 4rem); font-weight: 800; letter-spacing: -0.02em; }
+h2 { font-size: clamp(1.6rem, 3.4vw, 2.2rem); font-weight: 700; letter-spacing: -0.01em; }
+h3 { font-size: 1.15rem; font-weight: 700; }
+p { margin: 0; }
+.stack { display: flex; flex-direction: column; gap: 1rem; }
+.eyebrow {
+  font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent);
+}
+.muted { color: var(--muted); }
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+section { padding-block: 56px 8px; }
+section > .col { display: flex; flex-direction: column; gap: 1rem; }
+a { color: var(--accent); }
+code, .term { font-family: var(--mono); font-size: 0.88em; background: var(--surface-2); padding: 0.05em 0.35em; border-radius: 4px; }
+
+/* hero */
+header.hero { padding-block: 48px 8px; display: grid; gap: 28px; }
+.hero-text { display: flex; flex-direction: column; gap: 14px; max-width: 760px; }
+.hero-text .lede { font-size: 1.2rem; color: var(--muted); max-width: 640px; }
+.video-frame { background: #0b0a1c; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); }
+.video-frame video { display: block; width: 100%; height: auto; }
+.facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.fact { border-top: 2px solid var(--ink); padding-top: 10px; display: flex; flex-direction: column; gap: 2px; }
+.fact .n { font-family: var(--display); font-weight: 800; font-size: 1.9rem; font-variant-numeric: tabular-nums; }
+.fact .l { font-size: 0.86rem; color: var(--muted); line-height: 1.35; }
+@media (max-width: 720px) { .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* figures */
+figure { margin: 0; }
+.figure {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 20px;
+  display: flex; flex-direction: column; gap: 14px; margin-block: 8px;
+}
+.figure figcaption { font-size: 0.9rem; color: var(--muted); }
+.controls { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; }
+.control { display: flex; flex-direction: column; gap: 4px; min-width: 150px; flex: 1 1 180px; }
+.control label { font-family: var(--mono); font-size: 0.78rem; color: var(--muted); display: flex; justify-content: space-between; gap: 8px; }
+.control label b { color: var(--ink); font-weight: 600; }
+input[type="range"] { width: 100%; accent-color: var(--accent); }
+button {
+  font-family: var(--mono); font-size: 0.85rem; border: 1px solid var(--ink); background: var(--ink); color: var(--bg);
+  border-radius: 6px; padding: 8px 14px; cursor: pointer;
+}
+button.ghost { background: transparent; color: var(--ink); }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.seg button { border: 0; border-radius: 0; background: transparent; color: var(--muted); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+
+/* loop diagram */
+.loop svg { width: 100%; height: auto; display: block; }
+
+/* bot view */
+.botview { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 18px; }
+@media (max-width: 820px) { .botview { grid-template-columns: minmax(0, 1fr); } }
+canvas { display: block; width: 100%; height: auto; border-radius: 6px; }
+.panel-title { font-family: var(--mono); font-size: 0.76rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 0.8rem; color: var(--muted); font-family: var(--mono); }
+.legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; background: var(--c); vertical-align: -1px; }
+.bars { display: grid; grid-template-columns: 8.5em minmax(0, 1fr); gap: 6px 10px; align-items: center; font-size: 0.86rem; }
+.bars .name { font-family: var(--mono); font-size: 0.78rem; }
+.bars .name.chosen { color: var(--accent); font-weight: 600; }
+.trio { display: flex; flex-direction: column; gap: 2px; }
+.bar { height: 7px; border-radius: 3px; background: var(--c); width: 0; transition: width 0.18s ease; min-width: 1px; }
+.readouts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.readout { background: var(--surface-2); border-radius: 8px; padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; }
+.readout .k { font-family: var(--mono); font-size: 0.72rem; color: var(--muted); }
+.readout .v { font-family: var(--display); font-weight: 700; font-size: 1.35rem; font-variant-numeric: tabular-nums; }
+.note { font-size: 0.92rem; background: var(--surface-2); border-left: 3px solid var(--accent); padding: 10px 14px; border-radius: 0 6px 6px 0; }
+
+/* charts */
+.chart svg { width: 100%; height: auto; display: block; overflow: visible; }
+.chart text { font-family: var(--mono); font-size: 11px; fill: var(--muted); }
+.two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+@media (max-width: 820px) { .two { grid-template-columns: minmax(0, 1fr); } }
+
+/* formula */
+.formula { font-family: var(--mono); font-size: 0.95rem; background: var(--surface-2); padding: 12px 14px; border-radius: 8px; overflow-x: auto; white-space: nowrap; }
+
+/* reward table */
+table { border-collapse: collapse; width: 100%; font-size: 0.95rem; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-family: var(--mono); font-size: 0.76rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 400; }
+td.num { font-family: var(--mono); white-space: nowrap; }
+.table-wrap { overflow-x: auto; }
+
+/* verdict */
+.verdict { font-family: var(--display); font-weight: 700; font-size: 1.2rem; }
+.verdict.good { color: var(--green); }
+.verdict.bad { color: var(--red); }
+.scen { display: grid; grid-template-columns: 11em minmax(0, 1fr) 4.5em; gap: 8px 12px; align-items: center; font-size: 0.9rem; }
+.scen .track { position: relative; height: 18px; background: var(--surface-2); border-radius: 4px; }
+.scen .zero { position: absolute; top: -3px; bottom: -3px; width: 1px; background: var(--muted); left: 50%; }
+.scen .fill { position: absolute; top: 3px; bottom: 3px; border-radius: 3px; }
+
+/* network */
+.net { display: flex; flex-wrap: wrap; align-items: stretch; gap: 8px; }
+.net .blk { flex: 1 1 120px; background: var(--surface-2); border-radius: 8px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; }
+.net .blk b { font-family: var(--display); font-size: 1rem; }
+.net .blk span { font-family: var(--mono); font-size: 0.74rem; color: var(--muted); }
+.net .arrow { align-self: center; color: var(--muted); font-family: var(--mono); }
+.net .blk.out { background: var(--accent-soft); }
+
+/* glossary */
+dl { display: grid; grid-template-columns: 9em minmax(0, 1fr); gap: 8px 16px; margin: 0; }
+dt { font-family: var(--display); font-weight: 700; }
+dd { margin: 0; color: var(--muted); }
+@media (max-width: 560px) { dl { grid-template-columns: minmax(0, 1fr); } dd { margin-bottom: 8px; } .scen { grid-template-columns: 7.5em minmax(0, 1fr) 4em; } .readouts { grid-template-columns: minmax(0,1fr) minmax(0,1fr); } }
+footer { margin-top: 56px; padding-top: 18px; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.9rem; }
+@media (prefers-reduced-motion: reduce) { .bar { transition: none; } }
+
+
+/* ---------------------------------------------------------------- phase 7 additions */
+:root { --s-a: #0B84A0; --s-c: #A8700F; --s-d: #D0457A; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --s-a: #2AA0BA; --s-c: #BA8424; --s-d: #E0608A; }
+}
+:root[data-theme="dark"] { --s-a: #2AA0BA; --s-c: #BA8424; --s-d: #E0608A; }
+
+html { -webkit-text-size-adjust: 100%; }
+body { overflow-x: hidden; }
+@media (max-width: 560px) { body { font-size: 16px; padding-inline: 16px; } section { padding-block: 44px 6px; } .figure { padding: 14px; } }
+
+/* run cards */
+.cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 720px) { .cards { grid-template-columns: minmax(0, 1fr); } }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; display: flex; flex-direction: column; gap: 8px; border-top: 4px solid var(--c, var(--ink)); }
+.card h3 { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.card .tag { font-family: var(--mono); font-size: 0.72rem; color: var(--muted); font-weight: 400; letter-spacing: 0.06em; text-transform: uppercase; }
+.card p { font-size: 0.95rem; }
+.kv { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; font-size: 0.86rem; color: var(--muted); }
+.kv b { font-family: var(--mono); font-weight: 600; color: var(--ink); text-align: right; font-variant-numeric: tabular-nums; }
+
+/* horizontal comparison bars */
+.hbars { display: grid; grid-template-columns: 7.5em minmax(0, 1fr) 5.2em; gap: 8px 12px; align-items: center; font-size: 0.88rem; }
+.hbars .grp { grid-column: 1 / -1; font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-top: 6px; }
+.hbars .track { position: relative; height: 16px; background: var(--surface-2); border-radius: 4px; overflow: hidden; }
+.hbars .fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; background: var(--c); }
+.hbars .goal { position: absolute; top: -2px; bottom: -2px; width: 2px; background: var(--ink); }
+.hbars .val { font-family: var(--mono); font-size: 0.82rem; text-align: right; white-space: nowrap; }
+@media (max-width: 560px) { .hbars { grid-template-columns: 5.6em minmax(0, 1fr) 4.6em; gap: 6px 8px; font-size: 0.82rem; } }
+
+/* controls for the progress chart */
+.ctrl-rows { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; }
+.ctrl-rows .lab { font-family: var(--mono); font-size: 0.72rem; color: var(--muted); margin-right: 6px; }
+.seg { flex-wrap: wrap; }
+.seg button { padding: 7px 11px; }
+@media (max-width: 560px) { .seg button { padding: 7px 9px; font-size: 0.78rem; } }
+.legend .ln::before { width: 18px; height: 0; border-radius: 0; border-top: 2.5px solid var(--c); background: none; vertical-align: 3px; }
+.legend .ln.dash::before { border-top-style: dashed; border-top-width: 2px; }
+.legend .ln.mut::before { border-top-color: var(--muted); }
+.chart { position: relative; touch-action: pan-y; }
+.chart .tip {
+  position: absolute; top: 6px; pointer-events: none; background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+  padding: 8px 10px; font-family: var(--mono); font-size: 0.74rem; line-height: 1.45; color: var(--ink); box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+  min-width: 9.5em; display: none; z-index: 2;
+}
+.chart .tip b { font-weight: 600; }
+.chart .tip .sw { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 6px; vertical-align: 0; }
+.chart .tip .mu { color: var(--muted); }
+
+/* chips for milestone choice */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chips button { background: transparent; color: var(--ink); border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; font-size: 0.78rem; }
+.chips button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.chips button .r { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--c); margin-right: 6px; vertical-align: 0; }
+.scen { grid-template-columns: 7.5em minmax(0, 1fr) 3em; }
+.ends-note { font-size: 0.92rem; }
+
+/* timeline */
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0; }
+.timeline li { display: grid; grid-template-columns: 6.6em minmax(0, 1fr); gap: 4px 14px; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 0.94rem; }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .t { font-family: var(--mono); font-size: 0.78rem; color: var(--muted); padding-top: 3px; }
+.badge { display: inline-block; font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.04em; padding: 1px 7px; border-radius: 999px; border: 1px solid currentColor; vertical-align: 1px; white-space: nowrap; }
+.badge.no { color: var(--red); }
+.badge.leon { color: var(--accent); }
+.badge.ok { color: var(--green); }
+@media (max-width: 560px) { .timeline li { grid-template-columns: minmax(0, 1fr); gap: 2px; } }
+
+/* glossary as collapsible */
+details.gloss { background: var(--surface-2); border-radius: 8px; padding: 10px 14px; }
+details.gloss summary { cursor: pointer; font-family: var(--display); font-weight: 700; }
+details.gloss dl { margin-top: 10px; font-size: 0.92rem; }
+
+/* pool flow diagram */
+.flow { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px 14px; align-items: stretch; }
+.flow .blk { background: var(--surface-2); border-radius: 8px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; }
+.flow .blk b { font-family: var(--display); font-size: 1rem; }
+.flow .blk span { font-family: var(--mono); font-size: 0.76rem; color: var(--muted); line-height: 1.4; }
+.flow .gate { grid-column: 1 / -1; border: 2px dashed var(--ink); background: transparent; text-align: center; }
+.flow .dead { opacity: 0.9; border: 2px solid var(--red); background: transparent; }
+.flow .dead b { color: var(--red); text-decoration: line-through; text-decoration-thickness: 2px; }
+.flow .live { border: 2px solid var(--ink); }
+.flow .arrow { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); text-align: center; }
+.flow .arrow.no { color: var(--red); }
+.flow .train { grid-column: 1 / -1; background: var(--accent-soft); text-align: center; }
+pre.code { font-family: var(--mono); font-size: 0.8rem; line-height: 1.55; background: var(--surface-2); padding: 12px 14px; border-radius: 8px; overflow-x: auto; margin: 0; }
+pre.code .hl { color: var(--red); font-weight: 600; }
+pre.code .cm { color: var(--muted); }
+
+/* edge scenes */
+.scene svg { width: 100%; height: auto; display: block; }
+.scene text { font-family: var(--mono); font-size: 12px; fill: var(--muted); }
+.scene .ttl { font-family: var(--display); font-size: 15px; font-weight: 700; fill: var(--ink); }
+
+/* big reveal */
+.reveal { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 560px) { .reveal { grid-template-columns: minmax(0, 1fr); } }
+.tile { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; display: flex; flex-direction: column; gap: 6px; }
+.tile .k { font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.tile .n { font-family: var(--display); font-weight: 800; font-size: 2.6rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.tile .n small { font-size: 1.1rem; font-weight: 700; color: var(--muted); }
+.tile .ci { position: relative; height: 22px; background: var(--surface-2); border-radius: 4px; margin-top: 6px; }
+.tile .ci .rng { position: absolute; top: 5px; bottom: 5px; background: var(--c); opacity: 0.35; border-radius: 3px; }
+.tile .ci .pt { position: absolute; top: 1px; bottom: 1px; width: 4px; margin-left: -2px; background: var(--c); border-radius: 2px; }
+.tile .ci .half { position: absolute; top: -3px; bottom: -3px; width: 1px; background: var(--muted); left: 50%; }
+.tile .sub { font-size: 0.86rem; color: var(--muted); }
+
+td.ok { color: var(--green); font-weight: 600; }
+td.bad { color: var(--red); font-weight: 600; }
+tr.sep td { border-top: 2px solid var(--line); }
+.mark { font-family: var(--mono); font-size: 0.8rem; }
+.options th:first-child, .options td:first-child { font-family: var(--mono); font-size: 0.76rem; color: var(--muted); }
+@media (max-width: 560px) { table { font-size: 0.86rem; } th, td { padding: 7px 6px; } }
+h3.sub { margin-top: 10px; }
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <div class="hero-text">
+      <span class="eyebrow">Lerntagebuch · Phase 7</span>
+      <h1>Mehr Siege, ehrliche Gegenprobe</h1>
+      <p class="lede">Zwei Läufe treten an: das bewährte Netz aus Phase 6 und ein neues, tieferes Netz. Nach 33 Stunden öffnet der beste Bot die Truhe auf deinem Level in 85 von 128 Versuchen, mehr als doppelt so oft wie in Phase 6. Das Ziel verfehlt er trotzdem knapp. Auf einer geheimen zweiten Prüfung schafft er 49 von 128. Ein Teil des Vorsprungs auf deinem Level ist vermutlich Anpassung an genau dieses Level, ein Teil kann daran liegen, dass das zweite Level schwerer ist.</p>
+    </div>
+    <div class="facts">
+      <div class="fact"><span class="n mono">37 → 85</span><span class="l">von 128 Versuchen auf deinem Original-Level (Phase 6 gegen Phase 7)</span></div>
+      <div class="fact"><span class="n mono">126 → 138</span><span class="l">von 192 Versuchen auf der Test-Serie. Ziel waren 144</span></div>
+      <div class="fact"><span class="n mono">49</span><span class="l">von 128 Versuchen auf der geheimen zweiten Prüfung, die bewusst nie analysiert wurde</span></div>
+      <div class="fact"><span class="n mono">0 von 4</span><span class="l">Generator-Änderungen (v5 bis v8), die im Training wirklich ankamen</span></div>
+    </div>
+  </header>
+
+  <section id="zwei-wege">
+    <div class="col">
+      <span class="eyebrow">Der Vergleich</span>
+      <h2>Zwei Wege: weiterbauen oder neu anfangen</h2>
+      <p>Phase 6 endete mit einem Durchbruch-Modell bei 28 Mio. Schritten. Für Phase 7 stand die Frage im Raum: Bauen wir auf diesem Netz weiter, oder lohnt sich ein tieferes, moderneres Netz? Statt zu raten, liefen beide Wege gleichzeitig, jeder auf 2 der 4 Kerne.</p>
+    </div>
+    <div class="cards" style="margin-top:14px">
+      <div class="card" style="--c:var(--s-a)">
+        <h3>Lauf A <span class="tag">Weiterbau</span></h3>
+        <p>Das CNN aus Phase 6 mit Übersichtskarte, Stand 28 Mio. Schritte. Es kann schon einiges und trainiert einfach weiter.</p>
+        <div class="kv"><span>Start: Prüfung</span><b>21 / 64</b><span>Start: Test-Serie</span><b>64 / 96</b><span>Start: Validierung</span><b>171 / 200</b></div>
+      </div>
+      <div class="card" style="--c:var(--grey)">
+        <h3>Lauf B <span class="tag">Neubau</span></h3>
+        <p>Ein tieferes Netz nach dem IMPALA-Bauplan (DeepMind, 2018) mit Rest-Blöcken und einem eigenen Netz für die Wert-Schätzung. Es weiß anfangs nichts und lernt zuerst, den Löser nachzuahmen.</p>
+        <div class="kv"><span>Start: Prüfung</span><b>0 / 64</b><span>Start: Test-Serie</span><b>7 / 96</b><span>Start: Validierung</span><b>57 / 200</b></div>
+      </div>
+    </div>
+    <div class="col stack" style="margin-top:18px">
+      <p><strong>Beide bekamen dieselben Neuerungen:</strong></p>
+      <ul class="stack" style="padding-left:1.2em;margin:0;gap:0.5rem">
+        <li><strong>Stufe 12</strong> im Generator (Version 4): Sprungfolgen aus einem Katalog von Sprüngen, die der Löser als robust vermessen hat, und Gegner gleich am Start. Dazu kommen 40 eingefrorene Validierungslevel dieser Stufe (v4).</li>
+        <li><strong>Rückspulen:</strong> Nach einem gescheiterten Versuch beginnt die nächste Übungsrunde mit 40 % Wahrscheinlichkeit kurz vor der Stelle, an der der Bot gescheitert ist.</li>
+        <li><strong>EMA-Gewichte:</strong> Neben dem rohen Netz entsteht ein geglätteter Durchschnitt seiner Gewichte. Bei jedem Meilenstein werden beide geprüft.</li>
+        <li><strong>Eine geheime zweite Prüfung</strong> (<code>exam2</code>): Der Löser hat bewiesen, dass sie lösbar ist. Analysiert wird sie nie, notiert wird nur, wie oft der Bot gewinnt.</li>
+        <li><strong>Ein Autopilot</strong> entscheidet nach festen Regeln ohne Rückfrage: Vergleich nach 12 Stunden, Eingriffe bei Stillstand.</li>
+        <li><strong>Das Ziel:</strong> In der Endauswertung mindestens 64 von 128 Prüfungsversuchen (50 %) und 144 von 192 Versuchen auf der Test-Serie (75 %).</li>
+      </ul>
+    </div>
+    <div class="col figure" style="margin-top:18px">
+      <h3>Die Überraschung beim Tempo</h3>
+      <div class="hbars" id="speedBars"></div>
+      <figcaption>Tempo aus dem Probelauf am 1.10. um 08:28 UTC. Prüfung und Test-Serie: Anteil gewonnener Versuche, gemittelt über die letzten drei Meilensteine. Diesen Vergleich rechnet der Autopilot nach 12 Stunden. Der schwarze Strich markiert das Ziel der Phase.</figcaption>
+    </div>
+    <div class="col stack" style="margin-top:14px">
+      <p>Das neue Netz war im echten Lauf 3- bis 5-mal teurer, als ein vorheriger Test vermuten ließ: A schaffte rund 430 Schritte pro Sekunde, B nur 100 bis 130. In 12 Stunden kam B auf gut 5,5 Mio. Schritte. A kam in derselben Zeit von 28 auf 41 Mio.</p>
+      <p>Dazu kam Pech beim Start. Der erste Nachahm-Versuch für B war wertlos: Die Ausgänge des Netzes (Tanh) waren gesättigt, es wählte immer dieselbe Aktion. Nach dem Umbau auf ReLU gewann B nach dem Nachahmen 34,7 % der Validierungslevel, gefordert waren 40 %. Ein zweiter Versuch sollte das verbessern, ein Container-Neustart brach ihn aber ab.</p>
+      <p class="note">Nach 12 Stunden lag B bei Prüfung und Test-Serie jeweils mindestens 10 Punkte hinter A. Der Autopilot pausierte B, und A bekam alle vier Kerne. Ab hier geht es nur noch um A, seinen Abzweig C und dessen Abzweig D.</p>
+    </div>
+  </section>
+
+  <section id="verlauf">
+    <div class="col">
+      <span class="eyebrow">Meilenstein für Meilenstein</span>
+      <h2>Der Verlauf: hoch, runter und zweimal abgezweigt</h2>
+      <p>Nach jeder Million Schritte wurden beide Varianten geprüft, das rohe Netz und der EMA-Durchschnitt: je 64 Versuche auf deinem Level, 16 je Test-Level und 200 eingefrorene Validierungslevel. Die farbigen Linien markieren deine zwei Entscheidungen zum Abzweigen, die grauen die Eingriffe in Lauf A: v5 und v6 (kamen nie an) und den Feinschliff.</p>
+      <details class="gloss">
+        <summary>Begriffe kurz erklärt</summary>
+        <dl>
+          <dt>Meilenstein</dt><dd>Eine Prüfung des Bots nach jeder Million Trainingsschritte.</dd>
+          <dt>roh</dt><dd>Das Netz genau so, wie es nach dem letzten Update ist. Es wackelt mit jedem Update ein wenig.</dd>
+          <dt>EMA</dt><dd>Ein gleitender Durchschnitt der Gewichte über ungefähr die letzten hundert Updates. Er ist ruhiger als das rohe Netz.</dd>
+          <dt>Abzweig</dt><dd>Ein neuer Lauf, der von einem gespeicherten Stand eines anderen Laufs aus weitertrainiert.</dd>
+          <dt>Prüfung</dt><dd>Dein Level von 2023. Es wird nie trainiert.</dd>
+          <dt>Test-Serie</dt><dd>6 handgebaute Level, die ebenfalls nie trainiert werden.</dd>
+          <dt>Validierung</dt><dd>200 eingefrorene, generierte Level: 120 der Stufen 4–9 (v2), 40 lange der Stufen 10–11 (v3), 40 der Stufe 12 (v4).</dd>
+        </dl>
+      </details>
+    </div>
+    <div class="figure" style="margin-top:14px">
+      <div class="ctrl-rows">
+        <div><span class="lab">Kennzahl</span><div class="seg" role="group" aria-label="Kennzahl">
+          <button type="button" data-metric="ex" aria-pressed="true">Prüfung</button>
+          <button type="button" data-metric="ts" aria-pressed="false">Test-Serie</button>
+          <button type="button" data-metric="val" aria-pressed="false">Validierung</button>
+        </div></div>
+        <div><span class="lab">Gewichte</span><div class="seg" role="group" aria-label="Gewichte">
+          <button type="button" data-kind="ema" aria-pressed="true">EMA</button>
+          <button type="button" data-kind="raw" aria-pressed="false">roh</button>
+          <button type="button" data-kind="both" aria-pressed="false">beide</button>
+        </div></div>
+        <div><span class="lab">Zeitraum</span><div class="seg" role="group" aria-label="Zeitraum">
+          <button type="button" data-range="all" aria-pressed="true">alles</button>
+          <button type="button" data-range="zoom" aria-pressed="false">33–43 Mio.</button>
+        </div></div>
+      </div>
+      <div class="legend" id="progressLegend"></div>
+      <div class="chart" id="progressChart"></div>
+      <figcaption id="progressCaption"></figcaption>
+    </div>
+    <div class="col stack" style="margin-top:18px">
+      <p><strong>Was die Kurven zeigen:</strong></p>
+      <ul class="stack" style="padding-left:1.2em;margin:0;gap:0.6rem">
+        <li><strong>Der Gipfel.</strong> Zwischen 31 und 36 Mio. Schritten schaffte A (EMA) 35 bis 43 von 64 Versuchen, im Mittel 38,8. Das liegt schon über dem Ziel von 50 %.</li>
+        <li><strong>Der Absturz.</strong> Ab 37 Mio. fiel A auf 14, dann auf 8 von 64. Dazwischen (39–43 Mio.) erholte es sich kurz auf 18 bis 28. Ab 46 Mio. blieb es bei 1 bis 11. Das begann, bevor die erste Generator-Änderung (v5) überhaupt geplant war.</li>
+        <li><strong>Die Schere.</strong> Gleichzeitig stieg die Validierung von A von 187 auf 200 von 200. Der Bot wurde in seiner Übungswelt perfekt und auf deinem Level schlechter. Über alle Meilensteine von A und C gerechnet sagt die Validierung nichts über die Prüfung voraus (Korrelation r = −0,12). Für die EMA-Kurve von A allein ist der Zusammenhang sogar deutlich negativ (r = −0,52), das ist die Schere selbst. Beide Zahlen vergleichen allerdings zwei Auswertungsarten: Die Validierung spielt der Bot mit fester, die Prüfung mit zufälliger Aktionswahl.</li>
+        <li><strong>EMA ist besser, aber nicht immun.</strong> Am Gipfel holte der EMA-Durchschnitt im Mittel 38,8 von 64, das rohe Netz nur 16,8. Abgestürzt sind beide.</li>
+        <li><strong>Die Abzweige.</strong> C startete am Höchstpunkt von A und hielt sich im Mittel bei 35,8 von 64 (EMA), D bei 31,0. Das ist weit besser als das späte A, aber ein neuer Anstieg kam nicht.</li>
+        <li><strong>Die Test-Serie</strong> pendelte die ganze Phase um 60 bis 65 von 96, ohne Trend. Nur vier einzelne Messungen erreichten das Ziel von 75 % (72 von 96), alle in Lauf A.</li>
+      </ul>
+    </div>
+    <div class="col figure" style="margin-top:18px">
+      <h3>Was wann passiert ist</h3>
+      <ol class="timeline">
+        <li><span class="t">1.10. 05:49</span><span>Nachahmen für B beginnt. Der erste Versuch wird verworfen (gesättigte Tanh-Ausgänge). Nach dem Umbau auf ReLU gewinnt B 34,7 % der Validierungslevel (07:06), gefordert sind 40 %.</span></li>
+        <li><span class="t">1.10. 08:15</span><span>Ein Container-Neustart bricht den zweiten Nachahm-Versuch ab. A und B trainieren ab jetzt, je auf 2 Kernen.</span></li>
+        <li><span class="t">1.10. 19:02</span><span>A steht still (1. Plateau). Der Fehlerkatalog führt zu <strong>Generator v5</strong>: In Stufe 12 gibt es mehr frei laufende Gegner (Gewicht 0,8 statt 0,4), und die weitesten Sprünge kommen dreimal so oft vor. <span class="badge no">kam nie an</span></span></li>
+        <li><span class="t">1.10. 20:24</span><span>Vergleich nach 12 h: A 26 % Prüfung und 64 % Test-Serie, B 0 % und 36 %. B pausiert, A bekommt alle 4 Kerne.</span></li>
+        <li><span class="t">1.10. 22:52</span><span>Fehlerkatalog: 17 von 27 Fehlversuchen springen über die Truhe hinaus. Darauf folgt <strong>Generator v6</strong>, der die Truhe manchmal auf die letzte Bodenkachel stellt. <span class="badge no">kam nie an</span></span></li>
+        <li><span class="t">1.10. 23:01</span><span>2. Plateau, neun Minuten später: ruhiger Feinschliff mit Lernrate 3·10⁻⁵ und ohne Zufallsbonus. <span class="badge ok">in Lauf A die einzige echte Änderung</span></span></li>
+        <li><span class="t">2.10. 09:07</span><span>Du entscheidest „Ja, ab 34“. A pausiert, <strong>Lauf C</strong> zweigt vom EMA-Stand bei 34 Mio. ab, mit <strong>Generator v7</strong> (Truhe am Rand in den Stufen 10–12) und mit Lernrate 3·10⁻⁵ statt 1·10⁻⁴ und kleinem Zufallsbonus 0,003 (das kam an). <span class="badge leon">deine Entscheidung</span> <span class="badge no">v7 kam nie an</span></span></li>
+        <li><span class="t">2.10. 13:02</span><span>Du entscheidest „Muster ergänzen ab EMA 36“. C pausiert, <strong>Lauf D</strong> zweigt vom EMA-Stand bei 36 Mio. ab, mit <strong>Generator v8</strong> (Gegner auf Rampen, mehr obere Wege). <span class="badge leon">deine Entscheidung</span> <span class="badge no">v8 kam nie an</span></span></li>
+        <li><span class="t">2.10. 14:26</span><span>Reflexion und Gegenprüfung decken auf, dass v5 bis v8 nie im Training ankamen.</span></li>
+        <li><span class="t">2.10. 17:26</span><span>Bei 42 Mio. meldet die Plateau-Regel für D Stillstand. Weil der Zähler für D schon bei 2 stand, galt das als drittes Plateau: Um 17:26 wurde D gestoppt, um 17:31 endete die Phase von selbst, und die Endauswertung nach fester Regel wählte C (EMA, 35 Mio.). Die Reflexion hatte das um 14:26 vorhergesagt und empfohlen, die Regel zu entschärfen.</span></li>
+      </ol>
+      <figcaption>Zeiten in UTC, aus dem Protokoll des Autopiloten (<code>runs/phase7/state.json</code>) und den Commits.</figcaption>
+    </div>
+  </section>
+
+  <section id="fehlersuche">
+    <div class="col">
+      <span class="eyebrow">Fehlersuche</span>
+      <h2>Wo die Versuche enden</h2>
+      <p>Bei jedem Meilenstein wird für jeden verlorenen der 64 Prüfungsversuche notiert, bis zu welchem Abschnitt deines Levels er am weitesten kam. Wähle einen der markanten Stände, und die Karte färbt die Abschnitte nach der Zahl der Abbrüche.</p>
+    </div>
+    <div class="figure" style="margin-top:14px">
+      <div class="chips" id="endsChips" role="group" aria-label="Meilenstein"></div>
+      <p class="ends-note" id="endsNote"></p>
+      <canvas id="endsCanvas" width="2084" height="230" aria-label="Weiteste Punkte der verlorenen Versuche je Abschnitt"></canvas>
+      <div class="scen" id="endsBars"></div>
+      <figcaption>Abschnitte: Start mit Gegnerregen (Kachel 0–35), Gabelung mit Sackgasse unten (36–97), Trittsteine (98–159), Diagonalen (160–249), Ziel mit Tiefsprung und Truhe (ab 250). Jeweils 64 Versuche.</figcaption>
+    </div>
+    <div class="col stack" style="margin-top:18px">
+      <p>Beim Absturz von A wanderte der Engpass. Zuerst scheiterten die Versuche am Ziel: bei 46 Mio. endeten 43 von 64 im letzten Abschnitt, oft mit einem Sprung über die Truhe hinaus. Später starben viele schon am Start im Gegnerregen, obwohl der Bot genau diesen Abschnitt früher sicher beherrscht hatte.</p>
+      <p>In C und D liegen die meisten Abbrüche dagegen in den Trittsteinen (etwa 45 %), am Ziel nur noch 25 bis 35 %. Ein Haken an der Statistik: Sie zählt nur, bis zu welcher Spalte ein Versuch kam. Ein Teil der „Trittstein“-Abbrüche ist vermutlich ein Wegfehler: Der Bot nimmt früh den unteren Weg und scheitert dann am Köderblock bei Kachel 101. Das trennen wir, bevor wir dafür neue Daten bauen.</p>
+    </div>
+  </section>
+
+  <section id="ursache">
+    <div class="col">
+      <span class="eyebrow">Die versteckte Ursache</span>
+      <h2>Warum die neuen Muster nie ankamen</h2>
+      <p>Vier Generator-Versionen sollten dem Bot genau das beibringen, woran er auf deinem Level und auf der Test-Serie scheiterte. Die Reflexion am 2.10., als D noch lief, hat gezeigt, dass keine davon jemals in einer Übungsrunde vorkam. Der Grund ist eine Weiche im Datenweg. Dazu kommt ein zweites, ebenso leicht übersehenes Problem: Selbst angekommen, hätten v6 und v7 am Ziel wenig geändert.</p>
+      <h3 class="sub">1. Eine Weiche im Datenweg</h3>
+      <p>Vor Phase 7 habe ich eingebaut, dass das Training vom Löser geprüfte Level als gespeicherten Text abspielt. Die Idee war gut: Was der Löser als lösbar bestätigt hat, bleibt genau so, auch wenn sich der Generator später ändert. Der Haken steckt in einer Regel: Hat eine Stufe mindestens 100 gespeicherte Level, nimmt das Training nur noch diese und baut keine neuen mehr. Für die Stufen 10, 11 und 12 lagen 589, 493 und 697 Level bereit, alle aus Generator v4.</p>
+    </div>
+    <div class="col figure" style="margin-top:10px">
+      <div class="flow">
+        <div class="blk gate"><b>Weiche: Hat die Stufe mindestens 100 gespeicherte Level?</b><span>Stufen 10, 11, 12: ja (589 · 493 · 697)</span></div>
+        <div class="arrow">ja ↓</div>
+        <div class="arrow no">nein ↓ (für die Stufen 10–12 nie)</div>
+        <div class="blk live"><b>Gespeicherte Level</b><span>1 779 Level, alle aus Generator v4</span></div>
+        <div class="blk dead"><b>Frisch generieren</b><span>hier wären v5, v6, v7 und v8 zum Zug gekommen</span></div>
+        <div class="blk train"><b>Training der Stufen 10–12</b><span>neue Bausteine in den Übungsrunden: 0</span></div>
+      </div>
+      <pre class="code"><span class="cm"># nur Stufen mit ≥ 100 gespeicherten Leveln</span>
+texts = self.pool_texts.get(tier)
+if texts:
+    text = rng.choice(texts)
+    ...
+    <span class="cm"># Stufen 10–12 enden immer hier:</span>
+    <span class="hl">return self._parsed[text], tier</span>
+...
+<span class="cm"># hier wäre der neue Generator gewesen:</span>
+return generate(tier, seed), tier</pre>
+      <figcaption>Gekürzter Ausschnitt aus <code>jumpnrun/rl/curriculum.py</code> (Zeilen 129–139). Die Grenze von 100 steht in <code>load_pool_texts</code> (Zeilen 40–60).</figcaption>
+    </div>
+    <div class="col stack" style="margin-top:14px">
+      <p>Damit war D in Wahrheit einfach Lauf C, vom EMA-Stand bei 36 Mio. aus weitertrainiert. Seine Mittelwerte unterscheiden sich von C weniger als das Messrauschen. Und alle Einbrüche nach v5 und v6 hatten mit den neuen Daten nichts zu tun, denn es gab keine neuen Daten.</p>
+      <h3 class="sub">2. Die unsichtbare Wand am Levelrand</h3>
+      <p>Selbst wenn v6 und v7 angekommen wären, hätten sie das Problem am Ziel kaum gelöst. Am rechten Rand eines Levels hält das Spiel die Figur einfach fest, wie eine Wand, die man nicht sieht (<code>jumpnrun/core/entities.py</code>, Zeilen 47–52). Die Übersichtskarte zeichnet alles außerhalb des Levels sogar als festen Block. Für den Bot endet jedes Übungslevel also mit einer Wand, sichtbar oder unsichtbar. Wer zu weit springt, wird am Rand gestoppt und landet trotzdem bei der Truhe.</p>
+    </div>
+    <div class="two" style="margin-top:12px">
+      <figure class="figure scene" id="sceneTrain"></figure>
+      <figure class="figure scene" id="sceneExam"></figure>
+    </div>
+    <div class="col stack" style="margin-top:14px">
+      <p>Dein Level ist anders: Die Truhe steht bei Kachel 297 am Ende des Bodens, aber das Level ist 521 Kacheln breit. Dahinter liegen 223 leere Spalten. Wer dort zu weit springt, fällt ins Leere. In 62 Mio. Schritten hat der Bot nie erlebt, dass ein Sprung über die Truhe hinaus bestraft wird. Er hat auch nie ein Bild gesehen, in dem hinter der Truhe nichts mehr kommt. „Truhe auf der letzten Kachel“ (v6, v7) hätte daran nichts geändert, denn direkt dahinter wäre wieder der Rand gewesen.</p>
+      <h3 class="sub">Meine Fehler in dieser Phase</h3>
+      <ul class="stack" style="padding-left:1.2em;margin:0;gap:0.6rem">
+        <li><strong>Nie geprüft, ob eine Änderung ankommt.</strong> Ich habe die Weiche selbst eingebaut und danach vier Generator-Versionen gebaut, ohne einmal nachzuzählen, ob ihre Bausteine in den Übungsrunden auftauchen. Ein Blick in den ersten 30 Minuten hätte gereicht.</li>
+        <li><strong>Zufall als Wirkung gedeutet.</strong> Ich habe Einbrüche nach v5 und v6 den neuen Daten zugeschrieben, etwa mit dem Satz „jede Datenänderung senkt die Prüfung erst“. Das war falsch. Der Absturz begann schon bei 37 Mio., und die Daten haben sich nie geändert. Es waren Drift und Messrauschen.</li>
+        <li><strong>Zu viele Eingriffe.</strong> In 18 Stunden gab es fünf Eingriffe, zwei davon nur neun Minuten auseinander. So lässt sich keiner davon sauber beurteilen.</li>
+        <li><strong>An einem Einzel-Höchstwert abgezweigt (bei D).</strong> C-EMA bei 36 Mio. hatte 43 von 64. Dieselben Gewichte, als Start von D noch einmal gemessen, schafften nur 31. Der Abzweig von C hielt dagegen: A-EMA bei 34 Mio. schaffte als Start von C wieder 43.</li>
+        <li><strong>Blinde Flecken in den Werkzeugen.</strong> Die Status-Auswertung meldet „Rückschritt“ nur, wenn die Validierung sinkt, und hat den Absturz auf der Prüfung deshalb nie gemeldet. Die Lernrate war auf 400 Mio. Schritte ausgelegt und lag nach 62 Mio. noch bei 92 % des Startwerts. Und die Läufe A, C und D liefen auf allen vier Kernen statt auf den Kernen 0–2, wie es in CLAUDE.md steht.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="ergebnis">
+    <div class="col">
+      <span class="eyebrow">Endauswertung</span>
+      <h2>Das Ergebnis: Ziel knapp verfehlt</h2>
+      <p>Das Endmodell wurde nach einer vorher festgelegten Regel gewählt: Gezählt wird der Anteil gewonnener Versuche auf Prüfung und Test-Serie, je Meilenstein für die bessere der beiden Varianten (roh oder EMA). Den Lauf bestimmt der beste Durchschnitt der letzten drei Meilensteine, innerhalb des Laufs gewinnt der Meilenstein mit dem besten Mittel über drei benachbarte. So fiel die Wahl knapp vor D (1,097) auf C (1,127; höchstens möglich wären 2,0) und dort auf den EMA-Stand bei 35 Mio. Schritten. Es bekam 128 frische Versuche je Prüfungsversion und 32 je Test-Level.</p>
+    </div>
+    <div class="col figure" style="margin-top:10px">
+      <div class="table-wrap"><table id="finalTable"><thead><tr><th>Kennzahl</th><th>Ziel</th><th>Phase 6</th><th>Phase 7</th></tr></thead><tbody></tbody></table></div>
+      <figcaption>Phase 6: Durchbruch-Modell bei 28 Mio. Schritten. Phase 7: C-EMA bei 35 Mio. (<code>models/phase7_final.zip</code>). Gleiches Verfahren: 128 Versuche je Prüfungsversion, 32 je Test-Level, Validierung je ein Versuch pro Level.</figcaption>
+    </div>
+    <div class="col figure" style="margin-top:14px">
+      <h3>Die Test-Serie Level für Level</h3>
+      <div class="legend"><span style="--c:var(--grey)">Phase 6</span><span style="--c:var(--s-a)">Phase 7</span></div>
+      <div class="hbars" id="seriesBars"></div>
+      <figcaption>Gewonnene Versuche von je 32. Lange Reise springt von 3 auf 18, Höhle fällt von 16 auf 9.</figcaption>
+    </div>
+    <div class="col stack" style="margin-top:22px">
+      <h3>Das Ergebnis der geheimen Prüfung</h3>
+      <p>Seit Beginn von Phase 7 gibt es ein zweites Prüfungslevel, das bewusst nie analysiert wurde. Bei jedem Meilenstein lief es mit 32 Versuchen mit; gespeichert wurde nur die Zahl der Siege, und keine Auswahlregel und keine Entscheidung hat sie benutzt. Am Ende bekam das Endmodell dort 128 frische Versuche.</p>
+    </div>
+    <div class="col" style="margin-top:12px"><div class="reveal">
+      <div class="tile" style="--c:var(--s-a)"><span class="k">Deine Prüfung</span><span class="n">85<small> / 128</small></span><span class="sub">66 % gewonnen, 95-%-Bereich etwa 58–74 %</span><div class="ci" aria-hidden="true"><div class="half"></div><div class="rng" style="left:57.9%;width:16.1%"></div><div class="pt" style="left:66.4%"></div></div></div>
+      <div class="tile" style="--c:var(--s-d)"><span class="k">Geheime Prüfung exam2</span><span class="n">49<small> / 128</small></span><span class="sub">38 % gewonnen, 95-%-Bereich etwa 30–47 %</span><div class="ci" aria-hidden="true"><div class="half"></div><div class="rng" style="left:30.3%;width:16.6%"></div><div class="pt" style="left:38.3%"></div></div></div>
+    </div></div>
+    <div class="col stack" style="margin-top:14px">
+      <p class="muted" style="font-size:0.88rem">Balken von 0 bis 100 %, der graue Strich steht bei 50 %. Der helle Bereich zeigt, wo der wahre Wert mit 95 % Sicherheit liegt.</p>
+      <p><strong>Was der Abstand bedeutet.</strong> Die beiden Bereiche überlappen nicht, der Unterschied ist also kein Zufall. Auf deinem Level haben wir nie trainiert, aber wir haben uns ständig nach ihm gerichtet. In Phase 6 (v3) und vor Phase 7 (v4) wurden Generator-Muster ergänzt, wo der Bot dort scheiterte. Die Muster aus Phase 7 kamen zwar nie an, aber abgezweigt wurde an seinen Höchstwerten, und die Auswahlregel zählt es mit. Jede dieser Entscheidungen passt den Bot ein Stück an genau dieses eine Level an. Das ist wie bei einer Klasse, deren Unterricht sich immer nach derselben Probeklausur richtet: Die Note in dieser Klausur steigt schneller als das Können.</p>
+      <p>Ein Teil des Abstands kann auch daran liegen, dass <code>exam2</code> einfach schwerer ist. Mit nur einem geheimen Level lässt sich das nicht trennen. Deshalb braucht Phase 8 mehr unabhängige Level.</p>
+      <p><strong>So ist das zu lesen:</strong></p>
+      <ul class="stack" style="padding-left:1.2em;margin:0;gap:0.5rem">
+        <li><strong>Das Ziel ist verfehlt.</strong> Die Prüfung liegt mit 85 klar über den geforderten 64. Die Test-Serie liegt aber mit 138 um 6 Versuche unter 144. Deshalb bleibt alles auf dem Arbeits-Branch, nach <code>main</code> geht nichts.</li>
+        <li><strong>Die 85 sind eher zu hoch.</strong> Die Versuche waren frisch, aber das Modell wurde unter anderem nach der Prüfung ausgewählt. Ein ehrlicheres Maß für das allgemeine Können ist die 49 auf dem versiegelten Level, auch wenn dieses Level schwerer sein kann.</li>
+        <li><strong>Einzelne Meilensteine sind Würfelwürfe.</strong> Bei 64 Versuchen schwankt das Ergebnis um etwa ±4 Siege. Zwei Messungen unterscheiden sich erst ab etwa 10 Siegen wirklich.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="lektionen">
+    <div class="col">
+      <span class="eyebrow">Was bleibt</span>
+      <h2>Was wir gelernt haben</h2>
+      <h3 class="sub">Über den Bot</h3>
+      <ul class="stack" style="padding-left:1.2em;margin:0;gap:0.6rem">
+        <li><strong>Perfekt in der Übungswelt heißt nicht gut auf deinem Level.</strong> Lauf A schaffte 200 von 200 Validierungsleveln und gleichzeitig 1 bis 11 von 64 Prüfungsversuchen. Der Bot verallgemeinert gut innerhalb der Generator-Welt, über sie hinaus nur teilweise: 138 von 192 auf den 6 nie trainierten Leveln der Test-Serie, 49 von 128 auf dem versiegelten Level.</li>
+        <li><strong>Ohne Trainingssignal driftet das Verhalten.</strong> Dein Level verlangt Dinge, die im Training nie vorkommen: eine Truhe vor dem Abgrund, Steine in Reihe 2 und einen Start in der Luft. Für diese Stellen legt nichts das Verhalten fest. Es wandert mit jedem Update ein Stück, mal in die richtige Richtung und mal nicht.</li>
+        <li><strong>Tiefer ist nicht automatisch besser.</strong> Das IMPALA-Netz hat etwa gleich viele Gewichte (rund 0,86 gegen 0,85 Mio.), rechnet aber pro Schritt drei- bis viermal so lange (im Probelauf; über 12 h kam B auf 5,5 statt 13 Mio. Schritte). Das alte Netz hat genug Kapazität, wie die 200 von 200 zeigen. Ein größeres Netz würde vermutlich nur die Generator-Welt noch genauer treffen.</li>
+        <li><strong>Der Durchschnitt der Gewichte hilft, heilt aber nicht.</strong> EMA war am Gipfel mehr als doppelt so gut wie das rohe Netz und ist trotzdem mit abgestürzt.</li>
+      </ul>
+      <h3 class="sub">Über unsere Arbeitsweise</h3>
+      <p>Die mit „Vorschlag“ markierten Punkte stammen aus der Reflexion. Deine Entscheidung dazu steht noch aus.</p>
+      <ul class="stack" style="padding-left:1.2em;margin:0;gap:0.6rem">
+        <li><strong>Erst prüfen, ob eine Änderung ankommt.</strong> Vorschlag: Nach jeder Datenänderung zählen wir in den ersten 30 Minuten nach, ob die neuen Bausteine wirklich trainiert werden.</li>
+        <li><strong>Eine Messung ist kein Ergebnis.</strong> Vorschlag: Abgezweigt wird nie an einem einzelnen Höchstwert, den Startpunkt messen wir vorher mit 256 Versuchen nach. „Rückschritt“ soll am Mittel mehrerer Meilensteine auf Prüfung und Test-Serie gemessen werden.</li>
+        <li><strong>Wer nach der Prüfung auswählt, misst nicht mehr ehrlich.</strong> Dein Level ist inzwischen ein Entwicklungs-Level. Den ehrlichen Nachweis liefern nur Level, die bis zum Schluss versiegelt bleiben.</li>
+        <li><strong>Weniger Eingriffe, dafür mit Kontrolle.</strong> Vorschlag: Jeder Eingriff bekommt einen Kontroll-Ableger, der am selben Punkt startet und nichts ändert. Geurteilt wird frühestens nach 5 bis 8 Mio. Schritten.</li>
+        <li><strong>Ein Autopilot braucht die richtigen Messgrößen.</strong> Die Plateau-Regel hat selbst eingegriffen, statt zu fragen, und am Ende die ganze Phase von allein beendet. Vorschlag: Künftig soll sie nur melden und nachfragen.</li>
+        <li><strong>Der Container braucht Beschäftigung.</strong> Wenn die Sitzung untätig ist, wird der Container abgeräumt, auch wenn sie nur auf eine Freigabe wartet. Dann sterben die Trainingsprozesse. Am Morgen des 1.10. hat ein Container-Neustart den zweiten Nachahm-Versuch abgebrochen. Kurz danach (09:02 UTC) hast du die Regeln in CLAUDE.md geschärft: In den Beobachtungsrunden (je ~9,5 min) gibt es keine Werkzeuge mit Rückfrage wie <code>send_later</code> mehr – genau das hatte die alte Regel als Sicherheitsnetz vorgeschrieben –, stattdessen eine stündliche Wächter-Routine. Kommt der Planmodus nur durch einen Neustart zurück, wird ein freigegebener Plan nicht neu aufgerollt.</li>
+      </ul>
+    </div>
+    <div class="col stack" style="margin-top:22px">
+      <span class="eyebrow">Ausblick</span>
+      <h2>Vorschlag für Phase 8</h2>
+      <p>Das ist ein Vorschlag aus der Reflexion, du entscheidest. Die Kernidee: Erst reparieren und ehrlich messen, dann gezielt die Situationen üben, die dein Level verlangt. Kopiert wird dabei nichts aus deinem Level.</p>
+      <ol class="stack" style="padding-left:1.2em;margin:0;gap:0.6rem">
+        <li><strong>Billige Proben zuerst</strong> (nur Auswertung, zusammen 1–2 Stunden): Prüfung mit Wand statt Leere hinter der Truhe gegen das Original. Trittstein-Abbrüche nach oberem und unterem Weg trennen. A-EMA bei 34 Mio. und C-EMA bei 36 Mio. mit je 256 Versuchen nachmessen.</li>
+        <li><strong>Den Datenweg reparieren</strong> und nach jeder Änderung prüfen, ob sie ankommt.</li>
+        <li><strong>Level beim Laden abwandeln:</strong> Leere hinter der Truhe (bei der Hälfte 0–40 Spalten, bei der anderen 120–240), das ganze Level um eine Reihe anheben, Decken einziehen, Start in der Luft, Gegner mit zufälliger Startrichtung und zufälligem Weckabstand.</li>
+        <li><strong>Die Lernrate wirklich abklingen lassen</strong>, damit die Drift gebremst wird.</li>
+        <li><strong>Ehrlich messen:</strong> Fähigkeits-Proben mit je 40 festen Leveln, zum Beispiel „Truhe vor Leere“ und „Gabelung mit Köder“. Dazu neue Testlevel von dir, beginnend mit 3–4 Pilot-Leveln. <code>exam2</code> und ein Drittel der neuen Level bleiben versiegelt. Neues Kriterium für <code>main</code>: mindestens 76 von 128 auf den versiegelten Leveln. Dann liegt die untere 95-%-Grenze über 50 %.</li>
+      </ol>
+    </div>
+    <div class="col figure" style="margin-top:14px">
+      <div class="table-wrap"><table class="options">
+        <thead><tr><th></th><th>A „Daten-Fokus“ (empfohlen)</th><th>B „Lehrer-Fokus“</th><th>C „Komplett“</th></tr></thead>
+        <tbody>
+          <tr><td>Inhalt</td><td>Datenweg reparieren, Level abwandeln, abklingende Lernrate, Fähigkeits-Proben. Ein Daten-Arm gegen eine Kontrolle</td><td>Nachahmen dauerhaft stärker gewichten, frische Lehrer-Demos, Löser zeigt ab den Fehlerstellen des Bots den Weg, nur auf generierten Leveln</td><td>A und B zusammen, dazu mehr neue Testlevel und ein Editor</td></tr>
+          <tr><td>Vorbereitung</td><td>etwa 1 Arbeitstag</td><td>etwa 1 Arbeitstag</td><td>3–4 Tage plus deine Zeit für Level</td></tr>
+          <tr><td>Erwartung</td><td>realistisch +3 bis +8 von 64 im Ziel-Abschnitt</td><td>seltene Situationen schneller gelernt</td><td>höchste Obergrenze</td></tr>
+          <tr><td>Risiko</td><td>gering bis mittel</td><td>mittel bis hoch</td><td>Wirkungen kaum zuzuordnen</td></tr>
+        </tbody>
+      </table></div>
+      <figcaption>Aus <code>docs/reflexion/phase7_reflexion.md</code>, Abschnitt 6. Wenn du Zeit investieren willst, sind eigene Level wertvoller als zusätzliche Rechenzeit.</figcaption>
+    </div>
+  </section>
+
+  <footer class="col">Space Pirate Jump'n'Run · Phase 7 · Daten aus <code>docs/lernen/daten/phase7_meilensteine.json</code>, <code>docs/lernen/daten/phase7_endauswertung.json</code>, <code>runs/phase7/state.json</code> und <code>docs/reflexion/phase7_*.md</code>. Modelle: <code>models/phase7_final.zip</code> (C-EMA 35 Mio., Endmodell), <code>models/phase7a_ema34.zip</code> (A-EMA 34 Mio., Höchststand von A).</footer>
+</div>
+<script>window.PAGE_DATA={"runs":{"A":[{"m":28.0,"k":"raw","v2":114,"v3":36,"v4":21,"ts":64,"ex":21,"exe":19,"ends":{"diagonalen":24,"ziel":8,"trittsteine":11}},{"m":29.0,"k":"ema","v2":114,"v3":36,"v4":31,"ts":61,"ex":5,"exe":3,"ends":{"ziel":27,"start_gegnerregen":2,"trittsteine":19,"diagonalen":10,"gabelung_oben":1}},{"m":29.0,"k":"raw","v2":115,"v3":34,"v4":17,"ts":66,"ex":5,"exe":6,"ends":{"ziel":32,"diagonalen":10,"trittsteine":12,"start_gegnerregen":2,"gabelung_oben":3}},{"m":30.0,"k":"ema","v2":115,"v3":34,"v4":33,"ts":67,"ex":2,"exe":5,"ends":{"diagonalen":23,"ziel":23,"gabelung_oben":4,"trittsteine":11,"start_gegnerregen":1}},{"m":30.0,"k":"raw","v2":105,"v3":34,"v4":19,"ts":56,"ex":3,"exe":4,"ends":{"trittsteine":13,"ziel":23,"start_gegnerregen":11,"diagonalen":11,"gabelung_oben":3}},{"m":31.0,"k":"ema","v2":110,"v3":33,"v4":32,"ts":68,"ex":36,"exe":23,"ends":{"trittsteine":12,"ziel":7,"start_gegnerregen":7,"diagonalen":1,"gabelung_oben":1}},{"m":31.0,"k":"raw","v2":112,"v3":30,"v4":32,"ts":62,"ex":17,"exe":9,"ends":{"ziel":4,"trittsteine":18,"diagonalen":8,"start_gegnerregen":15,"gabelung_oben":2}},{"m":32.0,"k":"ema","v2":117,"v3":34,"v4":34,"ts":59,"ex":36,"exe":43,"ends":{"diagonalen":9,"ziel":11,"trittsteine":5,"start_gegnerregen":2,"gabelung_oben":1}},{"m":32.0,"k":"raw","v2":113,"v3":36,"v4":35,"ts":56,"ex":11,"exe":8,"ends":{"start_gegnerregen":4,"ziel":12,"diagonalen":26,"trittsteine":9,"gabelung_oben":2}},{"m":33.0,"k":"ema","v2":114,"v3":37,"v4":36,"ts":62,"ex":41,"exe":49,"ends":{"diagonalen":3,"ziel":11,"start_gegnerregen":1,"trittsteine":8}},{"m":33.0,"k":"raw","v2":112,"v3":36,"v4":28,"ts":48,"ex":7,"exe":13,"ends":{"ziel":24,"trittsteine":24,"start_gegnerregen":5,"gabelung_oben":1,"diagonalen":3}},{"m":34.0,"k":"ema","v2":113,"v3":39,"v4":35,"ts":55,"ex":43,"exe":49,"ends":{"trittsteine":11,"diagonalen":8,"ziel":2}},{"m":34.0,"k":"raw","v2":112,"v3":36,"v4":29,"ts":52,"ex":38,"exe":39,"ends":{"trittsteine":14,"ziel":5,"diagonalen":3,"start_gegnerregen":4}},{"m":35.0,"k":"ema","v2":112,"v3":34,"v4":34,"ts":60,"ex":42,"exe":33,"ends":{"gabelung_oben":9,"trittsteine":7,"ziel":2,"start_gegnerregen":3,"diagonalen":1}},{"m":35.0,"k":"raw","v2":115,"v3":36,"v4":25,"ts":63,"ex":15,"exe":20,"ends":{"gabelung_oben":34,"trittsteine":3,"ziel":10,"diagonalen":1,"start_gegnerregen":1}},{"m":36.0,"k":"ema","v2":117,"v3":34,"v4":36,"ts":74,"ex":35,"exe":28,"ends":{"diagonalen":6,"ziel":11,"start_gegnerregen":3,"trittsteine":9}},{"m":36.0,"k":"raw","v2":116,"v3":35,"v4":35,"ts":60,"ex":13,"exe":16,"ends":{"diagonalen":7,"ziel":24,"trittsteine":19,"start_gegnerregen":1}},{"m":37.0,"k":"ema","v2":116,"v3":38,"v4":34,"ts":58,"ex":14,"exe":8,"ends":{"diagonalen":6,"ziel":24,"start_gegnerregen":2,"trittsteine":18}},{"m":37.0,"k":"raw","v2":113,"v3":35,"v4":28,"ts":56,"ex":8,"exe":6,"ends":{"trittsteine":34,"diagonalen":1,"gabelung_oben":4,"ziel":17}},{"m":38.0,"k":"ema","v2":117,"v3":37,"v4":28,"ts":60,"ex":8,"exe":6,"ends":{"trittsteine":17,"ziel":31,"diagonalen":6,"start_gegnerregen":2}},{"m":38.0,"k":"raw","v2":103,"v3":29,"v4":12,"ts":56,"ex":8,"exe":10,"ends":{"trittsteine":37,"ziel":7,"start_gegnerregen":7,"diagonalen":5}},{"m":39.0,"k":"ema","v2":117,"v3":36,"v4":30,"ts":57,"ex":24,"exe":28,"ends":{"diagonalen":19,"ziel":7,"trittsteine":12,"start_gegnerregen":2}},{"m":39.0,"k":"raw","v2":115,"v3":34,"v4":27,"ts":51,"ex":27,"exe":22,"ends":{"trittsteine":19,"diagonalen":6,"start_gegnerregen":5,"ziel":6,"gabelung_oben":1}},{"m":40.0,"k":"ema","v2":114,"v3":39,"v4":37,"ts":68,"ex":27,"exe":28,"ends":{"trittsteine":8,"ziel":15,"diagonalen":10,"start_gegnerregen":3,"gabelung_oben":1}},{"m":40.0,"k":"raw","v2":117,"v3":37,"v4":35,"ts":75,"ex":24,"exe":28,"ends":{"start_gegnerregen":3,"trittsteine":13,"diagonalen":14,"ziel":9,"gabelung_oben":1}},{"m":41.0,"k":"ema","v2":119,"v3":35,"v4":33,"ts":69,"ex":18,"exe":13,"ends":{"ziel":16,"start_gegnerregen":2,"gabelung_oben":13,"trittsteine":12,"diagonalen":3}},{"m":41.0,"k":"raw","v2":119,"v3":34,"v4":24,"ts":51,"ex":1,"exe":3,"ends":{"start_gegnerregen":12,"trittsteine":13,"diagonalen":7,"ziel":22,"gabelung_oben":9}},{"m":42.0,"k":"ema","v2":116,"v3":35,"v4":37,"ts":64,"ex":28,"exe":23,"ends":{"start_gegnerregen":3,"ziel":15,"gabelung_oben":1,"trittsteine":9,"diagonalen":8}},{"m":42.0,"k":"raw","v2":115,"v3":35,"v4":27,"ts":58,"ex":22,"exe":22,"ends":{"diagonalen":5,"ziel":13,"trittsteine":14,"start_gegnerregen":8,"gabelung_oben":2}},{"m":43.0,"k":"ema","v2":117,"v3":34,"v4":34,"ts":60,"ex":25,"exe":18,"ends":{"ziel":11,"start_gegnerregen":14,"diagonalen":3,"trittsteine":11}},{"m":43.0,"k":"raw","v2":115,"v3":35,"v4":25,"ts":48,"ex":7,"exe":4,"ends":{"ziel":11,"start_gegnerregen":25,"gabelung_oben":3,"trittsteine":17,"diagonalen":1}},{"m":44.0,"k":"ema","v2":116,"v3":38,"v4":37,"ts":60,"ex":15,"exe":8,"ends":{"ziel":24,"diagonalen":3,"trittsteine":18,"start_gegnerregen":3,"gabelung_oben":1}},{"m":44.0,"k":"raw","v2":115,"v3":35,"v4":35,"ts":59,"ex":21,"exe":23,"ends":{"ziel":25,"trittsteine":11,"diagonalen":6,"gabelung_oben":1}},{"m":45.0,"k":"ema","v2":117,"v3":35,"v4":35,"ts":68,"ex":10,"exe":13,"ends":{"trittsteine":10,"ziel":41,"diagonalen":2,"start_gegnerregen":1}},{"m":45.0,"k":"raw","v2":114,"v3":38,"v4":33,"ts":69,"ex":22,"exe":13,"ends":{"diagonalen":19,"ziel":18,"trittsteine":5}},{"m":46.0,"k":"ema","v2":119,"v3":36,"v4":35,"ts":71,"ex":8,"exe":9,"ends":{"trittsteine":10,"start_gegnerregen":2,"ziel":43,"diagonalen":1}},{"m":46.0,"k":"raw","v2":116,"v3":35,"v4":35,"ts":66,"ex":2,"exe":2,"ends":{"ziel":25,"start_gegnerregen":21,"diagonalen":3,"trittsteine":12,"gabelung_oben":1}},{"m":47.0,"k":"ema","v2":116,"v3":35,"v4":37,"ts":60,"ex":9,"exe":12,"ends":{"start_gegnerregen":6,"trittsteine":9,"ziel":35,"diagonalen":4,"gabelung_oben":1}},{"m":47.0,"k":"raw","v2":115,"v3":35,"v4":38,"ts":60,"ex":6,"exe":16,"ends":{"start_gegnerregen":14,"ziel":19,"trittsteine":16,"diagonalen":9}},{"m":48.0,"k":"ema","v2":117,"v3":38,"v4":36,"ts":60,"ex":2,"exe":7,"ends":{"trittsteine":20,"ziel":13,"start_gegnerregen":25,"gabelung_oben":3,"diagonalen":1}},{"m":48.0,"k":"raw","v2":114,"v3":36,"v4":32,"ts":68,"ex":0,"exe":2,"ends":{"start_gegnerregen":39,"ziel":8,"trittsteine":13,"gabelung_oben":4}},{"m":49.0,"k":"ema","v2":117,"v3":35,"v4":37,"ts":62,"ex":1,"exe":4,"ends":{"start_gegnerregen":29,"trittsteine":14,"diagonalen":6,"ziel":9,"gabelung_oben":5}},{"m":49.0,"k":"raw","v2":117,"v3":34,"v4":38,"ts":64,"ex":0,"exe":1,"ends":{"ziel":21,"trittsteine":20,"gabelung_oben":3,"start_gegnerregen":19,"diagonalen":1}},{"m":50.0,"k":"ema","v2":117,"v3":37,"v4":39,"ts":64,"ex":4,"exe":6,"ends":{"diagonalen":1,"trittsteine":20,"start_gegnerregen":20,"ziel":17,"gabelung_oben":2}},{"m":50.0,"k":"raw","v2":115,"v3":36,"v4":38,"ts":68,"ex":7,"exe":4,"ends":{"trittsteine":18,"ziel":20,"start_gegnerregen":16,"diagonalen":3}},{"m":51.0,"k":"ema","v2":116,"v3":36,"v4":36,"ts":70,"ex":4,"exe":4,"ends":{"start_gegnerregen":11,"trittsteine":18,"diagonalen":2,"ziel":29}},{"m":51.0,"k":"raw","v2":116,"v3":36,"v4":37,"ts":65,"ex":13,"exe":9,"ends":{"ziel":29,"trittsteine":12,"diagonalen":8,"start_gegnerregen":2}},{"m":52.0,"k":"ema","v2":116,"v3":37,"v4":36,"ts":71,"ex":4,"exe":4,"ends":{"ziel":30,"trittsteine":19,"start_gegnerregen":11}},{"m":52.0,"k":"raw","v2":116,"v3":38,"v4":38,"ts":51,"ex":4,"exe":3,"ends":{"trittsteine":12,"start_gegnerregen":17,"ziel":26,"diagonalen":5}},{"m":53.0,"k":"ema","v2":116,"v3":39,"v4":39,"ts":62,"ex":3,"exe":9,"ends":{"trittsteine":23,"ziel":20,"start_gegnerregen":17,"diagonalen":1}},{"m":53.0,"k":"raw","v2":115,"v3":39,"v4":37,"ts":67,"ex":4,"exe":3,"ends":{"ziel":21,"trittsteine":19,"start_gegnerregen":16,"diagonalen":3,"gabelung_oben":1}},{"m":54.0,"k":"ema","v2":119,"v3":37,"v4":38,"ts":62,"ex":11,"exe":5,"ends":{"diagonalen":7,"trittsteine":23,"ziel":17,"start_gegnerregen":6}},{"m":54.0,"k":"raw","v2":115,"v3":39,"v4":38,"ts":66,"ex":7,"exe":11,"ends":{"ziel":25,"diagonalen":11,"trittsteine":17,"start_gegnerregen":3,"gabelung_oben":1}},{"m":55.0,"k":"ema","v2":118,"v3":39,"v4":39,"ts":58,"ex":8,"exe":6,"ends":{"ziel":24,"start_gegnerregen":8,"trittsteine":21,"diagonalen":3}},{"m":55.0,"k":"raw","v2":116,"v3":38,"v4":33,"ts":62,"ex":4,"exe":6,"ends":{"ziel":29,"trittsteine":21,"diagonalen":3,"start_gegnerregen":7}},{"m":56.0,"k":"ema","v2":118,"v3":37,"v4":39,"ts":56,"ex":4,"exe":9,"ends":{"start_gegnerregen":13,"ziel":31,"trittsteine":13,"gabelung_oben":2,"diagonalen":1}},{"m":56.0,"k":"raw","v2":119,"v3":38,"v4":39,"ts":72,"ex":6,"exe":8,"ends":{"start_gegnerregen":19,"trittsteine":14,"gabelung_oben":9,"diagonalen":1,"ziel":15}},{"m":57.0,"k":"ema","v2":118,"v3":39,"v4":40,"ts":64,"ex":10,"exe":7,"ends":{"ziel":18,"gabelung_oben":3,"trittsteine":15,"start_gegnerregen":17,"diagonalen":1}},{"m":57.0,"k":"raw","v2":115,"v3":36,"v4":39,"ts":73,"ex":8,"exe":8,"ends":{"ziel":35,"start_gegnerregen":8,"trittsteine":8,"diagonalen":4,"gabelung_oben":1}},{"m":58.0,"k":"ema","v2":118,"v3":38,"v4":39,"ts":67,"ex":5,"exe":5,"ends":{"trittsteine":19,"ziel":16,"start_gegnerregen":17,"gabelung_oben":6,"diagonalen":1}},{"m":58.0,"k":"raw","v2":117,"v3":37,"v4":37,"ts":63,"ex":11,"exe":1,"ends":{"gabelung_oben":5,"trittsteine":16,"ziel":16,"start_gegnerregen":16}},{"m":59.0,"k":"ema","v2":119,"v3":37,"v4":37,"ts":70,"ex":4,"exe":4,"ends":{"ziel":9,"start_gegnerregen":21,"trittsteine":18,"gabelung_oben":11,"diagonalen":1}},{"m":59.0,"k":"raw","v2":118,"v3":37,"v4":35,"ts":62,"ex":0,"exe":4,"ends":{"trittsteine":25,"gabelung_oben":9,"start_gegnerregen":28,"ziel":2}},{"m":60.0,"k":"ema","v2":120,"v3":39,"v4":39,"ts":70,"ex":2,"exe":0,"ends":{"trittsteine":18,"start_gegnerregen":30,"ziel":7,"gabelung_oben":7}},{"m":60.0,"k":"raw","v2":113,"v3":33,"v4":30,"ts":64,"ex":3,"exe":1,"ends":{"gabelung_oben":8,"trittsteine":26,"start_gegnerregen":24,"ziel":3}},{"m":61.0,"k":"ema","v2":120,"v3":40,"v4":40,"ts":67,"ex":7,"exe":4,"ends":{"trittsteine":19,"ziel":15,"start_gegnerregen":20,"gabelung_oben":3}},{"m":61.0,"k":"raw","v2":117,"v3":38,"v4":40,"ts":71,"ex":2,"exe":1,"ends":{"trittsteine":17,"start_gegnerregen":20,"ziel":13,"gabelung_oben":10,"diagonalen":2}},{"m":62.0,"k":"ema","v2":118,"v3":38,"v4":39,"ts":67,"ex":1,"exe":4,"ends":{"ziel":12,"gabelung_oben":9,"start_gegnerregen":18,"trittsteine":24}},{"m":62.0,"k":"raw","v2":119,"v3":40,"v4":36,"ts":60,"ex":1,"exe":2,"ends":{"trittsteine":23,"start_gegnerregen":19,"ziel":13,"gabelung_oben":8}}],"B":[{"m":0.0,"k":"raw","v2":53,"v3":3,"v4":1,"ts":7,"ex":0,"exe":0,"ends":{"start_gegnerregen":53,"gabelung_oben":11}},{"m":1.0,"k":"ema","v2":82,"v3":10,"v4":2,"ts":14,"ex":0,"exe":0,"ends":{"gabelung_oben":8,"start_gegnerregen":56}},{"m":1.0,"k":"raw","v2":87,"v3":8,"v4":1,"ts":16,"ex":0,"exe":0,"ends":{"start_gegnerregen":56,"gabelung_oben":8}},{"m":2.0,"k":"ema","v2":94,"v3":18,"v4":6,"ts":18,"ex":0,"exe":0,"ends":{"start_gegnerregen":44,"gabelung_oben":19,"trittsteine":1}},{"m":2.0,"k":"raw","v2":96,"v3":17,"v4":2,"ts":17,"ex":0,"exe":0,"ends":{"start_gegnerregen":53,"trittsteine":1,"gabelung_oben":10}},{"m":3.0,"k":"ema","v2":96,"v3":23,"v4":7,"ts":32,"ex":0,"exe":0,"ends":{"start_gegnerregen":42,"gabelung_oben":11,"trittsteine":11}},{"m":3.0,"k":"raw","v2":90,"v3":10,"v4":9,"ts":24,"ex":0,"exe":0,"ends":{"trittsteine":16,"start_gegnerregen":47,"gabelung_oben":1}},{"m":4.0,"k":"ema","v2":98,"v3":23,"v4":10,"ts":31,"ex":0,"exe":0,"ends":{"trittsteine":24,"start_gegnerregen":38,"gabelung_oben":2}},{"m":4.0,"k":"raw","v2":96,"v3":20,"v4":7,"ts":22,"ex":0,"exe":0,"ends":{"trittsteine":20,"start_gegnerregen":43,"gabelung_oben":1}},{"m":5.0,"k":"ema","v2":103,"v3":28,"v4":11,"ts":42,"ex":0,"exe":0,"ends":{"start_gegnerregen":33,"trittsteine":30,"gabelung_oben":1}},{"m":5.0,"k":"raw","v2":100,"v3":24,"v4":8,"ts":34,"ex":0,"exe":0,"ends":{"trittsteine":32,"start_gegnerregen":27,"gabelung_oben":5}}],"C":[{"m":34.0,"k":"raw","v2":113,"v3":39,"v4":35,"ts":58,"ex":43,"exe":42,"ends":{"diagonalen":5,"trittsteine":15,"ziel":1}},{"m":35.0,"k":"ema","v2":114,"v3":38,"v4":31,"ts":62,"ex":42,"exe":43,"ends":{"trittsteine":8,"ziel":7,"diagonalen":6,"start_gegnerregen":1}},{"m":35.0,"k":"raw","v2":114,"v3":38,"v4":31,"ts":60,"ex":35,"exe":38,"ends":{"ziel":19,"trittsteine":7,"diagonalen":2,"start_gegnerregen":1}},{"m":36.0,"k":"ema","v2":115,"v3":39,"v4":33,"ts":60,"ex":43,"exe":34,"ends":{"ziel":9,"diagonalen":5,"trittsteine":7}},{"m":36.0,"k":"raw","v2":115,"v3":37,"v4":33,"ts":59,"ex":29,"exe":34,"ends":{"start_gegnerregen":7,"ziel":10,"trittsteine":15,"gabelung_oben":1,"diagonalen":2}},{"m":37.0,"k":"ema","v2":115,"v3":37,"v4":34,"ts":58,"ex":35,"exe":32,"ends":{"trittsteine":16,"ziel":7,"start_gegnerregen":5,"diagonalen":1}},{"m":37.0,"k":"raw","v2":116,"v3":38,"v4":33,"ts":66,"ex":27,"exe":30,"ends":{"diagonalen":5,"trittsteine":21,"ziel":8,"start_gegnerregen":3}},{"m":38.0,"k":"ema","v2":118,"v3":39,"v4":34,"ts":58,"ex":28,"exe":29,"ends":{"ziel":11,"trittsteine":17,"start_gegnerregen":4,"diagonalen":4}},{"m":38.0,"k":"raw","v2":117,"v3":38,"v4":34,"ts":61,"ex":29,"exe":32,"ends":{"start_gegnerregen":5,"ziel":16,"trittsteine":11,"diagonalen":1,"gabelung_oben":2}},{"m":39.0,"k":"ema","v2":117,"v3":38,"v4":35,"ts":63,"ex":31,"exe":24,"ends":{"trittsteine":17,"ziel":11,"start_gegnerregen":4,"diagonalen":1}},{"m":39.0,"k":"raw","v2":116,"v3":34,"v4":32,"ts":68,"ex":27,"exe":20,"ends":{"trittsteine":18,"gabelung_oben":3,"diagonalen":2,"start_gegnerregen":7,"ziel":7}}],"D":[{"m":36.0,"k":"raw","v2":115,"v3":39,"v4":33,"ts":63,"ex":31,"exe":33,"ends":{"ziel":13,"diagonalen":1,"trittsteine":15,"start_gegnerregen":2,"gabelung_oben":2}},{"m":37.0,"k":"ema","v2":116,"v3":39,"v4":35,"ts":66,"ex":38,"exe":40,"ends":{"trittsteine":14,"ziel":6,"diagonalen":6}},{"m":37.0,"k":"raw","v2":116,"v3":37,"v4":32,"ts":62,"ex":32,"exe":36,"ends":{"diagonalen":2,"trittsteine":25,"ziel":5}},{"m":38.0,"k":"ema","v2":114,"v3":39,"v4":32,"ts":66,"ex":29,"exe":25,"ends":{"trittsteine":20,"start_gegnerregen":4,"diagonalen":2,"gabelung_oben":2,"ziel":7}},{"m":38.0,"k":"raw","v2":115,"v3":39,"v4":32,"ts":57,"ex":23,"exe":23,"ends":{"diagonalen":4,"ziel":16,"trittsteine":20,"start_gegnerregen":1}},{"m":39.0,"k":"ema","v2":115,"v3":37,"v4":33,"ts":68,"ex":27,"exe":26,"ends":{"trittsteine":20,"ziel":12,"start_gegnerregen":3,"diagonalen":2}},{"m":39.0,"k":"raw","v2":114,"v3":37,"v4":33,"ts":63,"ex":34,"exe":34,"ends":{"trittsteine":14,"diagonalen":3,"ziel":9,"start_gegnerregen":3,"gabelung_oben":1}},{"m":40.0,"k":"ema","v2":115,"v3":37,"v4":33,"ts":63,"ex":29,"exe":27,"ends":{"ziel":17,"trittsteine":14,"start_gegnerregen":4}},{"m":40.0,"k":"raw","v2":115,"v3":36,"v4":33,"ts":58,"ex":27,"exe":20,"ends":{"gabelung_oben":2,"trittsteine":19,"start_gegnerregen":11,"ziel":4,"diagonalen":1}},{"m":41.0,"k":"ema","v2":116,"v3":38,"v4":34,"ts":62,"ex":31,"exe":26,"ends":{"trittsteine":17,"ziel":7,"diagonalen":4,"start_gegnerregen":4,"gabelung_oben":1}},{"m":41.0,"k":"raw","v2":116,"v3":39,"v4":36,"ts":61,"ex":24,"exe":28,"ends":{"trittsteine":14,"ziel":20,"diagonalen":3,"start_gegnerregen":3}},{"m":42.0,"k":"ema","v2":116,"v3":38,"v4":33,"ts":53,"ex":32,"exe":35,"ends":{"trittsteine":13,"ziel":13,"diagonalen":5,"start_gegnerregen":1}},{"m":42.0,"k":"raw","v2":117,"v3":39,"v4":34,"ts":59,"ex":28,"exe":35,"ends":{"trittsteine":11,"ziel":21,"diagonalen":2,"gabelung_oben":1,"start_gegnerregen":1}}]},"final":{"checkpoint":"runs/phase7c/checkpoints/ema_step_0035000008.zip","pruefung_original":85,"pruefung_entschaerft":83,"test_serie":{"berg":26,"festung":25,"hoehle":9,"lange_reise":18,"parcours":31,"zwei_wege":29},"validierung_v2":114,"validierung_v3":38,"validierung_v4":31,"exam2_won":49,"exam2_of":128},"p6":{"pruefung_original":37,"pruefung_entschaerft":40,"test_serie":{"berg":30,"festung":20,"hoehle":16,"lange_reise":3,"parcours":31,"zwei_wege":26},"validierung_v2":114,"validierung_v3":36},"exam":["         E E E E E E E E E E E E                                                                                                                                                 E E E E B                                                                                                                                                                                            ","                                                                                 B                                                                                                BBBBBBBB                                                                                                                    ","                                                                                 B                     B   B   B  BB   B   B   B   BBB   B   B   B   B                                                        BB BB                                                                                                                                     ","                                                                    B   BE E EB  B                 B  B       E       B                                                                                     BB        BB BB                                    BB BB                                                                              ","                                       BBBB   B   B   B   B      B      BBBBBBB  B          BBBB  B              BBBBB                                   B                                              BB                  BB BB                      BB BB                                          ","                                 BBBB                         B      B                   B        E           B                                                               BBBBB                  BB                                         BB BB                                                                                                                                                                                                                                                                                    ","    E          E               B B                                                  B   B   B               B                                               B              BB       BB           BB                                      BB BB                                                                                                  ","                          BBBBB                  E                              B  B      E                 B                                                            BB             B      BB                                    BB BB                                                                                                  ","                    BBBB            EEE                                                                    B                                                  B       BB                   BBB                                                                                                                                          ","               BBB                                               E                            B        B                                                         B B                                                                                                                                                                                                                                                                                ","         BBBB                                                                                          B                                                                                                                                                                                                 C                                                                                                          ","      B                                BBB         B                                                 B   B                                                                                                                                                              BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB                                                                                                            ","BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"]};</script>
+<script>
+(function () {
+  const D = window.PAGE_DATA;
+  const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  const de = (v, d = 0) => v.toLocaleString("de-DE", { minimumFractionDigits: d, maximumFractionDigits: d });
+  const RUNS = [["A", "--s-a", "A · Weiterbau"], ["C", "--s-c", "C · Abzweig von A bei 34 Mio."], ["D", "--s-d", "D · Abzweig von C bei 36 Mio."]];
+  const COLOR = { A: "--s-a", C: "--s-c", D: "--s-d" };
+
+  // ---------------------------------------------------------------- section 1: speed and 12 h comparison
+  function hbar(label, value, max, color, text, goal) {
+    const g = goal == null ? "" : `<div class="goal" style="left:${(goal / max) * 100}%"></div>`;
+    return `<span>${label}</span><div class="track"><div class="fill" style="width:${(value / max) * 100}%;--c:var(${color})"></div>${g}</div><span class="val">${text}</span>`;
+  }
+  document.getElementById("speedBars").innerHTML =
+    `<span class="grp">Tempo, Schritte pro Sekunde</span>` +
+    hbar("A · Weiterbau", 430, 450, "--s-a", "≈ 430") + hbar("B · Neubau", 115, 450, "--grey", "100–130") +
+    `<span class="grp">Fortschritt in den ersten 12 h</span>` +
+    hbar("A · Weiterbau", 13, 15, "--s-a", "+13 Mio.") + hbar("B · Neubau", 5.5, 15, "--grey", "+5,5 Mio.") +
+    `<span class="grp">Prüfung nach 12 h (Ziel 50 %)</span>` +
+    hbar("A · Weiterbau", 26, 100, "--s-a", "26 %", 50) + hbar("B · Neubau", 0, 100, "--grey", "0 %", 50) +
+    `<span class="grp">Test-Serie nach 12 h (Ziel 75 %)</span>` +
+    hbar("A · Weiterbau", 64, 100, "--s-a", "64 %", 75) + hbar("B · Neubau", 36, 100, "--grey", "36 %", 75);
+
+  // ---------------------------------------------------------------- section 2: progress chart
+  const METRICS = {
+    ex: { min: 0, max: 64, step: 16, goal: 32, goalText: "Ziel 50 %", get: (d) => d.ex,
+          label: "gewonnene Prüfungsversuche auf deinem Original-Level (von 64)" },
+    ts: { min: 0, max: 96, step: 24, goal: 72, goalText: "Ziel 75 %", get: (d) => d.ts,
+          label: "gewonnene Versuche der Test-Serie (6 Level × 16, von 96)" },
+    val: { min: 140, max: 200, step: 10, goal: null, get: (d) => d.v2 + d.v3 + d.v4,
+           label: "gewonnene Validierungslevel (von 200; die Achse beginnt bei 140)" },
+  };
+  const RANGES = { all: [27.5, 62.5, 4], zoom: [33.5, 42.5, 1] };
+  const MARKS = [
+    { at: 34, text: "C zweigt ab", color: "--s-c", row: 0, side: "end" },
+    { at: 36, text: "D zweigt ab", color: "--s-d", row: 0, side: "start" },
+    { at: 39.7, text: "v5*", color: "--muted", row: 1, side: "start", dotted: true },
+    { at: 45.6, text: "v6* + Feinschliff", color: "--muted", row: 1, side: "start", dotted: true },
+  ];
+  // the first raw measurement of a run is its start model: it belongs to both kinds
+  const series = {};
+  for (const [run] of RUNS) {
+    const rows = D.runs[run], start = rows[0];
+    series[run] = {
+      start,
+      ema: [start, ...rows.filter((r) => r.k === "ema")],
+      raw: rows.filter((r) => r.k === "raw"),
+      at: (m) => ({ ema: rows.find((r) => r.k === "ema" && Math.round(r.m) === m), raw: rows.find((r) => r.k === "raw" && Math.round(r.m) === m) }),
+    };
+  }
+  const state = { metric: "ex", kind: "ema", range: "all" };
+  const H = 320, L = 42, R = 30, T = 44, B = 34;
+  let W = 760;  // follows the width of the chart box, so the text stays readable on a phone
+  let geo = null;
+
+  function drawLegend() {
+    let s = RUNS.map(([, c, name]) => `<span class="ln" style="--c:var(${c})">${name}</span>`).join("");
+    if (state.kind !== "raw") s += `<span class="ln" style="--c:var(--muted)">EMA (durchgezogen)</span>`;
+    if (state.kind !== "ema") s += `<span class="ln dash" style="--c:var(--muted)">roh (gestrichelt)</span>`;
+    document.getElementById("progressLegend").innerHTML = s;
+  }
+
+  function drawChart() {
+    const box = document.getElementById("progressChart");
+    W = Math.round(Math.max(340, Math.min(760, box.clientWidth || 760)));
+    const m = METRICS[state.metric], [x0, x1, xstep0] = RANGES[state.range];
+    const xstep = W < 560 && state.range === "all" ? 8 : xstep0;
+    const x = (v) => L + ((v - x0) / (x1 - x0)) * (W - L - R), y = (v) => T + (1 - (v - m.min) / (m.max - m.min)) * (H - T - B);
+    geo = { x, y, x0, x1, m };
+    let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Verlauf: ${m.label}">`;
+    s += `<defs><clipPath id="plotClip"><rect x="${L}" y="${T - 6}" width="${W - L - R}" height="${H - T - B + 12}"/></clipPath></defs>`;
+    for (let v = m.min; v <= m.max; v += m.step) s += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" style="stroke:var(--line)"/><text x="${L - 6}" y="${y(v) + 4}" text-anchor="end">${v}</text>`;
+    for (let v = Math.ceil(x0); v <= x1; v++) if ((v % xstep) === 0) s += `<text x="${x(v)}" y="${H - 14}" text-anchor="middle">${v}</text>`;
+    s += `<text x="${W - R}" y="${H - 1}" text-anchor="end">Mio. Schritte</text>`;
+    if (m.goal != null) s += `<line x1="${L}" x2="${W - R}" y1="${y(m.goal)}" y2="${y(m.goal)}" style="stroke:var(--ink);stroke-width:1.2;stroke-dasharray:2 4;opacity:0.7"/><text x="${W - R - 4}" y="${y(m.goal) - 6}" text-anchor="end" style="fill:var(--ink)">${m.goalText}</text>`;
+    const placed = [];
+    for (const k of MARKS) {
+      if (k.at < x0 || k.at > x1) continue;
+      const tw = k.text.length * 6.8, px = x(k.at);
+      let side = k.side;
+      if (side === "end" && px - 5 - tw < 2) side = "start";
+      const a = side === "end" ? px - 5 - tw : px + 5, b = a + tw;
+      let row = k.row;
+      const clash = (r) => placed.some((q) => q.row === r && a < q.b + 6 && b > q.a - 6);
+      if (clash(row) && !clash(1 - row)) row = 1 - row;
+      placed.push({ row, a, b });
+      s += `<line x1="${px}" x2="${px}" y1="${T - 8 + row * 14}" y2="${H - B}" style="stroke:var(${k.color});stroke-width:1.4;stroke-dasharray:${k.dotted ? "2 4" : "5 4"}"/>`;
+      s += `<text x="${side === "end" ? px - 5 : px + 5}" y="${T - 26 + row * 14}" text-anchor="${side}" style="fill:var(${k.color === "--muted" ? "--muted" : "--ink"})">${k.text}</text>`;
+    }
+    s += `<g clip-path="url(#plotClip)">`;
+    const kinds = state.kind === "both" ? ["raw", "ema"] : [state.kind];
+    for (const [run, color] of RUNS) {
+      for (const kind of kinds) {
+        const pts = series[run][kind].map((d) => `${x(d.m).toFixed(1)},${y(m.get(d)).toFixed(1)}`).join(" ");
+        const style = kind === "ema" ? `stroke:var(${color});stroke-width:2.4` : `stroke:var(${color});stroke-width:1.6;stroke-dasharray:5 3;opacity:${state.kind === "both" ? 0.8 : 1}`;
+        s += `<polyline points="${pts}" fill="none" style="${style}" stroke-linejoin="round" stroke-linecap="round"/>`;
+      }
+      const st = series[run].start;
+      s += `<circle cx="${x(st.m)}" cy="${y(m.get(st))}" r="4.5" style="fill:var(--surface);stroke:var(${color});stroke-width:2"/>`;
+    }
+    s += `</g>`;
+    // direct labels at the end of each visible line
+    const lastKind = state.kind === "raw" ? "raw" : "ema";
+    const labels = [];
+    for (const [run, color] of RUNS) {
+      const vis = series[run][lastKind].filter((d) => d.m >= x0 && d.m <= x1);
+      if (!vis.length) continue;
+      const last = vis[vis.length - 1];
+      labels.push({ run, color, lx: Math.min(W - R + 14, x(last.m) + 7), ly: y(m.get(last)) + 4 });
+    }
+    // keep labels that share a column at least 13 units apart
+    labels.sort((a, b) => a.ly - b.ly);
+    for (let i = 1; i < labels.length; i++) for (let j = 0; j < i; j++) {
+      if (Math.abs(labels[i].lx - labels[j].lx) < 24 && labels[i].ly - labels[j].ly < 13) labels[i].ly = labels[j].ly + 13;
+    }
+    for (const l of labels) s += `<text x="${l.lx}" y="${Math.max(T + 4, Math.min(H - B + 10, l.ly))}" style="fill:var(${l.color});font-weight:600;font-size:12px">${l.run}</text>`;
+    s += `<g id="hoverLayer"></g></svg><div class="tip" id="chartTip"></div>`;
+    box.innerHTML = s;
+    const parts = [`Y-Achse: ${m.label}.`, "Offene Kreise: Startmodell eines Laufs."];
+    if (state.range === "all") parts.push("* v5 und v6 kamen nie im Training an (siehe „Warum die neuen Muster nie ankamen“); die Lage der grauen Linien ist aus der Uhrzeit geschätzt.");
+    parts.push("Tippe oder zeige auf die Grafik für die genauen Werte.");
+    document.getElementById("progressCaption").textContent = parts.join(" ");
+    const svg = box.querySelector("svg");
+    const move = (ev) => hover(svg, ev);
+    svg.addEventListener("pointermove", move);
+    svg.addEventListener("pointerdown", move);
+    svg.addEventListener("pointerleave", () => { svg.querySelector("#hoverLayer").innerHTML = ""; document.getElementById("chartTip").style.display = "none"; });
+  }
+
+  function hover(svg, ev) {
+    const rect = svg.getBoundingClientRect(), { x, y, x0, x1, m } = geo;
+    const vx = ((ev.clientX - rect.left) / rect.width) * W;
+    const step = Math.round(x0 + ((vx - L) / (W - L - R)) * (x1 - x0));
+    const layer = svg.querySelector("#hoverLayer"), tip = document.getElementById("chartTip");
+    if (step < Math.ceil(x0) || step > Math.floor(x1)) { layer.innerHTML = ""; tip.style.display = "none"; return; }
+    let g = `<line x1="${x(step)}" x2="${x(step)}" y1="${T}" y2="${H - B}" style="stroke:var(--muted);stroke-width:1"/>`;
+    let rows = "";
+    for (const [run, color] of RUNS) {
+      const sr = series[run], at = sr.at(step), isStart = Math.round(sr.start.m) === step;
+      const cells = [];
+      if (isStart) cells.push(`Start <b>${m.get(sr.start)}</b>`);
+      else {
+        if (at.ema && state.kind !== "raw") cells.push(`EMA <b>${m.get(at.ema)}</b>`);
+        if (at.raw && state.kind !== "ema") cells.push(`roh <b>${m.get(at.raw)}</b>`);
+      }
+      if (!cells.length) continue;
+      rows += `<div><span class="sw" style="background:var(${color})"></span>${run}: ${cells.join(" · ")}</div>`;
+      const pts = isStart ? [sr.start] : [state.kind !== "raw" && at.ema, state.kind !== "ema" && at.raw].filter(Boolean);
+      for (const d of pts) g += `<circle cx="${x(d.m)}" cy="${y(m.get(d))}" r="4.5" style="fill:var(${color});stroke:var(--surface);stroke-width:2"/>`;
+    }
+    layer.innerHTML = g;
+    if (!rows) { tip.style.display = "none"; return; }
+    const scale = rect.width / W;
+    tip.innerHTML = `<div class="mu">${step} Mio. Schritte</div>${rows}`;
+    tip.style.display = "block";
+    const px = x(step) * scale, tw = tip.offsetWidth;
+    tip.style.left = (px + 12 + tw < rect.width ? px + 12 : Math.max(0, px - 12 - tw)) + "px";
+  }
+
+  function bindSeg(attr, key, after) {
+    document.querySelectorAll(`[data-${attr}]`).forEach((b) => b.addEventListener("click", () => {
+      state[key] = b.dataset[attr];
+      document.querySelectorAll(`[data-${attr}]`).forEach((o) => o.setAttribute("aria-pressed", String(o === b)));
+      after();
+    }));
+  }
+  bindSeg("metric", "metric", drawChart);
+  bindSeg("kind", "kind", () => { drawLegend(); drawChart(); });
+  bindSeg("range", "range", drawChart);
+
+  // ---------------------------------------------------------------- section 3: where attempts end
+  const LEVEL = D.exam.map((r) => r.padEnd(521, " "));
+  const COLS = 300, ROWS = 13;
+  const SECTIONS = [[0, 36, "start_gegnerregen", "Start"], [36, 98, "gabelung_oben", "Gabelung"], [98, 160, "trittsteine", "Trittsteine"], [160, 250, "diagonalen", "Diagonalen"], [250, 300, "ziel", "Ziel"]];
+  const PICKS = [
+    ["A", 34, "Höchststand von A. Von hier zweigt C ab."],
+    ["A", 38, "Mitten im Absturz: 31 Versuche scheitern erst im Ziel-Abschnitt."],
+    ["A", 46, "43 Versuche scheitern am Ziel. Der Fehlerkatalog kurz davor: 17 von 27 Fehlversuchen sprangen über die Truhe hinaus."],
+    ["A", 60, "Validierung 198 von 200, aber 30 Versuche sterben schon am Start im Gegnerregen."],
+    ["C", 35, "Das Endmodell. Die Abbrüche verteilen sich auf Trittsteine, Ziel und Diagonalen."],
+    ["D", 42, "Ende von D: je 13 Abbrüche in den Trittsteinen und am Ziel."],
+  ].map(([run, m, note]) => ({ run, m, note, d: D.runs[run].find((r) => r.k === "ema" && Math.round(r.m) === m) }));
+  let pick = 0;
+  const chips = document.getElementById("endsChips");
+  chips.innerHTML = PICKS.map((p, i) => `<button type="button" data-pick="${i}" aria-pressed="${i === pick}"><span class="r" style="--c:var(${COLOR[p.run]})"></span>${p.run} · ${p.m} Mio.</button>`).join("");
+  chips.querySelectorAll("button").forEach((b) => b.addEventListener("click", () => {
+    pick = +b.dataset.pick;
+    chips.querySelectorAll("button").forEach((o) => o.setAttribute("aria-pressed", String(o === b)));
+    drawEnds();
+  }));
+
+  function drawLevel(ctx, w, h, top) {
+    const t = w / COLS, th = (h - top) / ROWS;
+    ctx.fillStyle = css("--surface-2"); ctx.fillRect(0, top, w, h - top);
+    for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
+      const ch = LEVEL[r][c];
+      if (ch === "B") { ctx.fillStyle = css("--ink"); ctx.fillRect(c * t, top + r * th, Math.ceil(t), Math.ceil(th)); }
+      else if (ch === "E") { ctx.fillStyle = css("--gold"); ctx.beginPath(); ctx.arc((c + 0.5) * t, top + (r + 0.5) * th, Math.min(t, th) * 0.45, 0, 7); ctx.fill(); }
+      else if (ch === "C") { ctx.fillStyle = css("--green"); ctx.fillRect(c * t, top + r * th, Math.ceil(t), Math.ceil(th)); }
+    }
+    return { t, th };
+  }
+  const ec = document.getElementById("endsCanvas");
+  function drawEnds() {
+    const p = PICKS[pick], d = p.d;
+    document.getElementById("endsNote").innerHTML = `<strong>${p.run}-EMA bei ${p.m} Mio. Schritten: ${d.ex} von 64 gewonnen.</strong> ${p.note}`;
+    const ctx = ec.getContext("2d"); ctx.clearRect(0, 0, ec.width, ec.height);
+    const top = 50, { t } = drawLevel(ctx, ec.width, ec.height, top);
+    ctx.font = `600 28px ${css("--mono")}`; ctx.textAlign = "center";
+    for (const [a, b, key, name] of SECTIONS) {
+      const n = d.ends[key] || 0;
+      ctx.fillStyle = css("--red"); ctx.globalAlpha = Math.min(0.55, (n / 64) * 1.6); ctx.fillRect(a * t, top, (b - a) * t, ec.height - top); ctx.globalAlpha = 1;
+      ctx.strokeStyle = css("--line"); ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(a * t, 0); ctx.lineTo(a * t, ec.height); ctx.stroke();
+      ctx.fillStyle = n ? css("--red") : css("--muted"); ctx.fillText(`${name}: ${n}`, ((a + b) / 2) * t, 34);
+    }
+    let bars = "";
+    for (const [, , key, name] of SECTIONS) {
+      const n = d.ends[key] || 0;
+      bars += `<span>${name}</span><div class="track"><div class="fill" style="left:0;width:${(n / 64) * 100}%;background:var(--red)"></div></div><span class="mono">${n}</span>`;
+    }
+    bars += `<span><b>gewonnen</b></span><div class="track"><div class="fill" style="left:0;width:${(d.ex / 64) * 100}%;background:var(--green)"></div></div><span class="mono">${d.ex}</span>`;
+    document.getElementById("endsBars").innerHTML = bars;
+  }
+
+  // ---------------------------------------------------------------- section 4: edge scenes
+  function scene(id, title, sub, exam) {
+    const ink = "var(--ink)", W2 = 340, H2 = 200, gy = 158;
+    let s = `<svg viewBox="0 0 ${W2} ${H2}" role="img" aria-label="${title}: ${sub}">`;
+    s += `<text class="ttl" x="12" y="22">${title}</text><text x="12" y="40">${sub}</text>`;
+    const floorEnd = exam ? 290 : 300;
+    for (let c = 0; c < floorEnd; c += 20) s += `<rect x="${c}" y="${gy}" width="19" height="${H2 - gy}" style="fill:${ink}"/>`;
+    s += `<rect x="270" y="${gy - 20}" width="20" height="18" rx="2" style="fill:var(--green)"/><text x="264" y="${gy - 6}" text-anchor="end" style="fill:var(--ink)">Truhe</text>`;
+    s += `<rect x="150" y="${gy - 22}" width="14" height="22" rx="2" style="fill:var(--accent)"/>`;
+    if (!exam) {
+      s += `<rect x="300" y="52" width="40" height="${H2 - 52}" style="fill:var(--ink);opacity:0.22"/>`;
+      s += `<line x1="300" x2="300" y1="52" y2="${H2}" style="stroke:var(--ink);stroke-width:3;stroke-dasharray:6 4"/>`;
+      s += `<text x="296" y="66" text-anchor="end">Rand</text>`;
+      s += `<path d="M164 ${gy - 14} Q 240 40 294 96 L 294 ${gy - 24}" fill="none" style="stroke:var(--accent);stroke-width:2;stroke-dasharray:4 4"/>`;
+      s += `<path d="M289 ${gy - 34} l5 10 l5 -10" fill="none" style="stroke:var(--accent);stroke-width:2"/>`;
+    } else {
+      s += `<path d="M164 ${gy - 14} Q 250 30 316 110 L 334 ${H2 - 4}" fill="none" style="stroke:var(--red);stroke-width:2;stroke-dasharray:4 4"/>`;
+      s += `<path d="M328 ${H2 - 16} l6 12 l4 -13" fill="none" style="stroke:var(--red);stroke-width:2"/>`;
+      s += `<text x="336" y="66" text-anchor="end">223 leere</text><text x="336" y="80" text-anchor="end">Spalten →</text>`;
+    }
+    document.getElementById(id).innerHTML = s + `</svg><figcaption>${exam ? "Zu weit gesprungen heißt hier: Die Figur fällt ins Leere. Die Truhe steht bei Kachel 297 am Ende des Bodens, das Level ist 521 Kacheln breit." : "Zu weit gesprungen heißt hier: Die Figur wird am Rand gestoppt und landet trotzdem bei der Truhe. Die Übersichtskarte zeigt hinter dem Rand festen Block."}</figcaption>`;
+  }
+  scene("sceneTrain", "Im Training", "Der Levelrand wirkt wie eine Wand", false);
+  scene("sceneExam", "In deinem Level", "Hinter der Truhe kommt nichts mehr", true);
+
+  // ---------------------------------------------------------------- section 5: final table and test series
+  const F = D.final, P6 = D.p6, sum = (o) => Object.values(o).reduce((a, b) => a + b, 0);
+  const ts7 = sum(F.test_serie), ts6 = sum(P6.test_serie);
+  const goalExam = 64, goalSeries = 144;
+  const rows = [
+    ["Prüfung, Original", 128, `≥ ${goalExam}`, P6.pruefung_original, F.pruefung_original, F.pruefung_original >= goalExam ? ["ok", "erreicht"] : ["bad", "verfehlt"]],
+    ["Test-Serie", 192, `≥ ${goalSeries}`, ts6, ts7, ts7 >= goalSeries ? ["ok", "erreicht"] : ["bad", `${goalSeries - ts7} fehlen`]],
+    ["Prüfung, entschärft", 128, "–", P6.pruefung_entschaerft, F.pruefung_entschaerft],
+    ["Validierung Stufen 4–9 (v2)", 120, "–", P6.validierung_v2, F.validierung_v2],
+    ["Validierung lang, Stufen 10–11 (v3)", 40, "–", P6.validierung_v3, F.validierung_v3],
+    ["Validierung Stufe 12 (v4)", 40, "–", "–", F.validierung_v4],
+    ["Geheime Prüfung exam2", F.exam2_of, "–", "–", F.exam2_won],
+  ];
+  const tb = document.querySelector("#finalTable tbody");
+  rows.forEach((r, i) => {
+    const res = r[5] ? `<td class="num ${r[5][0]}">${r[4]}<br><span class="mark">${r[5][0] === "ok" ? "✓" : "✗"} ${r[5][1]}</span></td>` : `<td class="num">${r[4]}</td>`;
+    tb.insertAdjacentHTML("beforeend", `<tr${i === 2 || i === 6 ? ' class="sep"' : ""}><td>${r[0]} <span class="muted">(von ${r[1]})</span></td><td class="num">${r[2]}</td><td class="num">${r[3]}</td>${res}</tr>`);
+  });
+  const NAMES = { berg: "Berg", festung: "Festung", hoehle: "Höhle", lange_reise: "Lange Reise", parcours: "Parcours", zwei_wege: "Zwei Wege" };
+  let sb = "";
+  for (const [k, name] of Object.entries(NAMES)) {
+    const a = P6.test_serie[k], b = F.test_serie[k];
+    sb += `<span>${name}</span><div class="track" style="height:20px"><div class="fill" style="top:0;bottom:auto;height:8px;width:${(a / 32) * 100}%;--c:var(--grey)"></div><div class="fill" style="top:auto;bottom:0;height:8px;width:${(b / 32) * 100}%;--c:var(--s-a)"></div></div><span class="val">${a} → ${b}</span>`;
+  }
+  document.getElementById("seriesBars").innerHTML = sb;
+
+  // ---------------------------------------------------------------- redraw on theme change
+  function all() { drawLegend(); drawChart(); drawEnds(); }
+  all();
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", all);
+  let lastWidth = document.getElementById("progressChart").clientWidth, resizeTimer = 0;
+  window.addEventListener("resize", () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      const w = document.getElementById("progressChart").clientWidth;
+      if (Math.abs(w - lastWidth) > 4) { lastWidth = w; drawChart(); }
+    }, 150);
+  });
+  new MutationObserver(all).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+})();
+</script>
+</body>
+</html>
