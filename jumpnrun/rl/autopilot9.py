@@ -14,6 +14,7 @@ Judging (after JUDGE_STEPS steps of both arms): mean dev score (15 levels) over 
 control's; otherwise the control wins unless its protection validation (schutz) is >= 5 levels worse.
 A regression (3 EMA milestones in a row >= 8 points below the round's start) stops an arm early.
 Round 2 needs the way reward: if the control won round 1, round 2's new arm also gets --obs-v3 --path-reward.
+If turning back stalled in round 1 (<= 10/20 'umkehren' probes), round 2's new arm also gets --path-delta.
 After round 3 (or the 48 h budget) the final model is picked by a fixed rule and evaluated once on the sealed
 group (jumpnrun/rl/final9.py).
 """
@@ -129,12 +130,26 @@ def start_steps(path: str) -> int:
     return int(PPO.load(str(ROOT / path), device="cpu").num_timesteps)
 
 
+def turning_back_stalled(limit: int = 10) -> bool:
+    """Round 1's new arm (way reward) still solves at most `limit` of the 20 'umkehren' probes (latest EMA)."""
+
+    ms = milestones(run_dir(1, "neu"))
+    emas = sorted((int(k.split(":")[0]), v) for k, v in ms.items() if k.endswith(":ema") and "proben" in v)
+    if not emas:
+        return False
+    return emas[-1][1]["proben"].get("umkehren", {}).get("won", 0) <= limit
+
+
 def start_round(state: dict, rnd: int) -> None:
     info = state["rounds"].setdefault(str(rnd), {})
     base = state["base_flags"]
     extra = list(ROUND_FLAGS[rnd])
     if rnd >= 2 and "--path-reward" not in base:  # v10 levels (chest left, channels) need the way reward
         extra = ["--obs-v3", "--path-reward"] + extra
+    if rnd == 2 and "--path-delta" not in base and turning_back_stalled():
+        # announced to Leon on 03.10. 22:40 UTC: if turning back did not improve in round 1, round 2 also switches
+        # the way reward to the potential-based form (closer +, further away -); named openly in chapter 9
+        extra = ["--path-delta"] + extra
     info.update(start=state["start"], flags={"neu": base + extra, "kontrolle": list(base)},
                 started=time.time(), stopped=[], start_steps=start_steps(state["start"]))
     if "baseline" not in info:
