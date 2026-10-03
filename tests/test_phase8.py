@@ -210,3 +210,19 @@ def test_judging_rule_waits_for_six_million_steps(tmp_path, monkeypatch):
 def test_regression_stops_an_arm(tmp_path, monkeypatch):
     ap, state = _fake_round(tmp_path, monkeypatch, [0.55] * 3, [0.68] * 3)
     assert ap.judge(state, 1) is None and state["rounds"]["1"]["stopped"] == ["neu"]
+
+
+def test_round_flags_are_accepted_by_the_trainer():
+    """Phase 8 bug: '--plr' without its value crashed round 3 on its first start."""
+
+    import subprocess
+    import sys
+
+    from jumpnrun.rl.autopilot8 import ROUND_FLAGS
+
+    for flags in ROUND_FLAGS.values():
+        out = subprocess.run([sys.executable, "-c", "import sys; from jumpnrun.rl import train; sys.argv=['t','--run','x']+"
+                              + repr(flags) + "; import argparse; p=argparse.ArgumentParser(); train.main.__wrapped__ "
+                              "if hasattr(train.main,'__wrapped__') else None"], capture_output=True, text=True)
+        assert out.returncode == 0, out.stderr
+        assert all(not f.startswith("--plr") or flags[flags.index(f) + 1].replace(".", "").isdigit() for f in flags)

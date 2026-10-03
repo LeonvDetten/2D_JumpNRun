@@ -34,7 +34,7 @@ SCHUTZ_MARGIN = 5
 REGRESSION = 0.08
 BUDGET_HOURS = 48.0
 START = "runs/phase7c/checkpoints/ema_step_0035000008.zip"  # step 1 probe: best dev mean (0.681)
-ROUND_FLAGS = {1: ["--pool-share", "0.4", "--augment", "0.7"], 2: ["--obs-v2", "--stuck-death"], 3: ["--plr"]}
+ROUND_FLAGS = {1: ["--pool-share", "0.4", "--augment", "0.7"], 2: ["--obs-v2", "--stuck-death"], 3: ["--plr", "0.3"]}
 ROUND_READY = {1: None, 2: STATE_DIR / "r2_ready", 3: STATE_DIR / "r3_ready"}
 CORES = {"neu": [0, 1], "kontrolle": [2, 3]}
 
