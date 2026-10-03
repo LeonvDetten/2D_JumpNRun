@@ -39,8 +39,11 @@ class PPOWithDemos(PPO):
             folder = Path(self.demo_path)
             files = sorted(folder.glob("demos*.jsonl")) + sorted(folder.glob("dagger_*.jsonl"))
             overview = "overview" in self.observation_space.spaces
-            cache = folder / ("dataset_ppo_ov.npz" if overview else "dataset_ppo.npz")
-            self._demos = cached_dataset(files, cache, max_samples=300_000, overview=overview, shuffle=overview)
+            v3 = self.observation_space["vec"].shape[0] >= 23  # phase 9: wider view, the demos are re-rendered
+            cache = folder / ("dataset_ppo_ov3.npz" if v3 else "dataset_ppo_ov.npz" if overview else "dataset_ppo.npz")
+            extra = {"obs_v3": True} if v3 else {}
+            self._demos = cached_dataset(files, cache, max_samples=300_000, overview=overview, shuffle=overview,
+                                         **extra)
             self._demo_allowed = torch.as_tensor(self._demos["allowed"].astype(np.int64))
             want = self.observation_space["vec"].shape[0]
             have = self._demos["vec"].shape[1]

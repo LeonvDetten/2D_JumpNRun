@@ -114,6 +114,8 @@ class CurriculumSource:
         pool_share: float = 1.0,
         augment_prob: float = 0.0,
         plr: float = 0.0,
+        gen_variant: str = "v9",
+        augment_v2: bool = False,
     ):
         self.min_tier = min_tier
         # phase 8: tiers with a stored pool draw a stored level only with this probability, otherwise a
@@ -124,6 +126,9 @@ class CurriculumSource:
         # phase 8 round 3: Prioritized Level Replay - replay generated levels with the highest learning
         # potential (score p * (1 - p), p = estimated win rate), filled from the outcomes reported by the env
         self.plr = plr
+        # phase 9: generator variant for fresh levels ("v9" | "gabel" | "v10") and augmentation config V2
+        self.gen_variant = gen_variant
+        self.augment_v2 = augment_v2
         self._plr: dict = {}
         self.max_tier = max_tier
         self.weights: List[float] = [0.0] * NUM_TIERS
@@ -157,10 +162,10 @@ class CurriculumSource:
                 if len(self._parsed) > 4000:
                     self._parsed.clear()
                 self._parsed[text] = Level.from_text(text)
-            return self._augmented(self._parsed[text], rng, "pool"), tier
+            return self._augmented(self._parsed[text], rng, "pool", tier), tier
         seeds = self.pool.get(tier) if not texts else None
         seed = rng.choice(seeds) if seeds else rng.randrange(EVAL_SEED_OFFSET)
-        return self._augmented(generate(tier, seed), rng, "fresh"), tier
+        return self._augmented(generate(tier, seed, self.gen_variant), rng, "fresh", tier), tier
 
     def _replay(self, rng: random.Random):
         keys = list(self._plr)
@@ -185,11 +190,14 @@ class CurriculumSource:
         item["n"] += 1
         item["wins"] += int(won)
 
-    def _augmented(self, level: Level, rng: random.Random, source: str) -> Level:
+    def _augmented(self, level: Level, rng: random.Random, source: str, tier: int = -1) -> Level:
         if self.augment_prob and rng.random() < self.augment_prob:
-            from jumpnrun.levelgen.augment import augment
+            from jumpnrun.levelgen.augment import DEFAULT, V2, augment
 
-            level, _ = augment(level, rng)
+            partner = None
+            if self.augment_v2 and tier >= 6:  # a second level for "concat" (longer levels)
+                partner = generate(tier, rng.randrange(EVAL_SEED_OFFSET), self.gen_variant)
+            level, _ = augment(level, rng, V2 if self.augment_v2 else DEFAULT, partner=partner)
         else:
             level.augmentations = getattr(level, "augmentations", None) or []
         level.source = source

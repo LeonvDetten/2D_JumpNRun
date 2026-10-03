@@ -22,7 +22,7 @@ import time
 from dataclasses import dataclass
 from typing import List, Optional, Sequence, Tuple
 
-from jumpnrun.core.actions import ACTION_REPEAT, BOT_ACTIONS
+from jumpnrun.core.actions import ACTION_REPEAT, BOT_ACTIONS, BOT_ACTIONS_V3
 from jumpnrun.core.constants import PLAYER_SPEED, TILE
 from jumpnrun.core.level import Level
 from jumpnrun.core.sim import Simulation, Status
@@ -54,8 +54,14 @@ def solve(
     weight: float = 1.5,
     start: Optional[Simulation] = None,
     goal: Optional[Tuple[int, int]] = None,
+    dm=None,
+    actions: Sequence = BOT_ACTIONS,
 ) -> SolveResult:
-    """Search for the chest - or, with `goal=(col, row)`, for standing on that tile's top."""
+    """Search for the chest - or, with `goal=(col, row)`, for standing on that tile's top.
+
+    With a phase-9 distance map `dm` the search is guided by the way still to go instead of the x distance
+    (chest on the left, channels that wind up and back).
+    """
 
     start_time = time.time()
     root = start.clone() if start is not None else Simulation(level)
@@ -70,8 +76,17 @@ def solve(
         p = sim.player
         return p.on_ground and p.y + p.h == target_y and abs(p.x + p.w // 2 - target_x) <= TILE
 
-    def priority(sim: Simulation) -> float:
+    use_dm = dm is not None and dm.reachable and goal is None
+
+    def path_h(sim: Simulation, parent_h: float) -> float:
         p = sim.player
+        d = dm.at_player(p) if p.on_ground else dm.below(p.x, p.y, p.w, p.h)
+        return parent_h if d is None else d * TILE
+
+    def priority(sim: Simulation, h: Optional[float] = None) -> float:
+        p = sim.player
+        if h is not None:
+            return sim.frame + weight * h / PLAYER_SPEED
         if target_y is None:
             remaining = max(0, target_x - p.x)
         else:
@@ -81,8 +96,9 @@ def solve(
     # node storage for path reconstruction: parent index + action index
     parents: List[int] = [-1]
     via: List[int] = [-1]
+    hs: List[float] = [path_h(root, (dm.start or 0.0) * TILE) if use_dm else 0.0]
     counter = itertools.count()
-    heap = [(priority(root), next(counter), 0, root)]
+    heap = [(priority(root, hs[0] if use_dm else None), next(counter), 0, root)]
     seen = {_state_key(root)}
     expanded = 0
     best_x = root.player.x
@@ -90,13 +106,14 @@ def solve(
     while heap and expanded < max_expansions:
         _, _, node_id, sim = heapq.heappop(heap)
         expanded += 1
-        for action_index, action in enumerate(BOT_ACTIONS):
+        for action_index, action in enumerate(actions):
             child = sim.clone()
             status = child.step(action, frames=action_repeat)
             if status in (Status.DIED_PIT, Status.DIED_ENEMY):
                 continue
             parents.append(node_id)
             via.append(action_index)
+            hs.append(path_h(child, hs[node_id]) if use_dm else 0.0)
             child_id = len(parents) - 1
             if reached(child):
                 path = []
@@ -112,7 +129,7 @@ def solve(
                 continue
             seen.add(key)
             best_x = max(best_x, child.player.x)
-            heapq.heappush(heap, (priority(child), next(counter), child_id, child))
+            heapq.heappush(heap, (priority(child, hs[child_id] if use_dm else None), next(counter), child_id, child))
 
     return SolveResult(False, None, expanded, best_x, time.time() - start_time)
 
@@ -139,7 +156,7 @@ def solve_via(
         if not leg.solved:
             return SolveResult(False, None, expanded, max(sim.player.x, leg.max_x), time.time() - start_time)
         for action_index in leg.actions:
-            sim.step(BOT_ACTIONS[action_index], frames=action_repeat)
+            sim.step(BOT_ACTIONS_V3[action_index], frames=action_repeat)
         actions += leg.actions
     return SolveResult(True, actions, expanded, sim.player.x, time.time() - start_time)
 
@@ -152,6 +169,7 @@ def solve_auto(
     start: Optional[Simulation] = None,
     spacing: int = 15,
     total_budget: int = 0,
+    path: Optional[bool] = None,
 ) -> SolveResult:
     """Direct search for short levels; for long generated levels (with `waypoints`) leg by leg.
 
@@ -160,6 +178,13 @@ def solve_auto(
     stops after `total_budget` expansions (default: 3 x max_expansions), so no level takes forever.
     """
 
+    if path is None:  # phase 9: levels whose way is not simply "to the right"
+        path = getattr(level, "needs_path", False) or level.goal_x < level.spawn[0]
+    if path:
+        from jumpnrun.levelgen.distmap import DistanceMap
+
+        return solve(level, total_budget or 3 * max_expansions, action_repeat=action_repeat, weight=weight,
+                     start=start, dm=DistanceMap(level), actions=BOT_ACTIONS_V3)
     waypoints = getattr(level, "waypoints", None)
     if not waypoints or level.cols < 150:
         return solve(level, max_expansions, action_repeat=action_repeat, weight=weight, start=start)
@@ -185,7 +210,7 @@ def solve_auto(
                 return SolveResult(False, None, expanded, max(sim.player.x, leg.max_x), time.time() - t0)
             continue  # skip an awkward waypoint, aim for the next one
         for action_index in leg.actions:
-            sim.step(BOT_ACTIONS[action_index], frames=action_repeat)
+            sim.step(BOT_ACTIONS_V3[action_index], frames=action_repeat)
         actions += leg.actions
     if sim.status != Status.WON:
         return SolveResult(False, None, expanded, sim.player.x, time.time() - t0)
@@ -231,7 +256,7 @@ def replay(level: Level, actions: List[int], action_repeat: int = ACTION_REPEAT)
 
     sim = Simulation(level)
     for action_index in actions:
-        sim.step(BOT_ACTIONS[action_index], frames=action_repeat)
+        sim.step(BOT_ACTIONS_V3[action_index], frames=action_repeat)
     return sim
 
 
@@ -245,7 +270,7 @@ def _record(level: Level, actions: List[int], path: str, action_repeat: int = AC
     with VideoWriter(path) as video:
         for action_index in actions:
             for _ in range(action_repeat):
-                sim.step(BOT_ACTIONS[action_index])
+                sim.step(BOT_ACTIONS_V3[action_index])
                 renderer.draw(surface, sim)
                 video.add(surface)
         for end_frame in range(45):

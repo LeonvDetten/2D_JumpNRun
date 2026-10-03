@@ -24,7 +24,7 @@ from typing import Dict, List, Optional
 
 import numpy as np
 
-from jumpnrun.core.actions import BOT_ACTIONS, DEFAULT_REPEAT
+from jumpnrun.core.actions import BOT_ACTIONS, BOT_ACTIONS_V3, DEFAULT_REPEAT
 from jumpnrun.core.level import Level
 from jumpnrun.core.sim import Simulation, Status
 from jumpnrun.levelgen.generator import GENERATOR_VERSION, generate
@@ -39,7 +39,7 @@ NOISE_PROB = 0.05
 def _plan_still_wins(sim: Simulation, plan: List[int], repeat: int) -> bool:
     probe = sim.clone()
     for action in plan:
-        if probe.step(BOT_ACTIONS[action], frames=repeat) != Status.RUNNING:
+        if probe.step(BOT_ACTIONS_V3[action], frames=repeat) != Status.RUNNING:
             break
     return probe.status == Status.WON
 
@@ -65,7 +65,7 @@ def make_demo(tier: int, seed: int, repeat: int = DEFAULT_REPEAT, noise: float =
             backup = (sim.clone(), list(plan), len(actions))
             for _ in range(rng.randint(1, 2)):
                 nudge = rng.randrange(len(BOT_ACTIONS))
-                sim.step(BOT_ACTIONS[nudge], frames=repeat)
+                sim.step(BOT_ACTIONS_V3[nudge], frames=repeat)
                 actions.append(nudge)
                 mask.append(0)
                 plan.pop(0)
@@ -85,7 +85,7 @@ def make_demo(tier: int, seed: int, repeat: int = DEFAULT_REPEAT, noise: float =
             if not long_level or len(actions) > backup[2]:
                 continue
         action = plan.pop(0)
-        sim.step(BOT_ACTIONS[action], frames=repeat)
+        sim.step(BOT_ACTIONS_V3[action], frames=repeat)
         actions.append(action)
         mask.append(1)
     return dict(tier=tier, seed=seed, repeat=repeat, actions=actions, mask=mask,
@@ -103,20 +103,21 @@ def equivalent_actions(sim: Simulation, action: int, repeat: int) -> int:
     results = []
     for a in range(len(BOT_ACTIONS)):
         probe = sim.clone()
-        probe.step(BOT_ACTIONS[a], frames=repeat)
+        probe.step(BOT_ACTIONS_V3[a], frames=repeat)
         results.append(probe.state_signature())
     target = results[action]
     return sum(1 << a for a, r in enumerate(results) if r == target)
 
 
 def load_dataset(paths, max_samples: int = 800_000, thin_flat: float = 2 / 3, seed: int = 0,
-                 overview: bool = False, shuffle: bool = False):
+                 overview: bool = False, shuffle: bool = False, obs_v3: bool = False):
     """Rebuild (observation, label-set) samples from demo files.
 
     Returns dict with grid (int8, N x 4 x 13 x 25), vec (float32, N x 15),
     action (int64) and allowed (uint8 bit mask of equivalent actions).
     Long stretches where only "right" makes sense are thinned out.
     With overview=True also `overview` (uint8 quarters, N x 4 x 13 x 32).
+    obs_v3=True (phase 9): the wider view behind (grid 33 columns, overview 40, vec 23).
     shuffle=True mixes the demos of all files first, so max_samples does not cut off the last file.
     """
 
@@ -134,7 +135,7 @@ def load_dataset(paths, max_samples: int = 800_000, thin_flat: float = 2 / 3, se
     for demo in demos:
         level = generate(demo["tier"], demo["seed"]) if "level" not in demo else Level.from_text(demo["level"])
         repeat = demo["repeat"]
-        env = JumpNRunEnv(fixed_levels([level]), action_repeat=repeat, overview=overview)
+        env = JumpNRunEnv(fixed_levels([level]), action_repeat=repeat, overview=overview, obs_v3=obs_v3)
         env.reset(seed=0)
         sim = env.sim
         streak = 0
@@ -150,7 +151,7 @@ def load_dataset(paths, max_samples: int = 800_000, thin_flat: float = 2 / 3, se
                         overviews.append(np.rint(obs["overview"] * 4).astype(np.uint8))
                     acts.append(action)
                     allowed.append(eq)
-            sim.step(BOT_ACTIONS[action], frames=repeat)
+            sim.step(BOT_ACTIONS_V3[action], frames=repeat)
             if sim.status != Status.RUNNING:
                 break
         if len(acts) >= max_samples:

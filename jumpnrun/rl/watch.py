@@ -20,7 +20,7 @@ from typing import List, Optional
 
 import numpy as np
 
-from jumpnrun.core.actions import ACTION_REPEAT, BOT_ACTIONS
+from jumpnrun.core.actions import ACTION_REPEAT, BOT_ACTIONS, BOT_ACTIONS_V3
 from jumpnrun.core.level import Level
 from jumpnrun.core.sim import Status
 from jumpnrun.levelgen.generator import generate
@@ -60,7 +60,7 @@ class GhostRun:
         before = {i: self.envs[i].sim.max_x for i in active}
         for _ in range(self.action_repeat):
             for i, action in zip(active, actions):
-                self.envs[i].sim.step(BOT_ACTIONS[int(action)])
+                self.envs[i].sim.step(BOT_ACTIONS_V3[int(action)])
             yield
         for i, action in zip(active, actions):
             obs, _, terminated, truncated, info = self.envs[i].finish_step(int(action), before[i])

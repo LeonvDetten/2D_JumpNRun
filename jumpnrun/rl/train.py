@@ -43,14 +43,14 @@ from jumpnrun.rl.policy import GridFeatures, ImpalaFeatures
 def make_env(rank: int, seed: int, min_tier: int, max_tier: int, handmade_paths, handmade_prob: float,
              action_repeat: int, pool_dir=None, overview: bool = False, start_prob: float = 0.0, start_dirs=(),
              rewind_prob: float = 0.0, pool_share: float = 1.0, augment_prob: float = 0.0, obs_v2: bool = False,
-             stuck_death: bool = False, plr: float = 0.0):
+             stuck_death: bool = False, plr: float = 0.0, env_extra=None, source_extra=None):
     def _init():
         handmade = [Level.from_file(p) for p in handmade_paths]
         source = CurriculumSource(min_tier, max_tier, handmade, handmade_prob, pool_dir=pool_dir,
                                   start_prob=start_prob, start_dirs=start_dirs, pool_share=pool_share,
-                                  augment_prob=augment_prob, plr=plr)
+                                  augment_prob=augment_prob, plr=plr, **(source_extra or {}))
         return JumpNRunEnv(source, seed=seed * 1000 + rank, action_repeat=action_repeat, overview=overview,
-                           rewind_prob=rewind_prob, obs_v2=obs_v2, stuck_death=stuck_death)
+                           rewind_prob=rewind_prob, obs_v2=obs_v2, stuck_death=stuck_death, **(env_extra or {}))
 
     return _init
 
@@ -134,6 +134,14 @@ def main() -> None:
     parser.add_argument("--obs-v2", action="store_true",
                         help="phase 8: 6 more vector inputs (network surgery on the first start, new inputs at zero)")
     parser.add_argument("--stuck-death", action="store_true", help="phase 8: getting stuck counts as a death (-1)")
+    parser.add_argument("--obs-v3", action="store_true",
+                        help="phase 9: wider view behind, chest compass, 7th action left+jump (surgery on first start)")
+    parser.add_argument("--generator", choices=("v9", "gabel", "v10"), default="v9",
+                        help="phase 9: generator variant for fresh levels (gabel = repaired fork; v10 = + channels, Mario)")
+    parser.add_argument("--augment-v2", action="store_true",
+                        help="phase 9: augmentation V2 (mirror, enemy density, noise, concatenated levels)")
+    parser.add_argument("--path-reward", action="store_true",
+                        help="phase 9: reward progress along the way to the chest (distance map) instead of new max x")
     parser.add_argument("--plr", type=float, default=0.0,
                         help="phase 8: share of episodes replayed from the Prioritized Level Replay buffer")
     parser.add_argument("--augment", type=float, default=0.0,
@@ -164,7 +172,9 @@ def main() -> None:
     env_fns = [
         make_env(i, args.seed, args.min_tier, args.max_tier, handmade_paths, args.handmade_prob,
                  args.action_repeat, args.pool, args.overview, args.start_prob, tuple(args.start_dirs),
-                 args.rewind_prob, args.pool_share, args.augment, args.obs_v2, args.stuck_death, args.plr)
+                 args.rewind_prob, args.pool_share, args.augment, args.obs_v2, args.stuck_death, args.plr,
+                 env_extra=dict(obs_v3=args.obs_v3, path_reward=args.path_reward),
+                 source_extra=dict(gen_variant=args.generator, augment_v2=args.augment_v2))
         for i in range(args.envs)
     ]
     # the game is so fast that the network update dominates; one process is usually best
@@ -200,7 +210,9 @@ def main() -> None:
     else:
         phase_start = 0
     config_path.write_text(json.dumps({"action_repeat": args.action_repeat, "overview": args.overview,
-                                       "arch": args.arch, "phase_start": phase_start, "obs_v2": args.obs_v2},
+                                       "arch": args.arch, "phase_start": phase_start, "obs_v2": args.obs_v2,
+                                       "obs_v3": args.obs_v3, "path_reward": args.path_reward,
+                                       "generator": args.generator, "augment_v2": args.augment_v2},
                                       indent=2) + "\n")
     eval_levels = eval_level_set(range(args.min_tier, args.max_tier + 1), args.eval_per_tier)
     # hand-made training levels are "practice grades"; --test-levels are never trained on
@@ -226,7 +238,12 @@ def main() -> None:
         ent_coef=args.ent,
         target_kl=args.target_kl,
     )
-    if args.resume and args.obs_v2 and PPO.load(args.resume, device="cpu").observation_space["vec"].shape[0] < 21:
+    if args.resume and args.obs_v3 and PPO.load(args.resume, device="cpu").observation_space["vec"].shape[0] < 23:
+        from jumpnrun.rl.modelinfo import grow_v3
+
+        model = grow_v3(args.resume, vec_env, algo, tensorboard_log=str(run_dir / "tb"), **hyper, **extra)
+        print(f"Network surgery v3: wider view behind, compass, 7th action, from {args.resume}")
+    elif args.resume and args.obs_v2 and PPO.load(args.resume, device="cpu").observation_space["vec"].shape[0] < 21:
         from jumpnrun.rl.modelinfo import grow_vec
 
         model = grow_vec(args.resume, vec_env, algo, tensorboard_log=str(run_dir / "tb"), **hyper, **extra)
