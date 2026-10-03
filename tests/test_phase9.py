@@ -210,3 +210,13 @@ def test_round_two_adds_the_way_reward_if_the_control_won(tmp_path, monkeypatch)
     ap.start_round(state, 2)
     flags = state["rounds"]["2"]["flags"]
     assert "--path-reward" in flags["neu"] and "--obs-v3" in flags["neu"] and "--path-reward" not in flags["kontrolle"]
+
+
+def test_path_delta_rewards_turning_back():
+    lv = Level(["", "", "", "", "", "", "", "", "", "", "", " P              C", "B" * 18])
+    env = JumpNRunEnv(fixed_levels([lv]), action_repeat=2, path_delta=True)
+    env.reset(seed=0)
+    forward = sum(env.step(2)[1] for _ in range(30))
+    back = sum(env.step(1)[1] for _ in range(10))
+    again = sum(env.step(2)[1] for _ in range(10))
+    assert forward > 0.6 and back < -0.1 and abs(back + again) < 1e-9  # loops sum to zero
