@@ -199,9 +199,11 @@ def finish(state: dict) -> None:
     state["final_choice"] = dict(checkpoint=ckpt, window_mean=best[0])
     note(state, f"Endmodell nach fester Regel: {ckpt} (Dev-Fenster {best[0]:.1%}) -> Endauswertung")
     save_state(state)
-    subprocess.run([sys.executable, "-m", "jumpnrun.rl.final8", "--checkpoint", ckpt], cwd=ROOT)
-    state["done"] = True
-    (STATE_DIR / "DONE").write_text(f"phase 8 finished: {ckpt}\n")
+    # detached: an observation round must never cut the (one-time) sealed evaluation short
+    with open(STATE_DIR / "final8.log", "a") as f:
+        subprocess.Popen([sys.executable, "-m", "jumpnrun.rl.final8", "--checkpoint", ckpt], cwd=ROOT,
+                         stdout=f, stderr=subprocess.STDOUT, start_new_session=True)
+    state["final_started"] = time.time()
 
 
 def tick() -> None:
@@ -209,6 +211,21 @@ def tick() -> None:
     try:
         if state.get("done"):
             print("Phase 8 abgeschlossen.")
+            return
+        if state.get("final_started"):
+            if (STATE_DIR / "final.json").exists():
+                res = json.loads((STATE_DIR / "final.json").read_text())
+                state["done"] = True
+                (STATE_DIR / "DONE").write_text(f"phase 8 finished: {res['checkpoint']}\n")
+                note(state, f"Endauswertung fertig: versiegelt {res['sealed_total']['won']}/{res['sealed_total']['of']} "
+                            f"(untere 95-%-Grenze {res['sealed_total']['low95']:.1%}) -> Ziel "
+                            f"{'erreicht' if res['goal_met'] else 'nicht erreicht'}")
+            elif not running("jumpnrun.rl.final8"):
+                note(state, "Endauswertung lief nicht zu Ende -> neu gestartet")
+                state.pop("final_started")
+                finish(state)
+            else:
+                print("Endauswertung läuft.")
             return
         rnd = state["round"]
         if str(rnd) not in state["rounds"]:
