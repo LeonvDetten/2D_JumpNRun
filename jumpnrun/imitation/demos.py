@@ -97,11 +97,11 @@ def _work(args):
     return make_demo(*args)
 
 
-def equivalent_actions(sim: Simulation, action: int, repeat: int) -> int:
+def equivalent_actions(sim: Simulation, action: int, repeat: int, n_actions: int = len(BOT_ACTIONS)) -> int:
     """Bit mask of all actions that lead to exactly the same next state as `action`."""
 
     results = []
-    for a in range(len(BOT_ACTIONS)):
+    for a in range(n_actions):
         probe = sim.clone()
         probe.step(BOT_ACTIONS_V3[a], frames=repeat)
         results.append(probe.state_signature())
@@ -141,7 +141,7 @@ def load_dataset(paths, max_samples: int = 800_000, thin_flat: float = 2 / 3, se
         streak = 0
         for action, labelled in zip(demo["actions"], demo["mask"]):
             if labelled:
-                eq = equivalent_actions(sim, action, repeat)
+                eq = equivalent_actions(sim, action, repeat, len(BOT_ACTIONS_V3) if obs_v3 else len(BOT_ACTIONS))
                 streak = streak + 1 if eq == right_only else 0
                 if not (streak > 2 and rng.random() < thin_flat):
                     obs = env.observe()
