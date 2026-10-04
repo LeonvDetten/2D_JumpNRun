@@ -1,0 +1,340 @@
+{
+ "checkpoint": "runs/phase9_r1_neu/checkpoints/ema2_step_0055000000.zip",
+ "dev": {
+  "pruefung": {
+   "won": 191,
+   "of": 256
+  },
+  "serie_berg": {
+   "won": 28,
+   "of": 32
+  },
+  "serie_festung": {
+   "won": 24,
+   "of": 32
+  },
+  "serie_hoehle": {
+   "won": 13,
+   "of": 32
+  },
+  "serie_lange_reise": {
+   "won": 23,
+   "of": 32
+  },
+  "serie_parcours": {
+   "won": 32,
+   "of": 32
+  },
+  "serie_zwei_wege": {
+   "won": 30,
+   "of": 32
+  },
+  "hand_abgrund": {
+   "won": 31,
+   "of": 32
+  },
+  "hand_doppelgabel": {
+   "won": 0,
+   "of": 32
+  },
+  "hand_hoehlendach": {
+   "won": 32,
+   "of": 32
+  },
+  "hand_lange_tour": {
+   "won": 0,
+   "of": 32
+  },
+  "hand9_gabel_drei": {
+   "won": 0,
+   "of": 32
+  },
+  "hand9_kreuzung": {
+   "won": 0,
+   "of": 32
+  },
+  "hand9_serpentine": {
+   "won": 0,
+   "of": 32
+  },
+  "hand9_spiegelweg": {
+   "won": 0,
+   "of": 32
+  }
+ },
+ "dev_mean": 0.4935,
+ "test_total": {
+  "won": 148,
+  "of": 256
+ },
+ "sealed8": {
+  "exam2": {
+   "won": 34,
+   "of": 128
+  },
+  "gegnertreppe": {
+   "won": 28,
+   "of": 32
+  },
+  "regenstart": {
+   "won": 31,
+   "of": 32
+  },
+  "turm": {
+   "won": 31,
+   "of": 32
+  },
+  "zickzack": {
+   "won": 32,
+   "of": 32
+  }
+ },
+ "sealed8_total": {
+  "won": 156,
+  "of": 256,
+  "rate": 0.6094,
+  "low95": 0.5484,
+  "high95": 0.6671
+ },
+ "sealed9": {
+  "won": 32,
+  "of": 128,
+  "rate": 0.25,
+  "low95": 0.183,
+  "high95": 0.3316
+ },
+ "sealed9_phase8": {
+  "won": 32,
+  "of": 128,
+  "rate": 0.25,
+  "low95": 0.183,
+  "high95": 0.3316
+ },
+ "sealed9_gain": 0.0,
+ "merge": false,
+ "phase8_reference": {
+  "sealed_total": "208/256",
+  "pruefung": "183/256",
+  "dev_mean_phase8_protocol": 0.6758
+ },
+ "baseline_phase8_on_phase9_groups": {
+  "dev_mean": [
+   0.4948,
+   0.2706,
+   0.719
+  ],
+  "dev_alt": [
+   0.6747,
+   0.4526,
+   0.8968
+  ],
+  "dev_neu": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "test": {
+   "won": 76,
+   "of": 128
+  },
+  "schutz": {
+   "won": 76,
+   "of": 80
+  },
+  "proben": {
+   "truhe_abgrund": 16,
+   "hohe_steine": 12,
+   "gegner_treppe": 19,
+   "koeder": 18,
+   "decke": 19,
+   "luftstart": 20,
+   "gegner_entgegen": 14,
+   "umkehren": 10,
+   "kanal": 0,
+   "truhe_links": 0,
+   "mario": 20,
+   "lang": 20,
+   "gegner_dicht": 20
+  }
+ },
+ "rounds": {
+  "1": {
+   "start": "models/phase8_final.zip",
+   "flags": {
+    "neu": [
+     "--pool-share",
+     "0.4",
+     "--augment",
+     "0.7",
+     "--plr",
+     "0.3",
+     "--obs-v3",
+     "--path-reward",
+     "--generator",
+     "gabel"
+    ],
+    "kontrolle": [
+     "--pool-share",
+     "0.4",
+     "--augment",
+     "0.7",
+     "--plr",
+     "0.3"
+    ]
+   },
+   "started": 1791055474.5346773,
+   "stopped": [],
+   "start_steps": 50000000,
+   "baseline": 0.4958,
+   "judged": {
+    "mean": {
+     "neu": 0.48679999999999995,
+     "kontrolle": 0.4802333333333333
+    },
+    "alt": {
+     "neu": 0.6638333333333333,
+     "kontrolle": 0.6548666666666666
+    },
+    "schutz": {
+     "neu": 76,
+     "kontrolle": 74
+    },
+    "winner": "kontrolle"
+   }
+  },
+  "2": {
+   "start": "runs/phase9_r1_kontrolle/checkpoints/ema_step_0059000000.zip",
+   "flags": {
+    "neu": [
+     "--pool-share",
+     "0.4",
+     "--augment",
+     "0.7",
+     "--plr",
+     "0.3",
+     "--path-delta",
+     "--obs-v3",
+     "--path-reward",
+     "--generator",
+     "v10",
+     "--max-tier",
+     "13"
+    ],
+    "kontrolle": [
+     "--pool-share",
+     "0.4",
+     "--augment",
+     "0.7",
+     "--plr",
+     "0.3"
+    ]
+   },
+   "started": 1791077417.848199,
+   "stopped": [],
+   "start_steps": 59000000,
+   "baseline": 0.4542,
+   "judged": {
+    "mean": {
+     "neu": 0.4545333333333333,
+     "kontrolle": 0.41806666666666664
+    },
+    "alt": {
+     "neu": 0.6008666666666668,
+     "kontrolle": 0.5700666666666666
+    },
+    "schutz": {
+     "neu": 75,
+     "kontrolle": 73
+    },
+    "winner": "neu"
+   }
+  },
+  "3": {
+   "start": "runs/phase9_r2_neu/checkpoints/ema_step_0065000000.zip",
+   "flags": {
+    "neu": [
+     "--pool-share",
+     "0.4",
+     "--augment",
+     "0.7",
+     "--plr",
+     "0.3",
+     "--path-delta",
+     "--obs-v3",
+     "--path-reward",
+     "--generator",
+     "v10",
+     "--max-tier",
+     "13",
+     "--demos",
+     "runs/demos49",
+     "--start-dirs",
+     "runs/demos4",
+     "runs/demos9",
+     "--augment-v2"
+    ],
+    "kontrolle": [
+     "--pool-share",
+     "0.4",
+     "--augment",
+     "0.7",
+     "--plr",
+     "0.3",
+     "--path-delta",
+     "--obs-v3",
+     "--path-reward",
+     "--generator",
+     "v10",
+     "--max-tier",
+     "13",
+     "--demos",
+     "runs/demos49",
+     "--start-dirs",
+     "runs/demos4",
+     "runs/demos9"
+    ]
+   },
+   "started": 1791099544.1172104,
+   "stopped": [],
+   "start_steps": 65000000,
+   "baseline": 0.4594,
+   "judged": {
+    "mean": {
+     "neu": 0.4152666666666667,
+     "kontrolle": 0.45136666666666664
+    },
+    "alt": {
+     "neu": 0.5587333333333334,
+     "kontrolle": 0.5909
+    },
+    "schutz": {
+     "neu": 74,
+     "kontrolle": 79
+    },
+    "winner": "kontrolle"
+   }
+  }
+ },
+ "final_choice": {
+  "checkpoint": "runs/phase9_r1_neu/checkpoints/ema2_step_0055000000.zip",
+  "window_mean": 0.5222
+ },
+ "log": [
+  "2026-10-03 19:32 Runde 1 startet von models/phase8_final.zip (Dev-Mittel Start 49.6%); neu: --pool-share 0.4 --augment 0.7 --plr 0.3 --obs-v3 --path-reward --generator gabel",
+  "2026-10-03 19:32 Runde 1, Arm neu: Training gestartet/fortgesetzt auf Kernen [0, 1]",
+  "2026-10-03 19:32 Runde 1, Arm kontrolle: Training gestartet/fortgesetzt auf Kernen [2, 3]",
+  "2026-10-04 01:30 Runde 1 entschieden: neu 48.7% vs Kontrolle 48.0% (alt 66.4% vs 65.5%, Schutz 76 vs 74) -> kontrolle",
+  "2026-10-04 01:30 Weiter mit Runde 2 ab runs/phase9_r1_kontrolle/checkpoints/ema_step_0059000000.zip",
+  "2026-10-04 01:30 Runde 2 startet von runs/phase9_r1_kontrolle/checkpoints/ema_step_0059000000.zip (Dev-Mittel Start 45.4%); neu: --pool-share 0.4 --augment 0.7 --plr 0.3 --path-delta --obs-v3 --path-reward --generator v10 --max-tier 13",
+  "2026-10-04 01:30 Runde 2, Arm neu: Training gestartet/fortgesetzt auf Kernen [0, 1]",
+  "2026-10-04 01:30 Runde 2, Arm kontrolle: Training gestartet/fortgesetzt auf Kernen [2, 3]",
+  "2026-10-04 07:38 Runde 2 entschieden: neu 45.5% vs Kontrolle 41.8% (alt 60.1% vs 57.0%, Schutz 75 vs 73) -> neu",
+  "2026-10-04 07:38 Weiter mit Runde 3 ab runs/phase9_r2_neu/checkpoints/ema_step_0065000000.zip",
+  "2026-10-04 07:39 Runde 3 startet von runs/phase9_r2_neu/checkpoints/ema_step_0065000000.zip (Dev-Mittel Start 45.9%); neu: --pool-share 0.4 --augment 0.7 --plr 0.3 --path-delta --obs-v3 --path-reward --generator v10 --max-tier 13 --demos runs/demos49 --start-dirs runs/demos4 runs/demos9 --augment-v2",
+  "2026-10-04 07:39 Runde 3, Arm neu: Training gestartet/fortgesetzt auf Kernen [0, 1]",
+  "2026-10-04 07:39 Runde 3, Arm kontrolle: Training gestartet/fortgesetzt auf Kernen [2, 3]",
+  "2026-10-04 13:32 Runde 3 entschieden: neu 41.5% vs Kontrolle 45.1% (alt 55.9% vs 59.1%, Schutz 74 vs 79) -> kontrolle",
+  "2026-10-04 13:32 Endmodell nach fester Regel: runs/phase9_r1_neu/checkpoints/ema2_step_0055000000.zip (Dev-Fenster 52.2%) -> Endauswertung",
+  "2026-10-04 13:36 Endauswertung fertig: neue versiegelte Level 32/128 (Phase 8: 32), Phase-8-versiegelt untere Grenze 54.8% -> Merge-Kriterium nicht erf\u00fcllt"
+ ]
+}
