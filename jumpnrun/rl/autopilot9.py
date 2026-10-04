@@ -41,7 +41,8 @@ START = "models/phase8_final.zip"  # phase 8 round 3 (PLR) ema2 50M
 BASE_FLAGS = ["--pool-share", "0.4", "--augment", "0.7", "--plr", "0.3"]  # the phase-8 winner
 ROUND_FLAGS = {1: ["--obs-v3", "--path-reward", "--generator", "gabel"], 2: ["--generator", "v10", "--max-tier", "13"],
                3: ["--augment-v2"]}
-ROUND_READY = {1: None, 2: None, 3: None}
+ROUND_READY = {1: None, 2: None, 3: STATE_DIR / "r3_ready"}
+TEACH = ["--demos", "runs/demos49", "--start-dirs", "runs/demos4", "runs/demos9"]
 ALT_MARGIN = 0.05
 CORES = {"neu": [0, 1], "kontrolle": [2, 3]}
 
@@ -150,7 +151,16 @@ def start_round(state: dict, rnd: int) -> None:
         # announced to Leon on 03.10. 22:40 UTC: if turning back did not improve in round 1, round 2 also switches
         # the way reward to the potential-based form (closer +, further away -); named openly in chapter 9
         extra = ["--path-delta"] + extra
-    info.update(start=state["start"], flags={"neu": base + extra, "kontrolle": list(base)},
+    kontrolle = list(base)
+    if rnd == 3:
+        # (decided 04.10. ~03:30 UTC after round 2's training log: 0 wins on channels / turn-back forks, the 7th
+        # action never tried) both arms of round 3 also learn from teacher demos with left+jump (runs/demos9:
+        # channels, turn-backs, mirrored levels, starts at dead ends) - so round 3 still differs only in
+        # --augment-v2. A control without the v3 network (6 actions) cannot use these demos.
+        if "--obs-v3" in base:
+            kontrolle += TEACH
+        extra = TEACH + extra
+    info.update(start=state["start"], flags={"neu": base + extra, "kontrolle": kontrolle},
                 started=time.time(), stopped=[], start_steps=start_steps(state["start"]))
     if "baseline" not in info:
         from jumpnrun.rl.milestones9 import evaluate_checkpoint
