@@ -110,7 +110,7 @@ def grow_vec(old_model_path, env, algo=None, **kwargs):
     return model
 
 
-def grow_v3(old_model_path, env, algo=None, **kwargs):
+def grow_v3(old_model_path, env, algo=None, a6_bias_offset: float = -4.0, **kwargs):
     """Network surgery for phase 9 (--obs-v3): wider view behind, longer overview behind, chest compass.
 
     The grid gains 8 columns on the left (5 -> 13 behind) and the overview 8 columns (32 more tiles behind).
@@ -174,7 +174,7 @@ def grow_v3(old_model_path, env, algo=None, **kwargs):
                 value[:src.shape[0]] = src
                 value[src.shape[0]:] = src[1:2]
                 if key.endswith("bias"):
-                    value[src.shape[0]:] -= 4.0
+                    value[src.shape[0]:] += a6_bias_offset  # phase 9: -4 (rare); phase 10: 0 (as likely as "left")
             else:
                 raise AssertionError(key)
     model.policy.load_state_dict(new_state)

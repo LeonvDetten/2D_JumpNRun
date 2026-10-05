@@ -32,7 +32,7 @@ class PPOWithDemos(PPO):
         super().__init__(*args, **kwargs)
 
     def _excluded_save_params(self):
-        return super()._excluded_save_params() + ["_demos"]
+        return super()._excluded_save_params() + ["_demos", "bc_paused"]
 
     def _load_demos(self):
         if self._demos is None and self.demo_path:
@@ -55,7 +55,7 @@ class PPOWithDemos(PPO):
     def train(self) -> None:
         super().train()
         demos = self._load_demos()
-        if demos is None:
+        if demos is None or getattr(self, "bc_paused", False):  # phase 10: no BC during the critic warm-up
             return
         coef = max(self.bc_min, self.bc_coef * self.bc_decay ** self.bc_updates)
         self.bc_updates += 1

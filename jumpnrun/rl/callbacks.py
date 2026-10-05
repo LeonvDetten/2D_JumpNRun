@@ -245,3 +245,35 @@ class EmaWeights(BaseCallback):
 
         if self.ema is not None:
             torch.save(self.ema, self.path)
+
+
+class CriticWarmup(BaseCallback):
+    """Phase 10: for the first `steps` after the phase start only the value branch learns.
+
+    After the network surgery the optimizer is fresh and the reward (way distance) is new, so the critic's first
+    estimates are poor; letting it settle before the policy moves avoids a bad first push. The behaviour-cloning
+    steps pause meanwhile (model.bc_paused).
+    """
+
+    def __init__(self, phase_start: int, steps: int):
+        super().__init__()
+        self.until = phase_start + steps
+        self.active = None
+
+    def _set(self, frozen: bool) -> None:
+        policy = self.model.policy
+        for name, p in policy.named_parameters():
+            if frozen:
+                p.requires_grad_("value_net" in name)
+            else:
+                p.requires_grad_(True)
+        self.model.bc_paused = frozen
+        self.active = frozen
+
+    def _on_training_start(self) -> None:
+        self._set(self.model.num_timesteps < self.until)
+
+    def _on_step(self) -> bool:
+        if self.active and self.num_timesteps >= self.until:
+            self._set(False)
+        return True

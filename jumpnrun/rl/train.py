@@ -71,6 +71,39 @@ def cosine_schedule(start: float, decay_steps: int, target: int, phase_start: in
     return schedule
 
 
+def staged_schedule(plan: dict, target: int, phase_start: int, run_dir: Path):
+    """Phase 10: learning rate in fixed stages by absolute steps since the phase start - never restarted.
+
+    plan = {"stages": [[0, 5e-5], [3000000, 3e-5], ...], "critic_warmup": 150000, "ramp": 300000}
+    After the critic-only warm-up the rate ramps up linearly over `ramp` steps. A brake (autopilot10) can scale
+    the rate by writing runs/<arm>/lr_scale.json ({"scale": 0.5}); it is re-read every 50 updates.
+    """
+
+    stages = sorted((int(a), float(b)) for a, b in plan["stages"])
+    warm = int(plan.get("critic_warmup", 0))
+    ramp = int(plan.get("ramp", 0))
+    scale_path = run_dir / "lr_scale.json"
+    state = {"calls": 0, "scale": 1.0}
+
+    def schedule(progress_remaining: float) -> float:
+        if state["calls"] % 50 == 0 and scale_path.exists():
+            try:
+                state["scale"] = float(json.loads(scale_path.read_text()).get("scale", 1.0))
+            except (ValueError, OSError):
+                pass
+        state["calls"] += 1
+        rel = (1.0 - progress_remaining) * target - phase_start
+        lr = stages[0][1]
+        for start, value in stages:
+            if rel >= start:
+                lr = value
+        if ramp and rel >= warm:
+            lr *= min(1.0, max(0.02, (rel - warm) / ramp))
+        return lr * state["scale"]
+
+    return schedule
+
+
 def linear_schedule(start: float, end_fraction: float = 0.1, target: int = 0, phase_start: int = 0):
     """Linear decay from `start` to `end_fraction * start`.
 
@@ -140,6 +173,7 @@ def main() -> None:
                         help="phase 9: generator variant for fresh levels (gabel = repaired fork; v10 = + channels, Mario)")
     parser.add_argument("--augment-v2", action="store_true",
                         help="phase 9: augmentation V2 (mirror, enemy density, noise, concatenated levels)")
+    parser.add_argument("--lr-plan", help="phase 10: JSON (or file) with learning-rate stages, critic warm-up and ramp")
     parser.add_argument("--path-delta", action="store_true",
                         help="phase 9: way reward as potential difference (closer +, further away -)")
     parser.add_argument("--path-reward", action="store_true",
@@ -223,6 +257,9 @@ def main() -> None:
     eval_levels += [("test_handgebaut", Level.from_file(p))
                     for pattern in args.test_levels for p in sorted(glob.glob(pattern))]
 
+    lr_plan = None
+    if args.lr_plan:
+        lr_plan = json.loads(Path(args.lr_plan).read_text() if Path(args.lr_plan).exists() else args.lr_plan)
     algo = PPO
     extra = {}
     if args.demos:
@@ -231,7 +268,8 @@ def main() -> None:
         algo = PPOWithDemos
         extra = dict(demo_path=args.demos, bc_coef=args.bc_coef, bc_decay=args.bc_decay, bc_min=args.bc_min)
     hyper = dict(
-        learning_rate=(cosine_schedule(args.lr, args.lr_decay_steps, args.target, phase_start)
+        learning_rate=(staged_schedule(lr_plan, args.target, phase_start, run_dir) if lr_plan else
+                       cosine_schedule(args.lr, args.lr_decay_steps, args.target, phase_start)
                        if args.lr_decay_steps else linear_schedule(args.lr, target=args.target, phase_start=phase_start)),
         n_steps=args.n_steps,
         batch_size=args.batch,
@@ -288,6 +326,10 @@ def main() -> None:
     ]
     if args.time_limit_hours:
         callbacks.append(TimeLimit(run_dir, args.time_limit_hours))
+    if lr_plan and lr_plan.get("critic_warmup"):
+        from jumpnrun.rl.callbacks import CriticWarmup
+
+        callbacks.append(CriticWarmup(phase_start, int(lr_plan["critic_warmup"])))
     if args.ema_every:
         callbacks.append(EmaWeights(run_dir, args.ema_every))
         if args.ema2_decay:
