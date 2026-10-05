@@ -39,6 +39,7 @@ nice -n 5 python3 scripts/demos_phase10.py 2500 > runs/demos10/demos.log 2>&1
 nice -n 5 python3 scripts/build_probes10.py 4 > runs/demos10/probes.log 2>&1
 python3 -m jumpnrun.rl.autopilot10_bc a6states > runs/demos10/a6.log 2>&1
 python3 -c "from jumpnrun.rl.ppo_demos import bc2_dataset; d = bc2_dataset({dirs}); print(len(d['action']), int((d['action'] == 6).sum()))" > runs/demos10/bc2.log 2>&1
+nice -n 5 python3 -m jumpnrun.rl.drift anchor > runs/demos10/anchor.log 2>&1
 echo '{{"done": true}}' > runs/demos10/done.json
 """
 
@@ -78,7 +79,7 @@ def tick_demos(state: dict) -> None:
                       f"Startmodell P(links+springen | nur-links+springen) {state['b_start_p_a6_only']:.3f}")
         state["stage"] = "B"
         return
-    if A.running("demos_phase10.py") or A.running("build_probes10.py") or A.running("autopilot10_bc a6states"):
+    if A.running("runs/demos10/run.sh"):
         return
     if state.get("demos_started"):
         A.note(state, "Demo-Fenster: Skript beendet ohne done.json -> angehalten (bitte prüfen)")
@@ -266,7 +267,7 @@ def judge_b(state: dict, runs: dict, stopped: list):
 
 def tick_b(state: dict) -> None:
     if state["b_plan"].get("anker") and not anchor_available():
-        print("Runde B braucht den Anker (Regel 'keine sicher'), der noch nicht gebaut ist -> wartet.")
+        print("Runde B braucht den Anker (Regel 'keine sicher'), aber runs/phase10/anchor_states.npz fehlt -> wartet.")
         return
     runs = b_runs()
     info = state["rounds"].setdefault("B", {"target": B_TARGET, "stopped": []})
@@ -308,14 +309,151 @@ def tick_b(state: dict) -> None:
 
 
 def anchor_available() -> bool:
-    out = subprocess.run([sys.executable, "-m", "jumpnrun.rl.train", "--help"], cwd=A.ROOT, capture_output=True,
-                         text=True).stdout
-    return "--anchor" in out
+    return (A.STATE_DIR / "anchor_states.npz").exists()
 
 
-# ----------------------------------------------------------------------------------------------- round C (TODO)
+# ----------------------------------------------------------------------------------------------- round C
+C_STEPS = 6 * MILLION
+C_RAMP = 200_000
+DAGGER = A.ROOT / "runs/dagger10"
+MIX_B_END = {"skill": 0.10, "v10": 0.30, "p8": 0.60}
+
+
+def practice_goal(run: str, results: list) -> dict:
+    """Per kind: v11 probes stochastic (pooled over `results`) and the fresh training win rate (last 3000)."""
+
+    from jumpnrun.levelgen.skills import KINDS
+
+    probe = {k: [0, 0] for k in KINDS}
+    for r in results:
+        for k, v in r.get("uebung_stoch", {}).items():
+            probe[k][0] += v["won"]
+            probe[k][1] += v["of"]
+    train = {k: [] for k in KINDS}
+    path = A.ROOT / run / "episodes.jsonl"
+    if path.exists():
+        for line in path.read_text().splitlines()[-30000:]:
+            e = json.loads(line)
+            if e.get("kind") in train and e.get("rewind_depth", 0) == 0 and e.get("tier") == -4:
+                train[e["kind"]].append(int(e["won"]))
+    out = {k: dict(proben=probe[k][0] / probe[k][1] if probe[k][1] else None,
+                   training=float(np.mean(train[k][-3000:])) if train[k] else None) for k in KINDS}
+    reached = sum(1 for v in out.values() if (v["proben"] or 0) >= 0.7 and (v["training"] or 0) >= 0.6)
+    return dict(je_art=out, erreicht=reached, ziel=reached >= 5)
+
+
+def pooled_probe(results: list, skill: str) -> float:
+    won = sum(r["proben_stoch"].get(skill, {}).get("won", 0) for r in results)
+    of = sum(r["proben_stoch"].get(skill, {}).get("of", 0) for r in results)
+    return won / of if of else 0.0
+
+
+def c_rule(state: dict) -> dict:
+    """The rule of the preregistration that applies to the B winner (checked in order 0-3)."""
+
+    winner = state["b_winner"]
+    run = b_runs()[winner]
+    w = window(run, A.START_STEPS, (8, 9, 10))
+    res = w["ema"] + w["ema2"]
+    alt = mean(res, "alt")
+    p8 = A.p8_basis()
+    dev_neu = mean(res, "dev_neu")
+    kanal = pooled_probe(res, "kanal")
+    goal = practice_goal(run, w["ema2"])
+    anchor_b = bool(state["b_plan"].get("anker"))
+    facts = dict(alt=alt, p8_basis=p8, dev_neu=dev_neu, kanal=kanal, uebungsziel=goal)
+    if p8 is not None and alt < p8 - 0.03:
+        return dict(fall=1, fakten=facts, neu=dict(lr=1e-5, mix={"skill": 0.10, "v10": 0.15, "p8": 0.75}, anker=True),
+                    kontrolle=dict(lr=2e-5, mix=MIX_B_END, anker=anchor_b), gewinnt="alt")
+    if dev_neu < 0.25 or kanal < 0.5 or not goal["ziel"]:
+        return dict(fall=2, fakten=facts, neu=dict(lr=2e-5, mix={"skill": 0.30, "v10": 0.15, "p8": 0.55},
+                                                   anker=anchor_b, dagger=True),
+                    kontrolle=dict(lr=2e-5, mix=MIX_B_END, anker=anchor_b), gewinnt="F")
+    neu = dict(lr=2e-5, mix=MIX_B_END, anker=False) if anchor_b else \
+        dict(lr=2e-5, mix={"skill": 0.10, "v10": 0.40, "p8": 0.50}, anker=False)
+    return dict(fall=3, fakten=facts, neu=neu, kontrolle=dict(lr=2e-5, mix=MIX_B_END, anker=anchor_b), gewinnt="F")
+
+
+def c_start(state: dict) -> str:
+    run = b_runs()[state["b_winner"]]
+    ck = sorted((A.ROOT / run / "checkpoints").glob("ema2_step_*.zip"))
+    return str(ck[-1].relative_to(A.ROOT))
+
+
+def c_command(state: dict, arm: dict, run: str, start_steps: int) -> list:
+    lr_scale = 0.5 if state["rounds"]["B"].get("braked") else 1.0  # a brake in B stays (never restarted upwards)
+    lr = {"stages": [[0, max(1e-5, arm["lr"] * lr_scale)]], "critic_warmup": 0, "ramp": C_RAMP}
+    dirs = DEMO_DIRS + ([str(DAGGER.relative_to(A.ROOT))] if arm.get("dagger") else [])
+    extra = ["--mix-schedule", json.dumps([[0, arm["mix"]]]), "--demos2", *dirs, "--bc2-plan",
+             json.dumps([[0, 0.03]]), "--bc2-a6-share", "0.05"]
+    if arm.get("anker"):
+        extra += ["--anchor"]
+    return A.train_cmd(run, lr, start_steps + C_RAMP + C_STEPS, extra, start=state["c_start"])
+
+
+def judge_c(state: dict, runs: dict, stopped: list, start: int):
+    rule = state["rounds"]["C"]["regel"]
+    rel = (C_STEPS // MILLION - 2, C_STEPS // MILLION - 1, C_STEPS // MILLION)
+    w = {n: window(r, start, rel) for n, r in runs.items()}
+    for n in runs:
+        if n not in stopped and (len(w[n]["ema"]) < 3 or len(w[n]["ema2"]) < 1):
+            return None
+    if len(stopped) == 2:
+        return "keiner", {"grund": "beide Arme im Katastrophen-Stopp"}
+    if stopped:
+        return next(n for n in runs if n not in stopped), {"grund": f"{stopped[0]} im Katastrophen-Stopp"}
+    pooled = {n: w[n]["ema"] + w[n]["ema2"] for n in runs}
+    dF = mean(pooled["neu"], "F") - mean(pooled["kontrolle"], "F")
+    dAlt = mean(pooled["neu"], "alt") - mean(pooled["kontrolle"], "alt")
+    details = dict(dF=round(dF, 4), dAlt=round(dAlt, 4))
+    if rule["gewinnt"] == "alt":
+        won = dAlt >= 0.03 and dF > -0.05
+        text = "Alt >= +3 Pp und F nicht >= 5 Pp schlechter"
+    else:
+        won = dF >= 0.05 and dAlt > -0.03
+        text = "F >= +5 Pp und Alt nicht >= 3 Pp schlechter"
+    return ("neu" if won else "kontrolle"), dict(details, grund=("neu gewinnt: " if won else "neu verfehlt: ") + text)
+
+
 def tick_c(state: dict, hours: float) -> None:
-    print("Runde C: Regeln werden während Runde B gebaut.")
+    info = state["rounds"].setdefault("C", {"stopped": []})
+    if "regel" not in info:
+        info["regel"] = c_rule(state)
+        state["c_start"] = c_start(state)
+        A.note(state, f"Runde C: Fall {info['regel']['fall']} ({json.dumps(info['regel']['fakten'], default=str)[:300]}); "
+                      f"Start {state['c_start']}")
+    rule = info["regel"]
+    if rule["neu"].get("dagger") and not (DAGGER / "done.json").exists():
+        print("Runde C (Fall 2) wartet auf die Korrektur-Beispiele (runs/dagger10).")
+        return
+    if (rule["neu"].get("anker") or rule["kontrolle"].get("anker")) and not anchor_available():
+        print("Runde C braucht den Anker, aber runs/phase10/anchor_states.npz fehlt -> wartet.")
+        return
+    runs = state.setdefault("c_runs", {"neu": "runs/phase10_c_neu", "kontrolle": "runs/phase10_c_kontrolle"})
+    from jumpnrun.rl.modelinfo import load_model
+
+    start_steps = info.setdefault("start_steps", int(load_model(A.ROOT / state["c_start"]).num_timesteps))
+    target = start_steps + C_RAMP + C_STEPS
+    stopped = info["stopped"]
+    for i, (name, run) in enumerate(runs.items()):
+        if name in stopped or A.last_step(run) >= target or A.train_running(run):
+            continue
+        (A.ROOT / run).mkdir(parents=True, exist_ok=True)
+        A.spawn(c_command(state, rule[name], run, start_steps), A.ROOT / f"{run}.log", A.CORES[i])
+        A.note(state, f"Runde C, Arm {name}: Training gestartet/fortgesetzt (Kerne {A.CORES[i]})")
+    for run in runs.values():
+        A.update_drift(run)
+    brakes(state, "C", runs, stopped, start_steps)
+    res = judge_c(state, runs, stopped, start_steps)
+    if res is None:
+        return
+    winner, details = res
+    info["urteil"] = dict(details, gewinner=winner)
+    for run in runs.values():
+        A.stop(run)
+    A.note(state, f"Runde C entschieden: {details['grund']}" +
+           (f" (ΔF {details['dF']:+.1%}, ΔAlt {details['dAlt']:+.1%})" if "dF" in details else ""))
+    state["stage"] = "auswahl"
 
 
 def tick(state: dict, hours: float) -> None:
@@ -325,7 +463,13 @@ def tick(state: dict, hours: float) -> None:
     elif stage == "B":
         tick_b(state)
     elif stage == "C":
-        tick_c(state, hours)
+        if state["rounds"]["B"]["urteil"]["gewinner"] == "keiner":  # rule 0
+            state["stage"] = "halt"
+            A.note(state, "Regel 0: beide B-Arme im Katastrophen-Stopp -> keine Runde C, P8 bleibt (Diagnose + Frage an Leon)")
+        else:
+            tick_c(state, hours)
+    elif stage == "auswahl":
+        print("Auswahl/Endauswertung: select10/final10 werden während Runde B/C gebaut.")
     elif stage == "halt":
         print("Autopilot angehalten:", state["log"][-1] if state["log"] else "")
 

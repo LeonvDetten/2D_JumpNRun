@@ -188,6 +188,8 @@ def main() -> None:
     parser.add_argument("--demos2", nargs="*", default=[], help="phase 10: demo dirs for the second BC stream")
     parser.add_argument("--bc2-plan", help="phase 10: JSON [[steps, coef], ...] for the second BC stream")
     parser.add_argument("--bc2-a6-share", type=float, default=0.05)
+    parser.add_argument("--anchor", action="store_true",
+                        help="phase 10 (only by rule): KL anchor to P8 on runs/phase10/anchor_states.npz")
     parser.add_argument("--path-delta", action="store_true",
                         help="phase 9: way reward as potential difference (closer +, further away -)")
     parser.add_argument("--path-reward", action="store_true",
@@ -285,6 +287,8 @@ def main() -> None:
 
         algo = PPOWithDemos
         extra = dict(demo_path=args.demos, bc_coef=args.bc_coef, bc_decay=args.bc_decay, bc_min=args.bc_min)
+        if args.anchor:
+            extra["anchor_path"] = str(Path(__file__).resolve().parent.parent.parent / "runs/phase10/anchor_states.npz")
         if args.demos2:
             extra.update(demo2_paths=list(args.demos2), bc2_plan=_json_arg(args.bc2_plan),
                          bc2_a6_share=args.bc2_a6_share, phase10_start=phase_start)

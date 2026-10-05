@@ -67,6 +67,56 @@ def build(n_states: int = 6000, every: int = 6) -> None:
     print("states:", len(keep["vec"]), "from", k, "episodes")
 
 
+ANCHOR = ROOT / "runs/phase10/anchor_states.npz"
+NO_ANCHOR_BLOCKS = ("bait_fork", "channel", "gabel_", "channel_end")
+
+
+def build_anchor(n_states: int = 12000, every: int = 4) -> None:
+    """States of WON stochastic phase-8 episodes on generated v9 levels (own seed space "anchor10", without forks,
+    channels or dead ends) with P8's action probabilities - the target of the anchor (only active by rule)."""
+
+    from jumpnrun.levelgen.generator import generate
+    from jumpnrun.rl.env import JumpNRunEnv, fixed_levels
+    from jumpnrun.rl.modelinfo import load_model
+
+    torch.set_num_threads(1)
+    model = load_model(P8)
+    rng = random.Random("anchor10")
+    keep = {"grid": [], "overview": [], "vec": [], "p8": []}
+    torch.manual_seed(11)
+    k = 0
+    while len(keep["vec"]) < n_states:
+        level = generate(rng.randint(4, 12), 800000 + k)
+        k += 1
+        if any(b.startswith(NO_ANCHOR_BLOCKS) for b in getattr(level, "building_blocks", {})):
+            continue
+        env = JumpNRunEnv(fixed_levels([level]), action_repeat=2, overview=True, obs_v3=True, progress="path")
+        obs, _ = env.reset(seed=k)
+        ep = {key: [] for key in keep}
+        t = 0
+        while True:
+            o = {key: torch.as_tensor(v[None]) for key, v in old_view(obs).items()}
+            with torch.no_grad():
+                dist = model.policy.get_distribution(o).distribution
+                a = int(dist.sample()[0])
+            if t % every == 0:
+                for key in ("grid", "overview", "vec"):
+                    ep[key].append(obs[key].copy())
+                ep["p8"].append(dist.probs[0].numpy().copy())
+            obs, _, term, trunc, info = env.step(a)
+            t += 1
+            if term or trunc:
+                break
+        if info.get("episode_end", {}).get("won"):
+            for key in keep:
+                keep[key] += ep[key]
+    ANCHOR.parent.mkdir(parents=True, exist_ok=True)
+    np.savez_compressed(ANCHOR, grid=np.stack(keep["grid"]).astype(np.int8), vec=np.stack(keep["vec"]),
+                        overview=np.rint(np.stack(keep["overview"]) * 4).astype(np.uint8),
+                        p8=np.stack(keep["p8"]).astype(np.float32))
+    print("anchor states:", len(keep["vec"]), "from", k, "levels")
+
+
 def _load_states():
     d = np.load(STATES)
     return {"grid": torch.as_tensor(d["grid"], dtype=torch.float32), "vec": torch.as_tensor(d["vec"]),
@@ -101,12 +151,15 @@ def measure(model, states=None, batch: int = 1000) -> dict:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("cmd", choices=("build", "measure"))
+    parser.add_argument("cmd", choices=("build", "measure", "anchor"))
     parser.add_argument("ckpts", nargs="*")
     args = parser.parse_args()
     torch.set_num_threads(1)
     if args.cmd == "build":
         build()
+        return
+    if args.cmd == "anchor":
+        build_anchor()
         return
     from jumpnrun.rl.modelinfo import load_model
 
