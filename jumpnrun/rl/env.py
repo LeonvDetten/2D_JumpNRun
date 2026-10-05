@@ -29,6 +29,7 @@ progress (truncated).
 
 from __future__ import annotations
 
+import math
 import random
 from collections import deque
 from typing import Callable, Optional
@@ -64,6 +65,7 @@ REWARD_PER_TILE = 0.1
 REWARD_DEATH = -1.0
 REWARD_WIN = 2.0
 NO_PROGRESS_FRAMES = 600  # episode is truncated after this many frames without new progress
+PATH_TIME_FACTOR = 1.2  # phase 10: time limit covers 1.2 x the way to the chest (at least the level width)
 NO_PROGRESS_STEPS = NO_PROGRESS_FRAMES // ACTION_REPEAT  # (at the legacy repeat of 4)
 
 # A level source returns (level, tier) for each new episode. tier = -1 for hand-made levels.
@@ -95,6 +97,8 @@ class JumpNRunEnv(gym.Env):
         obs_v3: bool = False,
         path_reward: bool = False,
         path_delta: bool = False,
+        progress: str = "x",
+        path_time_factor: float = 0.0,
     ):
         super().__init__()
         self.level_source = level_source
@@ -117,6 +121,12 @@ class JumpNRunEnv(gym.Env):
         # -0.1 (walking onto a dead end costs, turning back pays at once; loops sum to zero)
         self.path_delta = bool(path_delta)
         self.cur_dist = None
+        # phase 10: "stuck" counts frames without a new best of the way distance (progress="path") instead of
+        # frames without a new rightmost x - turning back is no longer cut off as "stuck" (phase-9 measurement
+        # bug: even the solver's solutions of serpentine / spiegelweg ended as "stuck"). Without a reward change.
+        self.progress = "path" if self.path_reward else progress
+        # phase 10: time limit from the length of the way, max(cols, factor * start distance) tiles
+        self.path_time_factor = float(path_time_factor or (PATH_TIME_FACTOR if self.progress == "path" else 0.0))
         self.dm = None
         self.best_dist = None
         # phase 8: getting stuck (no new progress for NO_PROGRESS_FRAMES) ends the episode like a death
@@ -182,7 +192,8 @@ class JumpNRunEnv(gym.Env):
         self.actions_taken = []
         if self.rewind_prob and self.sim.player.on_ground:
             self._snapshots.append(self.sim.clone())
-        if self.path_reward:
+        self.best_dist = None
+        if self.progress == "path":
             from jumpnrun.levelgen.distmap import DistanceMap
 
             if self.dm is None or self.dm.level is not level:
@@ -194,6 +205,9 @@ class JumpNRunEnv(gym.Env):
             self.best_dist = here  # None: no way known - this episode falls back to the x reward
             self.cur_dist = here
             self.start_dist = here
+            if here is not None and self.path_time_factor:
+                tiles = max(level.cols, math.ceil(self.path_time_factor * here))
+                self.max_steps = int(tiles * self.max_steps_per_tile) + 200 // self.action_repeat
 
     def step(self, action: int):
         before = self.sim.max_x
@@ -217,7 +231,9 @@ class JumpNRunEnv(gym.Env):
             if here is not None and here < self.best_dist:
                 gained, self.best_dist = self.best_dist - here, here
             reward = REWARD_PER_TILE * gained
-            if self.path_delta:
+            if not self.path_reward:  # path progress only for "stuck": the reward stays "new rightmost x"
+                reward = REWARD_PER_TILE * (sim.max_x - max_x_before) / TILE
+            elif self.path_delta:
                 reward = 0.0
                 if here is not None:
                     reward = REWARD_PER_TILE * (self.cur_dist - here)
