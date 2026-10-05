@@ -35,7 +35,8 @@ def bc2_dataset(dirs) -> dict:
 class PPOWithDemos(PPO):
     def __init__(self, *args, demo_path=None, bc_coef: float = 0.5, bc_decay: float = 0.99,
                  bc_min: float = 0.02, demo2_paths=None, bc2_plan=None, bc2_a6_share: float = 0.05,
-                 phase10_start: int = 0, **kwargs):
+                 phase10_start: int = 0, anchor_path=None, anchor_eps: float = 0.02, anchor_coef: float = 0.1,
+                 anchor_target_kl: float = 0.02, **kwargs):
         self.demo_path = demo_path
         # phase 10: a second demo stream (BC2: teacher demos with left+jump on practice levels) with its own weight
         # by stage ([[steps since phase10_start, coef], ...]); left+jump samples drawn with share bc2_a6_share
@@ -44,6 +45,14 @@ class PPOWithDemos(PPO):
         self.bc2_a6_share = bc2_a6_share
         self.phase10_start = phase10_start
         self._demos2 = None
+        # phase 10 anchor (only active by rule): KL(teacher || policy) on states of won phase-8 episodes; the teacher
+        # is P8 with a small share eps on left+jump (so the anchor does not forbid it); the weight adapts so the
+        # measured KL stays near anchor_target_kl
+        self.anchor_path = anchor_path
+        self.anchor_eps = anchor_eps
+        self.anchor_coef = anchor_coef
+        self.anchor_target_kl = anchor_target_kl
+        self._anchor = None
         self.bc_coef = bc_coef
         self.bc_decay = bc_decay
         self.bc_min = bc_min
@@ -52,7 +61,7 @@ class PPOWithDemos(PPO):
         super().__init__(*args, **kwargs)
 
     def _excluded_save_params(self):
-        return super()._excluded_save_params() + ["_demos", "_demos2", "bc_paused"]
+        return super()._excluded_save_params() + ["_demos", "_demos2", "_anchor", "bc_paused"]
 
     def _load_demos(self):
         if self._demos is None and self.demo_path:
@@ -79,6 +88,22 @@ class PPOWithDemos(PPO):
             data["a6_idx"] = np.nonzero(data["action"] == 6)[0]
             self._demos2 = data
         return getattr(self, "_demos2", None)
+
+    def _load_anchor(self):
+        if getattr(self, "_anchor", None) is None and getattr(self, "anchor_path", None):
+            d = np.load(self.anchor_path)
+            p = torch.as_tensor(d["p8"])
+            eps = self.anchor_eps
+            teacher = torch.cat([p * (1 - eps), torch.full((len(p), 1), eps)], dim=1)
+            self._anchor = {"grid": d["grid"], "vec": d["vec"], "overview": d["overview"], "teacher": teacher}
+        return getattr(self, "_anchor", None)
+
+    def _anchor_loss(self, data):
+        idx = np.random.randint(0, len(data["vec"]), BC_BATCH)
+        obs = _obs_tensors(data, idx)
+        logp = torch.log_softmax(self.policy.get_distribution(obs).distribution.logits, dim=1)
+        t = data["teacher"][idx]
+        return (t * (t.clamp_min(1e-8).log() - logp)).sum(1).mean()
 
     def bc2_coef(self) -> float:
         plan = getattr(self, "bc2_plan", None)
@@ -113,6 +138,8 @@ class PPOWithDemos(PPO):
         coef2 = self.bc2_coef()
         demos2 = self._load_demos2() if coef2 > 0 else None
         losses2, accs2 = [], []
+        anchor = self._load_anchor()
+        kls = []
         for _ in range(batches):
             idx = np.random.randint(0, n, BC_BATCH)
             loss, acc = bc_loss(self.policy, _obs_tensors(demos, idx), self._demo_allowed[idx])
@@ -123,6 +150,10 @@ class PPOWithDemos(PPO):
                 total = total + coef2 * loss2
                 losses2.append(loss2.item())
                 accs2.append(acc2.item())
+            if anchor is not None:
+                kl = self._anchor_loss(anchor)
+                total = total + self.anchor_coef * kl
+                kls.append(kl.item())
             self.policy.optimizer.zero_grad()
             total.backward()
             torch.nn.utils.clip_grad_norm_(self.policy.parameters(), self.max_grad_norm)
@@ -132,6 +163,14 @@ class PPOWithDemos(PPO):
         self.logger.record("vorbild/gewicht", coef)
         self.logger.record("vorbild/verlust", float(np.mean(losses)))
         self.logger.record("vorbild/uebereinstimmung", float(np.mean(accs)))
+        if kls:  # adaptive weight, as PPO's adaptive KL penalty
+            kl = float(np.mean(kls))
+            if kl > 1.5 * self.anchor_target_kl:
+                self.anchor_coef = min(10.0, self.anchor_coef * 1.5)
+            elif kl < self.anchor_target_kl / 1.5:
+                self.anchor_coef = max(0.01, self.anchor_coef / 1.5)
+            self.logger.record("anker/kl", kl)
+            self.logger.record("anker/gewicht", self.anchor_coef)
         if losses2:
             self.logger.record("vorbild2/gewicht", coef2)
             self.logger.record("vorbild2/verlust", float(np.mean(losses2)))
