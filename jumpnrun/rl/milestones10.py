@@ -174,6 +174,7 @@ def main() -> None:
     parser.add_argument("--once", help="evaluate one checkpoint fully (baseline)")
     parser.add_argument("--tag", help="name for --once")
     parser.add_argument("--repeat", type=int, default=1, help="--once: independent repeats (seeds 0, 1, ...)")
+    parser.add_argument("--seed-offset", type=int, default=0, help="--once: first seed (selection: fresh seeds)")
     parser.add_argument("--seconds", type=float, default=1e9)
     args = parser.parse_args()
     torch.set_num_threads(1)
@@ -183,11 +184,11 @@ def main() -> None:
         model = load_model(ROOT / args.once)
         for k in range(args.repeat):
             t0 = time.time()
-            res = evaluate(model, full=True, seed=k)
+            res = evaluate(model, full=True, seed=args.seed_offset + k)
             res["seconds"] = round(time.time() - t0)
             res["checkpoint"] = args.once
             data = json.loads(out.read_text()) if out.exists() else {}
-            data[f"{args.tag or args.once}:{k}"] = res
+            data[f"{args.tag or args.once}:{args.seed_offset + k}"] = res
             out.write_text(json.dumps(data, indent=1))
             print(f"{args.tag or args.once} #{k}: {describe(res)} [{res['seconds']}s]", flush=True)
         return
