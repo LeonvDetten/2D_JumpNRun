@@ -98,6 +98,9 @@ def main():
                 f.write(json.dumps(r["demo"]) + "\n")
                 f.flush()
                 stats["demos"] += 1
+    from jumpnrun.rl.ppo_demos import bc2_dataset  # prebuild the BC2 cache of round C (same dir order)
+
+    bc2_dataset(["runs/demos10", "runs/demos9", "runs/dagger10"])
     (OUT / "done.json").write_text(json.dumps(dict(stats, checkpoint=ckpt)))
     print(stats)
 
