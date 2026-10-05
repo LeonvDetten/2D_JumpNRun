@@ -277,3 +277,29 @@ class CriticWarmup(BaseCallback):
         if self.active and self.num_timesteps >= self.until:
             self._set(False)
         return True
+
+
+class MixScheduler(BaseCallback):
+    """Phase 10: switches the mix stage of every env's MixSource by absolute steps since the phase start."""
+
+    def __init__(self, phase_start: int, stage_starts):
+        super().__init__()
+        self.phase_start = phase_start
+        self.starts = sorted(int(x) for x in stage_starts)
+        self.stage = None
+
+    def _current(self) -> int:
+        rel = self.model.num_timesteps - self.phase_start
+        return max(i for i, s in enumerate(self.starts) if rel >= s) if rel >= self.starts[0] else 0
+
+    def _on_training_start(self) -> None:
+        self.stage = self._current()
+        self.training_env.env_method("set_mix_stage", self.stage)
+
+    def _on_step(self) -> bool:
+        if self.n_calls % 256 == 0:
+            idx = self._current()
+            if idx != self.stage:
+                self.stage = idx
+                self.training_env.env_method("set_mix_stage", idx)
+        return True

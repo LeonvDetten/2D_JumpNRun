@@ -175,7 +175,7 @@ class CurriculumSource:
         item["level"].source = "plr"
         return item["level"], item["tier"]
 
-    def feedback(self, level: Level, tier: int, won: bool) -> None:
+    def feedback(self, level: Level, tier: int, won: bool, **_) -> None:
         """Outcome of an episode (called by the env); feeds the PLR buffer."""
 
         if not self.plr or tier < 6 or getattr(level, "source", None) not in ("fresh", "pool", "plr"):
@@ -202,6 +202,61 @@ class CurriculumSource:
             level.augmentations = getattr(level, "augmentations", None) or []
         level.source = source
         return level
+
+
+class MixSource:
+    """Phase 10: several level sources mixed by TRAINING STEPS, in stages ("erst üben, dann mischen").
+
+    sources  {"p8": CurriculumSource, "v10": CurriculumSource, "skill": SkillSource}
+    schedule [[stage_start_steps, {"skill": 0.55, "v10": 0.0, "p8": 0.45}], ...] (steps relative to the phase start;
+             the stage is set from outside by the MixScheduler callback via set_mix_stage)
+    Deficit control: each new episode comes from the source furthest behind its target share of the steps played
+    in the current stage, so the shares hold in steps although practice episodes are much shorter.
+    """
+
+    def __init__(self, sources: dict, schedule: list):
+        self.sources = sources
+        self.schedule = sorted(([int(a), dict(b)] for a, b in schedule), key=lambda x: x[0])
+        self.stage = 0
+        self.steps = {n: 0 for n in sources}
+
+    @property
+    def weights(self):
+        return self.sources["p8"].weights
+
+    @weights.setter
+    def weights(self, value):  # the tier curriculum only steers the phase-8 source
+        self.sources["p8"].weights = value
+
+    def set_mix_stage(self, idx: int) -> None:
+        if idx != self.stage:
+            self.stage = idx
+            self.steps = {n: 0 for n in self.sources}
+
+    def shares(self) -> dict:
+        return self.schedule[min(self.stage, len(self.schedule) - 1)][1]
+
+    def __call__(self, rng: random.Random):
+        shares = {n: v for n, v in self.shares().items() if v > 0 and n in self.sources}
+        total = sum(self.steps.values())
+        if total == 0:
+            name = rng.choices(list(shares), weights=list(shares.values()))[0]
+        else:
+            name = max(shares, key=lambda n: (shares[n] * total - self.steps[n], rng.random()))
+        level, tier, *rest = self.sources[name](rng)
+        level.mix_source = name
+        return (level, tier, *rest)
+
+    def feedback(self, level: Level, tier: int, won: bool, steps: int = 0, fresh: bool = True) -> None:
+        name = getattr(level, "mix_source", None)
+        if name not in self.sources:
+            return
+        self.steps[name] += steps
+        src = self.sources[name]
+        if name == "skill":
+            src.feedback(level, won, fresh)
+        else:
+            src.feedback(level, tier, won)
 
 
 class CurriculumTracker:
