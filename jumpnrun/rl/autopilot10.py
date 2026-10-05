@@ -230,6 +230,12 @@ def tick_a(state: dict) -> None:
     decision = dict(pa["regel"][key], fall=key)
     info["judged"] = {"verlust": loss, "sicher": safe, "basis": basis, "entscheidung": decision}
     state["b_plan"] = decision
+    fps = []
+    for run in runs.values():  # the speed assumption for the start checks of round B
+        secs = ROOT / run / "seconds_used"
+        if secs.exists() and float(secs.read_text() or 0) > 0:
+            fps.append((last_step(run) - START_STEPS) / float(secs.read_text()))
+    state["fps_a"] = sum(fps) / len(fps) if fps else None
     for run in runs.values():
         stop(run)
     note(state, f"Runde A entschieden: Alt-Verlust 2e-5 {loss.get('a_2e5', 0):+.1%}, 5e-5 {loss.get('a_5e5', 0):+.1%} "

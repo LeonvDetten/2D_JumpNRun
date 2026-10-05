@@ -248,7 +248,8 @@ class MixSource:
         return (level, tier, *rest)
 
     def feedback(self, level: Level, tier: int, won: bool, steps: int = 0, fresh: bool = True) -> None:
-        name = getattr(level, "mix_source", None)
+        # mid-start episodes (demos4 levels, chosen by the env, not by this source) are phase-8 data
+        name = getattr(level, "mix_source", None) or "p8"
         if name not in self.sources:
             return
         self.steps[name] += steps
