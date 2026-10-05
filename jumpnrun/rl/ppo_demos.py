@@ -45,9 +45,10 @@ class PPOWithDemos(PPO):
         self.bc2_a6_share = bc2_a6_share
         self.phase10_start = phase10_start
         self._demos2 = None
-        # phase 10 anchor (only active by rule): KL(teacher || policy) on states of won phase-8 episodes; the teacher
-        # is P8 with a small share eps on left+jump (so the anchor does not forbid it); the weight adapts so the
-        # measured KL stays near anchor_target_kl
+        # phase 10 anchor (only active by rule): KL(P8 || policy) on states of won phase-8 episodes, over the six
+        # old actions with the policy renormalised to them - left+jump is neither forbidden nor pushed (a fixed eps
+        # share for it pulled left+jump up wherever the policy had ~0 there); the weight adapts so the measured
+        # KL stays near anchor_target_kl. anchor_eps is kept for loading old models and is not used.
         self.anchor_path = anchor_path
         self.anchor_eps = anchor_eps
         self.anchor_coef = anchor_coef
@@ -92,16 +93,14 @@ class PPOWithDemos(PPO):
     def _load_anchor(self):
         if getattr(self, "_anchor", None) is None and getattr(self, "anchor_path", None):
             d = np.load(self.anchor_path)
-            p = torch.as_tensor(d["p8"])
-            eps = self.anchor_eps
-            teacher = torch.cat([p * (1 - eps), torch.full((len(p), 1), eps)], dim=1)
+            teacher = torch.as_tensor(d["p8"])
             self._anchor = {"grid": d["grid"], "vec": d["vec"], "overview": d["overview"], "teacher": teacher}
         return getattr(self, "_anchor", None)
 
     def _anchor_loss(self, data):
         idx = np.random.randint(0, len(data["vec"]), BC_BATCH)
         obs = _obs_tensors(data, idx)
-        logp = torch.log_softmax(self.policy.get_distribution(obs).distribution.logits, dim=1)
+        logp = torch.log_softmax(self.policy.get_distribution(obs).distribution.logits[:, :6], dim=1)
         t = data["teacher"][idx]
         return (t * (t.clamp_min(1e-8).log() - logp)).sum(1).mean()
 
