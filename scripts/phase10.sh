@@ -13,7 +13,7 @@ if [ -n "$RUNS" ] && [ ! -f runs/phase10/DONE ]; then
         ARGS=""
         for r in $RUNS; do ARGS="$ARGS --run $r"; done
         echo "$RUNS" > runs/phase10/eval_runs
-        OMP_NUM_THREADS=1 nohup nice -n 5 taskset -c 3 python3 -m jumpnrun.rl.milestones10 $ARGS \
+        OMP_NUM_THREADS=1 nohup nice -n 10 python3 -m jumpnrun.rl.milestones10 $ARGS \
             >> runs/phase10/milestones10.log 2>&1 &
     fi
 fi
