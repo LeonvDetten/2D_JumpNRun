@@ -1,0 +1,70 @@
+{
+ "phase": 10,
+ "stand": "2026-10-05, vor dem ersten Trainingsschritt (Plan freigegeben von Leon)",
+ "entscheidungen_leon": {
+  "startmodell": "phase8_final + grow_v3 (links+springen wie links)",
+  "p8_anteil_schritte": [0.45, 0.55, 0.60],
+  "anker": "nur nach Regel",
+  "runde_a": "2e-5 gegen 5e-5",
+  "ueben_test": "fester Wechsel, gleiche Menge",
+  "loesbarkeit": "blinder Zaehler, nur Summen",
+  "budget_stunden": 48,
+  "merge": "kein automatischer Merge, Leon entscheidet manuell"
+ },
+ "messung": {
+  "progress": "path", "path_time_factor": 1.2,
+  "klein": "EMA jede 1 Mio.: dev 16 je Level (Pruefung 32), v10-Proben kanal/umkehren/truhe_links stochastisch x2",
+  "voll": "EMA und EMA2 bei geraden Mio. seit Phasenstart: dev 32 (Pruefung 64), Waechter-Val 32, alle Proben det+stoch, Uebungsproben v11, Schutz, Test-Summen",
+  "roh": "Roh-Checkpoints bei ganzen Mio.: klein; alle 0,25 Mio.: Drift-KL",
+  "F": "0,5 * dev_neu + 0,5 * Mittel der stochastischen v10-Proben kanal, umkehren, truhe_links",
+  "alt": "dev_alt; sobald der Waechter gueltig ist: Mittel aus dev_alt und Waechter-Val",
+  "waechter_gueltig": "Waechter-Val trennt P8 von R1-Kontrolle EMA 54M um >= 8 Pp (64 Versuche je Level)"
+ },
+ "runde_a": {
+  "arme": {"a_2e5": 2e-5, "a_5e5": 5e-5},
+  "schritte_nach_warmup": 4000000, "critic_warmup": 150000, "ramp": 300000,
+  "daten": "100 % Phase-8-Level (v9 Stufen 0-12, pool 0,4, augment 0,7, plr 0,3, start-prob 0,2, rewind 0,4, Hand 0,05), --obs-v3 --path-delta, BC1 demos4 0,02, kein BC2, kein Anker",
+  "alt_verlust": "dev_alt gepoolt ueber EMA und roh bei +2/+3/+4 Mio. (Versuche zusammengezaehlt) minus Startmodell-Basis (3 volle Messungen gepoolt)",
+  "sicher_wenn_verlust_groesser_als": -0.03,
+  "regel": {
+   "5e5_sicher": {"lr_ueben": 5e-5, "lr_mischen1": 3e-5, "lr_mischen2": 2e-5, "anker": false},
+   "nur_2e5_sicher": {"lr_ueben": 3e-5, "lr_mischen1": 2e-5, "lr_mischen2": 2e-5, "anker": false},
+   "keine_sicher": {"lr_ueben": 3e-5, "lr_mischen1": 2e-5, "lr_mischen2": 2e-5, "anker": true}
+  },
+  "bremse": "keine (Lernrate ist die gepruefte Groesse); nur Katastrophen-Stopp"
+ },
+ "runde_b": {
+  "schritte": 10000000,
+  "mix_neu": [[0, {"skill": 0.55, "v10": 0.0, "p8": 0.45}], [3000000, {"skill": 0.25, "v10": 0.20, "p8": 0.55}], [6000000, {"skill": 0.10, "v10": 0.30, "p8": 0.60}]],
+  "mix_kontrolle": [[0, {"skill": 0.40, "v10": 0.10, "p8": 0.50}], [6000000, {"skill": 0.10, "v10": 0.30, "p8": 0.60}]],
+  "lr_stufen": "[0, lr_ueben], [3 Mio., lr_mischen1], [6 Mio., lr_mischen2] - in beiden Armen gleich",
+  "startpruefungen_bei_1mio": {"p_a6_nur_a6_anstieg_min": 0.05, "p_a6_alte_zustaende_max": 0.01, "anteil_abweichung_max_pp": 3, "bc1_uebereinstimmung_min": 0.90, "fps_min_anteil": 0.8},
+  "uebungsziel_nur_bericht": "je Art >= 70 % stochastisch v11-Proben und >= 60 % frische Trainingsquote, in >= 5 von 7 Arten",
+  "urteil": "Fenster +8/+9/+10 Mio., EMA und EMA2 gepoolt, gleiche Richtung in beiden. neu gewinnt bei F >= +5 Pp und Alt >= -3 Pp; Kontrolle spiegelbildlich; sonst kein Unterschied -> Arm mit hoeherem Alt geht weiter"
+ },
+ "runde_c": {
+  "schritte": 6000000,
+  "start": "EMA2 des B-Gewinners, 0,2 Mio. Rampe",
+  "regeln_in_reihenfolge": [
+   "0: beide B-Arme im Katastrophen-Stopp -> keine Runde C, P8 bleibt, Diagnose + Frage an Leon",
+   "1: Alt des Gewinners < P8-Basis - 3 Pp -> neu = Lernrate 1e-5, Phase-8-Anteil 75 %, Anker an; neu gewinnt bei Alt >= +3 Pp und F nicht >= 5 Pp schlechter",
+   "2: dev_neu < 25 % oder Kanal-Probe stochastisch < 50 % oder Uebungsziel verfehlt -> neu = DAgger + 30 % Uebung; neu gewinnt bei F >= +5 Pp und Alt nicht >= 3 Pp schlechter",
+   "3: beides gut -> neu = Phase-8-Anteil 50 %, lange v10 40 % (lief B mit Anker: neu = ohne Anker)"
+  ],
+  "lr": "2e-5 in beiden Armen (Fall 1 neu: 1e-5)"
+ },
+ "bremsen_b_c": {
+  "alt": "volle Messung (EMA+EMA2 gepoolt) dev_alt >= 8 Pp unter Startmodell-Basis, bestaetigt durch naechste Messung >= 6 Pp darunter",
+  "kl": "Roh-Drift-KL an 2 aufeinanderfolgenden Pruefungen > S_KL",
+  "S_KL": "Mittel aus P8-intern (0,0187) und R1-Kontrolle roh 53M (0,0867) = 0,0527",
+  "folge": "Lernrate halbieren (einmal je Runde, Untergrenze 1e-5), immer in beiden Armen",
+  "katastrophe": "dev_alt an 2 Messungen in Folge >= 15 Pp unter Startmodell-Basis -> Arm endet und verliert"
+ },
+ "endauswahl": {
+  "kandidaten": "voll gemessene EMA/EMA2 aus B und C",
+  "alt_tor": "3er-Nachbarschaftsfenster: dev_alt >= P8-Basis - 3 Pp und Waechter-Val >= P8 - 5 Pp",
+  "nachmessung": "Top 3 nach F, frische Seeds, doppelte Versuchszahl, P8 gepaart; Ausschluss bei Pruefung < P8 - 10 Pp; dann hoechstes F",
+  "kein_kandidat": "P8 bleibt, bester Kandidat nur berichtet"
+ },
+ "endauswertung": "final10.py einmal, gepaart mit P8: exam2 128, handmade8-versiegelt 4x32, handmade9-versiegelt 4x32, Pruefung 256; nur Gruppensummen; kein Merge"
+}
