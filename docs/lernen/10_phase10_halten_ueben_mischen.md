@@ -126,7 +126,23 @@ Leon entschied am 4./5. Oktober:
 
 ### Lehrer-Fenster
 
-- 05.10. ab 15:14, auf allen 4 Kernen, ohne Training parallel: 2500 Lehrer-Beispiele, Übungsproben v11,
-  Anker-Zustände und der BC2-Cache.
+- 05.10. 15:14–18:42 (3,5 h statt geplanter ≤ 3 h), auf allen 4 Kernen, ohne Training parallel:
+  - 2323 von 2500 Lehrer-Beispielen lösbar, mit 3748 links+springen-Schritten.
+  - Zusammen mit den Phase-9-Demos stehen 4554 links+springen-Samples im BC2-Strom (495 000 Samples insgesamt).
+    Das Ziel von 5000 wird knapp verfehlt.
+  - Übungsproben v11: 7 × 40.
+  - 489 reine links+springen-Zustände für die Startprüfung.
+  - 12 020 Anker-Zustände aus 87 gewonnenen Phase-8-Leveln.
+
+### Runde B
+
+- **Fehlstart 18:42:**
+  - Der Anker verlangte in jedem alten Zustand 2 % links+springen („ε-Lehrer“). Wo das Netz dort fast 0 % hatte,
+    ergab das schon beim Startmodell eine KL von 0,18, und das adaptive Gewicht sprang auf das Maximum 10. Der
+    Anker hätte links+springen überall hochgedrückt.
+  - Korrektur: Der Anker vergleicht nur die 6 alten Aktionen (Netz darauf renormiert). links+springen bleibt
+    frei; beim Startmodell liegt die Anker-KL jetzt bei 0,001.
+  - Beide Arme wurden nach 0,2 Mio. Schritten gestoppt und neu gestartet (alte Läufe: `runs/phase10/b_fehlstart`).
+- **Neustart 19:00**, Anker an, Lernraten 3e-5 → 2e-5 → 2e-5.
 
 *(Fortsetzung folgt.)*
