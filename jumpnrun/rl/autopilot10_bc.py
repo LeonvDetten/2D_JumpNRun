@@ -469,16 +469,18 @@ def tick(state: dict, hours: float) -> None:
         else:
             tick_c(state, hours)
     elif stage == "auswahl":
-        print("Auswahl/Endauswertung: select10/final10 werden während Runde B/C gebaut.")
+        from jumpnrun.rl import select10
+
+        select10.tick(state)
     elif stage == "halt":
         print("Autopilot angehalten:", state["log"][-1] if state["log"] else "")
 
 
 def current_runs(state: dict) -> list:
     stage = state["stage"]
-    if stage == "B" or (stage in ("C", "halt") and "B" in state["rounds"]):
+    if stage == "B" or (stage in ("C", "halt", "auswahl") and "B" in state["rounds"]):
         runs = list(b_runs().values())
-        if stage == "C":
+        if stage in ("C", "auswahl"):
             runs += [r for r in state.get("c_runs", {}).values()]
         return runs
     return []
