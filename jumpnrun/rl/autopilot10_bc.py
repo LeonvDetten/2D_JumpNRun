@@ -424,7 +424,12 @@ def tick_c(state: dict, hours: float) -> None:
                       f"Start {state['c_start']}")
     rule = info["regel"]
     if rule["neu"].get("dagger") and not (DAGGER / "done.json").exists():
-        print("Runde C (Fall 2) wartet auf die Korrektur-Beispiele (runs/dagger10).")
+        if not A.running("scripts/dagger10.py"):  # own 4-core window before round C, never next to training
+            DAGGER.mkdir(parents=True, exist_ok=True)
+            subprocess.Popen(["nice", "-n", "5", sys.executable, "scripts/dagger10.py", state["c_start"], "1500"],
+                             cwd=A.ROOT, start_new_session=True, stdout=open(DAGGER / "run.log", "a"),
+                             stderr=subprocess.STDOUT)
+            A.note(state, "Runde C (Fall 2): Korrektur-Beispiele (DAgger) gestartet, 4 Kerne")
         return
     if (rule["neu"].get("anker") or rule["kontrolle"].get("anker")) and not anchor_available():
         print("Runde C braucht den Anker, aber runs/phase10/anchor_states.npz fehlt -> wartet.")
