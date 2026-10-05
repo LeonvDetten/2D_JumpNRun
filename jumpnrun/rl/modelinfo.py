@@ -35,7 +35,8 @@ def env_kwargs(model) -> dict:
     return dict(action_repeat=getattr(model, "action_repeat", ACTION_REPEAT),
                 overview="overview" in model.observation_space.spaces,
                 obs_v2=model.observation_space["vec"].shape[0] > 15,
-                obs_v3=model.observation_space["vec"].shape[0] > 21)
+                obs_v3=model.observation_space["vec"].shape[0] > 21,
+                progress="path")  # phase 10: measurement counts "stuck" along the way, not along x
 
 
 def load_model(model_path):
