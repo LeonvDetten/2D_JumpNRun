@@ -43,6 +43,7 @@ from jumpnrun.core.level import Level
 from jumpnrun.core.sim import Simulation, Status
 
 REWIND_TIER = -3  # same value as jumpnrun.rl.curriculum.REWIND_TIER
+MID_START_TIER = -2  # same value as jumpnrun.rl.curriculum.MID_START_TIER
 
 VIEW_BEHIND = 5
 VIEW_AHEAD = 19
@@ -266,7 +267,11 @@ class JumpNRunEnv(gym.Env):
         if terminated or truncated:
             feedback = getattr(self.level_source, "feedback", None)
             if feedback is not None:
-                feedback(sim.level, self.origin_tier, status == Status.WON)
+                fresh = self.rewind_depth == 0 and self.tier not in (REWIND_TIER, MID_START_TIER)
+                try:  # phase 10: the mix source counts steps per source
+                    feedback(sim.level, self.origin_tier, status == Status.WON, steps=self.steps, fresh=fresh)
+                except TypeError:
+                    feedback(sim.level, self.origin_tier, status == Status.WON)
             info["episode_end"] = {
                 "outcome": status.value if status != Status.RUNNING else ("stuck" if stuck else "timeout"),
                 "won": status == Status.WON,
@@ -282,6 +287,9 @@ class JumpNRunEnv(gym.Env):
                 "rewind_depth": self.rewind_depth,
                 "source": getattr(sim.level, "source", None),
                 "aug": getattr(sim.level, "augmentations", None) or [],
+                "mix": getattr(sim.level, "mix_source", None),
+                "kind": getattr(sim.level, "skill_kind", None),
+                "difficulty": getattr(sim.level, "difficulty", None),
             }
         return self._observe(), float(reward), terminated, truncated, info
 
@@ -291,6 +299,12 @@ class JumpNRunEnv(gym.Env):
         if self.best_dist is not None and self.start_dist:
             return max(0.0, min(1.0, 1.0 - self.best_dist / self.start_dist))
         return min(1.0, self.sim.max_x / max(1, self.sim.level.goal_x))
+
+    def set_mix_stage(self, idx: int) -> None:
+        """Called by the MixScheduler callback (phase 10)."""
+
+        if hasattr(self.level_source, "set_mix_stage"):
+            self.level_source.set_mix_stage(idx)
 
     def set_tier_weights(self, weights) -> None:
         """Called by the curriculum (training process) to steer level difficulty."""
