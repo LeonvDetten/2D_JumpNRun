@@ -102,4 +102,31 @@ Leon entschied am 4./5. Oktober:
   - Vermutete Ursache ist die geänderte Belohnung: Weg-Belohnung statt Rechts-Belohnung, mit der Phase 8 trainiert
     wurde. Die Lernrate allein erklärt die Drift nicht.
 
+- **Tempo:**
+  - Bei der kleinen Lernrate erreicht PPO die KL-Abbruchschwelle (`target_kl`) nie, deshalb laufen in jedem Update
+    alle Epochen. Etwa 85 % der Zeit gehen ins Update, die Arme schaffen 190–240 Schritte/s statt 430 in Phase 9.
+  - Zusätzlich bremste ein auf Kern 3 gepinnter Auswerter den Arm, der sich diesen Kern teilte: Mit 2 Threads
+    wartet jeder Schritt auf den langsamsten. Der Auswerter läuft seitdem mit nice 10 auf allen Kernen.
+- **Urteil (05.10. 15:14, nach Regel):**
+
+  | Arm | Alt-Verlust (dev_alt, EMA + roh, +2/+3/+4 Mio.) | Wächter-Val bei +4 Mio. | Drift-KL am Ende |
+  |---|---|---|---|
+  | 2e-5 | −3,8 Pp | 63 % (EMA) / 59 % (EMA2) | 0,24 |
+  | 5e-5 | −3,2 Pp | 57 % / 62 % | 0,22 |
+
+  Startmodell 67,7 %, P8 auf dem Wächter 77 %. → **Keine Lernrate sicher** → Runde B mit **Anker** in beiden Armen,
+  Lernraten 3e-5 → 2e-5 → 2e-5.
+- **Was wir daraus lernen:**
+  - Die Lernrate war nicht der Hebel, die doppelte Rate verlor sogar etwas weniger.
+  - Auch mit nur Phase-8-Leveln und kleiner Lernrate entfernt sich das Netz breit vom Phase-8-Verhalten.
+  - Am deutlichsten zeigt sich das auf den langen Wächter-Leveln (−15 bis −20 Pp).
+  - Hauptverdacht ist der Wechsel von der Rechts-Belohnung (mit ihr lernte Phase 8) auf die Weg-Belohnung mit dem
+    neuen Zeitlimit.
+  - Ohne den Wächter wäre der Einbruch auf langen Leveln unsichtbar geblieben; dev_alt allein zeigte nur −3 bis −4 Pp.
+
+### Lehrer-Fenster
+
+- 05.10. ab 15:14, auf allen 4 Kernen, ohne Training parallel: 2500 Lehrer-Beispiele, Übungsproben v11,
+  Anker-Zustände und der BC2-Cache.
+
 *(Fortsetzung folgt.)*
