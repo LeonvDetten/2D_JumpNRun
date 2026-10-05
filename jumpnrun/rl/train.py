@@ -46,9 +46,19 @@ def make_env(rank: int, seed: int, min_tier: int, max_tier: int, handmade_paths,
              stuck_death: bool = False, plr: float = 0.0, env_extra=None, source_extra=None):
     def _init():
         handmade = [Level.from_file(p) for p in handmade_paths]
+        extra = dict(source_extra or {})
+        mix = extra.pop("mix", None)
         source = CurriculumSource(min_tier, max_tier, handmade, handmade_prob, pool_dir=pool_dir,
                                   start_prob=start_prob, start_dirs=start_dirs, pool_share=pool_share,
-                                  augment_prob=augment_prob, plr=plr, **(source_extra or {}))
+                                  augment_prob=augment_prob, plr=plr, **extra)
+        if mix:  # phase 10: phase-8 levels + long v10 levels + practice levels, mixed by steps
+            from jumpnrun.levelgen.generator import NUM_TIERS
+            from jumpnrun.levelgen.skills import SkillSource
+            from jumpnrun.rl.curriculum import MixSource
+
+            v10 = CurriculumSource(10, 13, pool_share=1.0, augment_prob=augment_prob, plr=plr, gen_variant="v10")
+            v10.weights = [1.0 if t >= 10 else 0.0 for t in range(NUM_TIERS)]
+            source = MixSource({"p8": source, "v10": v10, "skill": SkillSource()}, mix)
         return JumpNRunEnv(source, seed=seed * 1000 + rank, action_repeat=action_repeat, overview=overview,
                            rewind_prob=rewind_prob, obs_v2=obs_v2, stuck_death=stuck_death, **(env_extra or {}))
 
@@ -174,6 +184,10 @@ def main() -> None:
     parser.add_argument("--augment-v2", action="store_true",
                         help="phase 9: augmentation V2 (mirror, enemy density, noise, concatenated levels)")
     parser.add_argument("--lr-plan", help="phase 10: JSON (or file) with learning-rate stages, critic warm-up and ramp")
+    parser.add_argument("--mix-schedule", help="phase 10: JSON (or file) [[steps, {p8/v10/skill: share}], ...]")
+    parser.add_argument("--demos2", nargs="*", default=[], help="phase 10: demo dirs for the second BC stream")
+    parser.add_argument("--bc2-plan", help="phase 10: JSON [[steps, coef], ...] for the second BC stream")
+    parser.add_argument("--bc2-a6-share", type=float, default=0.05)
     parser.add_argument("--path-delta", action="store_true",
                         help="phase 9: way reward as potential difference (closer +, further away -)")
     parser.add_argument("--path-reward", action="store_true",
@@ -204,13 +218,17 @@ def main() -> None:
     run_dir.mkdir(parents=True, exist_ok=True)
     torch.set_num_threads(args.threads or os.cpu_count() or 1)
 
+    def _json_arg(value):
+        return json.loads(Path(value).read_text() if Path(value).exists() else value) if value else None
+
+    mix_schedule = _json_arg(args.mix_schedule)
     handmade_paths = sorted(p for pattern in args.handmade for p in glob.glob(pattern))
     env_fns = [
         make_env(i, args.seed, args.min_tier, args.max_tier, handmade_paths, args.handmade_prob,
                  args.action_repeat, args.pool, args.overview, args.start_prob, tuple(args.start_dirs),
                  args.rewind_prob, args.pool_share, args.augment, args.obs_v2, args.stuck_death, args.plr,
                  env_extra=dict(obs_v3=args.obs_v3, path_reward=args.path_reward, path_delta=args.path_delta),
-                 source_extra=dict(gen_variant=args.generator, augment_v2=args.augment_v2))
+                 source_extra=dict(gen_variant=args.generator, augment_v2=args.augment_v2, mix=mix_schedule))
         for i in range(args.envs)
     ]
     # the game is so fast that the network update dominates; one process is usually best
@@ -267,6 +285,9 @@ def main() -> None:
 
         algo = PPOWithDemos
         extra = dict(demo_path=args.demos, bc_coef=args.bc_coef, bc_decay=args.bc_decay, bc_min=args.bc_min)
+        if args.demos2:
+            extra.update(demo2_paths=list(args.demos2), bc2_plan=_json_arg(args.bc2_plan),
+                         bc2_a6_share=args.bc2_a6_share, phase10_start=phase_start)
     hyper = dict(
         learning_rate=(staged_schedule(lr_plan, args.target, phase_start, run_dir) if lr_plan else
                        cosine_schedule(args.lr, args.lr_decay_steps, args.target, phase_start)
@@ -326,6 +347,10 @@ def main() -> None:
     ]
     if args.time_limit_hours:
         callbacks.append(TimeLimit(run_dir, args.time_limit_hours))
+    if mix_schedule:
+        from jumpnrun.rl.callbacks import MixScheduler
+
+        callbacks.append(MixScheduler(phase_start, [m[0] for m in mix_schedule]))
     if lr_plan and lr_plan.get("critic_warmup"):
         from jumpnrun.rl.callbacks import CriticWarmup
 

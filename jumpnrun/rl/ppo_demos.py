@@ -20,10 +20,30 @@ from jumpnrun.imitation.demos import cached_dataset
 BC_BATCH = 256
 
 
+def bc2_dataset(dirs) -> dict:
+    """Phase 10: the BC2 samples of all demos*.jsonl in `dirs`, cached by a hash of the file list and sizes
+    (prebuilt in the demo window: `python3 -c "from jumpnrun.rl.ppo_demos import bc2_dataset; bc2_dataset([...])"`)."""
+
+    import hashlib
+
+    files = sorted(f for d in dirs for f in Path(d).glob("demos*.jsonl"))
+    key = hashlib.sha256("|".join(f"{f}:{f.stat().st_size}" for f in files).encode()).hexdigest()[:16]
+    cache = Path(dirs[0]) / f"bc2_{key}.npz"
+    return dict(cached_dataset(files, cache, max_samples=10**7, overview=True, shuffle=True, obs_v3=True))
+
+
 class PPOWithDemos(PPO):
     def __init__(self, *args, demo_path=None, bc_coef: float = 0.5, bc_decay: float = 0.99,
-                 bc_min: float = 0.02, **kwargs):
+                 bc_min: float = 0.02, demo2_paths=None, bc2_plan=None, bc2_a6_share: float = 0.05,
+                 phase10_start: int = 0, **kwargs):
         self.demo_path = demo_path
+        # phase 10: a second demo stream (BC2: teacher demos with left+jump on practice levels) with its own weight
+        # by stage ([[steps since phase10_start, coef], ...]); left+jump samples drawn with share bc2_a6_share
+        self.demo2_paths = demo2_paths
+        self.bc2_plan = bc2_plan
+        self.bc2_a6_share = bc2_a6_share
+        self.phase10_start = phase10_start
+        self._demos2 = None
         self.bc_coef = bc_coef
         self.bc_decay = bc_decay
         self.bc_min = bc_min
@@ -32,7 +52,7 @@ class PPOWithDemos(PPO):
         super().__init__(*args, **kwargs)
 
     def _excluded_save_params(self):
-        return super()._excluded_save_params() + ["_demos", "bc_paused"]
+        return super()._excluded_save_params() + ["_demos", "_demos2", "bc_paused"]
 
     def _load_demos(self):
         if self._demos is None and self.demo_path:
@@ -52,6 +72,33 @@ class PPOWithDemos(PPO):
                 self._demos["vec"] = np.pad(self._demos["vec"], ((0, 0), (0, want - have)))
         return self._demos
 
+    def _load_demos2(self):
+        if getattr(self, "_demos2", None) is None and getattr(self, "demo2_paths", None):
+            data = bc2_dataset(self.demo2_paths)
+            data["allowed_t"] = torch.as_tensor(data["allowed"].astype(np.int64))
+            data["a6_idx"] = np.nonzero(data["action"] == 6)[0]
+            self._demos2 = data
+        return getattr(self, "_demos2", None)
+
+    def bc2_coef(self) -> float:
+        plan = getattr(self, "bc2_plan", None)
+        if not plan:
+            return 0.0
+        rel = self.num_timesteps - getattr(self, "phase10_start", 0)
+        coef = 0.0
+        for start, value in sorted(plan):
+            if rel >= start:
+                coef = value
+        return coef
+
+    def _bc2_batch(self, data):
+        n = len(data["action"])
+        idx = np.random.randint(0, n, BC_BATCH)
+        if len(data["a6_idx"]) and self.bc2_a6_share:
+            k = np.random.rand(BC_BATCH) < self.bc2_a6_share
+            idx[k] = np.random.choice(data["a6_idx"], int(k.sum()))
+        return _obs_tensors(data, idx), data["allowed_t"][idx]
+
     def train(self) -> None:
         super().train()
         demos = self._load_demos()
@@ -63,11 +110,21 @@ class PPOWithDemos(PPO):
         batches = max(1, self.n_epochs * (self.n_steps * self.n_envs // self.batch_size) // 2)
         losses, accs = [], []
         self.policy.set_training_mode(True)
+        coef2 = self.bc2_coef()
+        demos2 = self._load_demos2() if coef2 > 0 else None
+        losses2, accs2 = [], []
         for _ in range(batches):
             idx = np.random.randint(0, n, BC_BATCH)
             loss, acc = bc_loss(self.policy, _obs_tensors(demos, idx), self._demo_allowed[idx])
+            total = coef * loss
+            if demos2 is not None:
+                obs2, allowed2 = self._bc2_batch(demos2)
+                loss2, acc2 = bc_loss(self.policy, obs2, allowed2)
+                total = total + coef2 * loss2
+                losses2.append(loss2.item())
+                accs2.append(acc2.item())
             self.policy.optimizer.zero_grad()
-            (coef * loss).backward()
+            total.backward()
             torch.nn.utils.clip_grad_norm_(self.policy.parameters(), self.max_grad_norm)
             self.policy.optimizer.step()
             losses.append(loss.item())
@@ -75,3 +132,7 @@ class PPOWithDemos(PPO):
         self.logger.record("vorbild/gewicht", coef)
         self.logger.record("vorbild/verlust", float(np.mean(losses)))
         self.logger.record("vorbild/uebereinstimmung", float(np.mean(accs)))
+        if losses2:
+            self.logger.record("vorbild2/gewicht", coef2)
+            self.logger.record("vorbild2/verlust", float(np.mean(losses2)))
+            self.logger.record("vorbild2/uebereinstimmung", float(np.mean(accs2)))
