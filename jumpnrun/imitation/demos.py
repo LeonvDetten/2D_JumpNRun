@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import random
 from multiprocessing import Pool
 from pathlib import Path
@@ -109,8 +110,81 @@ def equivalent_actions(sim: Simulation, action: int, repeat: int, n_actions: int
     return sum(1 << a for a, r in enumerate(results) if r == target)
 
 
+def _render_demo(demo: dict, rng: random.Random, out: dict, overview: bool, obs_v3: bool, thin_flat: float,
+                 progress: str) -> bool:
+    """Replay one demo and append its labelled (observation, label-set) samples to the lists in `out`.
+
+    progress="x": the simulation is stepped directly, the env's step bookkeeping stays at the start of the
+    episode (vec[16] = 0, vec[17] = 1 in every sample - how the phase 5-10 caches were built).
+    progress="path" (Neustart arm) also replays strictly:
+    - every action goes through env.step with the way-distance bookkeeping of training (--path-delta), so
+      vec[16] (steps without progress) and vec[17] (time left) are those the bot would see at this point of
+      the run; truncation (stuck / time limit) does not stop the replay;
+    - mirrored phase-9 demos ("spiegel") get their enemy directions back (augment sets -1, the stored level
+      text cannot hold it; without it 34 of 51 replays failed);
+    - a demo stored as won that does not win on replay is dropped (returns False).
+    """
+
+    from jumpnrun.rl.env import JumpNRunEnv, fixed_levels
+
+    right_only = 1 << 2
+    strict = progress == "path"
+    level = generate(demo["tier"], demo["seed"]) if "level" not in demo else Level.from_text(demo["level"])
+    if strict and demo.get("kind") == "spiegel" and level.enemy_spawns:
+        level.enemy_directions = [-1] * len(level.enemy_spawns)
+    repeat = demo["repeat"]
+    env = JumpNRunEnv(fixed_levels([level]), action_repeat=repeat, overview=overview, obs_v3=obs_v3,
+                      progress=progress)
+    env.reset(seed=0)
+    sim = env.sim
+    streak = 0
+    mine = {k: [] for k in out} if strict else out
+    for action, labelled in zip(demo["actions"], demo["mask"]):
+        if labelled:
+            eq = equivalent_actions(sim, action, repeat, len(BOT_ACTIONS_V3) if obs_v3 else len(BOT_ACTIONS))
+            streak = streak + 1 if eq == right_only else 0
+            if not (streak > 2 and rng.random() < thin_flat):
+                obs = env.observe()
+                mine["grid"].append(obs["grid"].astype(np.int8))
+                mine["vec"].append(obs["vec"])
+                if overview:
+                    mine["overview"].append(np.rint(obs["overview"] * 4).astype(np.uint8))
+                mine["action"].append(action)
+                mine["allowed"].append(eq)
+        if strict:
+            env.step(action)
+        else:
+            sim.step(BOT_ACTIONS_V3[action], frames=repeat)
+        if sim.status != Status.RUNNING:
+            break
+    if not strict:
+        return True
+    if demo.get("won") and sim.status != Status.WON:
+        return False
+    for k in out:
+        out[k].extend(mine[k])
+    return True
+
+
+def _stack(out: dict, overview: bool) -> dict:
+    data = dict(grid=np.stack(out["grid"]), vec=np.stack(out["vec"]).astype(np.float32),
+                action=np.array(out["action"], np.int64), allowed=np.array(out["allowed"], np.uint8))
+    if overview:
+        data["overview"] = np.stack(out["overview"])
+    return data
+
+
+def _render_chunk(job):
+    demos, seed, overview, obs_v3, thin_flat, progress = job
+    rng = random.Random(seed)
+    out = {k: [] for k in ("grid", "vec", "overview", "action", "allowed")}
+    dropped = sum(not _render_demo(demo, rng, out, overview, obs_v3, thin_flat, progress) for demo in demos)
+    return (_stack(out, overview) if out["action"] else {}), dropped
+
+
 def load_dataset(paths, max_samples: int = 800_000, thin_flat: float = 2 / 3, seed: int = 0,
-                 overview: bool = False, shuffle: bool = False, obs_v3: bool = False):
+                 overview: bool = False, shuffle: bool = False, obs_v3: bool = False, progress: str = "x",
+                 procs: int = 1):
     """Rebuild (observation, label-set) samples from demo files.
 
     Returns dict with grid (int8, N x 4 x 13 x 25), vec (float32, N x 15),
@@ -119,48 +193,42 @@ def load_dataset(paths, max_samples: int = 800_000, thin_flat: float = 2 / 3, se
     With overview=True also `overview` (uint8 quarters, N x 4 x 13 x 32).
     obs_v3=True (phase 9): the wider view behind (grid 33 columns, overview 40, vec 23).
     shuffle=True mixes the demos of all files first, so max_samples does not cut off the last file.
+    progress="path" (Neustart arm): replay through env.step, see _render_demo.
+    procs > 1: render all demos in chunks on several processes, then cut to max_samples (thinning draws from
+    one random stream per chunk, so the result differs from procs=1 but is deterministic for a given procs).
     """
 
-    from jumpnrun.rl.env import JumpNRunEnv, fixed_levels
-
     rng = random.Random(seed)
-    grids, vecs, overviews, acts, allowed = [], [], [], [], []
-    right_only = 1 << 2
     demos = []
     for path in paths:
         with open(path, encoding="utf-8") as f:
             demos += [json.loads(line) for line in f if line.strip()]
     if shuffle:
         rng.shuffle(demos)
+    if procs > 1:  # ordered chunks of 50 demos; stop once max_samples are rendered (memory: ~4 kB per sample)
+        jobs = [(demos[i:i + 50], f"{seed}:{i}", overview, obs_v3, thin_flat, progress)
+                for i in range(0, len(demos), 50)]
+        parts, total, dropped = [], 0, 0
+        with Pool(procs) as workers:
+            for part, n in workers.imap(_render_chunk, jobs):
+                dropped += n
+                if part:
+                    parts.append(part)
+                    total += len(part["action"])
+                if total >= max_samples:
+                    break
+        if dropped:
+            print(f"load_dataset: {dropped} demos dropped (stored as won, no win on replay)", flush=True)
+        return {k: np.concatenate([p[k] for p in parts])[:max_samples] for k in parts[0]}
+    out = {k: [] for k in ("grid", "vec", "overview", "action", "allowed")}
+    dropped = 0
     for demo in demos:
-        level = generate(demo["tier"], demo["seed"]) if "level" not in demo else Level.from_text(demo["level"])
-        repeat = demo["repeat"]
-        env = JumpNRunEnv(fixed_levels([level]), action_repeat=repeat, overview=overview, obs_v3=obs_v3)
-        env.reset(seed=0)
-        sim = env.sim
-        streak = 0
-        for action, labelled in zip(demo["actions"], demo["mask"]):
-            if labelled:
-                eq = equivalent_actions(sim, action, repeat, len(BOT_ACTIONS_V3) if obs_v3 else len(BOT_ACTIONS))
-                streak = streak + 1 if eq == right_only else 0
-                if not (streak > 2 and rng.random() < thin_flat):
-                    obs = env.observe()
-                    grids.append(obs["grid"].astype(np.int8))
-                    vecs.append(obs["vec"])
-                    if overview:
-                        overviews.append(np.rint(obs["overview"] * 4).astype(np.uint8))
-                    acts.append(action)
-                    allowed.append(eq)
-            sim.step(BOT_ACTIONS_V3[action], frames=repeat)
-            if sim.status != Status.RUNNING:
-                break
-        if len(acts) >= max_samples:
+        dropped += not _render_demo(demo, rng, out, overview, obs_v3, thin_flat, progress)
+        if len(out["action"]) >= max_samples:
             break
-    data = dict(grid=np.stack(grids), vec=np.stack(vecs).astype(np.float32),
-                action=np.array(acts, np.int64), allowed=np.array(allowed, np.uint8))
-    if overview:
-        data["overview"] = np.stack(overviews)
-    return data
+    if dropped:
+        print(f"load_dataset: {dropped} demos dropped (stored as won, no win on replay)", flush=True)
+    return _stack(out, overview)
 
 
 def cached_dataset(demo_files, cache: Path, **kwargs):
@@ -170,7 +238,10 @@ def cached_dataset(demo_files, cache: Path, **kwargs):
         data = np.load(cache)
         return {k: data[k] for k in data.files}
     data = load_dataset(demo_files, **kwargs)
-    np.savez_compressed(cache, **data)
+    tmp = cache.with_name(cache.name + ".tmp")  # atomic: a restart never finds a half-written cache
+    with open(tmp, "wb") as f:
+        np.savez_compressed(f, **data)
+    os.replace(tmp, cache)
     return data
 
 

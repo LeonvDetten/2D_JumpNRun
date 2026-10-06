@@ -214,11 +214,15 @@ class MixSource:
     in the current stage, so the shares hold in steps although practice episodes are much shorter.
     """
 
-    def __init__(self, sources: dict, schedule: list):
+    def __init__(self, sources: dict, schedule: list, gates: dict = None):
         self.sources = sources
         self.schedule = sorted(([int(a), dict(b)] for a, b in schedule), key=lambda x: x[0])
         self.stage = 0
         self.steps = {n: 0 for n in sources}
+        # Neustart arm: {"v10": 10} - a source only plays once the tier curriculum of the phase-8 source has
+        # unlocked that tier (a fresh net cannot play long v10 levels); until then its share goes to the others
+        self.gates = dict(gates or {})
+        self.unlocked = None
 
     @property
     def weights(self):
@@ -227,6 +231,20 @@ class MixSource:
     @weights.setter
     def weights(self, value):  # the tier curriculum only steers the phase-8 source
         self.sources["p8"].weights = value
+        if self.gates:
+            unlocked = max((t for t, w in enumerate(value) if w > 0), default=-1)
+            if unlocked != self.unlocked:
+                was = self._open()
+                self.unlocked = unlocked
+                if self._open() != was:  # a source opens: no catch-up burst of its share
+                    self.steps = {n: 0 for n in self.sources}
+
+    def _open(self) -> set:
+        return {n for n, tier in self.gates.items() if self.unlocked is not None and self.unlocked >= tier}
+
+    def set_skill_state(self, levels: dict, p: dict) -> None:
+        if "skill" in self.sources:
+            self.sources["skill"].set_state(levels, p)
 
     def set_mix_stage(self, idx: int) -> None:
         if idx != self.stage:
@@ -234,7 +252,13 @@ class MixSource:
             self.steps = {n: 0 for n in self.sources}
 
     def shares(self) -> dict:
-        return self.schedule[min(self.stage, len(self.schedule) - 1)][1]
+        shares = self.schedule[min(self.stage, len(self.schedule) - 1)][1]
+        if not self.gates:
+            return shares
+        open_ = self._open()
+        shares = {n: v for n, v in shares.items() if n not in self.gates or n in open_}
+        total = sum(shares.values())
+        return {n: v / total for n, v in shares.items()} if total > 0 else shares
 
     def __call__(self, rng: random.Random):
         shares = {n: v for n, v in self.shares().items() if v > 0 and n in self.sources}

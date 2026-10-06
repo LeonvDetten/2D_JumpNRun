@@ -48,6 +48,7 @@ def make_env(rank: int, seed: int, min_tier: int, max_tier: int, handmade_paths,
         handmade = [Level.from_file(p) for p in handmade_paths]
         extra = dict(source_extra or {})
         mix = extra.pop("mix", None)
+        gates = extra.pop("mix_gates", None)
         source = CurriculumSource(min_tier, max_tier, handmade, handmade_prob, pool_dir=pool_dir,
                                   start_prob=start_prob, start_dirs=start_dirs, pool_share=pool_share,
                                   augment_prob=augment_prob, plr=plr, **extra)
@@ -58,11 +59,21 @@ def make_env(rank: int, seed: int, min_tier: int, max_tier: int, handmade_paths,
 
             v10 = CurriculumSource(10, 13, pool_share=1.0, augment_prob=augment_prob, plr=plr, gen_variant="v10")
             v10.weights = [1.0 if t >= 10 else 0.0 for t in range(NUM_TIERS)]
-            source = MixSource({"p8": source, "v10": v10, "skill": SkillSource()}, mix)
+            source = MixSource({"p8": source, "v10": v10, "skill": SkillSource()}, mix, gates=gates)
         return JumpNRunEnv(source, seed=seed * 1000 + rank, action_repeat=action_repeat, overview=overview,
                            rewind_prob=rewind_prob, obs_v2=obs_v2, stuck_death=stuck_death, **(env_extra or {}))
 
     return _init
+
+
+def _zip_ok(path: Path) -> bool:
+    import zipfile
+
+    try:
+        with zipfile.ZipFile(path) as z:
+            return z.testzip() is None
+    except (zipfile.BadZipFile, OSError):
+        return False
 
 
 def cosine_schedule(start: float, decay_steps: int, target: int, phase_start: int, end_fraction: float = 0.1):
@@ -89,7 +100,9 @@ def staged_schedule(plan: dict, target: int, phase_start: int, run_dir: Path):
     the rate by writing runs/<arm>/lr_scale.json ({"scale": 0.5}); it is re-read every 50 updates.
     """
 
-    stages = sorted((int(a), float(b)) for a, b in plan["stages"])
+    stages = sorted((int(a), float(b)) for a, b in plan.get("stages", [[0, 0.0]]))
+    # Neustart arm: {"cosine": [start, end, decay_steps]} instead of stages - one cosine over the whole run
+    cosine = plan.get("cosine")
     warm = int(plan.get("critic_warmup", 0))
     ramp = int(plan.get("ramp", 0))
     scale_path = run_dir / "lr_scale.json"
@@ -107,6 +120,12 @@ def staged_schedule(plan: dict, target: int, phase_start: int, run_dir: Path):
         for start, value in stages:
             if rel >= start:
                 lr = value
+        if cosine:
+            import math
+
+            lr0, lr1, span = float(cosine[0]), float(cosine[1]), float(cosine[2])
+            x = min(1.0, max(0.0, rel / span))
+            lr = lr1 + (lr0 - lr1) * 0.5 * (1 + math.cos(math.pi * x))
         if ramp and rel >= warm:
             lr *= min(1.0, max(0.02, (rel - warm) / ramp))
         return lr * state["scale"]
@@ -190,6 +209,21 @@ def main() -> None:
     parser.add_argument("--bc2-a6-share", type=float, default=0.05)
     parser.add_argument("--anchor", action="store_true",
                         help="phase 10 (only by rule): KL anchor to P8 on runs/phase10/anchor_states.npz")
+    parser.add_argument("--mix-gates", help="Neustart: JSON {source: tier}, e.g. {\"v10\": 10} - a mix source "
+                                            "only plays once the tier curriculum has unlocked that tier")
+    parser.add_argument("--skill-central", action="store_true",
+                        help="Neustart: practice difficulty pooled over all envs in the training process and "
+                             "saved in curriculum.json (phase 10: per env, lost on restart)")
+    parser.add_argument("--tracker-p8-only", action="store_true",
+                        help="Neustart: only episodes of the phase-8 mix source steer the tier curriculum")
+    parser.add_argument("--demo-progress", choices=("x", "path"), default="x",
+                        help="Neustart: render the BC1/BC2 demos with the training bookkeeping (own caches)")
+    parser.add_argument("--kickstart", help="Neustart arm B: teacher model (models/phase8_final.zip) for "
+                                            "kickstarting on the policy's own phase-8-level states")
+    parser.add_argument("--kickstart-plan", help="Neustart: JSON [[steps, coef], ...], linear in between")
+    parser.add_argument("--channels-last", action="store_true",
+                        help="Neustart: conv weights in channels_last memory format (~1.5x faster update, "
+                             "same results up to float rounding; saved checkpoints load as usual)")
     parser.add_argument("--path-delta", action="store_true",
                         help="phase 9: way reward as potential difference (closer +, further away -)")
     parser.add_argument("--path-reward", action="store_true",
@@ -230,7 +264,8 @@ def main() -> None:
                  args.action_repeat, args.pool, args.overview, args.start_prob, tuple(args.start_dirs),
                  args.rewind_prob, args.pool_share, args.augment, args.obs_v2, args.stuck_death, args.plr,
                  env_extra=dict(obs_v3=args.obs_v3, path_reward=args.path_reward, path_delta=args.path_delta),
-                 source_extra=dict(gen_variant=args.generator, augment_v2=args.augment_v2, mix=mix_schedule))
+                 source_extra=dict(gen_variant=args.generator, augment_v2=args.augment_v2, mix=mix_schedule,
+                                   mix_gates=_json_arg(args.mix_gates)))
         for i in range(args.envs)
     ]
     # the game is so fast that the network update dominates; one process is usually best
@@ -240,10 +275,18 @@ def main() -> None:
     tracker = CurriculumTracker(args.min_tier, args.max_tier)
     if args.unlock_all:
         tracker.unlocked = args.max_tier
+    if args.skill_central:
+        from jumpnrun.levelgen.skills import SkillTracker
+
+        tracker.skill = SkillTracker()
     config_path = run_dir / "config.json"
     old_config = json.loads(config_path.read_text()) if config_path.exists() else {}
     if args.target:
         checkpoints = sorted((run_dir / "checkpoints").glob("step_*.zip"))
+        while checkpoints and not _zip_ok(checkpoints[-1]):  # a kill while saving leaves a broken zip
+            print(f"Skipping broken checkpoint {checkpoints[-1].name}")
+            checkpoints[-1].rename(checkpoints[-1].with_suffix(".broken"))
+            checkpoints.pop()
         if checkpoints:
             args.resume = str(checkpoints[-1])
             done = int(checkpoints[-1].stem.split("_")[1])
@@ -254,6 +297,8 @@ def main() -> None:
                 tracker.success = (state["success"] + [0.0] * n)[:n]
                 tracker.episodes = (state["episodes"] + [0] * n)[:n]
                 tracker.unlocked = max(args.min_tier, min(state["unlocked"], args.max_tier))
+                if getattr(tracker, "skill", None) is not None and "skill" in state:
+                    tracker.skill.load(state["skill"])
         else:
             done = int(PPO.load(args.resume, device="cpu").num_timesteps) if args.resume else 0
         args.steps = args.target - done
@@ -286,12 +331,16 @@ def main() -> None:
         from jumpnrun.rl.ppo_demos import PPOWithDemos
 
         algo = PPOWithDemos
-        extra = dict(demo_path=args.demos, bc_coef=args.bc_coef, bc_decay=args.bc_decay, bc_min=args.bc_min)
+        extra = dict(demo_path=args.demos, bc_coef=args.bc_coef, bc_decay=args.bc_decay, bc_min=args.bc_min,
+                     demo_progress=args.demo_progress)
         if args.anchor:
             extra["anchor_path"] = str(Path(__file__).resolve().parent.parent.parent / "runs/phase10/anchor_states.npz")
         if args.demos2:
             extra.update(demo2_paths=list(args.demos2), bc2_plan=_json_arg(args.bc2_plan),
                          bc2_a6_share=args.bc2_a6_share, phase10_start=phase_start)
+        if args.kickstart:
+            extra.update(kickstart_path=args.kickstart, kickstart_plan=_json_arg(args.kickstart_plan),
+                         phase10_start=phase_start)
     hyper = dict(
         learning_rate=(staged_schedule(lr_plan, args.target, phase_start, run_dir) if lr_plan else
                        cosine_schedule(args.lr, args.lr_decay_steps, args.target, phase_start)
@@ -344,13 +393,19 @@ def main() -> None:
         watcher = subprocess.Popen(cmd)
 
     model.action_repeat = args.action_repeat
+    if args.channels_last:  # weights only: the conv layers pick the faster kernels, outputs stay the same
+        model.policy.to(memory_format=torch.channels_last)
     callbacks = [
-        TrainingMonitor(tracker, run_dir),
+        TrainingMonitor(tracker, run_dir, p8_only=args.tracker_p8_only),
         CheckpointSaver(run_dir, args.checkpoint_every, tracker, keep_every=args.keep_every),
         Evaluator(eval_levels, args.eval_every, run_dir),
     ]
     if args.time_limit_hours:
         callbacks.append(TimeLimit(run_dir, args.time_limit_hours))
+    if args.kickstart:
+        from jumpnrun.rl.ppo_demos import KickstartRecorder
+
+        callbacks.append(KickstartRecorder.make())
     if mix_schedule:
         from jumpnrun.rl.callbacks import MixScheduler
 
@@ -365,12 +420,22 @@ def main() -> None:
             callbacks.append(EmaWeights(run_dir, args.ema_every, decay=args.ema2_decay, prefix="ema2"))
     print(f"Training {args.steps:,} steps, tiers {args.min_tier}-{args.max_tier}, "
           f"{args.envs} envs, {len(handmade_paths)} hand-made levels -> {run_dir}")
+    import signal
+
+    def _terminate(signum, frame):  # the autopilot stops a run with SIGTERM: save like Ctrl+C
+        raise KeyboardInterrupt
+
+    signal.signal(signal.SIGTERM, _terminate)
     try:
         model.learn(total_timesteps=args.steps, callback=callbacks, progress_bar=False,
                     reset_num_timesteps=not args.resume, tb_log_name="ppo")
     except KeyboardInterrupt:
+        signal.signal(signal.SIGTERM, signal.SIG_IGN)
         print("Interrupted - saving checkpoint.")
         callbacks[1].save()
+        for cb in callbacks:  # EMA state too, else a restart continues from the last whole million
+            if isinstance(cb, EmaWeights) and cb.ema is not None:
+                torch.save(cb.ema, cb.path)
     finally:
         model.save(str(run_dir / "final_model.zip"))
         vec_env.close()

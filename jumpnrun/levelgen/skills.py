@@ -202,8 +202,17 @@ class SkillSource:
         self.seed_space = seed_space
         self.level = {k: 0 for k in KINDS}
         self.hist = {(k, d): [] for k in KINDS for d in range(3)}
+        self.central = None  # Neustart: {kind: p} from the SkillTracker of the training process
+
+    def set_state(self, levels: dict, p: dict) -> None:
+        """Neustart: difficulty and frontier estimate per kind pooled over all envs (SkillTracker)."""
+
+        self.level = {k: int(levels.get(k, 0)) for k in KINDS}
+        self.central = dict(p)
 
     def _p(self, kind: str) -> float:
+        if self.central is not None:
+            return self.central.get(kind, 0.5)
         h = self.hist[(kind, self.level[kind])]
         return sum(h) / len(h) if h else 0.5
 
@@ -220,10 +229,48 @@ class SkillSource:
 
     def feedback(self, level: Level, won: bool, fresh: bool = True) -> None:
         kind, d = getattr(level, "skill_kind", None), getattr(level, "difficulty", None)
-        if kind is None or not fresh:
+        if kind is None or not fresh or self.central is not None:  # central: the training process decides
             return
         h = self.hist[(kind, d)]
         h.append(int(won))
         del h[:-self.WINDOW]
         if d == self.level[kind] and d < 2 and len(h) >= self.WINDOW and sum(h) / len(h) >= self.OPEN_AT:
             self.level[kind] = d + 1
+
+
+class SkillTracker:
+    """Neustart arm: the SkillSource frontier pooled over all envs, in the training process (as the tier
+    curriculum). Phase 10 kept it per env (8 x 100 episodes per kind before the next difficulty opened) and lost it
+    on every restart; here it is shared, sent to the envs at every rollout end and saved in curriculum.json."""
+
+    WINDOW = SkillSource.WINDOW
+    OPEN_AT = SkillSource.OPEN_AT
+
+    def __init__(self):
+        self.level = {k: 0 for k in KINDS}
+        self.hist = {f"{k}:{d}": [] for k in KINDS for d in range(3)}
+
+    def record(self, kind: str, d: int, won: bool) -> None:
+        h = self.hist.get(f"{kind}:{d}")
+        if h is None:
+            return
+        h.append(int(won))
+        del h[:-self.WINDOW]
+        if d == self.level[kind] and d < 2 and len(h) >= self.WINDOW and sum(h) / len(h) >= self.OPEN_AT:
+            self.level[kind] = d + 1
+
+    def p(self) -> dict:
+        out = {}
+        for k in KINDS:
+            h = self.hist[f"{k}:{self.level[k]}"]
+            out[k] = sum(h) / len(h) if h else 0.5
+        return out
+
+    def state(self) -> dict:
+        return {"level": self.level, "hist": self.hist}
+
+    def load(self, state: dict) -> None:
+        self.level.update({k: int(v) for k, v in state.get("level", {}).items() if k in self.level})
+        for key, h in state.get("hist", {}).items():
+            if key in self.hist:
+                self.hist[key] = list(h)[-self.WINDOW:]
