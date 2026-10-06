@@ -34,7 +34,7 @@ def allowed_solutions():
     guard = ROOT / "levels/handmade10/split.json"
     if guard.exists():  # the phase-10 guard levels are built by Claude for monitoring: all of them are checked
         split = json.loads(guard.read_text())
-        for n in split["val"] + split["test"]:
+        for n in split["val"] + split["test"] + split.get("val_plus", []):
             sol = json.loads((ROOT / "levels/handmade10" / f"{n}.loesung.json").read_text())
             out.append((f"handmade10_{n}", ROOT / "levels/handmade10" / f"{n}.txt", sol["actions"], sol["action_repeat"]))
     return out
