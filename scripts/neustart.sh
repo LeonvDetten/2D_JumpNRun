@@ -8,7 +8,8 @@ bash scripts/setup_neustart.sh > /dev/null 2>&1 || bash scripts/setup_neustart.s
 taskset -c 3 $PY -m jumpnrun.rl.autopilot_neustart tick
 RUNS=$($PY -m jumpnrun.rl.autopilot_neustart runs)
 if [ -n "$RUNS" ]; then
-    PID=$(pgrep -f "jumpnrun.rl.milestones10 --run runs/neustart_" | head -1)
+    # only a real python process (a shell whose command line merely contains the text must not count)
+    PID=$(pgrep -f "^[^ ]*python[^ ]* -m jumpnrun.rl.milestones10 --run runs/neustart_" | head -1)
     if [ -n "$PID" ] && [ "$(cat runs/neustart/eval_runs 2>/dev/null)" != "$RUNS" ]; then
         kill "$PID"; sleep 2; PID=""
     fi

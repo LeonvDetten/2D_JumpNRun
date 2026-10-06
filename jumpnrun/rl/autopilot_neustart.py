@@ -86,10 +86,20 @@ def note(state: dict, text: str) -> None:
 
 
 def running(pattern: str):
+    """PID of a python process whose command line contains `pattern` (never a shell that merely mentions it)."""
+
     out = subprocess.run(["pgrep", "-f", pattern], capture_output=True, text=True).stdout.split()
     own = {os.getpid(), os.getppid()}
-    pids = [int(p) for p in out if int(p) not in own]
-    return pids[0] if pids else None
+    for p in out:
+        if int(p) in own:
+            continue
+        try:
+            argv0 = Path(f"/proc/{p}/cmdline").read_bytes().split(b"\0")[0].decode()
+        except OSError:
+            continue
+        if "python" in Path(argv0).name:
+            return int(p)
+    return None
 
 
 def run_dir(arm: str) -> str:
