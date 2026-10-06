@@ -5,7 +5,10 @@
   "2026-10-06 11:32 BC fertig (runs/neustart/bc.zip)",
   "2026-10-06 11:32 Startpr\u00fcfung bestanden {\"holdout\": 0.986, \"holdout_ohne_rechts\": 0.975, \"holdout_basis_rechts\": 0.681, \"p_a6_auf_a6\": 0.946, \"n\": 68117, \"n_ohne_rechts\": 21722, \"n_a6\": 489, \"p_a6_alte_zustaende\": 0.002, \"siege_val\": 0.375}",
   "2026-10-06 11:32 Arm ks: Training gestartet/fortgesetzt bei 0 (Kerne [0, 1, 2, 3])",
-  "2026-10-06 14:15 Arm ks: Training gestartet/fortgesetzt bei 1,300,000 (Kerne [0, 1, 2, 3])"
+  "2026-10-06 14:15 Arm ks: Training gestartet/fortgesetzt bei 1,300,000 (Kerne [0, 1, 2, 3])",
+  "2026-10-06 16:32 Arm ks: Neustart mit 3 Threads auf Kernen [0, 1, 2]",
+  "2026-10-06 16:32 Arm ks: Training gestartet/fortgesetzt bei 4,372,000 (Kerne [0, 1, 2])",
+  "2026-10-06 16:56 Arm ks: Sicherungspaket +5 Mio. (4,900,000 Schritte) -> backup_neustart/ks"
  ],
  "started": 1791284223.9751284,
  "arms": {
@@ -13,7 +16,10 @@
    "status": "ppo",
    "bc_zip": "runs/neustart/bc.zip",
    "regel": {},
-   "threads": 4
+   "threads": 3,
+   "sicherung": [
+    5
+   ]
   }
  },
  "bc": {
