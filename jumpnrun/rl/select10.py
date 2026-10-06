@@ -116,6 +116,13 @@ def tick(state: dict) -> None:
         state["stage"] = "fertig"
         return
     if not FINAL.exists():
+        # Leon (06.10.): the sealed comparison runs once, paired, later together with the restart arm -
+        # the final only starts after an explicit release file
+        if not (A.STATE_DIR / "FINAL_FREIGABE").exists():
+            if not sel.get("wartet_noted"):
+                sel["wartet_noted"] = True
+                A.note(state, f"Auswahl fertig, Endauswertung (versiegelt) wartet auf Freigabe; Kandidat {ck}")
+            return
         if not A.running("jumpnrun.rl.select10 final"):
             A.spawn([sys.executable, "-m", "jumpnrun.rl.select10", "final", ck], A.STATE_DIR / "final.log", [0, 1, 2, 3])
         return
