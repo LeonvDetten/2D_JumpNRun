@@ -35,6 +35,9 @@ BACKUP = ROOT / "backup_neustart"
 PY = str(ROOT / ".venv/bin/python")
 MILLION = 1_000_000
 ALL_CORES = [0, 1, 2, 3]
+# a lone arm trains on cores 0-2; core 3 belongs to the evaluator, the ticks and the dashboard (scripts/neustart.sh):
+# a 4-thread trainer sharing a core with the single-thread full measurement ran at ~35-90 instead of ~540 steps/s
+ALONE_CORES = [0, 1, 2]
 P8 = "models/phase8_final.zip"
 
 PPO_FLAGS = ["--overview", "--obs-v3", "--path-delta", "--pool", "runs/demos4", "--demos", "runs/demos4",
@@ -239,9 +242,12 @@ def restore_pack(state: dict, arm: str) -> bool:
 def update_drift(arm: str, every: int = 500_000) -> None:
     """KL to P8 and P(left+jump) on old states for raw checkpoints every 0.5 M - observation only."""
 
+    import torch
+
     from jumpnrun.rl.drift import measure
     from jumpnrun.rl.modelinfo import load_model
 
+    torch.set_num_threads(1)  # never compete with the trainer's threads
     path = ROOT / run_dir(arm) / "drift.json"
     done = json.loads(path.read_text()) if path.exists() else {}
     changed = False
@@ -385,7 +391,7 @@ def tick_ppo(state: dict, pr: dict) -> None:
     order = sorted(pr["arme"])
     for arm in arms:
         info = state["arms"][arm]
-        cores = ALL_CORES if len(arms) == 1 else ([0, 1] if order.index(arm) == 0 else [2, 3])
+        cores = ALONE_CORES if len(arms) == 1 else ([0, 1] if order.index(arm) == 0 else [2, 3])
         pid = train_running(arm)
         if pid and info.get("threads") != len(cores):
             stop_pid(pid)

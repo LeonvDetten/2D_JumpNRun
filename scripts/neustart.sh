@@ -5,7 +5,7 @@
 cd "$(dirname "$0")/.."
 PY=.venv/bin/python
 bash scripts/setup_neustart.sh > /dev/null 2>&1 || bash scripts/setup_neustart.sh
-$PY -m jumpnrun.rl.autopilot_neustart tick
+taskset -c 3 $PY -m jumpnrun.rl.autopilot_neustart tick
 RUNS=$($PY -m jumpnrun.rl.autopilot_neustart runs)
 if [ -n "$RUNS" ]; then
     PID=$(pgrep -f "jumpnrun.rl.milestones10 --run runs/neustart_" | head -1)
@@ -16,8 +16,10 @@ if [ -n "$RUNS" ]; then
         ARGS=""
         for r in $RUNS; do ARGS="$ARGS --run $r"; done
         echo "$RUNS" > runs/neustart/eval_runs
-        OMP_NUM_THREADS=1 nohup nice -n 10 $PY -m jumpnrun.rl.milestones10 $ARGS >> runs/neustart/milestones10.log 2>&1 &
+        # core 3 only: a trainer sharing a core with the full measurement stalled to ~35-90 steps/s (the trainer
+        # runs on cores 0-2, see autopilot_neustart.ALONE_CORES)
+        OMP_NUM_THREADS=1 nohup taskset -c 3 nice -n 10 $PY -m jumpnrun.rl.milestones10 $ARGS >> runs/neustart/milestones10.log 2>&1 &
     fi
 fi
 sleep "${PHASE_WAIT:-470}"
-$PY -m jumpnrun.rl.autopilot_neustart tick
+taskset -c 3 $PY -m jumpnrun.rl.autopilot_neustart tick
