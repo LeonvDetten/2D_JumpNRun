@@ -188,6 +188,8 @@ def main() -> None:
     parser.add_argument("--demos2", nargs="*", default=[], help="phase 10: demo dirs for the second BC stream")
     parser.add_argument("--bc2-plan", help="phase 10: JSON [[steps, coef], ...] for the second BC stream")
     parser.add_argument("--bc2-a6-share", type=float, default=0.05)
+    parser.add_argument("--teacher", help="phase 10 D: frozen P8 model as teacher on own phase-8-level states")
+    parser.add_argument("--teacher-plan", help="phase 10 D: JSON [[steps, coef], ...] (linear in between)")
     parser.add_argument("--anchor", action="store_true",
                         help="phase 10 (only by rule): KL anchor to P8 on runs/phase10/anchor_states.npz")
     parser.add_argument("--path-delta", action="store_true",
@@ -287,6 +289,8 @@ def main() -> None:
 
         algo = PPOWithDemos
         extra = dict(demo_path=args.demos, bc_coef=args.bc_coef, bc_decay=args.bc_decay, bc_min=args.bc_min)
+        if args.teacher:
+            extra.update(teacher_path=args.teacher, teacher_plan=_json_arg(args.teacher_plan))
         if args.anchor:
             extra["anchor_path"] = str(Path(__file__).resolve().parent.parent.parent / "runs/phase10/anchor_states.npz")
         if args.demos2:
@@ -351,6 +355,10 @@ def main() -> None:
     ]
     if args.time_limit_hours:
         callbacks.append(TimeLimit(run_dir, args.time_limit_hours))
+    if args.teacher:
+        from jumpnrun.rl.callbacks import TeacherMask
+
+        callbacks.append(TeacherMask())
     if mix_schedule:
         from jumpnrun.rl.callbacks import MixScheduler
 

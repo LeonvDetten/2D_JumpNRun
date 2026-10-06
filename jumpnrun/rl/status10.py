@@ -10,6 +10,7 @@ training steps per source; round A: 100 % phase 8), text (exam, protection, brak
 from __future__ import annotations
 
 import json
+import os
 import time
 from collections import Counter
 
@@ -23,6 +24,10 @@ S_KL = 0.0527
 
 
 def arms(state: dict) -> dict:
+    import os
+
+    if os.environ.get("PHASE10_ARMS"):  # e.g. "lehrer=runs/phase10_d_lehrer,kontrolle_c=runs/phase10_c_kontrolle"
+        return dict(kv.split("=") for kv in os.environ["PHASE10_ARMS"].split(","))
     if state["stage"] == "A":
         return A.arm_runs_a()
     from jumpnrun.rl import autopilot10_bc as B
@@ -62,8 +67,8 @@ def main() -> None:
     state = A.load_state()
     runs = arms(state)
     start = A.START_STEPS
-    if state["stage"] == "C":
-        start = state["rounds"].get("C", {}).get("start_steps", start)
+    if state["stage"] in ("C", "auswahl") or os.environ.get("PHASE10_START"):
+        start = int(os.environ.get("PHASE10_START", state["rounds"].get("C", {}).get("start_steps", start)))
     plt.rcParams.update({"font.size": 10, "axes.edgecolor": GRID, "axes.labelcolor": INK2, "xtick.color": INK2,
                          "ytick.color": INK2, "axes.titlesize": 11, "axes.titleweight": "bold",
                          "axes.titlecolor": INK, "figure.facecolor": SURFACE, "axes.facecolor": SURFACE})
