@@ -1,0 +1,39 @@
+{
+ "stage": "ppo",
+ "log": [
+  "2026-10-06 10:57 BC gestartet (Versuch 1, 16000 Schritte, 4 Kerne)",
+  "2026-10-06 11:32 BC fertig (runs/neustart/bc.zip)",
+  "2026-10-06 11:32 Startpr\u00fcfung bestanden {\"holdout\": 0.986, \"holdout_ohne_rechts\": 0.975, \"holdout_basis_rechts\": 0.681, \"p_a6_auf_a6\": 0.946, \"n\": 68117, \"n_ohne_rechts\": 21722, \"n_a6\": 489, \"p_a6_alte_zustaende\": 0.002, \"siege_val\": 0.375}",
+  "2026-10-06 11:32 Arm ks: Training gestartet/fortgesetzt bei 0 (Kerne [0, 1, 2, 3])",
+  "2026-10-06 14:15 Arm ks: Training gestartet/fortgesetzt bei 1,300,000 (Kerne [0, 1, 2, 3])"
+ ],
+ "started": 1791284223.9751284,
+ "arms": {
+  "ks": {
+   "status": "ppo",
+   "bc_zip": "runs/neustart/bc.zip",
+   "regel": {},
+   "threads": 4
+  }
+ },
+ "bc": {
+  "versuch": 0,
+  "zip": "runs/neustart/bc.zip",
+  "startpruefung": [
+   {
+    "holdout": 0.986097449975777,
+    "holdout_ohne_rechts": 0.9750483380904152,
+    "holdout_basis_rechts": 0.6811075062025632,
+    "p_a6_auf_a6": 0.9458162874775674,
+    "n": 68117,
+    "n_ohne_rechts": 21722,
+    "n_a6": 489,
+    "p_a6_alte_zustaende": 0.002222472896629005,
+    "siege_val": 0.375,
+    "nicht_bestanden": []
+   }
+  ]
+ },
+ "prereg_sha256": "08944e4ddd896b7f9441be08a12ce2cf312e596c5cf7e363d3d0904083c4bf85",
+ "ppo_started": 1791286331.7825918
+}

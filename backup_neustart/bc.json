@@ -1,0 +1,7 @@
+{
+  "action_repeat": 2,
+  "overview": true,
+  "arch": "grid",
+  "obs_v3": true,
+  "source": "neustart: fresh net, solver behaviour cloning (+ value warm-up)"
+}
