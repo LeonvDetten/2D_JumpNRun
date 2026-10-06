@@ -58,7 +58,12 @@ def make_env(rank: int, seed: int, min_tier: int, max_tier: int, handmade_paths,
 
             v10 = CurriculumSource(10, 13, pool_share=1.0, augment_prob=augment_prob, plr=plr, gen_variant="v10")
             v10.weights = [1.0 if t >= 10 else 0.0 for t in range(NUM_TIERS)]
-            source = MixSource({"p8": source, "v10": v10, "skill": SkillSource()}, mix)
+            sources = {"p8": source, "v10": v10, "skill": SkillSource()}
+            if any("spiegel" in shares for _, shares in mix):  # phase 10 D: mirrored levels (both directions)
+                from jumpnrun.levelgen.skills import MirrorSource
+
+                sources["spiegel"] = MirrorSource()
+            source = MixSource(sources, mix)
         return JumpNRunEnv(source, seed=seed * 1000 + rank, action_repeat=action_repeat, overview=overview,
                            rewind_prob=rewind_prob, obs_v2=obs_v2, stuck_death=stuck_death, **(env_extra or {}))
 

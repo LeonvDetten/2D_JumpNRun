@@ -227,3 +227,40 @@ class SkillSource:
         del h[:-self.WINDOW]
         if d == self.level[kind] and d < 2 and len(h) >= self.WINDOW and sum(h) / len(h) >= self.OPEN_AT:
             self.level[kind] = d + 1
+
+
+def mirror_level(level: Level, name: str = None) -> Level:
+    """The level mirrored left-right (chest on the other side); needs the way-distance measurement."""
+
+    lines = level.to_text().splitlines()
+    w = max(len(l) for l in lines)
+    out = Level("\n".join(l.ljust(w)[::-1].rstrip() for l in lines).splitlines(), name=name or level.name + "_spiegel")
+    out.needs_path = True
+    return out
+
+
+class MirrorSource:
+    """Phase 10 D: mirrored phase-8 generator levels (v9, tiers 4-12, chest on the left) for the generalist goal
+    "both directions"; only levels whose mirror the distance map can solve are used."""
+
+    MIRROR_TIER = -5
+
+    def __init__(self, min_tier: int = 4, max_tier: int = 12):
+        self.tiers = list(range(min_tier, max_tier + 1))
+
+    def __call__(self, rng: random.Random):
+        from jumpnrun.levelgen.distmap import DistanceMap
+
+        for _ in range(10):
+            tier = rng.choice(self.tiers)
+            level = mirror_level(G.generate(tier, rng.randrange(10**8)))
+            dm = DistanceMap(level)
+            if dm.reachable and dm.start is not None:
+                break
+        level.source = "spiegel"
+        level.augmentations = ["mirror"]
+        level.mirror_tier = tier
+        return level, self.MIRROR_TIER
+
+    def feedback(self, *args, **kwargs) -> None:
+        pass
