@@ -145,4 +145,36 @@ Leon entschied am 4./5. Oktober:
   - Beide Arme wurden nach 0,2 Mio. Schritten gestoppt und neu gestartet (alte Läufe: `runs/phase10/b_fehlstart`).
 - **Neustart 19:00**, Anker an, Lernraten 3e-5 → 2e-5 → 2e-5.
 
+- **Verlauf** (EMA, volle Messungen):
+
+  | Mio. seit Start | neu: dev_alt / F / Wächter | Kontrolle: dev_alt / F / Wächter |
+  |---|---|---|
+  | +2 | 54,7 / 25,8 / 43,8 | 59,5 / 22,9 / 49,2 |
+  | +4 | 61,9 / 34,0 / 59,4 | 56,4 / 32,4 / 46,9 |
+  | +6 | 60,2 / 39,9 / 44,5 | 58,5 / 41,1 / 59,4 |
+  | +8 | 64,3 / 40,8 / 57,8 | 59,0 / 43,1 / 59,4 |
+  | +10 | 64,8 / 44,6 / 50,0 | 60,5 / 44,3 / 64,8 |
+
+  - In den ersten 2 Mio. Schritten fielen die alten Level stark, und zwar in beiden Armen. Der Bot lief auf alten
+    Leveln viel öfter nach links (258 statt 14 „links“ in 10 Episoden auf hoehlendach) und stürzte vor Gruben ab:
+    Das Umkehren färbte ab.
+  - Die Drift-KL blieb mit Anker bei 0,02–0,03 und sah das nicht, denn sie mittelt über alle Zustände.
+  - Ab dem 60-%-Phase-8-Anteil (+6 Mio.) erholten sich die alten Level.
+- **Urteil (06.10. 07:19):** kein Unterschied (ΔF −1,1 Pp, ΔAlt −0,3 Pp) → Kontrolle geht weiter (höherer Alt-Wert).
+  **„Erst üben, dann mischen“ brachte keinen messbaren Vorteil gegenüber festem Mischen.**
+- **Gewonnen** (Kontrolle, gepoolt +8–10 Mio.):
+  - Kanal-Probe 91 %, alle 7 Übungsarten ≥ 80 % in den Proben.
+  - dev_neu ≈ 20 %; in Phase 9 lagen alle neuen Fähigkeiten bei ≈ 0 %.
+- **Verloren:**
+  - Alt 60,9 % gegen die P8-Basis 66,4 %.
+  - Wächter 50–65 % gegen 77 %.
+  - handmade8-Test 24–38 / 64 gegen ~45.
+
+### Runde C (Regel-Fall 1: Reparatur)
+
+- Start 06.10. 07:20 vom EMA2 der Kontrolle bei +10 Mio., je 6 Mio. Schritte.
+- **neu:** Lernrate 1e-5, Phase-8-Anteil 75 %, Anker.
+- **Kontrolle:** wie das Ende von Runde B (Lernrate 2e-5, 60 %, Anker).
+- **Urteil:** neu gewinnt bei Alt ≥ +3 Pp, solange F nicht ≥ 5 Pp schlechter ist.
+
 *(Fortsetzung folgt.)*
