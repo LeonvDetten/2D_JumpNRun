@@ -303,3 +303,17 @@ class MixScheduler(BaseCallback):
                 self.stage = idx
                 self.training_env.env_method("set_mix_stage", idx)
         return True
+
+
+class TeacherMask(BaseCallback):
+    """Phase 10 D: marks which rollout-buffer entries come from phase-8 levels (info["p8_level"] of the step), so
+    the P8 teacher only acts there. Stored on the model as `_p8_mask` (n_steps x n_envs, same layout as the buffer)."""
+
+    def _on_rollout_start(self) -> None:
+        self.model._p8_mask = np.zeros((self.model.n_steps, self.model.n_envs), dtype=bool)
+
+    def _on_step(self) -> bool:
+        pos = self.model.rollout_buffer.pos  # called after env.step, before the buffer adds this step
+        if pos < self.model.n_steps:
+            self.model._p8_mask[pos] = [bool(i.get("p8_level", False)) for i in self.locals["infos"]]
+        return True

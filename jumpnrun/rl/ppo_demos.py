@@ -36,7 +36,7 @@ class PPOWithDemos(PPO):
     def __init__(self, *args, demo_path=None, bc_coef: float = 0.5, bc_decay: float = 0.99,
                  bc_min: float = 0.02, demo2_paths=None, bc2_plan=None, bc2_a6_share: float = 0.05,
                  phase10_start: int = 0, anchor_path=None, anchor_eps: float = 0.02, anchor_coef: float = 0.1,
-                 anchor_target_kl: float = 0.02, **kwargs):
+                 anchor_target_kl: float = 0.02, teacher_path=None, teacher_plan=None, **kwargs):
         self.demo_path = demo_path
         # phase 10: a second demo stream (BC2: teacher demos with left+jump on practice levels) with its own weight
         # by stage ([[steps since phase10_start, coef], ...]); left+jump samples drawn with share bc2_a6_share
@@ -54,6 +54,11 @@ class PPOWithDemos(PPO):
         self.anchor_coef = anchor_coef
         self.anchor_target_kl = anchor_target_kl
         self._anchor = None
+        # phase 10 D: P8 as a teacher on the student's OWN rollout states of phase-8 levels (KL over the six old
+        # actions, student renormalised), weight by plan [[steps since phase10_start, coef], ...] linear in between
+        self.teacher_path = teacher_path
+        self.teacher_plan = teacher_plan
+        self._teacher = None
         self.bc_coef = bc_coef
         self.bc_decay = bc_decay
         self.bc_min = bc_min
@@ -62,7 +67,7 @@ class PPOWithDemos(PPO):
         super().__init__(*args, **kwargs)
 
     def _excluded_save_params(self):
-        return super()._excluded_save_params() + ["_demos", "_demos2", "_anchor", "bc_paused"]
+        return super()._excluded_save_params() + ["_demos", "_demos2", "_anchor", "_teacher", "_p8_mask", "bc_paused"]
 
     def _load_demos(self):
         if self._demos is None and self.demo_path:
@@ -104,6 +109,46 @@ class PPOWithDemos(PPO):
         t = data["teacher"][idx]
         return (t * (t.clamp_min(1e-8).log() - logp)).sum(1).mean()
 
+    def teacher_coef(self) -> float:
+        plan = sorted(getattr(self, "teacher_plan", None) or [])
+        if not plan or not getattr(self, "teacher_path", None):
+            return 0.0
+        rel = self.num_timesteps - getattr(self, "phase10_start", 0)
+        if rel <= plan[0][0]:
+            return float(plan[0][1])
+        for (s0, c0), (s1, c1) in zip(plan, plan[1:]):
+            if rel <= s1:
+                return float(c0 + (c1 - c0) * (rel - s0) / max(1, s1 - s0))
+        return float(plan[-1][1])
+
+    def _teacher_states(self):
+        """Indices (into the flattened rollout buffer) of states from phase-8 levels, or None."""
+
+        mask = getattr(self, "_p8_mask", None)
+        buf = self.rollout_buffer
+        if mask is None or not buf.full:
+            return None
+        flat = mask.swapaxes(0, 1).reshape(-1) if buf.generator_ready else mask.reshape(-1)
+        idx = np.nonzero(flat)[0]
+        return idx if len(idx) else None
+
+    def _teacher_loss(self, idx_pool):
+        from jumpnrun.rl.drift import old_view
+
+        if getattr(self, "_teacher", None) is None:
+            from jumpnrun.rl.modelinfo import load_model
+
+            self._teacher = load_model(self.teacher_path).policy
+            self._teacher.set_training_mode(False)
+        buf = self.rollout_buffer
+        idx = np.random.choice(idx_pool, BC_BATCH)
+        obs = {k: torch.as_tensor(v[idx].reshape((BC_BATCH,) + v.shape[2:]) if v.ndim > 2 and not buf.generator_ready
+                                  else v[idx], dtype=torch.float32) for k, v in buf.observations.items()}
+        with torch.no_grad():
+            t = self._teacher.get_distribution(old_view(obs)).distribution.probs
+        logp = torch.log_softmax(self.policy.get_distribution(obs).distribution.logits[:, :6], dim=1)
+        return (t * (t.clamp_min(1e-8).log() - logp)).sum(1).mean()
+
     def bc2_coef(self) -> float:
         plan = getattr(self, "bc2_plan", None)
         if not plan:
@@ -139,6 +184,9 @@ class PPOWithDemos(PPO):
         losses2, accs2 = [], []
         anchor = self._load_anchor()
         kls = []
+        coef_t = self.teacher_coef()
+        teacher_idx = self._teacher_states() if coef_t > 0 else None
+        tkls = []
         for _ in range(batches):
             idx = np.random.randint(0, n, BC_BATCH)
             loss, acc = bc_loss(self.policy, _obs_tensors(demos, idx), self._demo_allowed[idx])
@@ -153,6 +201,10 @@ class PPOWithDemos(PPO):
                 kl = self._anchor_loss(anchor)
                 total = total + self.anchor_coef * kl
                 kls.append(kl.item())
+            if teacher_idx is not None:
+                tkl = self._teacher_loss(teacher_idx)
+                total = total + coef_t * tkl
+                tkls.append(tkl.item())
             self.policy.optimizer.zero_grad()
             total.backward()
             torch.nn.utils.clip_grad_norm_(self.policy.parameters(), self.max_grad_norm)
@@ -170,6 +222,10 @@ class PPOWithDemos(PPO):
                 self.anchor_coef = max(0.01, self.anchor_coef / 1.5)
             self.logger.record("anker/kl", kl)
             self.logger.record("anker/gewicht", self.anchor_coef)
+        if tkls:
+            self.logger.record("lehrer/kl", float(np.mean(tkls)))
+            self.logger.record("lehrer/gewicht", coef_t)
+            self.logger.record("lehrer/anteil_p8", len(teacher_idx) / (self.n_steps * self.n_envs))
         if losses2:
             self.logger.record("vorbild2/gewicht", coef2)
             self.logger.record("vorbild2/verlust", float(np.mean(losses2)))
