@@ -44,7 +44,27 @@ def candidate(i: int):
     return i, "\n".join(lv._lines) + "\n", list(r.actions)
 
 
+def main_plus():
+    """Phase 10 D: 8 more guard levels (g8..g15, candidates 20..39) as split key "val_plus" - only for the sharper
+    guard measurement (scripts/guard_plus10.py); milestones10 keeps its 4 val levels for comparability."""
+
+    with Pool(2) as p:
+        found = [r for r in p.map(candidate, range(20, 40), chunksize=1) if r][:8]
+    names = []
+    for k, (i, text, actions) in enumerate(found):
+        name = f"g{8 + k}"
+        (OUT / f"{name}.txt").write_text(text)
+        (OUT / f"{name}.loesung.json").write_text(json.dumps({"action_repeat": 2, "actions": actions}))
+        names.append(name)
+    split = json.loads((OUT / "split.json").read_text())
+    split["val_plus"] = names
+    (OUT / "split.json").write_text(json.dumps(split, indent=1))
+    print("extra guard levels:", names)
+
+
 def main():
+    if sys.argv[1:] == ["plus"]:
+        return main_plus()
     with Pool(int(sys.argv[1]) if len(sys.argv) > 1 else 4) as p:
         found = [r for r in p.map(candidate, range(14), chunksize=1) if r][:8]
     OUT.mkdir(parents=True, exist_ok=True)
