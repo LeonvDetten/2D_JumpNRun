@@ -1,0 +1,5 @@
+{
+ "phase10_kandidat_alt.zip": {"quelle": "runs/phase10_c_kontrolle/checkpoints/ema2_step_0066000000.zip", "grund": "bester Alt-Wert (volle Messung +6 Mio.: dev_alt 66,5 %, Wächter-Val 69,5 %, Prüfung 46/64, F 43,5 %)"},
+ "phase10_kandidat_f.zip": {"quelle": "runs/phase10_c_neu/checkpoints/ema_step_0066000000.zip", "grund": "höchstes F im Auswahlfenster (dev_alt 63,6 %, Wächter-Val 66,4 %, Prüfung 48/64, F 44,2 %)"},
+ "hinweis": "Kein Kandidat besteht das vorregistrierte Alt-Tor (dev_alt >= P8-Basis - 3 Pp und Wächter >= P8 - 5 Pp im 3er-Fenster). P8 bleibt Stand. Versiegelter Endvergleich: später gemeinsam mit dem Neustart-Arm, gepaart."
+}

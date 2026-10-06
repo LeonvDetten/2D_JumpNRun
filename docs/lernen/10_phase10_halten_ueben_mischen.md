@@ -177,4 +177,48 @@ Leon entschied am 4./5. Oktober:
 - **Kontrolle:** wie das Ende von Runde B (Lernrate 2e-5, 60 %, Anker).
 - **Urteil:** neu gewinnt bei Alt ≥ +3 Pp, solange F nicht ≥ 5 Pp schlechter ist.
 
-*(Fortsetzung folgt.)*
+- Ein Neustart des Containers stoppte das Training am 06.10. zwischen etwa 12:20 und 14:15. Es wurde vom
+  Checkpoint bei 64,0 Mio. fortgesetzt; es ging nur Zeit verloren.
+- **Verlauf** (volle Messungen, EMA / EMA2):
+
+  | Mio. seit Start | Reparatur: dev_alt / Wächter / F / Prüfung | Kontrolle: dev_alt / Wächter / F / Prüfung |
+  |---|---|---|
+  | +2 | 61,4 / 60,2 / 43,9 / 34 von 64 | 58,4 / 59,4 / 43,5 / 47 von 64 |
+  | +4 | 59,9 / 65,6 / 44,7 / 38 | 64,9 / 70,3 / 41,5 / 49 (EMA2: 61,5 / 69,5 / 44,7 / 45) |
+  | +6 | 63,6 / 66,4 / 44,2 / 48 | 65,9 / 64,8 / 39,9 / 44 (EMA2: **66,5 / 69,5 / 43,5 / 46**) |
+
+- **Urteil (06.10. 17:10):** neu verfehlt (ΔF +3,2 Pp, ΔAlt −0,9 Pp; verlangt waren Alt ≥ +3 Pp) → Kontrolle.
+  **Die Reparatur (Lernrate 1e-5, 75 % Phase-8-Level) brachte nichts über die Kontrolle hinaus.**
+
+### Auswahl
+
+- **0 von 32 Kandidaten** bestehen das Alt-Tor (dev_alt ≥ 63,4 % und Wächter ≥ 72,3 % im 3er-Fenster). Der Wächter
+  ist der Engpass: Die besten liegen bei 65–70 %.
+- **Gesichert für den späteren Vergleich:**
+  - `models/phase10_kandidat_alt.zip` (Kontrolle EMA2 +6 Mio.: dev_alt 66,5 %, Wächter 69,5 %, Prüfung 46/64,
+    F 43,5 %, dev_neu 18,8 %).
+  - `models/phase10_kandidat_f.zip` (Reparatur EMA +6 Mio.).
+- **Die versiegelte Endauswertung ist zurückgestellt.** Leon (06.10.): Der Endvergleich läuft einmalig und gepaart,
+  später gemeinsam mit dem parallel gestarteten Neustart-Arm (eigene Session, frisches Netz). `select10` startet
+  das Finale erst nach einer Freigabe-Datei.
+
+## Fazit Phase 10 (vorläufig, ohne versiegelte Werte)
+
+1. **Die Messreparatur war richtig und wichtig.** Sie deckte Messfehler auf, die in Phase 9 Fähigkeiten als 0 %
+   erscheinen ließen.
+2. **Neue Fähigkeiten sind lernbar:**
+   - Kanal-Probe ≈ 90 %, alle Übungsarten ≥ 80 %, dev_neu ≈ 20 %. In Phase 9 lag alles bei ≈ 0 %.
+   - Geholfen haben kurze Übungslevel, der zweite Vorbild-Strom (BC2) mit links+springen und die Mischung nach
+     Schritten.
+3. **Der Preis ist Vergessen auf langen alten Leveln.**
+   - Am Ende sind dev_alt und Prüfung wieder auf P8-Niveau.
+   - Der Wächter (lange Level im Phase-8-Stil) bleibt aber 7–12 Pp, der handmade8-Test 15–19 von 64 unter P8.
+4. **Nicht geholfen haben:**
+   - eine kleinere Lernrate (Runde A),
+   - die Reihenfolge „erst üben, dann mischen“ (Runde B),
+   - mehr Phase-8-Anteil bei noch kleinerer Lernrate (Runde C).
+5. **Geholfen hat:**
+   - ein Phase-8-Anteil von 60 % über längere Zeit, zusammen mit dem Anker. Ab +6 Mio. in Runde B erholten sich
+     die alten Level stetig.
+6. **Offene Hauptfrage:** Verursacht der Wechsel auf Weg-Belohnung und Weg-Zeitregel das Vergessen, und hilft ein
+   frisches Netz (Plastizität)? Das prüft der Neustart-Arm.
