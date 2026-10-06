@@ -232,7 +232,8 @@ class EmaWeights(BaseCallback):
                 self.ema = saved
         if self.ema is None:
             self.ema = {k: v.detach().clone().float() for k, v in params.items()}
-        self._next = (self.num_timesteps // self.every + 1) * self.every
+        # a restart exactly at a multiple (killed between checkpoint and EMA save) still writes that EMA
+        self._next = max(self.every, -(-self.num_timesteps // self.every) * self.every)
 
     def _on_rollout_start(self) -> None:  # called after every PPO update
         import torch
@@ -258,8 +259,10 @@ class EmaWeights(BaseCallback):
         policy = self.model.policy
         current = {k: v.detach().clone() for k, v in policy.state_dict().items()}
         policy.load_state_dict(self.ema)
-        self.model.save(str(self.dir / f"{self.prefix}_step_{self.num_timesteps:010d}.zip"))
-        policy.load_state_dict(current)
+        try:
+            self.model.save(str(self.dir / f"{self.prefix}_step_{self.num_timesteps:010d}.zip"))
+        finally:  # a SIGTERM in between must not leave the EMA weights in the training policy
+            policy.load_state_dict(current)
         torch.save(self.ema, self.path)
 
     def _on_training_end(self) -> None:

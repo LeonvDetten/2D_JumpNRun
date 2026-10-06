@@ -300,6 +300,9 @@ def main() -> None:
                 if getattr(tracker, "skill", None) is not None and "skill" in state:
                     tracker.skill.load(state["skill"])
         else:
+            if (run_dir / "curriculum.json").exists():  # progress existed, but no usable checkpoint is left
+                raise SystemExit(f"{run_dir}: curriculum.json but no valid checkpoint - refusing to start again at "
+                                 f"{args.resume or 'scratch'} (restore a checkpoint first)")
             done = int(PPO.load(args.resume, device="cpu").num_timesteps) if args.resume else 0
         args.steps = args.target - done
         # the step count at which this run (phase) began, kept across restarts for the LR schedule

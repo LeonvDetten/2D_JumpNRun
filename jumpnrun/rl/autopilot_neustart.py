@@ -197,7 +197,9 @@ def save_pack(state: dict, arm: str, label: str) -> None:
     """Restart pack: newest raw checkpoint, EMA weights, curriculum/practice state, config, seconds used."""
 
     src = ROOT / run_dir(arm)
-    ck = sorted((src / "checkpoints").glob("step_*.zip"))
+    from jumpnrun.rl.train import _zip_ok
+
+    ck = [c for c in sorted((src / "checkpoints").glob("step_*.zip"))[:-1] if _zip_ok(c)]  # never the one being written
     if not ck:
         return
     dst = BACKUP / arm
