@@ -1,0 +1,75 @@
+{
+ "started": 1791363682.0022063,
+ "log": [
+  "09:01 Arm a: Training gestartet/fortgesetzt (Kerne [0, 1])",
+  "09:01 Arm b: Training gestartet/fortgesetzt (Kerne [2, 3])",
+  "10:35 Arm a: Training gestartet/fortgesetzt (Kerne [0, 1])",
+  "10:36 Arm a: Training gestartet/fortgesetzt (Kerne [0, 1])",
+  "10:36 Arm b: Training gestartet/fortgesetzt (Kerne [2, 3])",
+  "11:52 Bremse (ausgel\u00f6st von Arm a bei 74000000): LR-Faktor 0.5 in beiden Armen",
+  "12:59 Arm a: Training gestartet/fortgesetzt (Kerne [0, 1])",
+  "12:59 Arm b: Training gestartet/fortgesetzt (Kerne [2, 3])",
+  "12:59 Korrektur: die 7 Phase-10-\u00dcbungsarten starten auf d2 (beide Arme, Neustart vom letzten Checkpoint)",
+  "14:24 Bremse (ausgel\u00f6st von Arm b bei 76000000): LR-Faktor 0.5 in beiden Armen",
+  "17:47 Arm a: Training gestartet/fortgesetzt (Kerne [0, 1])",
+  "17:47 Arm A seit ~16:50 nur ~60 fps (B ~280, gleiche Gewichtsgeschwindigkeit) - Prozess-Neustart vom letzten Checkpoint",
+  "18:33 Bremse (ausgel\u00f6st von Arm b bei 79000000): LR-Faktor 0.5 in beiden Armen",
+  "20:58 Bremse (ausgel\u00f6st von Arm b bei 80000000): LR-Faktor 0.5 in beiden Armen",
+  "20:58 Urteil: kein Unterschied; Kandidat = Arm mit h\u00f6herem G und bestandenem Tor: a. a: G 50.9%, dev_alt 77.6%, Pr\u00fcfung 66.1%, Spiegel 3.8%, Tor ja | b: G 51.0%, dev_alt 79.8%, Pr\u00fcfung 59.9%, Spiegel 0.0%, Tor nein | Phase-10-Lehrer G 37.8% -> Phase-11-Kandidat ist besser (>= +5 Pp)"
+ ],
+ "brakes": [
+  [
+   "a",
+   "74000000"
+  ],
+  [
+   "b",
+   "76000000"
+  ],
+  [
+   "b",
+   "79000000"
+  ],
+  [
+   "b",
+   "80000000"
+  ]
+ ],
+ "stopped": [],
+ "rueckfrage": false,
+ "urteil": {
+  "arme": {
+   "a": {
+    "G": 0.5088,
+    "dev_alt": 0.7765,
+    "pruefung": 0.6615,
+    "spiegel": 0.038,
+    "waechter_plus": 0.7977,
+    "F": 0.387,
+    "doppelgabel": 0.6979,
+    "sackgasse": 0.9271,
+    "tor": true
+   },
+   "b": {
+    "G": 0.5102,
+    "dev_alt": 0.7978,
+    "pruefung": 0.599,
+    "spiegel": 0.0,
+    "waechter_plus": 0.796,
+    "F": 0.3636,
+    "doppelgabel": 0.8125,
+    "sackgasse": 0.95,
+    "tor": false
+   }
+  },
+  "kandidat": "a",
+  "besser_als_phase10": true,
+  "lehrer_G": 0.3784,
+  "p8": {
+   "dev_alt": 0.6449,
+   "pruefung": 0.6875,
+   "G": 0.2297
+  },
+  "text": "kein Unterschied; Kandidat = Arm mit h\u00f6herem G und bestandenem Tor: a. a: G 50.9%, dev_alt 77.6%, Pr\u00fcfung 66.1%, Spiegel 3.8%, Tor ja | b: G 51.0%, dev_alt 79.8%, Pr\u00fcfung 59.9%, Spiegel 0.0%, Tor nein | Phase-10-Lehrer G 37.8% -> Phase-11-Kandidat ist besser (>= +5 Pp)"
+ }
+}

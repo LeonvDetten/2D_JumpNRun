@@ -2,7 +2,7 @@
 
 Rohdaten und Regeln: `docs/lernen/daten/phase11_vorregistrierung.json` (alle Schwellen, vor dem ersten
 Trainingsschritt committet), `runs/phase11/state.json` (Autopilot-Protokoll), `jumpnrun/rl/autopilot11.py`,
-`milestones11.py`, `status11.py`. *Entwurf – wird während der Phase ergänzt.*
+`milestones11.py`, `status11.py`; Ergebnisse in `docs/lernen/daten/phase11_*.json`.
 
 ## Ausgangslage
 
@@ -118,3 +118,88 @@ Gespiegelte Level im Training von Arm A (letzte Episoden):
 - kurze gespiegelte Level: 10 % gewonnen, im Mittel 32 % des Weges,
 - gespiegelte lange Level: 0 % gewonnen, im Mittel 8 % des Weges,
 - gestorben wird fast immer in Gruben oder an Gegnern.
+
+**Weitere Ereignisse:**
+
+- **14:20 – Wichtiger Messbefund zur Prüfung.**
+  - Im gepaarten Nachtest (48 Versuche, gleiche Seeds) schaffte das Startmodell nur 26/48, nicht wie in
+    der Basis-Messung 51/64.
+  - Die Prüfungszahl der Meilensteine hängt also stark davon ab, welche Seeds gezogen werden.
+  - Die Bremsungen um 11:52, 14:24, 18:33 und 20:58 reagierten damit auf einen zufällig hohen Startwert.
+  - Die Lernrate blieb nach der Vorregistrierung auf dem Minimum von 1e-5.
+- **17:47 und 18:35 – Tempo.** Der ungepinnte Auswerter belegte zeitweise einen von Arm A's Kernen; A lief dann
+  mit ~60–120 fps. Abhilfe: Neustart von A und Auswerter auf feste Kerne gelegt.
+- **20:15 / 20:40** Ende der Arme. Die restlichen Fenster-Messungen liefen auf allen vier Kernen.
+
+## Urteil (vorregistriert; Fenster +6/+7/+8 Mio., EMA und EMA2 gepoolt)
+
+| | Arm A (mit Spiegel) | Arm B (ohne) |
+|---|---|---|
+| G | 50,9 % | 51,0 % |
+| dev_alt | 77,6 % | 79,8 % |
+| Prüfung | 66,1 % (Tor ✔) | 59,9 % (Tor ✘) |
+| Wächter-plus | 79,8 % | 79,6 % |
+| doppelgabel | 70 % | 81 % |
+| Sackgasse-Proben | 93 % | 95 % |
+| Gespiegelt | 3,8 % | 0 % |
+
+- **A gegen B:** kein Unterschied (ΔG < 5 Pp). Nur A besteht das Halte-Tor, also ist A der Kandidat.
+- **Kandidat:** Arm A, EMA2 bei +8 Mio., gesichert als `models/phase11_kandidat.zip`.
+- **Vorregistrierte Regel gegen Phase 10:** Der Kandidat liegt mit G 53,1 % mehr als 5 Pp über dem
+  Phase-10-Lehrer (37,8 %) und gilt damit als „besser“.
+
+## Gepaarter Abschlussvergleich (`scripts/vergleich11.py`)
+
+Gemessen mit den Seeds 1 und 2, die in der Auswahl nicht benutzt wurden, dazu 128 Prüfungsversuche:
+
+| | Phase-11-Kandidat | Phase-10-Lehrer | P8 |
+|---|---|---|---|
+| G | **49,8 %** | 38,8 % | 23,5 % |
+| dev_alt | **79,4 %** | 64,6 % | 67,4 % |
+| Prüfung (2 × 64 + 128 = 256 Versuche) | 179 (70 %) | 171 (67 %) | **197 (77 %)** |
+| doppelgabel | **66 %** | 0 % | 0 % |
+| Sackgasse-Proben | **89 %** | 66 % | 11 % |
+| Gespiegelt (alt) | **7,4 %** | 0 % | 0 % |
+| Wächter-plus | 79,8 % | 79,6 % | 80,2 % |
+| F (Phase-9-Fähigkeiten) | 38,2 % | **42,9 %** | 8,3 % |
+| dev_neu | 5,1 % | **18,8 %** | 0,4 % |
+| Test-Summe h8 (128) | 56 | 61 | **94** |
+| Test-Summe h9 (128) | 61 | 58 | 59 |
+| Test-Summe h10 (128) | 105 | 113 | **114** |
+| Schutz (160) | 160 | 158 | 152 |
+
+## Was wir gelernt haben
+
+1. **Gezielte Übung wirkt – und das schnell.**
+   - Die Übungsart mit realistischer Geometrie hat das doppelgabel-Problem in ~2 Mio. Schritten gelöst
+     (0 → 66–81 %).
+   - Entscheidend war die Diagnose: Lücke mit Boden darunter statt Grube. Die erste, „naheliegende“ Fassung traf
+     das Problem nicht.
+2. **Aber: dev_alt ist kein unabhängiges Maß mehr.**
+   - Die neue Übung wurde aus dem Dev-Level doppelgabel abgeleitet. Ein Teil des Sprungs von dev_alt
+     (65 → 79 %) ist doppelgabel selbst.
+   - Die **ungesehenen Test-Gruppen zeigen keinen Gewinn**: h8 56 statt 61, h10 105 statt 113, h9 61 statt 58.
+3. **P8 bleibt auf der Prüfung und auf dem handmade8-Test das stärkste Modell** (77 % bzw. 94/128).
+   - Phase 10 und Phase 11 haben neue Fähigkeiten dazugewonnen: Kanäle, Sackgassen, erste gespiegelte Siege.
+   - Dabei haben sie auf diesen beiden Gruppen gegenüber P8 verloren.
+4. **Spiegeln ist der harte Kern des Generalist-Ziels.**
+   - Mit 15 % gespiegelten Leveln und 353 gespiegelten Vorbild-Läufen kamen erste Siege (kurze und
+     mittellange gespiegelte Level 7–10 %).
+   - Gespiegelte lange Level blieben bei 0 %.
+   - Im Training sterben die Bots dort fast immer in Gruben oder an Gegnern, das Springen nach links ist unsicher.
+5. **serpentine wird verdrängt.** Die schnelle EMA verlernt den Kanal, die langsame EMA2 hält ihn länger.
+   Kanal-Übungen auf Stufe d2 gewinnt das Modell zu fast 100 %, die erzeugten Kanäle sind also zu leicht.
+6. **Messung:** Die Prüfung mit 64 Versuchen ist zu unsicher für Bremsen und Tore. Künftig sind ≥ 256 Versuche
+   über mehrere Seed-Sätze nötig.
+
+## Empfehlung
+
+- **Für `main` nicht empfohlen.** P8 ist auf der Prüfung, dem eigentlichen Ziel für `main`, weiterhin besser.
+- Der Phase-11-Kandidat ist das beste Modell für den Generalist-Weg: Sackgassen, alte Dev-Level, erste
+  Spiegel-Erfolge.
+- Die versiegelte Endauswertung bleibt gesperrt und soll gemeinsam mit dem Neustart-Modell gepaart laufen.
+- **Nächste Hebel:**
+  - Spiegeln mit einer eigenen Übungsart „links springen über Gruben/Gegner“, statt ganze gespiegelte Level.
+  - Schwerere Kanal-Übungen.
+  - Prüfungs-Messung mit 256+ Versuchen.
+  - Vergleich mit dem Neustart-Zweig, der beim h8-Test stärker ist.
