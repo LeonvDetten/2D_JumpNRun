@@ -1,0 +1,11 @@
+{
+  "action_repeat": 2,
+  "overview": true,
+  "arch": "grid",
+  "obs_v3": true,
+  "source": "neustart ks ema 44M",
+  "dev_alt": 0.7131,
+  "F": 0.488,
+  "waechter_val": 0.5859,
+  "pruefung": "42/64"
+}

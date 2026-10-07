@@ -3,7 +3,7 @@
 Rohdaten und Regeln: `docs/lernen/daten/neustart_vorregistrierung.json` (alle Schwellen, vor dem ersten
 PPO-Schritt committet), `docs/lernen/daten/neustart_profiling.json`, `docs/lernen/daten/neustart/` (Meilensteine,
 Drift, Autopilot-Zustand, Statusbild), Code `jumpnrun/rl/neustart_bc.py`, `autopilot_neustart.py`,
-`status_neustart.py`. *Entwurf – wird während des Laufs ergänzt.*
+`status_neustart.py`. Kandidaten für den gepaarten Endvergleich: `models/neustart_kandidat_*.zip`.
 
 ## Ausgangslage
 
@@ -85,5 +85,61 @@ Beobachtungen unterwegs:
   noch nicht (verlangt 72,3 %).
 - **Tempo:** von ~550 Schritte/s (Stufen bis 10) auf ~360 Schritte/s ab ~20 Mio. (vermutlich längere Level auf
   Stufe 12). Zwei weitere Sitzungs-Neustarts (19,4 Mio.) kosteten nur Minuten.
+
+| Mio. Schritte | dev_alt EMA / EMA2 | F EMA / EMA2 | Wächter EMA / EMA2 | Prüfung EMA / EMA2 (von 64) |
+|---|---|---|---|---|
+| 32 | 66,9 / 67,2 % | 43,1 / 46,7 % | 57,8 / 64,1 % | 21 / 27 |
+| 34 | 67,2 % / – | 43,6 % / – | 53,9 % / – | 23 / – |
+| 36 | 66,9 / 69,6 % | 46,3 / 47,6 % | 57,0 / 58,6 % | 29 / 32 |
+| 38 | 70,5 / 70,0 % | 46,8 / 48,4 % | 69,5 / 64,8 % | 38 / 39 |
+| 40 | 65,6 / 68,8 % | 46,4 / 46,8 % | 70,3 / 70,3 % | 32 / 34 |
+| 42 | 64,5 / 68,5 % | 45,2 / 45,5 % | 58,6 / 71,1 % | 32 / 34 |
+| 44 | 71,3 / 67,5 % | 48,8 / 44,3 % | 58,6 / 63,3 % | 42 / 31 |
+
+Ende: 45 Mio. Schritte am 07.10. um 18:23 UTC (≈ 31 h Wanduhr ab PPO-Start, Grenze 60 h).
+
+## Ergebnis (ohne versiegelte Werte)
+
+- **Alle drei Abbruchregeln bestanden** (+5 Mio.: dev_alt 46,8 %, F 33,5 %; +15 Mio.: 54,3 % / 35,1 %;
+  +30 Mio.: dev_alt 66,9 %, Wächter 64,5 %, F 43,0 %).
+- **Alt-Tor aus Phase 10 (select10-Fenster): 0 von 44 Ständen.** dev_alt erfüllt es ab ~28 Mio. durchgehend
+  (Fenster 67–69 %), der Wächter nicht: bestes Fenster 67,4 % bei 40 Mio. (verlangt 72,3 %). Phase 10 scheiterte
+  am selben Engpass (0 von 32, beste Wächter-Fenster 65–70 %).
+- **Kandidaten** (in `models/`, mit Messwerten in der Begleitdatei):
+
+  | Kandidat | Stand | dev_alt | F | Wächter | Prüfung |
+  |---|---|---|---|---|---|
+  | `neustart_kandidat_f` | EMA2 38 Mio. (bestes F-Fenster) | 70,0 % | 48,4 % | 64,8 % | 39/64 |
+  | `neustart_kandidat_waechter` | EMA2 40 Mio. (bestes Wächter-Fenster) | 68,8 % | 46,8 % | 70,3 % | 34/64 |
+  | `neustart_kandidat_pruefung` | EMA 44 Mio. | 71,3 % | 48,8 % | 58,6 % | 42/64 |
+
+- **Vergleich mit Phase 10** (gleiche Messung, Seed 0 – je eine volle Messung, also verrauscht; der gültige
+  Vergleich ist der spätere gepaarte Endvergleich):
+
+  | | dev_alt | F | Wächter | Prüfung |
+  |---|---|---|---|---|
+  | P8 (Basis) | 66,4 % | ≈ 8 % | 77,3 % | 44–52/64 |
+  | Phase 10 Kandidat Alt (Kontrolle EMA2 +6 Mio. Runde C) | 66,5 % | 43,5 % | 69,5 % | 46/64 |
+  | Phase 10 Runde D (P8 als Lehrer, EMA2 +6 Mio.) | 67,5 % | 43,4 % | – | 51/64 |
+  | Neustart Kandidat F (EMA2 38 Mio.) | 70,0 % | 48,4 % | 64,8 % | 39/64 |
+
+  Der Neustart liegt bei dev_alt (+3 Pp) und F (+5 Pp) vorn, beim Wächter etwa gleich, bei der Prüfung hinten
+  (39–42 gegen 46–51 von 64).
+
+## Was wir daraus lernen
+
+1. **Ein frisches Netz holt das P8-Niveau in ~30 Mio. Schritten zurück** – mit Löser-Nachahmen als Start und
+   Kickstarting von P8. Die P8-Linie brauchte dafür ~50 Mio. Schritte und mehrere Phasen.
+2. **Das Umkehren färbte nicht ab.** P(links+springen) auf alten Zuständen blieb nahe 0, auch ohne Lehrer.
+   Alt und Neu wurden gemeinsam gelernt statt gegeneinander getauscht – die Kernhoffnung des Neustarts.
+3. **Die Gewinne auf langen Leveln kamen spät,** mit sinkender Lernrate (Wächter 30 % bei 15 Mio., 65–70 % ab 38 Mio.).
+   EMA2 war dort meist besser als EMA.
+4. **F bleibt bei ~45–48 % hängen:** Von den 4 neuen Dev-Leveln gewann kein Ansatz je gabel_drei, kreuzung oder
+   spiegelweg. Das ist eine Grenze der Trainingsdaten, nicht des Neustarts.
+5. **Betrieb:** Ein 4-Thread-Trainer, der einen Kern mit der einfädigen Messung teilt, bricht auf ~5 % seines
+   Tempos ein; eigene Kerne für Messung und Training lösen das. Ein frisches Netz mit Tanh-Köpfen lernt beim
+   Nachahmen nur „immer rechts“.
+
+*Offen: der gepaarte Endvergleich mit Phase 10 (versiegelte Gruppe, einmalig) – Leons Entscheidung.*
 
 *(Fortsetzung folgt.)*
