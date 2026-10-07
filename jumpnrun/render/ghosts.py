@@ -130,13 +130,17 @@ class GhostView:
         subtitle: str = "",
     ) -> None:
         level = self.level
+        # phase 10: the chest may be on the left (mirrored levels) - the leader is the ghost closest to it
+        sign = -1 if level.goal_x < level.spawn[0] else 1
         alive_x = [s.player.x for s, r in zip(sims, running) if r]
-        leader_x = max(alive_x) if alive_x else max(s.player.x for s in sims)
+        pool = alive_x or [s.player.x for s in sims]
+        leader_x = max(pool, key=lambda x: sign * x)
         leader = None
         if alive_x:
-            leader = max((s for s, r in zip(sims, running) if r), key=lambda s: s.player.x)
+            leader = max((s for s, r in zip(sims, running) if r), key=lambda s: sign * s.player.x)
 
-        cam = 0 if self.fits else int(max(0, min(leader_x - 0.6 * self.view_w, level.pixel_width - self.view_w)))
+        lead = 0.6 if sign > 0 else 0.4
+        cam = 0 if self.fits else int(max(0, min(leader_x - lead * self.view_w, level.pixel_width - self.view_w)))
         view = self.base.subsurface((cam, 0, self.view_w, self.level_h)).copy()
 
         enemy_index = int(sims[0].frame * SPRITE_LOOP_SPEED) % 3 if sims else 0
