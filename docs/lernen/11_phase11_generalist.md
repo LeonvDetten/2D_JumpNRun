@@ -87,4 +87,34 @@ Lücke, unter der Boden liegt. Der Bot behandelt sie wie eine tödliche Grube.
 
 ## Verlauf
 
-*(wird während des Trainings ergänzt)*
+**Ereignisse:**
+
+- **09:01** Start beider Arme. Arm A läuft auf den Kernen 0–1, Arm B auf 2–3, je ~250–300 fps.
+- **10:30** Arm A stürzt ab: Eine Sackgasse der Stufe d2 war in 12 Versuchen nie schmal genug (> 170 Felder).
+  - Korrektur: Die Übungsquelle zieht einen neuen Seed statt abzustürzen; d2 darf bis 230 Felder breit sein.
+  - Beide Arme laufen vom letzten Checkpoint weiter.
+- **11:52** Die vorregistrierte Bremse greift. Auslöser: Die Prüfung von Arm A lag zweimal ≥ 8 Pp unter dem Start
+  (19/32, 39/64). Die Lernrate wird in beiden Armen halbiert (2e-5 → 1e-5).
+- **12:59** Korrektur eines Umsetzungsfehlers:
+  - Der neue zentrale Übungsstand ließ alle Übungsarten bei d0 beginnen.
+  - Die sieben Phase-10-Arten gewann das Modell dort zu 100 %. Sie bekamen deshalb nur das Mindestgewicht und
+    stiegen nie auf; `lange_sackgasse` belegte ~70 % der Übungsschritte.
+  - Folge: serpentine (Kanal) fiel in beiden Armen.
+  - Seitdem starten die sieben Arten auf d2, in beiden Armen gleich.
+
+**Messungen** (EMA; „klein“ = 16 Versuche je Level, Prüfung 32; „voll“ = 32 / 64 Versuche):
+
+| | Start | A +2 Mio. (voll) | B +2 Mio. (voll) | A +3 Mio. (klein) | B +3 Mio. (klein) |
+|---|---|---|---|---|---|
+| dev_alt | 67,5 % | 78,5 % | 73,3 % | 79,8 % | 77,3 % |
+| Prüfung | 51/64 | 39/64 | 46/64 | 25/32 | 20/32 |
+| doppelgabel | 0/16 | 11/16 | 5/16 | 14/16 | 15/16 |
+| Wächter-plus | 77,3 % | 81,8 % | 77,9 % | – | – |
+| Sackgasse-Proben | 61 % | 91 % | 89 % | – | – |
+| Gespiegelt | 0 % | 0 % | 0 % | – | – |
+| dev_neu | 23,4 % | 14,8 % | 23,4 % | 12,5 % | 7,8 % |
+
+Gespiegelte Level im Training von Arm A (letzte Episoden):
+- kurze gespiegelte Level: 10 % gewonnen, im Mittel 32 % des Weges,
+- gespiegelte lange Level: 0 % gewonnen, im Mittel 8 % des Weges,
+- gestorben wird fast immer in Gruben oder an Gegnern.
