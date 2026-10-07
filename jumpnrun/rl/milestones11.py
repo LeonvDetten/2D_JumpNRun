@@ -117,6 +117,8 @@ def pending(run: Path, done: dict, phase_start: int):
         for c in sorted(cdir.glob(f"{prefix}_step_*.zip")):
             steps = int(c.stem[len(prefix) + 6:])
             rel = round((steps - phase_start) / 1e6)
+            if rel == 0:  # the start model: measured once as the baseline (--once), not per run
+                continue
             full = rel % 2 == 0 or rel in VOLL_ALSO
             if prefix == "ema2" and not full:
                 continue
