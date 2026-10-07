@@ -263,10 +263,11 @@ def main() -> None:
     vec_env = VecMonitor(vec_env)
 
     tracker = CurriculumTracker(args.min_tier, args.max_tier)
+    from jumpnrun.levelgen.skills import KINDS as KINDS_START_D2
     if args.phase11:
-        from jumpnrun.levelgen.skills import SkillTracker
+        from jumpnrun.levelgen.skills import KINDS, SkillTracker
 
-        tracker.skill = SkillTracker()
+        tracker.skill = SkillTracker(start_levels={k: 2 for k in KINDS})
     if args.unlock_all:
         tracker.unlocked = args.max_tier
     config_path = run_dir / "config.json"
@@ -285,6 +286,8 @@ def main() -> None:
                 tracker.unlocked = max(args.min_tier, min(state["unlocked"], args.max_tier))
                 if getattr(tracker, "skill", None) is not None and "skill" in state:
                     tracker.skill.load(state["skill"])
+                    for k in KINDS_START_D2:  # phase 11: never below the start difficulty
+                        tracker.skill.level[k] = max(tracker.skill.level[k], 2)
         else:
             done = int(PPO.load(args.resume, device="cpu").num_timesteps) if args.resume else 0
         args.steps = args.target - done
