@@ -30,6 +30,10 @@ from jumpnrun.levelgen import generator as G
 KINDS = ("kanal_ende", "kanal2", "kanal3", "sackgasse_runter", "gabel_umkehren", "gabel_oben", "truhe_links_kurz")
 # Phase 11: + lange_sackgasse (the doppelgabel failure: the phase-10 bot walks back along a long dead-end road but
 # climbs the stairs up again instead of dropping to the floor and going on under the road)
+# The fork is built by _long_fork, not generator._fork_v10: there the road always continues the top stair step,
+# while in doppelgabel a 2-tile gap (with floor below) separates them - the phase-10 bot walks back to that gap and
+# turns around as if it were a pit. _long_fork varies the gaps between the steps (1-3), the gap between the top
+# step and the road (0-3) and the road height (level with or one row above the top step).
 #   d0  spawn at the wall of a 20-28 tiles road without gaps, no enemies
 #   d1  road 30-40 tiles, an enemy on the floor under the road
 #   d2  two such forks in a row (25-40 tiles each), normal start before the first, enemies
@@ -78,6 +82,33 @@ def _channel(b: G._Builder, cfg: G.TierConfig, final: bool, wide: bool) -> int:
         b.surface = G.HIGHEST_SURFACE
         b.flat(rng.randint(3, 5))
     return s + w - 2
+
+
+def _long_fork(b: G._Builder, length: int) -> int:
+    """Stairs (3 steps, varied gaps) up to a gap-less dead-end road over a floor; returns the wall column."""
+
+    rng = b.rng
+    b.flat(2)
+    row = GROUND
+    for i in range(3):
+        for _ in range(rng.randint(1, 3) if i else rng.randint(0, 1)):  # floor only (the "gap" has floor below)
+            b.column(GROUND)
+        row -= 1
+        for _ in range(rng.randint(1, 3)):
+            b.column(GROUND, {row: "B"})
+    for _ in range(rng.randint(0, 3)):
+        b.column(GROUND)
+    road = row - (1 if rng.random() < 0.5 else 0)
+    for _ in range(length):
+        b.column(GROUND, {road: "B"})
+    wall = len(b.columns) - 1
+    for r in range(max(0, road - 3), road):
+        b.columns[wall][r] = "B"
+    b.needs_path = True
+    b.stats["lange_sackgasse"] = b.stats.get("lange_sackgasse", 0) + 1
+    b.surface = GROUND
+    b.flat(rng.randint(3, 5))
+    return wall
 
 
 def _segments(b: G._Builder, cfg: G.TierConfig, n: int) -> None:
@@ -136,15 +167,15 @@ def _build(kind: str, difficulty: int, rng: random.Random):
     elif kind == "lange_sackgasse":
         if difficulty < 2:
             start = len(b.columns)
-            G._fork_v10(b, cfg, "umkehren", length=rng.randint(20, 28) if difficulty == 0 else rng.randint(30, 40))
-            wall = max(c for c in range(start, len(b.columns))
-                       if sum(ch == "B" for ch in b.columns[c][:GROUND]) >= 3 and b.columns[c][GROUND] == "B")
+            wall = _long_fork(b, rng.randint(20, 28) if difficulty == 0 else rng.randint(30, 40))
             if difficulty == 1:  # an enemy on the floor under the road
-                b.columns[rng.randint(start + 10, wall - 4)][GROUND - 1] = "E"
+                b.columns[rng.randint(start + 12, wall - 4)][GROUND - 1] = "E"
             key, high = wall - 1, True
         else:
-            G._fork_v10(b, cfg, "umkehren", length=rng.randint(25, 40))
-            G._fork_v10(b, cfg, "umkehren", length=rng.randint(25, 40))
+            for _ in range(2):
+                wall = _long_fork(b, rng.randint(25, 40))
+                if rng.random() < 0.5:
+                    b.columns[wall - rng.randint(4, 12)][GROUND - 1] = "E"
             key = None
         G._segment(b, cfg)
         _finish(b)
