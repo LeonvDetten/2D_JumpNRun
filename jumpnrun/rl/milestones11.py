@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import time
 from pathlib import Path
 
@@ -124,6 +125,8 @@ def pending(run: Path, done: dict, phase_start: int):
                 continue
             if f"{steps}:{prefix}" not in done:
                 todo.append((steps, prefix, full, c))
+    if os.environ.get("PHASE11_NO_RAW"):  # evaluator behind the arms: raw checkpoints are not used in any verdict
+        return todo
     seen = set()
     for c in sorted(cdir.glob("step_*.zip"))[:-1]:
         steps = int(c.stem[5:])
@@ -173,15 +176,35 @@ def main() -> None:
         if not jobs:
             time.sleep(15)
             continue
-        steps, _, run, kind, full, ckpt = min(jobs, key=lambda j: (j[0], j[1]))
+        claimed = None
+        for steps, _, run, kind, full, ckpt in sorted(jobs, key=lambda j: (j[0], j[1])):
+            lock = run / f".m11_{steps}_{kind}.lock"  # several evaluators in parallel: one job each
+            try:
+                os.close(os.open(lock, os.O_CREAT | os.O_EXCL))
+            except FileExistsError:
+                if time.time() - lock.stat().st_mtime < 3 * 3600:
+                    continue
+                lock.touch()  # stale (evaluator died): take it over
+            claimed = (steps, run, kind, full, ckpt, lock)
+            break
+        if claimed is None:
+            time.sleep(15)
+            continue
+        steps, run, kind, full, ckpt, lock = claimed
         t0 = time.time()
         res = evaluate(ckpt, full=full, seed=0)
         res["seconds"] = round(time.time() - t0)
         res["checkpoint"] = ckpt.name
         path = run / "milestones11.json"
-        done = json.loads(path.read_text()) if path.exists() else {}
-        done[f"{steps}:{kind}"] = res
-        path.write_text(json.dumps(done, indent=1))
+        import fcntl
+
+        with open(run / ".m11_write.lock", "w") as guard:  # read-modify-write under a lock (parallel evaluators)
+            fcntl.flock(guard, fcntl.LOCK_EX)
+            done = json.loads(path.read_text()) if path.exists() else {}
+            done[f"{steps}:{kind}"] = res
+            tmp = path.with_name(path.name + f".{os.getpid()}.tmp")
+            tmp.write_text(json.dumps(done, indent=1))
+            os.replace(tmp, path)
         print(f"{run.name} {steps:,} {kind}: {describe(res)} [{res['seconds']}s]", flush=True)
 
 
