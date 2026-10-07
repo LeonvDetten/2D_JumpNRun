@@ -1,4 +1,4 @@
-# Lerntagebuch 11 – Neustart: ein frisches Netz neben Phase 10
+# Lerntagebuch 10b – Neustart: ein frisches Netz neben Phase 10
 
 Rohdaten und Regeln: `docs/lernen/daten/neustart_vorregistrierung.json` (alle Schwellen, vor dem ersten
 PPO-Schritt committet), `docs/lernen/daten/neustart_profiling.json`, `docs/lernen/daten/neustart/` (Meilensteine,
