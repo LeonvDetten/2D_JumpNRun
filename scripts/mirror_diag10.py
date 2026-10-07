@@ -18,7 +18,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-MODELS = {"p8": "models/phase8_final.zip", "kandidat": "models/phase10_kandidat_alt.zip"}
+MODELS = {"p8": "models/phase8_final.zip", "kandidat": "models/phase10_kandidat_alt.zip", "lehrer": "models/phase10_kandidat_lehrer.zip"}
 N = 16
 
 

@@ -222,3 +222,54 @@ Leon entschied am 4./5. Oktober:
      die alten Level stetig.
 6. **Offene Hauptfrage:** Verursacht der Wechsel auf Weg-Belohnung und Weg-Zeitregel das Vergessen, und hilft ein
    frisches Netz (Plastizität)? Das prüft der Neustart-Arm.
+
+
+## Nachtrag: Runde D und Prüfungen (06./07.10.)
+
+Leon: Ziel bleibt der **Generalist** (beide Richtungen, beliebig komplex), keine Rechts-Belohnung auf
+Phase-8-Leveln. In der Wartezeit auf den Neustart-Arm liefen vier Teile.
+
+1. **Runde D – P8 als Lehrer auf den eigenen Zuständen** (6 Mio. Schritte ab `phase10_kandidat_alt`):
+   - Auf Phase-8-Leveln zeigt das eingefrorene P8 an jedem Zustand, den der Bot gerade erlebt, was es tun würde.
+     Das ist eine KL über die 6 alten Aktionen; links+springen bleibt frei.
+   - Das Gewicht sinkt von 1,0 auf 0,1. Sonst wie die Kontrolle aus Runde C.
+   - Bestes Modell EMA2 +6 Mio. (`models/phase10_kandidat_lehrer.zip`): dev_alt 67,5 %, Prüfung 51/64,
+     Schutz 79/80, F 43,4 %, dev_neu 23,4 %.
+   - **Damit liegt es auf den alten Dev-Leveln und der Prüfung auf P8-Niveau oder darüber, und hat dazu die
+     neuen Fähigkeiten.**
+   - Mit auslaufendem Lehrer (unter ~0,3) wurde das rohe Modell wieder unruhiger.
+   - Der handmade8-Test blieb bei 29–31/64 (P8 ~46).
+2. **Genauere Wächter-Messung** (8 neue Level, 12 × 64 Versuche, gepaart):
+
+   | Modell | Wächter |
+   |---|---|
+   | P8 | 82,2 % |
+   | Lehrer-Kandidat | 79,0 % |
+   | Runde-C-Kandidat | 77,3 % |
+   | Delle | 60,9 % |
+
+   - Die alte 4-Level-Messung streute um über 10 Pp, auch bei P8.
+3. **Spiegel-Messung** (Truhe links):
+
+   | Modell | Dev-Level gespiegelt | Wächter gespiegelt |
+   |---|---|---|
+   | P8 | 0/176 | 0/64 |
+   | alle Phase-10-Modelle | 0/176 | 0/64 |
+
+   - **Kein Modell kann lange Level in Gegenrichtung**, obwohl kurze „Truhe links“-Proben zu ~90 % gelingen.
+   - Verlorene Versuche normal: Die Phase-10-Modelle stürzen häufiger in Gruben als P8.
+4. **Architektur-Test per Nachahmung** (gleiche Lehrer-Daten; Varianten heute, symmetrische Sicht, Gedächtnis,
+   doppelte Breite):
+   - Nachahmung auf zurückgehaltenen Episoden: P8 74/74/74/**78** %, Übung und Spiegel jeweils ~96 %.
+   - Selbstspielen: alle schwach und gleichauf (2–7 % Dev, 19–24 % Übung, 5–12 % gespiegelt).
+   - → **Die Architektur ist nicht der Engpass.** Nur mehr Breite hilft etwas beim Festhalten von P8.
+   - Nachahmen allein ergibt keinen Spieler.
+   - Gespiegelte Trainingsdaten bringen schon beim Nachahmen erste Siege in Gegenrichtung.
+
+**Folgerung für den Generalisten:**
+- Gespiegelte Level gehören fest ins Verstärkungslernen, mit Löser-Beispielen in Gegenrichtung (vorbereitet:
+  `runs/demos_spiegel`, 353 Demos; `MirrorSource` im Mischplan).
+- P8 bleibt als Lehrer, mit nicht zu stark auslaufendem Gewicht.
+- Optional ein breiteres Netz.
+- Der handmade8-Test zeigt eine Lücke, die weder der Lehrer noch mehr Phase-8-Daten schließen. Dort kommt
+  vermutlich eine Situation vor, die im Training fehlt; die Testlevel bleiben geschlossen.
