@@ -13522,5 +13522,822 @@
   "alt": 0.6055,
   "seconds": 781,
   "checkpoint": "ema_step_0034000000.zip"
+ },
+ "34000000:ema2": {
+  "size": "voll",
+  "seed": 0,
+  "dev": {
+   "pruefung": {
+    "won": 23,
+    "of": 64
+   },
+   "serie_berg": {
+    "won": 31,
+    "of": 32
+   },
+   "serie_festung": {
+    "won": 29,
+    "of": 32
+   },
+   "serie_hoehle": {
+    "won": 23,
+    "of": 32
+   },
+   "serie_lange_reise": {
+    "won": 19,
+    "of": 32
+   },
+   "serie_parcours": {
+    "won": 32,
+    "of": 32
+   },
+   "serie_zwei_wege": {
+    "won": 32,
+    "of": 32
+   },
+   "hand_abgrund": {
+    "won": 32,
+    "of": 32
+   },
+   "hand_doppelgabel": {
+    "won": 2,
+    "of": 32
+   },
+   "hand_hoehlendach": {
+    "won": 32,
+    "of": 32
+   },
+   "hand_lange_tour": {
+    "won": 0,
+    "of": 32
+   },
+   "hand9_gabel_drei": {
+    "won": 0,
+    "of": 32
+   },
+   "hand9_kreuzung": {
+    "won": 0,
+    "of": 32
+   },
+   "hand9_serpentine": {
+    "won": 27,
+    "of": 32
+   },
+   "hand9_spiegelweg": {
+    "won": 0,
+    "of": 32
+   }
+  },
+  "dev_alt": 0.6918,
+  "dev_neu": 0.2109,
+  "proben_stoch": {
+   "truhe_abgrund": {
+    "won": 37,
+    "of": 40
+   },
+   "hohe_steine": {
+    "won": 26,
+    "of": 40
+   },
+   "gegner_treppe": {
+    "won": 29,
+    "of": 40
+   },
+   "koeder": {
+    "won": 32,
+    "of": 40
+   },
+   "decke": {
+    "won": 36,
+    "of": 40
+   },
+   "luftstart": {
+    "won": 32,
+    "of": 40
+   },
+   "gegner_entgegen": {
+    "won": 34,
+    "of": 40
+   },
+   "umkehren": {
+    "won": 38,
+    "of": 40
+   },
+   "kanal": {
+    "won": 33,
+    "of": 40
+   },
+   "truhe_links": {
+    "won": 11,
+    "of": 40
+   },
+   "mario": {
+    "won": 37,
+    "of": 40
+   },
+   "lang": {
+    "won": 35,
+    "of": 40
+   },
+   "gegner_dicht": {
+    "won": 36,
+    "of": 40
+   }
+  },
+  "f_proben": 0.6833,
+  "F": 0.4471,
+  "proben_det": {
+   "truhe_abgrund": {
+    "won": 18,
+    "of": 20
+   },
+   "hohe_steine": {
+    "won": 15,
+    "of": 20
+   },
+   "gegner_treppe": {
+    "won": 17,
+    "of": 20
+   },
+   "koeder": {
+    "won": 17,
+    "of": 20
+   },
+   "decke": {
+    "won": 20,
+    "of": 20
+   },
+   "luftstart": {
+    "won": 16,
+    "of": 20
+   },
+   "gegner_entgegen": {
+    "won": 17,
+    "of": 20
+   },
+   "umkehren": {
+    "won": 19,
+    "of": 20
+   },
+   "kanal": {
+    "won": 17,
+    "of": 20
+   },
+   "truhe_links": {
+    "won": 7,
+    "of": 20
+   },
+   "mario": {
+    "won": 20,
+    "of": 20
+   },
+   "lang": {
+    "won": 19,
+    "of": 20
+   },
+   "gegner_dicht": {
+    "won": 19,
+    "of": 20
+   }
+  },
+  "uebung_stoch": {
+   "kanal_ende": {
+    "won": 36,
+    "of": 40
+   },
+   "kanal2": {
+    "won": 37,
+    "of": 40
+   },
+   "kanal3": {
+    "won": 39,
+    "of": 40
+   },
+   "sackgasse_runter": {
+    "won": 39,
+    "of": 40
+   },
+   "gabel_umkehren": {
+    "won": 37,
+    "of": 40
+   },
+   "gabel_oben": {
+    "won": 38,
+    "of": 40
+   },
+   "truhe_links_kurz": {
+    "won": 23,
+    "of": 40
+   }
+  },
+  "uebung_det": {
+   "kanal_ende": {
+    "won": 36,
+    "of": 40
+   },
+   "kanal2": {
+    "won": 39,
+    "of": 40
+   },
+   "kanal3": {
+    "won": 38,
+    "of": 40
+   },
+   "sackgasse_runter": {
+    "won": 37,
+    "of": 40
+   },
+   "gabel_umkehren": {
+    "won": 35,
+    "of": 40
+   },
+   "gabel_oben": {
+    "won": 40,
+    "of": 40
+   },
+   "truhe_links_kurz": {
+    "won": 23,
+    "of": 40
+   }
+  },
+  "schutz": {
+   "won": 72,
+   "of": 80
+  },
+  "waechter_val": {
+   "hand10_g0": {
+    "won": 21,
+    "of": 32
+   },
+   "hand10_g2": {
+    "won": 28,
+    "of": 32
+   },
+   "hand10_g3": {
+    "won": 16,
+    "of": 32
+   },
+   "hand10_g7": {
+    "won": 15,
+    "of": 32
+   }
+  },
+  "waechter_val_rate": 0.625,
+  "test_summen": {
+   "h8": {
+    "won": 38,
+    "of": 64
+   },
+   "h9": {
+    "won": 32,
+    "of": 64
+   },
+   "h10": {
+    "won": 44,
+    "of": 64
+   }
+  },
+  "alt": 0.6584,
+  "seconds": 835,
+  "checkpoint": "ema2_step_0034000000.zip"
+ },
+ "34000000:raw": {
+  "size": "klein",
+  "seed": 0,
+  "dev": {
+   "pruefung": {
+    "won": 10,
+    "of": 32
+   },
+   "serie_berg": {
+    "won": 15,
+    "of": 16
+   },
+   "serie_festung": {
+    "won": 15,
+    "of": 16
+   },
+   "serie_hoehle": {
+    "won": 13,
+    "of": 16
+   },
+   "serie_lange_reise": {
+    "won": 4,
+    "of": 16
+   },
+   "serie_parcours": {
+    "won": 16,
+    "of": 16
+   },
+   "serie_zwei_wege": {
+    "won": 16,
+    "of": 16
+   },
+   "hand_abgrund": {
+    "won": 16,
+    "of": 16
+   },
+   "hand_doppelgabel": {
+    "won": 2,
+    "of": 16
+   },
+   "hand_hoehlendach": {
+    "won": 16,
+    "of": 16
+   },
+   "hand_lange_tour": {
+    "won": 0,
+    "of": 16
+   },
+   "hand9_gabel_drei": {
+    "won": 0,
+    "of": 16
+   },
+   "hand9_kreuzung": {
+    "won": 0,
+    "of": 16
+   },
+   "hand9_serpentine": {
+    "won": 7,
+    "of": 16
+   },
+   "hand9_spiegelweg": {
+    "won": 1,
+    "of": 16
+   }
+  },
+  "dev_alt": 0.6705,
+  "dev_neu": 0.125,
+  "proben_stoch": {
+   "umkehren": {
+    "won": 39,
+    "of": 40
+   },
+   "kanal": {
+    "won": 35,
+    "of": 40
+   },
+   "truhe_links": {
+    "won": 14,
+    "of": 40
+   }
+  },
+  "f_proben": 0.7333,
+  "F": 0.4291,
+  "alt": 0.6705,
+  "seconds": 94,
+  "checkpoint": "step_0034000000.zip"
+ },
+ "35000000:ema": {
+  "size": "klein",
+  "seed": 0,
+  "dev": {
+   "pruefung": {
+    "won": 16,
+    "of": 32
+   },
+   "serie_berg": {
+    "won": 15,
+    "of": 16
+   },
+   "serie_festung": {
+    "won": 14,
+    "of": 16
+   },
+   "serie_hoehle": {
+    "won": 12,
+    "of": 16
+   },
+   "serie_lange_reise": {
+    "won": 5,
+    "of": 16
+   },
+   "serie_parcours": {
+    "won": 15,
+    "of": 16
+   },
+   "serie_zwei_wege": {
+    "won": 16,
+    "of": 16
+   },
+   "hand_abgrund": {
+    "won": 16,
+    "of": 16
+   },
+   "hand_doppelgabel": {
+    "won": 1,
+    "of": 16
+   },
+   "hand_hoehlendach": {
+    "won": 15,
+    "of": 16
+   },
+   "hand_lange_tour": {
+    "won": 1,
+    "of": 16
+   },
+   "hand9_gabel_drei": {
+    "won": 0,
+    "of": 16
+   },
+   "hand9_kreuzung": {
+    "won": 0,
+    "of": 16
+   },
+   "hand9_serpentine": {
+    "won": 11,
+    "of": 16
+   },
+   "hand9_spiegelweg": {
+    "won": 0,
+    "of": 16
+   }
+  },
+  "dev_alt": 0.6705,
+  "dev_neu": 0.1719,
+  "proben_stoch": {
+   "umkehren": {
+    "won": 39,
+    "of": 40
+   },
+   "kanal": {
+    "won": 35,
+    "of": 40
+   },
+   "truhe_links": {
+    "won": 12,
+    "of": 40
+   }
+  },
+  "f_proben": 0.7167,
+  "F": 0.4443,
+  "alt": 0.6705,
+  "seconds": 93,
+  "checkpoint": "ema_step_0035000000.zip"
+ },
+ "35000000:raw": {
+  "size": "klein",
+  "seed": 0,
+  "dev": {
+   "pruefung": {
+    "won": 14,
+    "of": 32
+   },
+   "serie_berg": {
+    "won": 16,
+    "of": 16
+   },
+   "serie_festung": {
+    "won": 16,
+    "of": 16
+   },
+   "serie_hoehle": {
+    "won": 9,
+    "of": 16
+   },
+   "serie_lange_reise": {
+    "won": 8,
+    "of": 16
+   },
+   "serie_parcours": {
+    "won": 13,
+    "of": 16
+   },
+   "serie_zwei_wege": {
+    "won": 16,
+    "of": 16
+   },
+   "hand_abgrund": {
+    "won": 16,
+    "of": 16
+   },
+   "hand_doppelgabel": {
+    "won": 0,
+    "of": 16
+   },
+   "hand_hoehlendach": {
+    "won": 16,
+    "of": 16
+   },
+   "hand_lange_tour": {
+    "won": 0,
+    "of": 16
+   },
+   "hand9_gabel_drei": {
+    "won": 0,
+    "of": 16
+   },
+   "hand9_kreuzung": {
+    "won": 0,
+    "of": 16
+   },
+   "hand9_serpentine": {
+    "won": 15,
+    "of": 16
+   },
+   "hand9_spiegelweg": {
+    "won": 1,
+    "of": 16
+   }
+  },
+  "dev_alt": 0.6648,
+  "dev_neu": 0.25,
+  "proben_stoch": {
+   "umkehren": {
+    "won": 34,
+    "of": 40
+   },
+   "kanal": {
+    "won": 37,
+    "of": 40
+   },
+   "truhe_links": {
+    "won": 11,
+    "of": 40
+   }
+  },
+  "f_proben": 0.6833,
+  "F": 0.4667,
+  "alt": 0.6648,
+  "seconds": 95,
+  "checkpoint": "step_0035000000.zip"
+ },
+ "36000000:ema": {
+  "size": "voll",
+  "seed": 0,
+  "dev": {
+   "pruefung": {
+    "won": 29,
+    "of": 64
+   },
+   "serie_berg": {
+    "won": 32,
+    "of": 32
+   },
+   "serie_festung": {
+    "won": 30,
+    "of": 32
+   },
+   "serie_hoehle": {
+    "won": 18,
+    "of": 32
+   },
+   "serie_lange_reise": {
+    "won": 13,
+    "of": 32
+   },
+   "serie_parcours": {
+    "won": 32,
+    "of": 32
+   },
+   "serie_zwei_wege": {
+    "won": 31,
+    "of": 32
+   },
+   "hand_abgrund": {
+    "won": 32,
+    "of": 32
+   },
+   "hand_doppelgabel": {
+    "won": 1,
+    "of": 32
+   },
+   "hand_hoehlendach": {
+    "won": 32,
+    "of": 32
+   },
+   "hand_lange_tour": {
+    "won": 0,
+    "of": 32
+   },
+   "hand9_gabel_drei": {
+    "won": 0,
+    "of": 32
+   },
+   "hand9_kreuzung": {
+    "won": 0,
+    "of": 32
+   },
+   "hand9_serpentine": {
+    "won": 30,
+    "of": 32
+   },
+   "hand9_spiegelweg": {
+    "won": 0,
+    "of": 32
+   }
+  },
+  "dev_alt": 0.669,
+  "dev_neu": 0.2344,
+  "proben_stoch": {
+   "truhe_abgrund": {
+    "won": 36,
+    "of": 40
+   },
+   "hohe_steine": {
+    "won": 25,
+    "of": 40
+   },
+   "gegner_treppe": {
+    "won": 37,
+    "of": 40
+   },
+   "koeder": {
+    "won": 33,
+    "of": 40
+   },
+   "decke": {
+    "won": 32,
+    "of": 40
+   },
+   "luftstart": {
+    "won": 34,
+    "of": 40
+   },
+   "gegner_entgegen": {
+    "won": 36,
+    "of": 40
+   },
+   "umkehren": {
+    "won": 37,
+    "of": 40
+   },
+   "kanal": {
+    "won": 33,
+    "of": 40
+   },
+   "truhe_links": {
+    "won": 13,
+    "of": 40
+   },
+   "mario": {
+    "won": 39,
+    "of": 40
+   },
+   "lang": {
+    "won": 36,
+    "of": 40
+   },
+   "gegner_dicht": {
+    "won": 37,
+    "of": 40
+   }
+  },
+  "f_proben": 0.6917,
+  "F": 0.463,
+  "proben_det": {
+   "truhe_abgrund": {
+    "won": 19,
+    "of": 20
+   },
+   "hohe_steine": {
+    "won": 14,
+    "of": 20
+   },
+   "gegner_treppe": {
+    "won": 15,
+    "of": 20
+   },
+   "koeder": {
+    "won": 20,
+    "of": 20
+   },
+   "decke": {
+    "won": 20,
+    "of": 20
+   },
+   "luftstart": {
+    "won": 18,
+    "of": 20
+   },
+   "gegner_entgegen": {
+    "won": 15,
+    "of": 20
+   },
+   "umkehren": {
+    "won": 18,
+    "of": 20
+   },
+   "kanal": {
+    "won": 18,
+    "of": 20
+   },
+   "truhe_links": {
+    "won": 9,
+    "of": 20
+   },
+   "mario": {
+    "won": 20,
+    "of": 20
+   },
+   "lang": {
+    "won": 19,
+    "of": 20
+   },
+   "gegner_dicht": {
+    "won": 17,
+    "of": 20
+   }
+  },
+  "uebung_stoch": {
+   "kanal_ende": {
+    "won": 34,
+    "of": 40
+   },
+   "kanal2": {
+    "won": 39,
+    "of": 40
+   },
+   "kanal3": {
+    "won": 38,
+    "of": 40
+   },
+   "sackgasse_runter": {
+    "won": 39,
+    "of": 40
+   },
+   "gabel_umkehren": {
+    "won": 36,
+    "of": 40
+   },
+   "gabel_oben": {
+    "won": 37,
+    "of": 40
+   },
+   "truhe_links_kurz": {
+    "won": 18,
+    "of": 40
+   }
+  },
+  "uebung_det": {
+   "kanal_ende": {
+    "won": 38,
+    "of": 40
+   },
+   "kanal2": {
+    "won": 39,
+    "of": 40
+   },
+   "kanal3": {
+    "won": 40,
+    "of": 40
+   },
+   "sackgasse_runter": {
+    "won": 36,
+    "of": 40
+   },
+   "gabel_umkehren": {
+    "won": 34,
+    "of": 40
+   },
+   "gabel_oben": {
+    "won": 39,
+    "of": 40
+   },
+   "truhe_links_kurz": {
+    "won": 23,
+    "of": 40
+   }
+  },
+  "schutz": {
+   "won": 74,
+   "of": 80
+  },
+  "waechter_val": {
+   "hand10_g0": {
+    "won": 19,
+    "of": 32
+   },
+   "hand10_g2": {
+    "won": 22,
+    "of": 32
+   },
+   "hand10_g3": {
+    "won": 14,
+    "of": 32
+   },
+   "hand10_g7": {
+    "won": 18,
+    "of": 32
+   }
+  },
+  "waechter_val_rate": 0.5703,
+  "test_summen": {
+   "h8": {
+    "won": 36,
+    "of": 64
+   },
+   "h9": {
+    "won": 30,
+    "of": 64
+   },
+   "h10": {
+    "won": 51,
+    "of": 64
+   }
+  },
+  "alt": 0.6197,
+  "seconds": 810,
+  "checkpoint": "ema_step_0036000000.zip"
  }
 }
