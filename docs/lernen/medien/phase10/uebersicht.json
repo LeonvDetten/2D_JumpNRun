@@ -1,0 +1,35 @@
+{
+ "1_alt_dev": {
+  "p8": "15/16",
+  "phase10": "13/16"
+ },
+ "2_pruefung": {
+  "phase10": "11/16",
+  "p8": "11/16"
+ },
+ "3_schutz": {
+  "phase10": "16/16"
+ },
+ "5_phase9_dev": {
+  "p8": "0/16",
+  "phase10": "11/16"
+ },
+ "4_waechter": {
+  "phase10": "8/16",
+  "p8": "7/16"
+ },
+ "6_kanal_probe": {
+  "phase10": "13/16",
+  "p8": "0/16"
+ },
+ "7_umkehren_probe": {
+  "phase10": "16/16"
+ },
+ "8_ersatz_h8_test_doppelgabel": {
+  "phase10": "0/16",
+  "p8": "0/16"
+ },
+ "9_gespiegelt_lang": {
+  "phase10": "0/16"
+ }
+}

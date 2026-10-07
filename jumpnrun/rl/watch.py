@@ -32,10 +32,10 @@ from jumpnrun.rl.modelinfo import env_kwargs
 class GhostRun:
     """N bots on the same level, advanced frame by frame together."""
 
-    def __init__(self, level: Level, n: int, action_repeat: int = ACTION_REPEAT, overview: bool = False):
+    def __init__(self, level: Level, n: int, action_repeat: int = ACTION_REPEAT, overview: bool = False, **env_extra):
         self.level = level
         self.action_repeat = action_repeat
-        self.envs = [JumpNRunEnv(fixed_levels([level]), action_repeat=action_repeat, overview=overview)
+        self.envs = [JumpNRunEnv(fixed_levels([level]), action_repeat=action_repeat, overview=overview, **env_extra)
                      for _ in range(n)]
         self.obs = [env.reset(seed=i)[0] for i, env in enumerate(self.envs)]
         self.running = [True] * n
