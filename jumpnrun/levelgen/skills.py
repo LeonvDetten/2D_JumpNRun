@@ -232,7 +232,7 @@ def make_skill_level(kind: str, difficulty: int, seed: str, max_tries: int = 12)
         if built is None:
             continue
         lines, width = built
-        if width > MAX_WIDTH.get(kind, 120):  # long random segments: keep practice levels short
+        if width > MAX_WIDTH.get(kind, 120) + (60 if kind == "lange_sackgasse" and difficulty == 2 else 0):  # long random segments: keep practice levels short
             continue
         try:
             level = Level(lines, name=f"skill_{kind}_d{difficulty}")
@@ -281,7 +281,13 @@ class SkillSource:
         kind = rng.choices(kinds, weights=weights)[0]
         top = self.level[kind]
         d = top if top == 0 or rng.random() < 0.7 else rng.randrange(top)
-        level = make_skill_level(kind, d, f"{self.seed_space}:{kind}:{d}:{rng.randrange(10**9)}")
+        for attempt in range(5):  # phase 11: a seed without a valid level (12 tries) must not end the training
+            try:
+                level = make_skill_level(kind, d, f"{self.seed_space}:{kind}:{d}:{rng.randrange(10**9)}")
+                break
+            except RuntimeError:
+                if attempt == 4:
+                    raise
         level.source = "skill"
         level.augmentations = []
         return level, -4
