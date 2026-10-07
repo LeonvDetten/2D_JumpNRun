@@ -12,7 +12,8 @@
   "2026-10-06 17:04 Arm ks: Abbruchregel +5M bestanden {\"dev_alt\": 0.4682, \"F\": 0.3348, \"n\": 4, \"waechter_val\": 0.0625, \"unter\": []}",
   "2026-10-06 22:44 Arm ks: Abbruchregel +15M bestanden {\"dev_alt\": 0.5432, \"F\": 0.3505, \"n\": 4, \"waechter_val\": 0.3203, \"unter\": []}",
   "2026-10-06 22:44 Arm ks: Sicherungspaket +15 Mio. (15,000,000 Schritte) -> backup_neustart/ks",
-  "2026-10-07 00:38 Arm ks: Training gestartet/fortgesetzt bei 19,400,000 (Kerne [0, 1, 2])"
+  "2026-10-07 00:38 Arm ks: Training gestartet/fortgesetzt bei 19,400,000 (Kerne [0, 1, 2])",
+  "2026-10-07 07:35 Arm ks: Sicherungspaket +30 Mio. (30,000,000 Schritte) -> backup_neustart/ks"
  ],
  "started": 1791284223.9751284,
  "arms": {
@@ -38,7 +39,8 @@
    "threads": 3,
    "sicherung": [
     5,
-    15
+    15,
+    30
    ]
   }
  },
