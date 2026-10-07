@@ -622,7 +622,7 @@ def _bait_fork(b: _Builder, cfg: TierConfig) -> None:
     b.waypoints.append((len(b.columns) - 1, b.surface))
 
 
-def _fork_v10(b: _Builder, cfg: TierConfig, kind: str = "") -> None:
+def _fork_v10(b: _Builder, cfg: TierConfig, kind: str = "", length: int = None) -> None:
     """Phase 9 (v10): the repaired fork. Stairs up to an upper road over a floor - which branch goes on is random.
 
     unten     the road dead-ends at a wall, the floor goes on (no deadly pit under the road's end any more,
@@ -643,7 +643,7 @@ def _fork_v10(b: _Builder, cfg: TierConfig, kind: str = "") -> None:
         road_row -= 1
         items.append((1, None))
         items.append((rng.randint(1, 2), road_row))
-    length = rng.randint(14, 30)
+    length = rng.randint(14, 30) if length is None else length  # phase 11: lange_sackgasse sets it
     placed = 0
     while placed < length:
         gap = 0 if kind == "umkehren" else rng.randint(1, 2)

@@ -27,7 +27,8 @@ def bc2_dataset(dirs) -> dict:
     import hashlib
 
     files = sorted(f for d in dirs for f in Path(d).glob("demos*.jsonl"))
-    key = hashlib.sha256("|".join(f"{f}:{f.stat().st_size}" for f in files).encode()).hexdigest()[:16]
+    # "v2": phase 11 replays mirrored phase-9 demos with their enemy direction (demos.demo_enemy_dir)
+    key = hashlib.sha256(("v2|" + "|".join(f"{f}:{f.stat().st_size}" for f in files)).encode()).hexdigest()[:16]
     cache = Path(dirs[0]) / f"bc2_{key}.npz"
     return dict(cached_dataset(files, cache, max_samples=10**7, overview=True, shuffle=True, obs_v3=True))
 

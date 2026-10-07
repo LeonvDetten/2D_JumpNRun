@@ -1,0 +1,34 @@
+{
+ "phase": 11,
+ "datum": "2026-10-07",
+ "start": "models/phase10_kandidat_lehrer.zip",
+ "start_steps": 72000000,
+ "arme": {
+  "a": {"run": "runs/phase11_a", "kerne": [0, 1], "mix": "configs/phase11/a.json",
+        "demos2": ["runs/demos10", "runs/demos9", "runs/demos_spiegel"]},
+  "b": {"run": "runs/phase11_b", "kerne": [2, 3], "mix": "configs/phase11/b.json",
+        "demos2": ["runs/demos10", "runs/demos9"]}
+ },
+ "lr_plan": {"stages": [[0, 2e-5]], "critic_warmup": 150000, "ramp": 200000},
+ "schritte": 8000000,
+ "zeitlimit_h": 13,
+ "bc2_plan": [[0, 0.05]],
+ "bc2_a6_anteil": 0.05,
+ "lehrer": {"modell": "models/phase8_final.zip", "plan": [[0, 1.0], [4150000, 0.3], [8150000, 0.3]]},
+ "spiegel_lang_anteil": 0.3333,
+ "bremse": {"unter_start_pp": 8, "bestaetigt": true, "faktor": 0.5, "lr_min": 1e-5,
+            "groessen": ["dev_alt", "pruefung"]},
+ "katastrophe": {"unter_start_pp": 15, "messungen_in_folge": 2},
+ "messung": "jumpnrun/rl/milestones11.py (klein EMA je 1 Mio.; voll EMA+EMA2 bei +2/+4/+6/+7/+8 Mio.)",
+ "G": "Mittel aus Spiegel-Rate, Wächter-plus-Rate, F, Mittel(doppelgabel, Sackgasse-Proben)",
+ "urteil": {
+  "fenster_mio": [6, 7, 8],
+  "pooling": "EMA und EMA2 voll, gepoolt",
+  "halte_tor": {"dev_alt_min": "P8-Basis - 3 Pp", "pruefung_min": "P8-Basis - 3 Pp"},
+  "a_gewinnt": "G(A) - G(B) >= 5 Pp und A besteht das Halte-Tor",
+  "sonst": "kein Unterschied: der Arm mit hoeherem G (der das Tor besteht) ist Phase-11-Kandidat",
+  "gegen_phase10": "Kandidat-G >= Lehrer-G + 5 Pp, gepaart (gleiche Seeds), sonst bleibt der Phase-10-Lehrer-Kandidat",
+  "rueckfrage": "Spiegel-Rate in A nach +4 Mio. noch 0 -> Leon fragen, ohne Antwort weiter"
+ },
+ "basis": "runs/phase11/baseline_lehrer.json, runs/phase11/baseline_p8.json (milestones11 --once, Seed 0)"
+}

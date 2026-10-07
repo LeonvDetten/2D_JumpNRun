@@ -27,9 +27,12 @@ class TrainingMonitor(BaseCallback):
         curriculum/erfolg_stufe_N   success estimate per tier
     """
 
-    def __init__(self, tracker: CurriculumTracker, run_dir: Path, verbose: int = 0):
+    def __init__(self, tracker: CurriculumTracker, run_dir: Path, verbose: int = 0, p8_only: bool = False):
         super().__init__(verbose)
         self.tracker = tracker
+        # phase 11 (from the Neustart branch): only episodes of the phase-8 source steer the tier curriculum (v10,
+        # long and mirrored levels report tiers of their own and would mix into the success estimates)
+        self.p8_only = p8_only
         self.run_dir = run_dir
         self.recent: deque = deque(maxlen=200)
         self.mid_starts: deque = deque(maxlen=200)  # episodes started in the middle of a level
@@ -41,13 +44,23 @@ class TrainingMonitor(BaseCallback):
     def _on_training_start(self) -> None:
         self._history = open(self.history_path, "a", encoding="utf-8")
         self.training_env.env_method("set_tier_weights", self.tracker.weights())
+        self._send_skill_state()
+
+    def _send_skill_state(self) -> None:
+        skill = getattr(self.tracker, "skill", None)
+        if skill is not None:
+            self.training_env.env_method("set_skill_state", skill.level, skill.p())
 
     def _on_step(self) -> bool:
         for info in self.locals["infos"]:
             end = info.get("episode_end")
             if end is None:
                 continue
-            self.tracker.record(end["tier"], end["won"])
+            if not self.p8_only or end.get("mix") in (None, "p8"):
+                self.tracker.record(end["tier"], end["won"])
+            skill = getattr(self.tracker, "skill", None)
+            if skill is not None and end.get("kind") and end["tier"] == -4 and end.get("rewind_depth", 0) == 0:
+                skill.record(end["kind"], end["difficulty"], end["won"])  # fresh practice episodes only
             if end["tier"] == MID_START_TIER:
                 self.mid_starts.append(end)
             elif end["tier"] == REWIND_TIER:
@@ -60,6 +73,11 @@ class TrainingMonitor(BaseCallback):
 
     def _on_rollout_end(self) -> None:
         self.training_env.env_method("set_tier_weights", self.tracker.weights())
+        self._send_skill_state()
+        skill = getattr(self.tracker, "skill", None)
+        if skill is not None:
+            for kind, d in skill.level.items():
+                self.logger.record(f"uebung/stufe_{kind}", d)
         if not self.recent:
             return
         outcomes = Counter(e["outcome"] for e in self.recent)
@@ -102,7 +120,8 @@ class CheckpointSaver(BaseCallback):
     def _on_step(self) -> bool:
         if self.num_timesteps >= self._next:
             self.save()
-            self._next = self.num_timesteps + self.every
+            # on the grid of `every` (a save at an odd step, e.g. on SIGTERM, must not shift all later checkpoints)
+            self._next = (self.num_timesteps // self.every + 1) * self.every
         return True
 
     def save(self) -> None:
@@ -110,6 +129,8 @@ class CheckpointSaver(BaseCallback):
         self.model.save(str(path))
         state = {"timesteps": self.num_timesteps, "success": self.tracker.success,
                  "episodes": self.tracker.episodes, "unlocked": self.tracker.unlocked}
+        if getattr(self.tracker, "skill", None) is not None:
+            state["skill"] = self.tracker.skill.state()
         (self.dir.parent / "curriculum.json").write_text(json.dumps(state))
         if self.keep_every:  # long runs: keep every keep_every-th checkpoint plus the newest few
             checkpoints = sorted(self.dir.glob("step_*.zip"))
@@ -210,7 +231,8 @@ class EmaWeights(BaseCallback):
                 self.ema = saved
         if self.ema is None:
             self.ema = {k: v.detach().clone().float() for k, v in params.items()}
-        self._next = (self.num_timesteps // self.every + 1) * self.every
+        # a restart exactly at a multiple (killed between checkpoint and EMA save) still writes that EMA
+        self._next = max(self.every, -(-self.num_timesteps // self.every) * self.every)
 
     def _on_rollout_start(self) -> None:  # called after every PPO update
         import torch
@@ -236,8 +258,10 @@ class EmaWeights(BaseCallback):
         policy = self.model.policy
         current = {k: v.detach().clone() for k, v in policy.state_dict().items()}
         policy.load_state_dict(self.ema)
-        self.model.save(str(self.dir / f"{self.prefix}_step_{self.num_timesteps:010d}.zip"))
-        policy.load_state_dict(current)
+        try:
+            self.model.save(str(self.dir / f"{self.prefix}_step_{self.num_timesteps:010d}.zip"))
+        finally:  # a SIGTERM in between must not leave the EMA weights in the training policy
+            policy.load_state_dict(current)
         torch.save(self.ema, self.path)
 
     def _on_training_end(self) -> None:

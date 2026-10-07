@@ -28,6 +28,13 @@ from jumpnrun.core.level import Level
 from jumpnrun.levelgen import generator as G
 
 KINDS = ("kanal_ende", "kanal2", "kanal3", "sackgasse_runter", "gabel_umkehren", "gabel_oben", "truhe_links_kurz")
+# Phase 11: + lange_sackgasse (the doppelgabel failure: the phase-10 bot walks back along a long dead-end road but
+# climbs the stairs up again instead of dropping to the floor and going on under the road)
+#   d0  spawn at the wall of a 20-28 tiles road without gaps, no enemies
+#   d1  road 30-40 tiles, an enemy on the floor under the road
+#   d2  two such forks in a row (25-40 tiles each), normal start before the first, enemies
+KINDS11 = KINDS + ("lange_sackgasse",)
+MAX_WIDTH = {"lange_sackgasse": 170}  # practice levels are kept short (120 tiles), the long dead end needs more
 ROWS, GROUND = G.ROWS, G.GROUND
 
 
@@ -126,6 +133,21 @@ def _build(kind: str, difficulty: int, rng: random.Random):
         key -= 12  # the key spot is reached along the bottom corridor: start before the stairs
         if kind != "kanal_ende":
             _finish(b)
+    elif kind == "lange_sackgasse":
+        if difficulty < 2:
+            start = len(b.columns)
+            G._fork_v10(b, cfg, "umkehren", length=rng.randint(20, 28) if difficulty == 0 else rng.randint(30, 40))
+            wall = max(c for c in range(start, len(b.columns))
+                       if sum(ch == "B" for ch in b.columns[c][:GROUND]) >= 3 and b.columns[c][GROUND] == "B")
+            if difficulty == 1:  # an enemy on the floor under the road
+                b.columns[rng.randint(start + 10, wall - 4)][GROUND - 1] = "E"
+            key, high = wall - 1, True
+        else:
+            G._fork_v10(b, cfg, "umkehren", length=rng.randint(25, 40))
+            G._fork_v10(b, cfg, "umkehren", length=rng.randint(25, 40))
+            key = None
+        G._segment(b, cfg)
+        _finish(b)
     elif kind in ("sackgasse_runter", "gabel_umkehren", "gabel_oben"):
         start = len(b.columns)
         G._fork_v10(b, cfg, "umkehren" if kind != "gabel_oben" else "oben")
@@ -152,7 +174,11 @@ def _build(kind: str, difficulty: int, rng: random.Random):
         mirror = True
     lines = ["".join(col[r] for col in b.columns) for r in range(ROWS)]
     width = len(lines[0])
-    if difficulty == 0:
+    if key is None:  # lange_sackgasse d2: the normal start
+        pass
+    elif kind == "lange_sackgasse":  # d0/d1: at the dead-end wall, on the road
+        lines = _place_spawn(lines, key, True)
+    elif difficulty == 0:
         lines = _place_spawn(lines, key if high else key - 5, high)
     elif difficulty == 1:
         lines = _place_spawn(lines, key if high else key - rng.randint(10, 15), high)
@@ -175,7 +201,7 @@ def make_skill_level(kind: str, difficulty: int, seed: str, max_tries: int = 12)
         if built is None:
             continue
         lines, width = built
-        if width > 120:  # long random segments: keep practice levels short
+        if width > MAX_WIDTH.get(kind, 120):  # long random segments: keep practice levels short
             continue
         try:
             level = Level(lines, name=f"skill_{kind}_d{difficulty}")
@@ -198,18 +224,29 @@ class SkillSource:
     WINDOW = 100
     OPEN_AT = 0.7
 
-    def __init__(self, seed_space: str = "skill10"):
+    def __init__(self, seed_space: str = "skill10", kinds=KINDS, boost=None):
         self.seed_space = seed_space
-        self.level = {k: 0 for k in KINDS}
-        self.hist = {(k, d): [] for k in KINDS for d in range(3)}
+        self.kinds = tuple(kinds)
+        self.boost = dict(boost or {})  # phase 11: {kind: factor} on the frontier weight (lange_sackgasse x2)
+        self.level = {k: 0 for k in self.kinds}
+        self.hist = {(k, d): [] for k in self.kinds for d in range(3)}
+        self.central = None  # phase 11: {kind: p} from the SkillTracker of the training process
+
+    def set_state(self, levels: dict, p: dict) -> None:
+        """Phase 11: difficulty and frontier estimate per kind pooled over all envs (SkillTracker)."""
+
+        self.level = {k: int(levels.get(k, 0)) for k in self.kinds}
+        self.central = dict(p)
 
     def _p(self, kind: str) -> float:
+        if self.central is not None:
+            return self.central.get(kind, 0.5)
         h = self.hist[(kind, self.level[kind])]
         return sum(h) / len(h) if h else 0.5
 
     def __call__(self, rng: random.Random):
-        kinds = list(KINDS)
-        weights = [self._p(k) * (1 - self._p(k)) + 0.05 for k in kinds]
+        kinds = list(self.kinds)
+        weights = [(self._p(k) * (1 - self._p(k)) + 0.05) * self.boost.get(k, 1.0) for k in kinds]
         kind = rng.choices(kinds, weights=weights)[0]
         top = self.level[kind]
         d = top if top == 0 or rng.random() < 0.7 else rng.randrange(top)
@@ -220,13 +257,51 @@ class SkillSource:
 
     def feedback(self, level: Level, won: bool, fresh: bool = True) -> None:
         kind, d = getattr(level, "skill_kind", None), getattr(level, "difficulty", None)
-        if kind is None or not fresh:
+        if kind is None or not fresh or self.central is not None:  # central: the training process decides
             return
         h = self.hist[(kind, d)]
         h.append(int(won))
         del h[:-self.WINDOW]
         if d == self.level[kind] and d < 2 and len(h) >= self.WINDOW and sum(h) / len(h) >= self.OPEN_AT:
             self.level[kind] = d + 1
+
+
+class SkillTracker:
+    """Phase 11 (from the Neustart branch): the SkillSource frontier pooled over all envs, in the training process.
+    Phase 10 kept it per env (8 x 100 episodes per kind before the next difficulty opened) and lost it on every
+    restart; here it is shared, sent to the envs at every rollout end and saved in curriculum.json."""
+
+    WINDOW = SkillSource.WINDOW
+    OPEN_AT = SkillSource.OPEN_AT
+
+    def __init__(self, kinds=KINDS11):
+        self.level = {k: 0 for k in kinds}
+        self.hist = {f"{k}:{d}": [] for k in kinds for d in range(3)}
+
+    def record(self, kind: str, d: int, won: bool) -> None:
+        h = self.hist.get(f"{kind}:{d}")
+        if h is None:
+            return
+        h.append(int(won))
+        del h[:-self.WINDOW]
+        if d == self.level[kind] and d < 2 and len(h) >= self.WINDOW and sum(h) / len(h) >= self.OPEN_AT:
+            self.level[kind] = d + 1
+
+    def p(self) -> dict:
+        out = {}
+        for k, d in self.level.items():
+            h = self.hist[f"{k}:{d}"]
+            out[k] = sum(h) / len(h) if h else 0.5
+        return out
+
+    def state(self) -> dict:
+        return {"level": self.level, "hist": self.hist}
+
+    def load(self, state: dict) -> None:
+        self.level.update({k: int(v) for k, v in state.get("level", {}).items() if k in self.level})
+        for key, h in state.get("hist", {}).items():
+            if key in self.hist:
+                self.hist[key] = list(h)[-self.WINDOW:]
 
 
 def mirror_level(level: Level, name: str = None) -> Level:
@@ -245,12 +320,22 @@ class MirrorSource:
 
     MIRROR_TIER = -5
 
-    def __init__(self, min_tier: int = 4, max_tier: int = 12):
+    def __init__(self, min_tier: int = 4, max_tier: int = 12, long_share: float = 0.0):
         self.tiers = list(range(min_tier, max_tier + 1))
+        self.long_share = long_share  # phase 11: share of mirrored long levels (LongSource, chest far left)
 
     def __call__(self, rng: random.Random):
         from jumpnrun.levelgen.distmap import DistanceMap
 
+        if self.long_share and rng.random() < self.long_share:
+            for _ in range(10):
+                level = mirror_level(LongSource().make(rng))
+                dm = DistanceMap(level)
+                if dm.reachable and dm.start is not None:
+                    level.source = "spiegel"
+                    level.augmentations = ["mirror", "lang"]
+                    level.mirror_tier = LongSource.LONG_TIER
+                    return level, self.MIRROR_TIER
         for _ in range(10):
             tier = rng.choice(self.tiers)
             level = mirror_level(G.generate(tier, rng.randrange(10**8)))
@@ -261,6 +346,67 @@ class MirrorSource:
         level.augmentations = ["mirror"]
         level.mirror_tier = tier
         return level, self.MIRROR_TIER
+
+    def feedback(self, *args, **kwargs) -> None:
+        pass
+
+
+def _top(lines: List[str], col: int) -> Optional[int]:
+    return next((r for r in range(len(lines)) if col < len(lines[r]) and lines[r][col] == "B"), None)
+
+
+def concat_levels(a: Level, b: Level, name: str = None) -> Optional[Level]:
+    """Phase 11: one long level from two generator levels - a's chest and end wall removed, b's spawn removed,
+    joined by 4 floor columns at the lower of the two surfaces. None if the distance map finds no way."""
+
+    from jumpnrun.levelgen.distmap import DistanceMap
+
+    la, lb = a.to_text().splitlines(), b.to_text().splitlines()
+    rows = max(len(la), len(lb))
+    la += [""] * (rows - len(la))
+    lb += [""] * (rows - len(lb))
+    wa = max(len(l) for l in la) - 1  # without a's end wall column
+    la = [l.ljust(wa + 1)[:wa].replace("C", " ") for l in la]
+    lb = [l.replace("P", " ") for l in lb]
+    ta, tb = _top(la, wa - 1), _top(lb, 0)
+    if ta is None or tb is None:
+        return None
+    floor = max(ta, tb)
+    bridge = ["B" * 4 if r >= floor else " " * 4 for r in range(rows)]
+    lines = [(la[r] + bridge[r] + lb[r]).rstrip() for r in range(rows)]
+    try:
+        out = Level(lines, name=name or f"{a.name}+{b.name}")
+    except ValueError:
+        return None
+    out.needs_path = True
+    dm = DistanceMap(out)
+    return out if dm.reachable and dm.start is not None else None
+
+
+class LongSource:
+    """Phase 11: long levels (~300-700 tiles) made of two v9 generator levels of tiers 8-12 (endurance: on the
+    long guard levels the deaths spread over the whole length)."""
+
+    LONG_TIER = -6
+
+    def __init__(self, min_tier: int = 8, max_tier: int = 12):
+        self.tiers = list(range(min_tier, max_tier + 1))
+
+    def make(self, rng: random.Random) -> Level:
+        for _ in range(20):
+            ta, tb = rng.choice(self.tiers), rng.choice(self.tiers)
+            level = concat_levels(G.generate(ta, rng.randrange(10**8)), G.generate(tb, rng.randrange(10**8)),
+                                  name=f"lang_{ta}_{tb}")
+            if level is not None:
+                level.long_tiers = (ta, tb)
+                return level
+        raise RuntimeError("no valid long level in 20 tries")
+
+    def __call__(self, rng: random.Random):
+        level = self.make(rng)
+        level.source = "lang"
+        level.augmentations = []
+        return level, self.LONG_TIER
 
     def feedback(self, *args, **kwargs) -> None:
         pass
