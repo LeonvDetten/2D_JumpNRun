@@ -4,7 +4,7 @@
 cd "$(dirname "$0")/.."
 python3 -m jumpnrun.rl.autopilot11 2>&1 | tail -5
 if ! pgrep -f "jumpnrun.rl.milestones11 --run" > /dev/null; then
-    PHASE11_NO_RAW=1 OMP_NUM_THREADS=1 nohup nice -n 10 python3 -m jumpnrun.rl.milestones11 --run runs/phase11_a --run runs/phase11_b \
+    PHASE11_NO_RAW=1 OMP_NUM_THREADS=1 nohup nice -n 10 taskset -c ${PHASE11_EVAL_CORES:-2,3} python3 -m jumpnrun.rl.milestones11 --run runs/phase11_a --run runs/phase11_b \
         >> runs/phase11/milestones11.log 2>&1 &
 fi
 sleep "${PHASE11_WAIT:-540}"
