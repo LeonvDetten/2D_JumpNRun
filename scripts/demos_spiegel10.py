@@ -32,7 +32,7 @@ def demo(i: int):
         return None
     actions = list(r.actions)
     return dict(tier=13, seed=i, repeat=2, actions=actions, mask=[1] * len(actions), won=True, solved=True,
-                generator=G.GENERATOR_VERSION, kind="spiegel", a6=actions.count(6), level="\n".join(lv._lines) + "\n")
+                generator=G.GENERATOR_VERSION, kind="spiegel", enemy_dir=1, a6=actions.count(6), level="\n".join(lv._lines) + "\n")
 
 
 def main():

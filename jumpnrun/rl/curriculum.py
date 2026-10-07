@@ -228,6 +228,10 @@ class MixSource:
     def weights(self, value):  # the tier curriculum only steers the phase-8 source
         self.sources["p8"].weights = value
 
+    def set_skill_state(self, levels: dict, p: dict) -> None:
+        if "skill" in self.sources:
+            self.sources["skill"].set_state(levels, p)
+
     def set_mix_stage(self, idx: int) -> None:
         if idx != self.stage:
             self.stage = idx

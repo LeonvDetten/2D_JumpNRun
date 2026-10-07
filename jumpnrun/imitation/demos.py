@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import random
 from multiprocessing import Pool
 from pathlib import Path
@@ -109,6 +110,18 @@ def equivalent_actions(sim: Simulation, action: int, repeat: int, n_actions: int
     return sum(1 << a for a, r in enumerate(results) if r == target)
 
 
+def demo_enemy_dir(demo: dict):
+    """Enemy start direction a stored demo was recorded with (None = the level default).
+
+    Phase 11 fix (found in the Neustart branch): mirrored phase-9 demos ("spiegel") were recorded on augment's
+    mirror, whose enemies walk to the left (-1); the stored level text cannot hold that, so they were replayed with
+    enemies walking right and 34 of 51 did not win. Demos that know their direction store "enemy_dir"."""
+
+    if "enemy_dir" in demo:
+        return demo["enemy_dir"]
+    return -1 if demo.get("kind") == "spiegel" else None
+
+
 def load_dataset(paths, max_samples: int = 800_000, thin_flat: float = 2 / 3, seed: int = 0,
                  overview: bool = False, shuffle: bool = False, obs_v3: bool = False):
     """Rebuild (observation, label-set) samples from demo files.
@@ -134,6 +147,9 @@ def load_dataset(paths, max_samples: int = 800_000, thin_flat: float = 2 / 3, se
         rng.shuffle(demos)
     for demo in demos:
         level = generate(demo["tier"], demo["seed"]) if "level" not in demo else Level.from_text(demo["level"])
+        enemy_dir = demo_enemy_dir(demo)
+        if enemy_dir and level.enemy_spawns:
+            level.enemy_directions = [enemy_dir] * len(level.enemy_spawns)
         repeat = demo["repeat"]
         env = JumpNRunEnv(fixed_levels([level]), action_repeat=repeat, overview=overview, obs_v3=obs_v3)
         env.reset(seed=0)
@@ -170,7 +186,10 @@ def cached_dataset(demo_files, cache: Path, **kwargs):
         data = np.load(cache)
         return {k: data[k] for k in data.files}
     data = load_dataset(demo_files, **kwargs)
-    np.savez_compressed(cache, **data)
+    tmp = cache.with_name(cache.name + ".tmp")  # atomic: a restart never finds a half-written cache
+    with open(tmp, "wb") as f:
+        np.savez_compressed(f, **data)
+    os.replace(tmp, cache)
     return data
 
 

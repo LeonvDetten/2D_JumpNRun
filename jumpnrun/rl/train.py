@@ -48,6 +48,7 @@ def make_env(rank: int, seed: int, min_tier: int, max_tier: int, handmade_paths,
         handmade = [Level.from_file(p) for p in handmade_paths]
         extra = dict(source_extra or {})
         mix = extra.pop("mix", None)
+        p11 = extra.pop("phase11", None)
         source = CurriculumSource(min_tier, max_tier, handmade, handmade_prob, pool_dir=pool_dir,
                                   start_prob=start_prob, start_dirs=start_dirs, pool_share=pool_share,
                                   augment_prob=augment_prob, plr=plr, **extra)
@@ -58,11 +59,20 @@ def make_env(rank: int, seed: int, min_tier: int, max_tier: int, handmade_paths,
 
             v10 = CurriculumSource(10, 13, pool_share=1.0, augment_prob=augment_prob, plr=plr, gen_variant="v10")
             v10.weights = [1.0 if t >= 10 else 0.0 for t in range(NUM_TIERS)]
-            sources = {"p8": source, "v10": v10, "skill": SkillSource()}
+            skill = SkillSource()
+            if p11:  # phase 11: + lange_sackgasse (frontier weight x2)
+                from jumpnrun.levelgen.skills import KINDS11
+
+                skill = SkillSource(kinds=KINDS11, boost={"lange_sackgasse": 2.0})
+            sources = {"p8": source, "v10": v10, "skill": skill}
             if any("spiegel" in shares for _, shares in mix):  # phase 10 D: mirrored levels (both directions)
                 from jumpnrun.levelgen.skills import MirrorSource
 
-                sources["spiegel"] = MirrorSource()
+                sources["spiegel"] = MirrorSource(long_share=(p11 or {}).get("mirror_long_share", 0.0))
+            if any("lang" in shares for _, shares in mix):  # phase 11: two generator levels in a row
+                from jumpnrun.levelgen.skills import LongSource
+
+                sources["lang"] = LongSource()
             source = MixSource(sources, mix)
         return JumpNRunEnv(source, seed=seed * 1000 + rank, action_repeat=action_repeat, overview=overview,
                            rewind_prob=rewind_prob, obs_v2=obs_v2, stuck_death=stuck_death, **(env_extra or {}))
@@ -195,6 +205,13 @@ def main() -> None:
     parser.add_argument("--bc2-a6-share", type=float, default=0.05)
     parser.add_argument("--teacher", help="phase 10 D: frozen P8 model as teacher on own phase-8-level states")
     parser.add_argument("--teacher-plan", help="phase 10 D: JSON [[steps, coef], ...] (linear in between)")
+    parser.add_argument("--phase11", action="store_true",
+                        help="phase 11: practice kinds incl. lange_sackgasse, practice frontier pooled in the "
+                             "training process (saved in curriculum.json), tier curriculum from phase-8 episodes only")
+    parser.add_argument("--mirror-long-share", type=float, default=1 / 3,
+                        help="phase 11: share of mirrored long levels within the 'spiegel' source")
+    parser.add_argument("--channels-last", action="store_true",
+                        help="phase 11: conv weights in channels_last memory format (faster update, same outputs)")
     parser.add_argument("--anchor", action="store_true",
                         help="phase 10 (only by rule): KL anchor to P8 on runs/phase10/anchor_states.npz")
     parser.add_argument("--path-delta", action="store_true",
@@ -237,7 +254,8 @@ def main() -> None:
                  args.action_repeat, args.pool, args.overview, args.start_prob, tuple(args.start_dirs),
                  args.rewind_prob, args.pool_share, args.augment, args.obs_v2, args.stuck_death, args.plr,
                  env_extra=dict(obs_v3=args.obs_v3, path_reward=args.path_reward, path_delta=args.path_delta),
-                 source_extra=dict(gen_variant=args.generator, augment_v2=args.augment_v2, mix=mix_schedule))
+                 source_extra=dict(gen_variant=args.generator, augment_v2=args.augment_v2, mix=mix_schedule,
+                                  phase11=dict(mirror_long_share=args.mirror_long_share) if args.phase11 else None))
         for i in range(args.envs)
     ]
     # the game is so fast that the network update dominates; one process is usually best
@@ -245,6 +263,10 @@ def main() -> None:
     vec_env = VecMonitor(vec_env)
 
     tracker = CurriculumTracker(args.min_tier, args.max_tier)
+    if args.phase11:
+        from jumpnrun.levelgen.skills import SkillTracker
+
+        tracker.skill = SkillTracker()
     if args.unlock_all:
         tracker.unlocked = args.max_tier
     config_path = run_dir / "config.json"
@@ -261,6 +283,8 @@ def main() -> None:
                 tracker.success = (state["success"] + [0.0] * n)[:n]
                 tracker.episodes = (state["episodes"] + [0] * n)[:n]
                 tracker.unlocked = max(args.min_tier, min(state["unlocked"], args.max_tier))
+                if getattr(tracker, "skill", None) is not None and "skill" in state:
+                    tracker.skill.load(state["skill"])
         else:
             done = int(PPO.load(args.resume, device="cpu").num_timesteps) if args.resume else 0
         args.steps = args.target - done
@@ -353,8 +377,10 @@ def main() -> None:
         watcher = subprocess.Popen(cmd)
 
     model.action_repeat = args.action_repeat
+    if args.channels_last:  # weights only: the conv layers pick the faster kernels, outputs stay the same
+        model.policy.to(memory_format=torch.channels_last)
     callbacks = [
-        TrainingMonitor(tracker, run_dir),
+        TrainingMonitor(tracker, run_dir, p8_only=args.phase11),
         CheckpointSaver(run_dir, args.checkpoint_every, tracker, keep_every=args.keep_every),
         Evaluator(eval_levels, args.eval_every, run_dir),
     ]

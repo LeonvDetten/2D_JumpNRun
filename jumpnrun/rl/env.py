@@ -306,6 +306,12 @@ class JumpNRunEnv(gym.Env):
         if hasattr(self.level_source, "set_mix_stage"):
             self.level_source.set_mix_stage(idx)
 
+    def set_skill_state(self, levels: dict, p: dict) -> None:
+        """Phase 11: practice difficulty pooled over all envs (SkillTracker in the training process)."""
+
+        if hasattr(self.level_source, "set_skill_state"):
+            self.level_source.set_skill_state(levels, p)
+
     def set_tier_weights(self, weights) -> None:
         """Called by the curriculum (training process) to steer level difficulty."""
 
