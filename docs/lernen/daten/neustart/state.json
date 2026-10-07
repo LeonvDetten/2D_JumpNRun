@@ -1,5 +1,5 @@
 {
- "stage": "ppo",
+ "stage": "fertig",
  "log": [
   "2026-10-06 10:57 BC gestartet (Versuch 1, 16000 Schritte, 4 Kerne)",
   "2026-10-06 11:32 BC fertig (runs/neustart/bc.zip)",
@@ -14,12 +14,15 @@
   "2026-10-06 22:44 Arm ks: Sicherungspaket +15 Mio. (15,000,000 Schritte) -> backup_neustart/ks",
   "2026-10-07 00:38 Arm ks: Training gestartet/fortgesetzt bei 19,400,000 (Kerne [0, 1, 2])",
   "2026-10-07 07:35 Arm ks: Sicherungspaket +30 Mio. (30,000,000 Schritte) -> backup_neustart/ks",
-  "2026-10-07 08:00 Arm ks: Abbruchregel +30M bestanden {\"dev_alt\": 0.6687, \"F\": 0.4295, \"n\": 4, \"waechter_val\": 0.6445, \"unter\": []}"
+  "2026-10-07 08:00 Arm ks: Abbruchregel +30M bestanden {\"dev_alt\": 0.6687, \"F\": 0.4295, \"n\": 4, \"waechter_val\": 0.6445, \"unter\": []}",
+  "2026-10-07 18:23 Arm ks: Sicherungspaket Ende (44,900,000 Schritte) -> backup_neustart/ks",
+  "2026-10-07 18:23 Arm ks: fertig (45,000,000 Schritte)",
+  "2026-10-07 18:23 Alle Arme beendet"
  ],
  "started": 1791284223.9751284,
  "arms": {
   "ks": {
-   "status": "ppo",
+   "status": "fertig",
    "bc_zip": "runs/neustart/bc.zip",
    "regel": {
     "+5M": {

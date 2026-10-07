@@ -1,8 +1,8 @@
 {
  "arm": "ks",
- "label": "+30 Mio.",
- "steps": 30000000,
+ "label": "Ende",
+ "steps": 44900000,
  "ppo_started": 1791286331.7825918,
  "bc_zip": "runs/neustart/bc.zip",
- "time": "2026-10-07 07:35"
+ "time": "2026-10-07 18:23"
 }
