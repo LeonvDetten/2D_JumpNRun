@@ -58,8 +58,32 @@ verglich Ungleiches (Alt enthält den Wächter, die P8-Basis nicht) – jetzt gi
 | 4 | 47,0 % | 32,2 % | 8,6 % | 6,2 % | 1/64 | |
 | 5 | 48,9 % | 36,2 % | 12,5 % | – | 0/32 | Abbruchregel +5 Mio. bestanden (dev_alt 46,8 %, F 33,5 %) |
 | 6 | 49,7 % | 38,3 % | 14,8 % | 14,1 % | 4/64 | Schutz 63/80 |
+| 8 | 51,8 % | 42,7 % | 19,5 % | 21,1 % | 13/64 | Kickstart-Gewicht 0,45 |
+| 10 | 53,3 % | 39,5 % | 15,6 % | 29,7 % | 13/64 | |
+| 12 | 57,1 % | 39,4 % | 17,2 % | 18,0 % (EMA2 30,5 %) | 12/64 (EMA2 22) | |
+| 14 | 54,4 % | 39,9 % | 16,4 % | 32,0 % | 11/64 | Plateau-Frage an Leon |
+| 15 | – | – | – | – | – | Abbruchregel +15 Mio. bestanden (dev_alt 54,3 %, F 35,1 %); Lehrer aus |
+| 16 | 61,8 % | 44,3 % | 21,1 % | 41,4 % | 17/64 | ohne Lehrer weiter aufwärts |
+| 20 | 63,3 % | 45,5 % | 21,1 % | 33,6 % (EMA2 54,7 %) | 10/64 (EMA2 24) | |
+| 24 | 61,9 % | 42,3 % | 18,8 % | 43,8 % (EMA2 55,5 %) | 20/64 (EMA2 27) | |
+| 26 | 60,4 % | 48,0 % | 22,7 % | 50,0 % (EMA2 61,7 %) | 11/64 | |
+| 28 | 68,0 % | 42,2 % | 21,1 % | 60,2 % (EMA2 75,0 %) | 23/64 | dev_alt über P8-Basis |
+| 30 | 66,0 % | 40,5 % | 10,2 % | 49,2 % (EMA2 73,4 %) | 23/64 (EMA2 26) | Abbruchregel +30 Mio. bestanden (dev_alt 66,9 %, Wächter 64,5 %, F 43,0 %) |
 
 Zum Vergleich: Die P8-Linie (PPO ab frisch, ohne Kickstarting) lag bei 24 % nach 11 Mio. und 40 % nach 30 Mio.;
 Phase-10-Runde B bei +6 Mio. bei dev_alt 58–60 % und F 40–41 % – mit 50 Mio. Schritten Vorsprung.
+
+Beobachtungen unterwegs:
+- **dev_neu hängt an einem Level.** Von den 4 neuen Dev-Leveln wird nur „serpentine“ gewonnen; gabel_drei, kreuzung
+  und spiegelweg blieben in jeder Messung bei 0 – wie in Phase-10-Runde B. Das Auf und Ab von dev_neu (3–25 %) ist
+  das Schwanken dieses einen Levels.
+- **Kein Abfärben des Umkehrens.** P(links+springen) auf alten Zuständen blieb über den ganzen Lauf bei 0,01–0,24 %,
+  auch nachdem das Kickstarting-Gewicht auf 0 gefallen war. Die Drift-KL zu P8 stieg danach auf ~0,2 – das Netz geht
+  eigene Wege, ohne dass dev_alt leidet.
+- **EMA2 ist auf langen Leveln deutlich besser** als EMA (Wächter 73–75 % gegen 49–60 % bei 28–30 Mio.).
+- **Alt-Tor (select10-Fenster):** dev_alt erfüllt es ab 28 Mio., der Wächter (Fenstermittel 64,5 % bei 30 Mio.)
+  noch nicht (verlangt 72,3 %).
+- **Tempo:** von ~550 Schritte/s (Stufen bis 10) auf ~360 Schritte/s ab ~20 Mio. (vermutlich längere Level auf
+  Stufe 12). Zwei weitere Sitzungs-Neustarts (19,4 Mio.) kosteten nur Minuten.
 
 *(Fortsetzung folgt.)*
