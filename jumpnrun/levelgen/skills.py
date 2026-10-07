@@ -311,8 +311,10 @@ class SkillTracker:
     WINDOW = SkillSource.WINDOW
     OPEN_AT = SkillSource.OPEN_AT
 
-    def __init__(self, kinds=KINDS11):
-        self.level = {k: 0 for k in kinds}
+    def __init__(self, kinds=KINDS11, start_levels=None):
+        # phase 11: the seven phase-10 kinds start at d2 - at d0 the phase-10 model wins them all, they get the minimum
+        # frontier weight and never collect the 100 episodes to open d1 (the channel practice stayed trivial)
+        self.level = {k: int((start_levels or {}).get(k, 0)) for k in kinds}
         self.hist = {f"{k}:{d}": [] for k in kinds for d in range(3)}
 
     def record(self, kind: str, d: int, won: bool) -> None:
