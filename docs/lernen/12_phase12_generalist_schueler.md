@@ -102,7 +102,8 @@ Leon gab den Generator am 8.10. frei („mit Löser-Pool“).
 | 8 | 39,2 | 55,4 (51,9) | 46,8 (42,7) | 57 | 19 | 29 | 45 | 82 | 25 | 8 | 48 |
 | 10 | 41,7 | 59,1 (53,3) | 42,6 (39,5) | 57 | 19 | 29 | 52 | 86 | 23 | 19 | 48 |
 | 12 | 51,1 | 56,2 (57,1) | 48,3 (39,4) | 63 | 30 | 41 | 56 | 93 | 38 | 31 | 56 |
-| 14 | 49,3 | 60,8 | 47,9 | 67 | 21 | 44 | 58 | 96 | 22 | 23 | 62 |
+| 14 | 49,3 | 60,8 (≈59) | 47,9 | 67 | 21 | 44 | 58 | 96 | 22 | 23 | 62 |
+| 16 | 51,2 | 65,1 (61,8) | 49,2 (44,3) | 68 | 25 | 33 | 59 | 99 | 36 | 29 | 60 |
 
 **Entscheidungspunkte**
 - **E1 (2 Mio.): formal verfehlt.**
@@ -138,3 +139,14 @@ Leon gab den Generator am 8.10. frei („mit Löser-Pool“).
 - Kategorie 6 beruht auf nur 52 Versuchen. Die gespiegelten Validierungslevel standen bei 7/12 und jetzt bei 2/12.
 - Im Training sind die kurzen gespiegelten Level seit 12 Mio. flach bei 22 %. Spiegeln ist der Engpass.
 - Alte und strukturelle Fähigkeiten wachsen weiter: Klassisch 67 %, dev_alt 61 % (wieder über der Neustart-Kurve), Strukturen 62 %.
+
+**Spiegel-Diagnose (22:50)**
+- Die gespiegelten Level kommen gleichverteilt aus den Stufen 4–12, unabhängig vom Können.
+- Seit 12 Mio. gewonnen: Stufen 4–6 50–67 %, Stufe 7 32 %, Stufen 8–9 5–9 %, Stufen 10–12 0–2 %. Die Hälfte liefert also kaum Lernsignal.
+- Häufigste Todesursache: Sturz in die Grube (45 %).
+- Vorbereitet, aber noch nicht aktiv: ein eigenes Curriculum für gespiegelte Level (`--mirror-adaptive`). Es spielt bis zur Stufe, die gespiegelt zu ≥ 50 % gewonnen wird, plus die nächste; 10 % kommen aus allen Stufen.
+
+**E3 (16 Mio.): formal verfehlt, Training läuft weiter (Leons Vorgabe)**
+- dev_alt 65,1 % (Ziel ≥ 55 %, Neustart-Kurve 61,8 %) und F 49,2 % (Neustart 44,3 %) liegen klar über dem Neustart.
+- Aber nur 3 von 8 Kategorien liegen über dem fertigen Neustart-Modell (Ziel 5): Kanäle, Links/Spiegel, Strukturen.
+- Seit 12 Mio. pendelt der Generalist-Wert zwischen 49 und 51 %. Prüfung, lange Level und Sprünge schwanken stark (Rauschen ±5 Pp), ein Fortschritt ist dort nicht erkennbar.
