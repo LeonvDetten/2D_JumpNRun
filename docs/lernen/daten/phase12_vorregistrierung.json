@@ -84,15 +84,15 @@
   "E3": {
    "mio": 16,
    "weiter_wenn": "Klassisch >= 55 % (dev_alt) und mind. 5 Kategorien über dem Wert des Neustart-Kandidaten",
-   "stopp": true
+   "stopp": false
   },
   "E4": {
    "mio": 30,
    "weiter_wenn": "Generalist-Wert >= bisher bester Generalist-Wert - 5 Pp",
-   "stopp": true
+   "stopp": false
   }
  },
- "bedeutung_stopp": "E1/E2 verfehlt: Rückfrage an Leon, Training läuft bis zum nächsten Punkt weiter. E3/E4 verfehlt: Stopp, Rückfrage.",
+ "bedeutung_stopp": "E1-E4 verfehlt: wird notiert und an Leon berichtet; das Training läuft weiter (Leon, 8.10. 19:45: ohne Unterbrechung). Vorher: E3/E4 verfehlt -> Stopp.",
  "abweichung_vom_plan": "Der Neustart hat keine Scorecard-Werte je Schrittstand; verglichen wird an E1/E2 mit seinen dev_alt- und F-Kurven (gleiche milestones10-Messung, klein, EMA). E3 nutzt statt 15 Mio. den Messpunkt 16 Mio. (Takt 2 Mio.).",
  "messung": "jumpnrun/rl/milestones12.py (Scorecard + milestones10 klein) auf Kern 3; EMA bei 1 Mio. und jeder geraden Mio., EMA2 im Fenster 40/42/44",
  "urteil": "bester Stand im Fenster nach Generalist-Wert mit Halte-Tor (Prüfung >= P8 - 5 Pp bei 256 Versuchen, dev_alt >= P8 - 3 Pp); danach gepaarter Endvergleich (scripts/endvergleich12.py) und erst nach Leons Freigabe der versiegelte Test",
@@ -103,6 +103,12 @@
    "bei_mio": 10.5,
    "aenderung": "gespiegelte lange Level heraus (--mirror-long-share 0.25 -> 0.0); ihr Anteil geht an kurze gespiegelte Level",
    "grund": "Training: kurze gespiegelte Level 20 % gewonnen, gespiegelte lange 0 % (Fortschritt 10 %) - kaum Lernsignal; Links/Spiegel stagniert seit 4 Mio. bei ~23 %"
+  },
+  {
+   "zeit": "2026-10-08 19:45",
+   "bei_mio": 10.6,
+   "aenderung": "kein automatischer Stopp mehr an E3/E4 (stopp true -> false); das Training läuft bis Ziel oder Zeitlimit durch",
+   "grund": "Leon: 'Das Training soll weiterlaufen ohne Unterbrechung. Fragen können gestellt werden, aber wenn keine Antwort kommt, mach nach bestem Gewissen weiter. Keine Fragen bis 6:00 Uhr.'"
   }
  ]
 }
