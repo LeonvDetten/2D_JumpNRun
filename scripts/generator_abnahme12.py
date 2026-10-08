@@ -98,42 +98,47 @@ def _model_job(args):
 
 
 def gallery(n: int = 24):
-    import pygame
+    """Clear tile maps (no game graphics): blocks grey, enemies red, start green, chest gold."""
 
-    from jumpnrun.core.constants import TILE
+    from PIL import Image, ImageDraw, ImageFont
+
     from jumpnrun.levelgen.hard import make_hard_level
-    from jumpnrun.render.ghosts import GhostView
-    from jumpnrun.render.video import init_headless
 
-    init_headless()
-    pygame.font.init()
-    font = pygame.font.SysFont("Arial", 20, bold=True)
-    width, seg = 1800, 260
-    scale = width / (seg * TILE)
+    px, per_row, width = 8, 225, 1800
+    colors = {"B": (150, 150, 160), "E": (230, 60, 60), "P": (60, 220, 90), "C": (250, 200, 40)}
     fams = ["spruenge"] * 8 + ["strukturen"] * 8 + ["gemischt"] * 6 + ["lang"] * 2
+    try:
+        font = ImageFont.truetype("DejaVuSans-Bold.ttf", 15)
+    except OSError:
+        font = ImageFont.load_default()
     panels = []
     for i, fam in enumerate(fams[:n]):
         lv = make_hard_level(fam, f"galerie12:{fam}:{i}")
-        base = GhostView(lv).base
-        w, h = base.get_size()
-        rows = [base.subsurface((x, 0, min(seg * TILE, w - x), h)) for x in range(0, w, seg * TILE)]
-        row_h = int(h * scale)
-        panel = pygame.Surface((width, 26 + len(rows) * (row_h + 2)))
-        panel.fill((14, 12, 34))
-        panel.blit(font.render(f"{i + 1}. {fam} ({lv.cols} Kacheln): " + ", ".join(dict.fromkeys(lv.blocks)), True,
-                               (255, 230, 120)), (8, 3))
-        for k, part in enumerate(rows):
-            panel.blit(pygame.transform.smoothscale(part, (int(part.get_width() * scale), row_h)),
-                       (0, 26 + k * (row_h + 2)))
-        panels.append(panel)
-    canvas = pygame.Surface((width, sum(p.get_height() + 8 for p in panels)))
-    canvas.fill((8, 6, 20))
+        lines = lv.to_text().splitlines()
+        cols = max(len(l) for l in lines)
+        rows = -(-cols // per_row)
+        h = 22 + rows * (len(lines) * px + 6)
+        img = Image.new("RGB", (width, h), (18, 16, 36))
+        d = ImageDraw.Draw(img)
+        d.text((6, 3), f"{i + 1}. {fam} ({cols} Kacheln): " + ", ".join(dict.fromkeys(lv.blocks)), fill=(255, 230, 120),
+                font=font)
+        for k in range(rows):
+            y0 = 22 + k * (len(lines) * px + 6)
+            d.rectangle([0, y0, min(per_row, cols - k * per_row) * px, y0 + len(lines) * px - 1], fill=(30, 30, 60))
+            for r, line in enumerate(lines):
+                for c in range(k * per_row, min(len(line), (k + 1) * per_row)):
+                    ch = line[c]
+                    if ch in colors:
+                        x = (c - k * per_row) * px
+                        d.rectangle([x, y0 + r * px, x + px - 1, y0 + r * px + px - 1], fill=colors[ch])
+        panels.append(img)
+    canvas = Image.new("RGB", (width, sum(p.height + 10 for p in panels)), (8, 6, 20))
     y = 0
     for p in panels:
-        canvas.blit(p, (0, y))
-        y += p.get_height() + 8
+        canvas.paste(p, (0, y))
+        y += p.height + 10
     GALLERY.parent.mkdir(parents=True, exist_ok=True)
-    pygame.image.save(canvas, str(GALLERY))
+    canvas.save(GALLERY)
 
 
 def measurement_hashes():
