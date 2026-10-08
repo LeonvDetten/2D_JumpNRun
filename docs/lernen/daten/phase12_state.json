@@ -1,0 +1,53 @@
+{
+ "started": 1791454537.3331637,
+ "log": [
+  "10:15 BC-Start gestartet (4 Kerne)",
+  "10:53 Training gestartet/fortgesetzt (Kerne [0, 1, 2])",
+  "12:42 ENTSCHEIDUNGSPUNKT E1 (2 Mio.): VERFEHLT - Generalist 22.1%, dev_alt 30.7% (Neustart 36.4%), F 34.8% (Neustart 29.8%)",
+  "16:03 ENTSCHEIDUNGSPUNKT E2 (6 Mio.): erreicht - Generalist 35.8%, dev_alt 55.4% (Neustart 49.7%), F 37.8% (Neustart 38.3%)"
+ ],
+ "entscheidungen": {
+  "E1": {
+   "ok": false,
+   "mio": 2,
+   "generalist": 0.2215,
+   "dev_alt": 0.3068,
+   "F": 0.3485,
+   "neustart": {
+    "dev_alt": 0.3636,
+    "F": 0.2984
+   },
+   "kategorien": [
+    0.2227,
+    0.0,
+    0.0833,
+    0.3361,
+    0.7593,
+    0.225,
+    0.0,
+    0.1458
+   ]
+  },
+  "E2": {
+   "ok": true,
+   "mio": 6,
+   "generalist": 0.3576,
+   "dev_alt": 0.554,
+   "F": 0.3776,
+   "neustart": {
+    "dev_alt": 0.4972,
+    "F": 0.3826
+   },
+   "kategorien": [
+    0.4701,
+    0.0391,
+    0.3005,
+    0.5028,
+    0.8731,
+    0.2167,
+    0.1458,
+    0.3125
+   ]
+  }
+ }
+}

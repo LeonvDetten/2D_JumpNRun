@@ -84,4 +84,28 @@ Leon gab den Generator am 8.10. frei („mit Löser-Pool“).
 
 ## Verlauf
 
-*(folgt)*
+**Vorbereitung und Start**
+- **Löser-Demos v11:** 613 bewiesene schwere Level. Sie dienen als Demos und zugleich als Pool für die Hälfte der schweren Trainingslevel.
+- **BC-Start:**
+  - 16 000 Schritte auf 600k Phase-8-Beispielen und 1,1 Mio. weiteren (davon 12 700 links+springen).
+  - Bester Stand: Holdout 0,985 (ohne „rechts“ 0,970), P(links+springen) auf links+springen-Zuständen 0,98, auf alten Zuständen 0,0013, Validierung 30,6 %.
+- **Start des Trainings:** 8.10. um 10:53 auf den Kernen 0–2.
+  - Tempo: ~440 fps mit 5 Lehrern, ab Stufe 10 ~300–340 fps.
+  - Die Messung läuft auf Kern 3.
+
+| Mio. | Generalist | dev_alt (Neustart) | F (Neustart) | Klassisch | Prüfung | Lang | Gabeln | Kanäle | Links/Spiegel | Sprünge | Strukturen |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | 16,5 | 22,2 (17,1) | 35,6 (26,5) | 12 | 0 | 1 | 32 | 56 | 16 | 0 | 15 |
+| 2 | 22,1 | 30,7 (36,4) | 34,8 (29,8) | 22 | 0 | 8 | 34 | 76 | 22 | 0 | 15 |
+| 4 | 30,5 | 48,9 (47,0) | 38,1 (32,2) | 34 | 0 | 14 | 42 | 91 | 25 | 2 | 35 |
+| 6 | 35,8 | 55,4 (49,7) | 37,8 (38,3) | 47 | 4 | 30 | 50 | 87 | 22 | 15 | 31 |
+
+**Entscheidungspunkte**
+- **E1 (2 Mio.): formal verfehlt.**
+  - dev_alt lag unter der Neustart-Kurve.
+  - Erklärbar durch den Mischplan: 35 % Phase-8-Level gegenüber 60 % beim Neustart.
+  - Das Training lief vorregistriert weiter.
+- **E2 (6 Mio.): erreicht.**
+  - dev_alt liegt 5,7 Pp über dem Neustart, F gleichauf.
+  - Sprünge und Strukturen steigen.
+  - Die neuen Strukturen liegen ab 4 Mio. über dem bisher besten Modell.

@@ -1,0 +1,566 @@
+{
+ "1000000:ema": {
+  "dev_alt": 0.2216,
+  "dev_neu": 0.3125,
+  "F": 0.3563,
+  "pruefung32": "0/32",
+  "kategorien": [
+   0.1231,
+   0.0,
+   0.0125,
+   0.3194,
+   0.5583,
+   0.1625,
+   0.0,
+   0.1458
+  ],
+  "generalist": 0.1652,
+  "komponenten": {
+   "dev_klassisch": {
+    "kat": 0,
+    "won": 17,
+    "of": 72,
+    "fortschritt": 0.481
+   },
+   "val_v9_t8-12": {
+    "kat": 0,
+    "won": 4,
+    "of": 30,
+    "fortschritt": 0.402
+   },
+   "proben_klassisch": {
+    "kat": 0,
+    "won": 0,
+    "of": 96,
+    "fortschritt": 0.272
+   },
+   "pruefung": {
+    "kat": 1,
+    "won": 0,
+    "of": 256,
+    "fortschritt": 0.09
+   },
+   "waechter_plus": {
+    "kat": 2,
+    "won": 0,
+    "of": 96,
+    "fortschritt": 0.13
+   },
+   "val_lang": {
+    "kat": 2,
+    "won": 0,
+    "of": 12,
+    "fortschritt": 0.259
+   },
+   "probe_lang": {
+    "kat": 2,
+    "won": 1,
+    "of": 20,
+    "fortschritt": 0.348
+   },
+   "v13_lang": {
+    "kat": 2,
+    "won": 0,
+    "of": 9,
+    "fortschritt": 0.126
+   },
+   "uebung_gabeln": {
+    "kat": 3,
+    "won": 16,
+    "of": 24,
+    "fortschritt": 0.819
+   },
+   "probe_koeder": {
+    "kat": 3,
+    "won": 0,
+    "of": 20,
+    "fortschritt": 0.366
+   },
+   "dev_gabeln": {
+    "kat": 3,
+    "won": 7,
+    "of": 24,
+    "fortschritt": 0.584
+   },
+   "probe_kanal_umkehren": {
+    "kat": 4,
+    "won": 22,
+    "of": 40,
+    "fortschritt": 0.718
+   },
+   "uebung_kanal": {
+    "kat": 4,
+    "won": 9,
+    "of": 18,
+    "fortschritt": 0.679
+   },
+   "dev_serpentine": {
+    "kat": 4,
+    "won": 5,
+    "of": 8,
+    "fortschritt": 0.878
+   },
+   "probe_truhe_links": {
+    "kat": 5,
+    "won": 3,
+    "of": 20,
+    "fortschritt": 0.444
+   },
+   "uebung_truhe_links": {
+    "kat": 5,
+    "won": 4,
+    "of": 12,
+    "fortschritt": 0.534
+   },
+   "val_gespiegelt": {
+    "kat": 5,
+    "won": 2,
+    "of": 12,
+    "fortschritt": 0.267
+   },
+   "dev_spiegelweg": {
+    "kat": 5,
+    "won": 0,
+    "of": 8,
+    "fortschritt": 0.251
+   },
+   "v13_spruenge": {
+    "kat": 6,
+    "won": 0,
+    "of": 48,
+    "fortschritt": 0.215
+   },
+   "v13_strukturen": {
+    "kat": 7,
+    "won": 7,
+    "of": 48,
+    "fortschritt": 0.455
+   }
+  },
+  "sekunden": 351,
+  "checkpoint": "ema_step_0001000000.zip"
+ },
+ "2000000:ema": {
+  "dev_alt": 0.3068,
+  "dev_neu": 0.1719,
+  "F": 0.3485,
+  "pruefung32": "0/32",
+  "kategorien": [
+   0.2227,
+   0.0,
+   0.0833,
+   0.3361,
+   0.7593,
+   0.225,
+   0.0,
+   0.1458
+  ],
+  "generalist": 0.2215,
+  "komponenten": {
+   "dev_klassisch": {
+    "kat": 0,
+    "won": 22,
+    "of": 72,
+    "fortschritt": 0.573
+   },
+   "val_v9_t8-12": {
+    "kat": 0,
+    "won": 9,
+    "of": 30,
+    "fortschritt": 0.508
+   },
+   "proben_klassisch": {
+    "kat": 0,
+    "won": 6,
+    "of": 96,
+    "fortschritt": 0.377
+   },
+   "pruefung": {
+    "kat": 1,
+    "won": 0,
+    "of": 256,
+    "fortschritt": 0.183
+   },
+   "waechter_plus": {
+    "kat": 2,
+    "won": 0,
+    "of": 96,
+    "fortschritt": 0.221
+   },
+   "val_lang": {
+    "kat": 2,
+    "won": 1,
+    "of": 12,
+    "fortschritt": 0.355
+   },
+   "probe_lang": {
+    "kat": 2,
+    "won": 5,
+    "of": 20,
+    "fortschritt": 0.547
+   },
+   "v13_lang": {
+    "kat": 2,
+    "won": 0,
+    "of": 9,
+    "fortschritt": 0.114
+   },
+   "uebung_gabeln": {
+    "kat": 3,
+    "won": 19,
+    "of": 24,
+    "fortschritt": 0.861
+   },
+   "probe_koeder": {
+    "kat": 3,
+    "won": 1,
+    "of": 20,
+    "fortschritt": 0.379
+   },
+   "dev_gabeln": {
+    "kat": 3,
+    "won": 4,
+    "of": 24,
+    "fortschritt": 0.524
+   },
+   "probe_kanal_umkehren": {
+    "kat": 4,
+    "won": 25,
+    "of": 40,
+    "fortschritt": 0.812
+   },
+   "uebung_kanal": {
+    "kat": 4,
+    "won": 14,
+    "of": 18,
+    "fortschritt": 0.836
+   },
+   "dev_serpentine": {
+    "kat": 4,
+    "won": 7,
+    "of": 8,
+    "fortschritt": 0.974
+   },
+   "probe_truhe_links": {
+    "kat": 5,
+    "won": 3,
+    "of": 20,
+    "fortschritt": 0.478
+   },
+   "uebung_truhe_links": {
+    "kat": 5,
+    "won": 5,
+    "of": 12,
+    "fortschritt": 0.587
+   },
+   "val_gespiegelt": {
+    "kat": 5,
+    "won": 4,
+    "of": 12,
+    "fortschritt": 0.455
+   },
+   "dev_spiegelweg": {
+    "kat": 5,
+    "won": 0,
+    "of": 8,
+    "fortschritt": 0.273
+   },
+   "v13_spruenge": {
+    "kat": 6,
+    "won": 0,
+    "of": 48,
+    "fortschritt": 0.24
+   },
+   "v13_strukturen": {
+    "kat": 7,
+    "won": 7,
+    "of": 48,
+    "fortschritt": 0.466
+   }
+  },
+  "sekunden": 415,
+  "checkpoint": "ema_step_0002000000.zip"
+ },
+ "4000000:ema": {
+  "dev_alt": 0.4886,
+  "dev_neu": 0.2031,
+  "F": 0.3807,
+  "pruefung32": "0/32",
+  "kategorien": [
+   0.3403,
+   0.0,
+   0.1396,
+   0.4194,
+   0.9148,
+   0.25,
+   0.0208,
+   0.3542
+  ],
+  "generalist": 0.3049,
+  "komponenten": {
+   "dev_klassisch": {
+    "kat": 0,
+    "won": 33,
+    "of": 72,
+    "fortschritt": 0.686
+   },
+   "val_v9_t8-12": {
+    "kat": 0,
+    "won": 10,
+    "of": 30,
+    "fortschritt": 0.663
+   },
+   "proben_klassisch": {
+    "kat": 0,
+    "won": 22,
+    "of": 96,
+    "fortschritt": 0.55
+   },
+   "pruefung": {
+    "kat": 1,
+    "won": 0,
+    "of": 256,
+    "fortschritt": 0.268
+   },
+   "waechter_plus": {
+    "kat": 2,
+    "won": 4,
+    "of": 96,
+    "fortschritt": 0.371
+   },
+   "val_lang": {
+    "kat": 2,
+    "won": 2,
+    "of": 12,
+    "fortschritt": 0.516
+   },
+   "probe_lang": {
+    "kat": 2,
+    "won": 7,
+    "of": 20,
+    "fortschritt": 0.703
+   },
+   "v13_lang": {
+    "kat": 2,
+    "won": 0,
+    "of": 9,
+    "fortschritt": 0.12
+   },
+   "uebung_gabeln": {
+    "kat": 3,
+    "won": 19,
+    "of": 24,
+    "fortschritt": 0.922
+   },
+   "probe_koeder": {
+    "kat": 3,
+    "won": 6,
+    "of": 20,
+    "fortschritt": 0.636
+   },
+   "dev_gabeln": {
+    "kat": 3,
+    "won": 4,
+    "of": 24,
+    "fortschritt": 0.58
+   },
+   "probe_kanal_umkehren": {
+    "kat": 4,
+    "won": 32,
+    "of": 40,
+    "fortschritt": 0.885
+   },
+   "uebung_kanal": {
+    "kat": 4,
+    "won": 17,
+    "of": 18,
+    "fortschritt": 0.971
+   },
+   "dev_serpentine": {
+    "kat": 4,
+    "won": 8,
+    "of": 8,
+    "fortschritt": 1.0
+   },
+   "probe_truhe_links": {
+    "kat": 5,
+    "won": 5,
+    "of": 20,
+    "fortschritt": 0.474
+   },
+   "uebung_truhe_links": {
+    "kat": 5,
+    "won": 6,
+    "of": 12,
+    "fortschritt": 0.652
+   },
+   "val_gespiegelt": {
+    "kat": 5,
+    "won": 3,
+    "of": 12,
+    "fortschritt": 0.437
+   },
+   "dev_spiegelweg": {
+    "kat": 5,
+    "won": 0,
+    "of": 8,
+    "fortschritt": 0.249
+   },
+   "v13_spruenge": {
+    "kat": 6,
+    "won": 1,
+    "of": 48,
+    "fortschritt": 0.291
+   },
+   "v13_strukturen": {
+    "kat": 7,
+    "won": 17,
+    "of": 48,
+    "fortschritt": 0.592
+   }
+  },
+  "sekunden": 483,
+  "checkpoint": "ema_step_0004000000.zip"
+ },
+ "6000000:ema": {
+  "dev_alt": 0.554,
+  "dev_neu": 0.1719,
+  "F": 0.3776,
+  "pruefung32": "3/32",
+  "kategorien": [
+   0.4701,
+   0.0391,
+   0.3005,
+   0.5028,
+   0.8731,
+   0.2167,
+   0.1458,
+   0.3125
+  ],
+  "generalist": 0.3576,
+  "komponenten": {
+   "dev_klassisch": {
+    "kat": 0,
+    "won": 36,
+    "of": 72,
+    "fortschritt": 0.709
+   },
+   "val_v9_t8-12": {
+    "kat": 0,
+    "won": 17,
+    "of": 30,
+    "fortschritt": 0.745
+   },
+   "proben_klassisch": {
+    "kat": 0,
+    "won": 33,
+    "of": 96,
+    "fortschritt": 0.624
+   },
+   "pruefung": {
+    "kat": 1,
+    "won": 10,
+    "of": 256,
+    "fortschritt": 0.414
+   },
+   "waechter_plus": {
+    "kat": 2,
+    "won": 13,
+    "of": 96,
+    "fortschritt": 0.499
+   },
+   "val_lang": {
+    "kat": 2,
+    "won": 5,
+    "of": 12,
+    "fortschritt": 0.72
+   },
+   "probe_lang": {
+    "kat": 2,
+    "won": 13,
+    "of": 20,
+    "fortschritt": 0.851
+   },
+   "v13_lang": {
+    "kat": 2,
+    "won": 0,
+    "of": 9,
+    "fortschritt": 0.274
+   },
+   "uebung_gabeln": {
+    "kat": 3,
+    "won": 21,
+    "of": 24,
+    "fortschritt": 0.935
+   },
+   "probe_koeder": {
+    "kat": 3,
+    "won": 11,
+    "of": 20,
+    "fortschritt": 0.792
+   },
+   "dev_gabeln": {
+    "kat": 3,
+    "won": 2,
+    "of": 24,
+    "fortschritt": 0.39
+   },
+   "probe_kanal_umkehren": {
+    "kat": 4,
+    "won": 32,
+    "of": 40,
+    "fortschritt": 0.909
+   },
+   "uebung_kanal": {
+    "kat": 4,
+    "won": 17,
+    "of": 18,
+    "fortschritt": 0.97
+   },
+   "dev_serpentine": {
+    "kat": 4,
+    "won": 7,
+    "of": 8,
+    "fortschritt": 0.91
+   },
+   "probe_truhe_links": {
+    "kat": 5,
+    "won": 4,
+    "of": 20,
+    "fortschritt": 0.496
+   },
+   "uebung_truhe_links": {
+    "kat": 5,
+    "won": 6,
+    "of": 12,
+    "fortschritt": 0.612
+   },
+   "val_gespiegelt": {
+    "kat": 5,
+    "won": 2,
+    "of": 12,
+    "fortschritt": 0.424
+   },
+   "dev_spiegelweg": {
+    "kat": 5,
+    "won": 0,
+    "of": 8,
+    "fortschritt": 0.352
+   },
+   "v13_spruenge": {
+    "kat": 6,
+    "won": 7,
+    "of": 48,
+    "fortschritt": 0.415
+   },
+   "v13_strukturen": {
+    "kat": 7,
+    "won": 15,
+    "of": 48,
+    "fortschritt": 0.581
+   }
+  },
+  "sekunden": 535,
+  "checkpoint": "ema_step_0006000000.zip"
+ }
+}
