@@ -1,0 +1,136 @@
+{
+ "kategorien": [
+  0.8382,
+  0.6445,
+  0.6542,
+  0.5778,
+  0.9046,
+  0.1083,
+  0.5,
+  0.125
+ ],
+ "generalist": 0.5441,
+ "komponenten": {
+  "dev_klassisch": {
+   "kat": 0,
+   "won": 51,
+   "of": 72,
+   "fortschritt": 0.823
+  },
+  "val_v9_t8-12": {
+   "kat": 0,
+   "won": 27,
+   "of": 30,
+   "fortschritt": 0.98
+  },
+  "proben_klassisch": {
+   "kat": 0,
+   "won": 87,
+   "of": 96,
+   "fortschritt": 0.965
+  },
+  "pruefung": {
+   "kat": 1,
+   "won": 165,
+   "of": 256,
+   "fortschritt": 0.822
+  },
+  "waechter_plus": {
+   "kat": 2,
+   "won": 80,
+   "of": 96,
+   "fortschritt": 0.918
+  },
+  "val_lang": {
+   "kat": 2,
+   "won": 10,
+   "of": 12,
+   "fortschritt": 0.938
+  },
+  "probe_lang": {
+   "kat": 2,
+   "won": 19,
+   "of": 20,
+   "fortschritt": 0.999
+  },
+  "v13_lang": {
+   "kat": 2,
+   "won": 0,
+   "of": 9,
+   "fortschritt": 0.212
+  },
+  "uebung_gabeln": {
+   "kat": 3,
+   "won": 20,
+   "of": 24,
+   "fortschritt": 0.928
+  },
+  "probe_koeder": {
+   "kat": 3,
+   "won": 18,
+   "of": 20,
+   "fortschritt": 0.949
+  },
+  "dev_gabeln": {
+   "kat": 3,
+   "won": 0,
+   "of": 24,
+   "fortschritt": 0.295
+  },
+  "probe_kanal_umkehren": {
+   "kat": 4,
+   "won": 38,
+   "of": 40,
+   "fortschritt": 0.965
+  },
+  "uebung_kanal": {
+   "kat": 4,
+   "won": 16,
+   "of": 18,
+   "fortschritt": 0.947
+  },
+  "dev_serpentine": {
+   "kat": 4,
+   "won": 7,
+   "of": 8,
+   "fortschritt": 0.998
+  },
+  "probe_truhe_links": {
+   "kat": 5,
+   "won": 2,
+   "of": 20,
+   "fortschritt": 0.366
+  },
+  "uebung_truhe_links": {
+   "kat": 5,
+   "won": 4,
+   "of": 12,
+   "fortschritt": 0.56
+  },
+  "val_gespiegelt": {
+   "kat": 5,
+   "won": 0,
+   "of": 12,
+   "fortschritt": 0.199
+  },
+  "dev_spiegelweg": {
+   "kat": 5,
+   "won": 0,
+   "of": 8,
+   "fortschritt": 0.101
+  },
+  "v13_spruenge": {
+   "kat": 6,
+   "won": 24,
+   "of": 48,
+   "fortschritt": 0.721
+  },
+  "v13_strukturen": {
+   "kat": 7,
+   "won": 6,
+   "of": 48,
+   "fortschritt": 0.441
+  }
+ },
+ "modell": "models/phase10_kandidat_lehrer.zip"
+}

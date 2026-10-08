@@ -1,0 +1,136 @@
+{
+ "kategorien": [
+  0.8493,
+  0.5742,
+  0.6299,
+  0.6056,
+  0.9065,
+  0.35,
+  0.5208,
+  0.2292
+ ],
+ "generalist": 0.5832,
+ "komponenten": {
+  "dev_klassisch": {
+   "kat": 0,
+   "won": 54,
+   "of": 72,
+   "fortschritt": 0.852
+  },
+  "val_v9_t8-12": {
+   "kat": 0,
+   "won": 28,
+   "of": 30,
+   "fortschritt": 0.963
+  },
+  "proben_klassisch": {
+   "kat": 0,
+   "won": 83,
+   "of": 96,
+   "fortschritt": 0.955
+  },
+  "pruefung": {
+   "kat": 1,
+   "won": 147,
+   "of": 256,
+   "fortschritt": 0.651
+  },
+  "waechter_plus": {
+   "kat": 2,
+   "won": 60,
+   "of": 96,
+   "fortschritt": 0.88
+  },
+  "val_lang": {
+   "kat": 2,
+   "won": 10,
+   "of": 12,
+   "fortschritt": 0.972
+  },
+  "probe_lang": {
+   "kat": 2,
+   "won": 19,
+   "of": 20,
+   "fortschritt": 0.993
+  },
+  "v13_lang": {
+   "kat": 2,
+   "won": 1,
+   "of": 9,
+   "fortschritt": 0.244
+  },
+  "uebung_gabeln": {
+   "kat": 3,
+   "won": 22,
+   "of": 24,
+   "fortschritt": 0.966
+  },
+  "probe_koeder": {
+   "kat": 3,
+   "won": 18,
+   "of": 20,
+   "fortschritt": 0.97
+  },
+  "dev_gabeln": {
+   "kat": 3,
+   "won": 0,
+   "of": 24,
+   "fortschritt": 0.339
+  },
+  "probe_kanal_umkehren": {
+   "kat": 4,
+   "won": 36,
+   "of": 40,
+   "fortschritt": 0.967
+  },
+  "uebung_kanal": {
+   "kat": 4,
+   "won": 17,
+   "of": 18,
+   "fortschritt": 0.971
+  },
+  "dev_serpentine": {
+   "kat": 4,
+   "won": 7,
+   "of": 8,
+   "fortschritt": 0.945
+  },
+  "probe_truhe_links": {
+   "kat": 5,
+   "won": 8,
+   "of": 20,
+   "fortschritt": 0.621
+  },
+  "uebung_truhe_links": {
+   "kat": 5,
+   "won": 6,
+   "of": 12,
+   "fortschritt": 0.613
+  },
+  "val_gespiegelt": {
+   "kat": 5,
+   "won": 6,
+   "of": 12,
+   "fortschritt": 0.637
+  },
+  "dev_spiegelweg": {
+   "kat": 5,
+   "won": 0,
+   "of": 8,
+   "fortschritt": 0.239
+  },
+  "v13_spruenge": {
+   "kat": 6,
+   "won": 25,
+   "of": 48,
+   "fortschritt": 0.75
+  },
+  "v13_strukturen": {
+   "kat": 7,
+   "won": 11,
+   "of": 48,
+   "fortschritt": 0.444
+  }
+ },
+ "modell": "models/neustart_kandidat_pruefung.zip"
+}

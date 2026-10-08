@@ -1,0 +1,136 @@
+{
+ "kategorien": [
+  0.837,
+  0.7422,
+  0.6693,
+  0.4167,
+  0.075,
+  0.0,
+  0.5,
+  0.0417
+ ],
+ "generalist": 0.4102,
+ "komponenten": {
+  "dev_klassisch": {
+   "kat": 0,
+   "won": 56,
+   "of": 72,
+   "fortschritt": 0.892
+  },
+  "val_v9_t8-12": {
+   "kat": 0,
+   "won": 27,
+   "of": 30,
+   "fortschritt": 0.962
+  },
+  "proben_klassisch": {
+   "kat": 0,
+   "won": 80,
+   "of": 96,
+   "fortschritt": 0.924
+  },
+  "pruefung": {
+   "kat": 1,
+   "won": 190,
+   "of": 256,
+   "fortschritt": 0.861
+  },
+  "waechter_plus": {
+   "kat": 2,
+   "won": 73,
+   "of": 96,
+   "fortschritt": 0.909
+  },
+  "val_lang": {
+   "kat": 2,
+   "won": 11,
+   "of": 12,
+   "fortschritt": 0.946
+  },
+  "probe_lang": {
+   "kat": 2,
+   "won": 20,
+   "of": 20,
+   "fortschritt": 1.0
+  },
+  "v13_lang": {
+   "kat": 2,
+   "won": 0,
+   "of": 9,
+   "fortschritt": 0.139
+  },
+  "uebung_gabeln": {
+   "kat": 3,
+   "won": 6,
+   "of": 24,
+   "fortschritt": 0.441
+  },
+  "probe_koeder": {
+   "kat": 3,
+   "won": 20,
+   "of": 20,
+   "fortschritt": 1.0
+  },
+  "dev_gabeln": {
+   "kat": 3,
+   "won": 0,
+   "of": 24,
+   "fortschritt": 0.265
+  },
+  "probe_kanal_umkehren": {
+   "kat": 4,
+   "won": 9,
+   "of": 40,
+   "fortschritt": 0.585
+  },
+  "uebung_kanal": {
+   "kat": 4,
+   "won": 0,
+   "of": 18,
+   "fortschritt": 0.666
+  },
+  "dev_serpentine": {
+   "kat": 4,
+   "won": 0,
+   "of": 8,
+   "fortschritt": 0.32
+  },
+  "probe_truhe_links": {
+   "kat": 5,
+   "won": 0,
+   "of": 20,
+   "fortschritt": 0.013
+  },
+  "uebung_truhe_links": {
+   "kat": 5,
+   "won": 0,
+   "of": 12,
+   "fortschritt": 0.017
+  },
+  "val_gespiegelt": {
+   "kat": 5,
+   "won": 0,
+   "of": 12,
+   "fortschritt": 0.008
+  },
+  "dev_spiegelweg": {
+   "kat": 5,
+   "won": 0,
+   "of": 8,
+   "fortschritt": 0.0
+  },
+  "v13_spruenge": {
+   "kat": 6,
+   "won": 24,
+   "of": 48,
+   "fortschritt": 0.744
+  },
+  "v13_strukturen": {
+   "kat": 7,
+   "won": 2,
+   "of": 48,
+   "fortschritt": 0.284
+  }
+ },
+ "modell": "models/phase8_final.zip"
+}
