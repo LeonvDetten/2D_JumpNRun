@@ -359,9 +359,39 @@ class MirrorSource:
 
     MIRROR_TIER = -5
 
-    def __init__(self, min_tier: int = 4, max_tier: int = 12, long_share: float = 0.0):
+    WINDOW = 30
+    EXPLORE = 0.1
+
+    def __init__(self, min_tier: int = 4, max_tier: int = 12, long_share: float = 0.0, adaptive: bool = False,
+                 start_frontier: int = 6):
         self.tiers = list(range(min_tier, max_tier + 1))
         self.long_share = long_share  # phase 11: share of mirrored long levels (LongSource, chest far left)
+        # phase 12 (option): own curriculum for mirrored levels - tiers up to the frontier (all lower tiers won
+        # >= 50 % mirrored) plus the next one; EXPLORE share from all tiers
+        self.adaptive = adaptive
+        self.start_frontier = start_frontier
+        self.hist = {t: [] for t in self.tiers}
+
+    def frontier(self) -> int:
+        f = self.tiers[0] - 1
+        for t in self.tiers:
+            h = self.hist[t]
+            if len(h) >= 10:
+                if sum(h) / len(h) < 0.5:
+                    break
+            elif t > self.start_frontier:
+                break
+            f = t
+        return f
+
+    def _tier(self, rng: random.Random) -> int:
+        if not self.adaptive or rng.random() < self.EXPLORE:
+            return rng.choice(self.tiers)
+        f = self.frontier()
+        weights = [2.0 if t == f + 1 else 1.0 if t <= f else 0.0 for t in self.tiers]
+        if not any(weights):
+            weights[0] = 1.0
+        return rng.choices(self.tiers, weights)[0]
 
     def __call__(self, rng: random.Random):
         from jumpnrun.levelgen.distmap import DistanceMap
@@ -376,7 +406,7 @@ class MirrorSource:
                     level.mirror_tier = LongSource.LONG_TIER
                     return level, self.MIRROR_TIER
         for _ in range(10):
-            tier = rng.choice(self.tiers)
+            tier = self._tier(rng)
             level = mirror_level(G.generate(tier, rng.randrange(10**8)))
             dm = DistanceMap(level)
             if dm.reachable and dm.start is not None:
@@ -386,8 +416,10 @@ class MirrorSource:
         level.mirror_tier = tier
         return level, self.MIRROR_TIER
 
-    def feedback(self, *args, **kwargs) -> None:
-        pass
+    def feedback(self, level: Level = None, tier: int = None, won: bool = False, *args, **kwargs) -> None:
+        t = getattr(level, "mirror_tier", None)
+        if t in self.hist:
+            self.hist[t] = (self.hist[t] + [1.0 if won else 0.0])[-self.WINDOW:]
 
 
 def _top(lines: List[str], col: int) -> Optional[int]:

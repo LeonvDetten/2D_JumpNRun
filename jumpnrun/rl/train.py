@@ -71,7 +71,8 @@ def make_env(rank: int, seed: int, min_tier: int, max_tier: int, handmade_paths,
             if any("spiegel" in shares for _, shares in mix):  # phase 10 D: mirrored levels (both directions)
                 from jumpnrun.levelgen.skills import MirrorSource
 
-                sources["spiegel"] = MirrorSource(long_share=(p11 or {}).get("mirror_long_share", 0.0))
+                sources["spiegel"] = MirrorSource(long_share=(p11 or {}).get("mirror_long_share", 0.0),
+                                                  adaptive=(p11 or {}).get("mirror_adaptive", False))
             if any("lang" in shares for _, shares in mix):  # phase 11: two generator levels in a row
                 if (p11 or {}).get("hard"):  # phase 12: half of them long v11 levels
                     from jumpnrun.levelgen.hard import LongMixSource
@@ -237,6 +238,8 @@ def main() -> None:
     parser.add_argument("--phase11", action="store_true",
                         help="phase 11: practice kinds incl. lange_sackgasse, practice frontier pooled in the "
                              "training process (saved in curriculum.json), tier curriculum from phase-8 episodes only")
+    parser.add_argument("--mirror-adaptive", action="store_true",
+                        help="phase 12: own curriculum for mirrored levels (frontier of mirrored success)")
     parser.add_argument("--mirror-long-share", type=float, default=1 / 3,
                         help="phase 11: share of mirrored long levels within the 'spiegel' source")
     parser.add_argument("--phase12", action="store_true",
@@ -296,7 +299,8 @@ def main() -> None:
                  args.rewind_prob, args.pool_share, args.augment, args.obs_v2, args.stuck_death, args.plr,
                  env_extra=dict(obs_v3=args.obs_v3, path_reward=args.path_reward, path_delta=args.path_delta),
                  source_extra=dict(gen_variant=args.generator, augment_v2=args.augment_v2, mix=mix_schedule,
-                                  phase11=(dict(mirror_long_share=args.mirror_long_share, hard=args.phase12)
+                                  phase11=(dict(mirror_long_share=args.mirror_long_share, hard=args.phase12,
+                                                mirror_adaptive=args.mirror_adaptive)
                                            if (args.phase11 or args.phase12) else None),
                                   mix_gates=_json_arg(args.mix_gates), routing=_json_arg(args.routing)))
         for i in range(args.envs)

@@ -131,3 +131,29 @@ def test_no_v11_level_is_a_measurement_level():
     rng = random.Random(7)
     src = HardSource()
     assert not any(_hash(src(rng)[0]) in evaluation for _ in range(40))
+
+
+def test_mirror_adaptive_frontier():
+    import random
+
+    from jumpnrun.levelgen.skills import MirrorSource
+
+    src = MirrorSource(adaptive=True)
+    assert src.frontier() == 6  # start: tiers 4-6 assumed solvable, 7 is next
+    rng = random.Random(0)
+    tiers = [src._tier(rng) for _ in range(400)]
+    assert max(t for t in tiers) == 12  # explore share still reaches all tiers
+    assert sum(t >= 9 for t in tiers) < 0.1 * len(tiers)
+    level, _ = src(rng)
+
+    class L:
+        pass
+
+    for t, won in ((7, True), (8, False)):
+        for _ in range(12):
+            lv = L()
+            lv.mirror_tier = t
+            src.feedback(lv, -5, won)
+    assert src.frontier() == 7  # 7 won, 8 below 50 %
+    assert level.mirror_tier in src.tiers
+    assert MirrorSource()._tier(rng) in range(4, 13)
