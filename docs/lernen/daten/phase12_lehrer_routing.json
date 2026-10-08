@@ -1,0 +1,319 @@
+{
+ "teachers": [
+  "models/phase8_final.zip",
+  "models/neustart_kandidat_f.zip",
+  "models/phase11_kandidat.zip",
+  "models/phase10_kandidat_lehrer.zip",
+  "models/neustart_kandidat_pruefung.zip"
+ ],
+ "routing": {
+  "v9_t4": 0,
+  "v9_t5": 0,
+  "v9_t6": 0,
+  "v9_t7": 0,
+  "v9_t8": 1,
+  "v9_t9": 0,
+  "v9_t10": 2,
+  "v9_t11": 0,
+  "v9_t12": 0,
+  "v10_t10": 2,
+  "v10_t11": 3,
+  "v10_t12": 3,
+  "v10_t13": 1,
+  "uebung_kanal_ende": 3,
+  "uebung_kanal2": 3,
+  "uebung_kanal3": 4,
+  "uebung_sackgasse_runter": 2,
+  "uebung_gabel_umkehren": 1,
+  "uebung_gabel_oben": 0,
+  "uebung_truhe_links_kurz": 1,
+  "uebung_lange_sackgasse": 2,
+  "spiegel_t4-7": 4,
+  "spiegel_t8-12": -1,
+  "lang": 0,
+  "spiegel_lang": -1,
+  "v9_leicht": 0,
+  "_p8": 0,
+  "v11_spruenge": -1,
+  "v11_strukturen": -1,
+  "v11_gemischt": -1,
+  "v11_lang": -1
+ },
+ "begruendung": {
+  "v9_t4": {
+   "lehrer": "p8",
+   "quoten": {
+    "p8": 1.0,
+    "neustart_f": 1.0,
+    "lehrer10": 1.0,
+    "kandidat11": 1.0,
+    "neustart_waechter": 1.0,
+    "neustart_pruefung": 1.0
+   }
+  },
+  "v9_t5": {
+   "lehrer": "p8",
+   "quoten": {
+    "p8": 1.0,
+    "neustart_f": 1.0,
+    "lehrer10": 1.0,
+    "kandidat11": 1.0,
+    "neustart_waechter": 0.958,
+    "neustart_pruefung": 1.0
+   }
+  },
+  "v9_t6": {
+   "lehrer": "p8",
+   "quoten": {
+    "p8": 1.0,
+    "neustart_f": 0.958,
+    "lehrer10": 1.0,
+    "kandidat11": 1.0,
+    "neustart_waechter": 0.958,
+    "neustart_pruefung": 1.0
+   }
+  },
+  "v9_t7": {
+   "lehrer": "p8",
+   "quoten": {
+    "p8": 1.0,
+    "neustart_f": 1.0,
+    "lehrer10": 1.0,
+    "kandidat11": 1.0,
+    "neustart_waechter": 1.0,
+    "neustart_pruefung": 0.958
+   }
+  },
+  "v9_t8": {
+   "lehrer": "neustart_f",
+   "quoten": {
+    "p8": 0.875,
+    "neustart_f": 1.0,
+    "lehrer10": 1.0,
+    "kandidat11": 0.875,
+    "neustart_waechter": 0.917,
+    "neustart_pruefung": 0.917
+   }
+  },
+  "v9_t9": {
+   "lehrer": "p8",
+   "quoten": {
+    "p8": 1.0,
+    "neustart_f": 0.917,
+    "lehrer10": 0.958,
+    "kandidat11": 0.958,
+    "neustart_waechter": 0.917,
+    "neustart_pruefung": 1.0
+   }
+  },
+  "v9_t10": {
+   "lehrer": "kandidat11",
+   "quoten": {
+    "p8": 0.833,
+    "neustart_f": 0.792,
+    "lehrer10": 0.833,
+    "kandidat11": 1.0,
+    "neustart_waechter": 0.833,
+    "neustart_pruefung": 0.875
+   }
+  },
+  "v9_t11": {
+   "lehrer": "p8",
+   "quoten": {
+    "p8": 0.958,
+    "neustart_f": 0.833,
+    "lehrer10": 0.833,
+    "kandidat11": 0.875,
+    "neustart_waechter": 0.958,
+    "neustart_pruefung": 0.833
+   }
+  },
+  "v9_t12": {
+   "lehrer": "p8",
+   "quoten": {
+    "p8": 0.958,
+    "neustart_f": 0.75,
+    "lehrer10": 0.917,
+    "kandidat11": 0.833,
+    "neustart_waechter": 0.833,
+    "neustart_pruefung": 0.875
+   }
+  },
+  "v10_t10": {
+   "lehrer": "kandidat11",
+   "quoten": {
+    "p8": 0.708,
+    "neustart_f": 0.833,
+    "lehrer10": 0.833,
+    "kandidat11": 0.958,
+    "neustart_waechter": 0.875,
+    "neustart_pruefung": 0.833
+   }
+  },
+  "v10_t11": {
+   "lehrer": "lehrer10",
+   "quoten": {
+    "p8": 0.625,
+    "neustart_f": 0.708,
+    "lehrer10": 0.958,
+    "kandidat11": 0.917,
+    "neustart_waechter": 0.708,
+    "neustart_pruefung": 0.708
+   }
+  },
+  "v10_t12": {
+   "lehrer": "lehrer10",
+   "quoten": {
+    "p8": 0.75,
+    "neustart_f": 0.833,
+    "lehrer10": 0.958,
+    "kandidat11": 0.958,
+    "neustart_waechter": 0.875,
+    "neustart_pruefung": 0.958
+   }
+  },
+  "v10_t13": {
+   "lehrer": "neustart_f",
+   "quoten": {
+    "p8": 0.208,
+    "neustart_f": 0.958,
+    "lehrer10": 0.833,
+    "kandidat11": 0.958,
+    "neustart_waechter": 0.708,
+    "neustart_pruefung": 0.875
+   }
+  },
+  "uebung_kanal_ende": {
+   "lehrer": "lehrer10",
+   "quoten": {
+    "p8": 0.0,
+    "neustart_f": 0.917,
+    "lehrer10": 0.958,
+    "kandidat11": 0.917,
+    "neustart_waechter": 0.917,
+    "neustart_pruefung": 0.917
+   }
+  },
+  "uebung_kanal2": {
+   "lehrer": "lehrer10",
+   "quoten": {
+    "p8": 0.0,
+    "neustart_f": 0.917,
+    "lehrer10": 0.958,
+    "kandidat11": 0.958,
+    "neustart_waechter": 0.833,
+    "neustart_pruefung": 0.917
+   }
+  },
+  "uebung_kanal3": {
+   "lehrer": "neustart_pruefung",
+   "quoten": {
+    "p8": 0.0,
+    "neustart_f": 0.958,
+    "lehrer10": 0.833,
+    "kandidat11": 0.875,
+    "neustart_waechter": 0.958,
+    "neustart_pruefung": 1.0
+   }
+  },
+  "uebung_sackgasse_runter": {
+   "lehrer": "kandidat11",
+   "quoten": {
+    "p8": 0.0,
+    "neustart_f": 0.958,
+    "lehrer10": 0.958,
+    "kandidat11": 1.0,
+    "neustart_waechter": 0.917,
+    "neustart_pruefung": 0.958
+   }
+  },
+  "uebung_gabel_umkehren": {
+   "lehrer": "neustart_f",
+   "quoten": {
+    "p8": 0.0,
+    "neustart_f": 1.0,
+    "lehrer10": 0.917,
+    "kandidat11": 0.958,
+    "neustart_waechter": 0.958,
+    "neustart_pruefung": 0.958
+   }
+  },
+  "uebung_gabel_oben": {
+   "lehrer": "p8",
+   "quoten": {
+    "p8": 0.917,
+    "neustart_f": 0.917,
+    "lehrer10": 0.917,
+    "kandidat11": 0.958,
+    "neustart_waechter": 0.917,
+    "neustart_pruefung": 0.917
+   }
+  },
+  "uebung_truhe_links_kurz": {
+   "lehrer": "neustart_f",
+   "quoten": {
+    "p8": 0.0,
+    "neustart_f": 0.667,
+    "lehrer10": 0.167,
+    "kandidat11": 0.292,
+    "neustart_waechter": 0.542,
+    "neustart_pruefung": 0.667
+   }
+  },
+  "uebung_lange_sackgasse": {
+   "lehrer": "kandidat11",
+   "quoten": {
+    "p8": 0.167,
+    "neustart_f": 0.625,
+    "lehrer10": 0.5,
+    "kandidat11": 0.833,
+    "neustart_waechter": 0.708,
+    "neustart_pruefung": 0.583
+   }
+  },
+  "spiegel_t4-7": {
+   "lehrer": "neustart_pruefung",
+   "quoten": {
+    "p8": 0.0,
+    "neustart_f": 0.458,
+    "lehrer10": 0.042,
+    "kandidat11": 0.333,
+    "neustart_waechter": 0.417,
+    "neustart_pruefung": 0.5
+   }
+  },
+  "spiegel_t8-12": {
+   "lehrer": null,
+   "quoten": {
+    "p8": 0.0,
+    "neustart_f": 0.0,
+    "lehrer10": 0.0,
+    "kandidat11": 0.0,
+    "neustart_waechter": 0.083,
+    "neustart_pruefung": 0.0
+   }
+  },
+  "lang": {
+   "lehrer": "p8",
+   "quoten": {
+    "p8": 0.938,
+    "neustart_f": 0.75,
+    "lehrer10": 0.875,
+    "kandidat11": 0.875,
+    "neustart_waechter": 0.938,
+    "neustart_pruefung": 0.812
+   }
+  },
+  "spiegel_lang": {
+   "lehrer": null,
+   "quoten": {
+    "p8": 0.0,
+    "neustart_f": 0.0,
+    "lehrer10": 0.0,
+    "kandidat11": 0.0,
+    "neustart_waechter": 0.0,
+    "neustart_pruefung": 0.0
+   }
+  }
+ }
+}

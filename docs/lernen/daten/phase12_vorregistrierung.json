@@ -1,0 +1,35 @@
+{
+ "phase": 12,
+ "stand": "2026-10-08, vor dem ersten PPO-Schritt (Plan von Leon im Planmodus freigegeben)",
+ "entscheidungen_leon": {
+  "schueler": "frisches Netz (Löser-BC-Start wie Neustart)",
+  "generator": "schwere Sprünge, neue Strukturen, lange Level (v11, jumpnrun/levelgen/hard.py)",
+  "budget": "~48 h",
+  "anzeige": "Scorecard mit 8 Kategorien + Generalist-Wert, Neustart-Kurve als Schattenlinie",
+  "entscheidungspunkte": "E0 Generator-Abnahme (Leons Freigabe), E1 2 Mio., E2 6 Mio., E3 15 Mio., E4 30 Mio."
+ },
+ "run": "runs/phase12_schueler",
+ "start": "runs/phase12/bc.zip",
+ "kerne_training": [0, 1, 2],
+ "kern_messung": 3,
+ "ziel_schritte": 45000000,
+ "zeit_stunden": 40,
+ "lernrate": {"cosine": [0.0002, 0.00002, 45000000], "ramp": 200000, "critic_warmup": 150000},
+ "mischung": {"p8": 0.35, "skill": 0.15, "v10": 0.10, "hart": 0.20, "lang": 0.10, "spiegel": 0.10},
+ "mischung_sperre": {"v10": 10, "hart": 10, "lang": 12, "spiegel": 8},
+ "bc2_dirs": ["runs/demos10", "runs/demos9", "runs/demos_spiegel", "runs/demos12"],
+ "bc2_plan": [[0, 0.1], [3000000, 0.05], [6000000, 0.03]],
+ "lehrer": "runs/phase12/lehrer_routing.json (Familie -> Lehrer, aus dem Validierungsprofil, nie aus Test-Leveln)",
+ "lehrer_plan": [[0, 1.0], [20000000, 0.0]],
+ "entscheidungspunkte": {
+  "E1": {"mio": 2, "weiter_wenn": "Klassisch-Komponente dev_alt >= Neustart bei 2 Mio. (0,364) und Kategorien 4-6 > 0"},
+  "E2": {"mio": 6, "weiter_wenn": "dev_alt >= Neustart bei 6 Mio. (0,497) + 5 Pp oder F >= Neustart (0,383) + 5 Pp; Kategorien 7/8 steigen gegenüber 2 Mio."},
+  "E3": {"mio": 16, "weiter_wenn": "Klassisch >= 55 % (dev_alt) und mind. 5 Kategorien über dem Wert des Neustart-Kandidaten", "stopp": true},
+  "E4": {"mio": 30, "weiter_wenn": "Generalist-Wert >= bisher bester Generalist-Wert - 5 Pp", "stopp": true}
+ },
+ "bedeutung_stopp": "E1/E2 verfehlt: Rückfrage an Leon, Training läuft bis zum nächsten Punkt weiter. E3/E4 verfehlt: Stopp, Rückfrage.",
+ "abweichung_vom_plan": "Der Neustart hat keine Scorecard-Werte je Schrittstand; verglichen wird an E1/E2 mit seinen dev_alt- und F-Kurven (gleiche milestones10-Messung, klein, EMA). E3 nutzt statt 15 Mio. den Messpunkt 16 Mio. (Takt 2 Mio.).",
+ "messung": "jumpnrun/rl/milestones12.py (Scorecard + milestones10 klein) auf Kern 3; EMA bei 1 Mio. und jeder geraden Mio., EMA2 im Fenster 40/42/44",
+ "urteil": "bester Stand im Fenster nach Generalist-Wert mit Halte-Tor (Prüfung >= P8 - 5 Pp bei 256 Versuchen, dev_alt >= P8 - 3 Pp); danach gepaarter Endvergleich (scripts/endvergleich12.py) und erst nach Leons Freigabe der versiegelte Test",
+ "nie": "exam2 und versiegelte/Test-Level nur als Gruppensummen; Prüfung, Proben, Wächter- und Validierungslevel nie trainiert"
+}
