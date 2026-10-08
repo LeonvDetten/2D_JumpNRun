@@ -221,7 +221,7 @@ def picture(current: dict, label: str, history=None, shadow=None, out=OUT / "sco
         ax2.plot([a for a, _, _ in h], [100 * g for _, g, _ in h], "o-", color="#2a78d6", linewidth=2.5,
                  label="Generalist-Wert (Phase 12)")
         ax2.plot([a for a, _, _ in h], [100 * k for _, _, k in h], "s--", color="#2a78d6", linewidth=1.2,
-                 label="1 Klassisch rechts (Phase 12)")
+                 label="alte Dev-Level dev_alt (Phase 12)")
     if shadow:
         ax2.plot([a for a, _ in shadow], [100 * v for _, v in shadow], color="#9a9a9a", linewidth=4, alpha=0.5,
                  label="Neustart: alte Dev-Level beim gleichen Schrittstand")
