@@ -99,6 +99,9 @@ Leon gab den Generator am 8.10. frei („mit Löser-Pool“).
 | 2 | 22,1 | 30,7 (36,4) | 34,8 (29,8) | 22 | 0 | 8 | 34 | 76 | 22 | 0 | 15 |
 | 4 | 30,5 | 48,9 (47,0) | 38,1 (32,2) | 34 | 0 | 14 | 42 | 91 | 25 | 2 | 35 |
 | 6 | 35,8 | 55,4 (49,7) | 37,8 (38,3) | 47 | 4 | 30 | 50 | 87 | 22 | 15 | 31 |
+| 8 | 39,2 | 55,4 (51,9) | 46,8 (42,7) | 57 | 19 | 29 | 45 | 82 | 25 | 8 | 48 |
+| 10 | 41,7 | 59,1 (53,3) | 42,6 (39,5) | 57 | 19 | 29 | 52 | 86 | 23 | 19 | 48 |
+| 12 | 51,1 | 56,2 (57,1) | 48,3 (39,4) | 63 | 30 | 41 | 56 | 93 | 38 | 31 | 56 |
 
 **Entscheidungspunkte**
 - **E1 (2 Mio.): formal verfehlt.**
@@ -109,3 +112,22 @@ Leon gab den Generator am 8.10. frei („mit Löser-Pool“).
   - dev_alt liegt 5,7 Pp über dem Neustart, F gleichauf.
   - Sprünge und Strukturen steigen.
   - Die neuen Strukturen liegen ab 4 Mio. über dem bisher besten Modell.
+
+**Leons Eingriffe**
+- **19:40 (10,5 Mio.): gespiegelte lange Level heraus.**
+  - Im Training gewann der Schüler kurze gespiegelte Level zu 13–20 %, gespiegelte lange zu 0 % (Fortschritt 10 %). Diese lieferten kaum Lernsignal.
+  - Ihr Anteil geht seitdem an kurze gespiegelte Level.
+  - Nachher: kurze gespiegelte Level im Training 19 % gewonnen und 40 % Fortschritt (vorher 13 % und 30 %).
+  - In der Scorecard stieg Links/Spiegel bei 12 Mio. von 23 auf 38 %. Das liegt erstmals über dem bisher besten Modell. Ein Teil davon kann auch von der höheren Curriculum-Stufe kommen.
+- **19:45: kein automatischer Stopp mehr an E3/E4.**
+  - Leons Vorgabe: Das Training läuft ohne Unterbrechung.
+  - Fragen sind erlaubt; ohne Antwort wird nach bestem Gewissen weitergemacht.
+  - Verfehlte Punkte werden nur noch notiert und berichtet.
+
+**12 Mio.: der größte Sprung bisher**
+- Der Generalist-Wert steigt von 41,7 auf 51,1 %, alle 8 Kategorien legen zu.
+- Neue Strukturen liegen bei 56 %, mehr als doppelt so viel wie jedes Altmodell.
+- Offen bleiben:
+  - Klassisch rechts (63 % gegen 89 %),
+  - die Prüfung (30 % gegen 74 % bei P8),
+  - dev_alt, das leicht unter die Neustart-Kurve fällt, während die Lehrer ausklingen.
