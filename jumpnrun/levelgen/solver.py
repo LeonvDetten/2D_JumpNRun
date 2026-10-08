@@ -56,6 +56,7 @@ def solve(
     goal: Optional[Tuple[int, int]] = None,
     dm=None,
     actions: Sequence = BOT_ACTIONS,
+    goal_dist: Optional[float] = None,
 ) -> SolveResult:
     """Search for the chest - or, with `goal=(col, row)`, for standing on that tile's top.
 
@@ -76,12 +77,14 @@ def solve(
         p = sim.player
         return p.on_ground and p.y + p.h == target_y and abs(p.x + p.w // 2 - target_x) <= TILE
 
-    use_dm = dm is not None and dm.reachable and goal is None
+    # phase 12: a leg towards a waypoint ON the distance-map way is guided by (way left) - (way left at the goal)
+    use_dm = dm is not None and dm.reachable and (goal is None or goal_dist is not None)
+    offset = goal_dist or 0.0
 
     def path_h(sim: Simulation, parent_h: float) -> float:
         p = sim.player
         d = dm.at_player(p) if p.on_ground else dm.below(p.x, p.y, p.w, p.h)
-        return parent_h if d is None else d * TILE
+        return parent_h if d is None else max(0.0, d - offset) * TILE
 
     def priority(sim: Simulation, h: Optional[float] = None) -> float:
         p = sim.player
@@ -96,7 +99,7 @@ def solve(
     # node storage for path reconstruction: parent index + action index
     parents: List[int] = [-1]
     via: List[int] = [-1]
-    hs: List[float] = [path_h(root, (dm.start or 0.0) * TILE) if use_dm else 0.0]
+    hs: List[float] = [path_h(root, max(0.0, (dm.start or 0.0) - offset) * TILE) if use_dm else 0.0]
     counter = itertools.count()
     heap = [(priority(root, hs[0] if use_dm else None), next(counter), 0, root)]
     seen = {_state_key(root)}
@@ -309,3 +312,61 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+
+def way_cells(dm, start_cell) -> List[Tuple[int, int]]:
+    """Phase 12: the cells of the shortest way from `start_cell` to the chest (following the distance map)."""
+
+    out, u = [start_cell], start_cell
+    while dm.dist.get(u, 0) > 0.5 and len(out) < 5000:
+        nxt = min(dm.edges.get(u, []), key=lambda e: e[1] + dm.dist.get(e[0], 1e9), default=None)
+        if nxt is None or dm.dist.get(nxt[0], 1e9) >= dm.dist[u]:
+            break
+        u = nxt[0]
+        out.append(u)
+    return out
+
+
+def solve_path_legs(level: Level, leg_tiles: float = 18, leg_budget: int = 40_000, total_budget: int = 800_000,
+                    action_repeat: int = ACTION_REPEAT, weight: float = 1.2) -> SolveResult:
+    """Phase 12: long / winding levels leg by leg - goals are cells on the distance-map way, every `leg_tiles`
+    tiles of way; each leg is an A* guided by the way left to that goal. Awkward goals are skipped."""
+
+    from jumpnrun.levelgen.distmap import DistanceMap
+
+    dm = DistanceMap(level)
+    t0 = time.time()
+    if not dm.reachable:
+        return SolveResult(False, None, 0, 0, 0.0)
+    sim = Simulation(level)
+    p = sim.player
+    here = min((c for c in dm.dist if abs(c[0] * TILE + TILE // 2 - (p.x + p.w // 2)) <= TILE),
+               key=lambda c: abs(dm.dist[c] - (dm.start or 0)), default=None)
+    cells = way_cells(dm, here) if here is not None else []
+    goals, last = [], dm.start or 0.0
+    for c in cells[1:]:
+        if last - dm.dist[c] >= leg_tiles:
+            goals.append(c)
+            last = dm.dist[c]
+    actions: List[int] = []
+    expanded = 0
+    for goal in goals + [None]:
+        budget = min(leg_budget if goal is not None else 3 * leg_budget, total_budget - expanded)
+        if budget <= 0:
+            break
+        if goal is None:
+            leg = solve(level, budget, action_repeat=action_repeat, weight=weight, start=sim, dm=dm,
+                        actions=BOT_ACTIONS_V3)
+        else:  # stand on the block below the way cell
+            leg = solve(level, budget, action_repeat=action_repeat, weight=weight, start=sim, goal=(goal[0], goal[1] + 1),
+                        dm=dm, actions=BOT_ACTIONS_V3, goal_dist=dm.dist[goal])
+        expanded += leg.expanded
+        if not leg.solved:
+            if goal is None:
+                return SolveResult(False, None, expanded, sim.player.x, time.time() - t0)
+            continue
+        for a in leg.actions:
+            sim.step(BOT_ACTIONS_V3[a], frames=action_repeat)
+        actions += leg.actions
+    won = sim.status == Status.WON
+    return SolveResult(won, actions if won else None, expanded, sim.player.x, time.time() - t0)

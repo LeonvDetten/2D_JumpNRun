@@ -20,7 +20,7 @@ from jumpnrun.imitation.demos import cached_dataset
 BC_BATCH = 256
 
 
-def bc2_dataset(dirs) -> dict:
+def bc2_dataset(dirs, progress: str = "x", procs: int = 1) -> dict:
     """Phase 10: the BC2 samples of all demos*.jsonl in `dirs`, cached by a hash of the file list and sizes
     (prebuilt in the demo window: `python3 -c "from jumpnrun.rl.ppo_demos import bc2_dataset; bc2_dataset([...])"`)."""
 
@@ -28,16 +28,27 @@ def bc2_dataset(dirs) -> dict:
 
     files = sorted(f for d in dirs for f in Path(d).glob("demos*.jsonl"))
     # "v2": phase 11 replays mirrored phase-9 demos with their enemy direction (demos.demo_enemy_dir)
-    key = hashlib.sha256(("v2|" + "|".join(f"{f}:{f.stat().st_size}" for f in files)).encode()).hexdigest()[:16]
-    cache = Path(dirs[0]) / f"bc2_{key}.npz"
-    return dict(cached_dataset(files, cache, max_samples=10**7, overview=True, shuffle=True, obs_v3=True))
+    # "path" (phase 12): strict replay with the training bookkeeping, own cache, key from resolved paths
+    names = [str(f.resolve()) if progress == "path" else str(f) for f in files]
+    key = hashlib.sha256(("v2|" + "|".join(f"{n}:{f.stat().st_size}" for n, f in zip(names, files))).encode()
+                         ).hexdigest()[:16]
+    cache = Path(dirs[0]) / (f"bc2_path_{key}.npz" if progress == "path" else f"bc2_{key}.npz")
+    extra = {"progress": "path", "procs": procs} if progress == "path" else {}
+    return dict(cached_dataset(files, cache, max_samples=10**7, overview=True, shuffle=True, obs_v3=True, **extra))
+
+
+def bc1_cache_name(v3: bool, overview: bool, progress: str = "x") -> str:
+    if v3 and progress == "path":
+        return "dataset_ppo_ov3_path.npz"
+    return "dataset_ppo_ov3.npz" if v3 else "dataset_ppo_ov.npz" if overview else "dataset_ppo.npz"
 
 
 class PPOWithDemos(PPO):
     def __init__(self, *args, demo_path=None, bc_coef: float = 0.5, bc_decay: float = 0.99,
                  bc_min: float = 0.02, demo2_paths=None, bc2_plan=None, bc2_a6_share: float = 0.05,
                  phase10_start: int = 0, anchor_path=None, anchor_eps: float = 0.02, anchor_coef: float = 0.1,
-                 anchor_target_kl: float = 0.02, teacher_path=None, teacher_plan=None, **kwargs):
+                 anchor_target_kl: float = 0.02, teacher_path=None, teacher_plan=None, teachers=None,
+                 demo_progress: str = "x", **kwargs):
         self.demo_path = demo_path
         # phase 10: a second demo stream (BC2: teacher demos with left+jump on practice levels) with its own weight
         # by stage ([[steps since phase10_start, coef], ...]); left+jump samples drawn with share bc2_a6_share
@@ -60,6 +71,12 @@ class PPOWithDemos(PPO):
         self.teacher_path = teacher_path
         self.teacher_plan = teacher_plan
         self._teacher = None
+        # phase 12: several teachers [path, ...]; each rollout state carries the index of its level family's teacher
+        # (info["teacher"], -1 = none), recorded by TeacherMask as `_teacher_ids`; same plan / weight for all
+        self.teachers = list(teachers or [])
+        self._teacher_policies = None
+        # phase 12: demos replayed with the training bookkeeping (progress="path"), own cache files
+        self.demo_progress = demo_progress
         self.bc_coef = bc_coef
         self.bc_decay = bc_decay
         self.bc_min = bc_min
@@ -68,7 +85,8 @@ class PPOWithDemos(PPO):
         super().__init__(*args, **kwargs)
 
     def _excluded_save_params(self):
-        return super()._excluded_save_params() + ["_demos", "_demos2", "_anchor", "_teacher", "_p8_mask", "bc_paused"]
+        return super()._excluded_save_params() + ["_demos", "_demos2", "_anchor", "_teacher", "_p8_mask", "bc_paused",
+                                                  "_teacher_policies", "_teacher_ids"]
 
     def _load_demos(self):
         if self._demos is None and self.demo_path:
@@ -76,8 +94,11 @@ class PPOWithDemos(PPO):
             files = sorted(folder.glob("demos*.jsonl")) + sorted(folder.glob("dagger_*.jsonl"))
             overview = "overview" in self.observation_space.spaces
             v3 = self.observation_space["vec"].shape[0] >= 23  # phase 9: wider view, the demos are re-rendered
-            cache = folder / ("dataset_ppo_ov3.npz" if v3 else "dataset_ppo_ov.npz" if overview else "dataset_ppo.npz")
+            progress = getattr(self, "demo_progress", "x")
+            cache = folder / bc1_cache_name(v3, overview, progress)
             extra = {"obs_v3": True} if v3 else {}
+            if v3 and progress == "path":
+                extra["progress"] = "path"
             self._demos = cached_dataset(files, cache, max_samples=300_000, overview=overview, shuffle=overview,
                                          **extra)
             self._demo_allowed = torch.as_tensor(self._demos["allowed"].astype(np.int64))
@@ -90,7 +111,7 @@ class PPOWithDemos(PPO):
 
     def _load_demos2(self):
         if getattr(self, "_demos2", None) is None and getattr(self, "demo2_paths", None):
-            data = bc2_dataset(self.demo2_paths)
+            data = bc2_dataset(self.demo2_paths, getattr(self, "demo_progress", "x"))
             data["allowed_t"] = torch.as_tensor(data["allowed"].astype(np.int64))
             data["a6_idx"] = np.nonzero(data["action"] == 6)[0]
             self._demos2 = data
@@ -112,7 +133,7 @@ class PPOWithDemos(PPO):
 
     def teacher_coef(self) -> float:
         plan = sorted(getattr(self, "teacher_plan", None) or [])
-        if not plan or not getattr(self, "teacher_path", None):
+        if not plan or not (getattr(self, "teacher_path", None) or getattr(self, "teachers", None)):
             return 0.0
         rel = self.num_timesteps - getattr(self, "phase10_start", 0)
         if rel <= plan[0][0]:
@@ -150,6 +171,54 @@ class PPOWithDemos(PPO):
         logp = torch.log_softmax(self.policy.get_distribution(obs).distribution.logits[:, :6], dim=1)
         return (t * (t.clamp_min(1e-8).log() - logp)).sum(1).mean()
 
+    def _multi_teacher_states(self):
+        """Phase 12: {teacher index: indices into the flattened rollout buffer} of states whose level family has that
+        teacher, or None."""
+
+        ids = getattr(self, "_teacher_ids", None)
+        buf = self.rollout_buffer
+        if ids is None or not buf.full or not getattr(self, "teachers", None):
+            return None
+        flat = ids.swapaxes(0, 1).reshape(-1) if buf.generator_ready else ids.reshape(-1)
+        out = {t: np.nonzero(flat == t)[0] for t in range(len(self.teachers))}
+        out = {t: v for t, v in out.items() if len(v)}
+        return out or None
+
+    def _multi_teacher_loss(self, pools: dict):
+        """KL(teacher || student) on a batch drawn from all teacher states (share by state count); a 6-action teacher
+        (P8) sees the old view and is compared over the six old actions (student renormalised), a 7-action teacher
+        (phase 11, Neustart) over all seven. Returns (loss, {teacher: kl})."""
+
+        from jumpnrun.rl.drift import old_view
+
+        if getattr(self, "_teacher_policies", None) is None:
+            from jumpnrun.rl.modelinfo import load_model
+
+            self._teacher_policies = []
+            for path in self.teachers:
+                pol = load_model(path).policy
+                pol.set_training_mode(False)
+                self._teacher_policies.append(pol)
+        buf = self.rollout_buffer
+        sizes = {t: len(v) for t, v in pools.items()}
+        total_n = sum(sizes.values())
+        loss, kls = 0.0, {}
+        for t, pool in pools.items():
+            k = max(8, int(round(BC_BATCH * sizes[t] / total_n)))
+            idx = np.random.choice(pool, k)
+            obs = {key: torch.as_tensor((v if buf.generator_ready else v.reshape((-1,) + v.shape[2:]))[idx],
+                                        dtype=torch.float32) for key, v in buf.observations.items()}
+            teacher = self._teacher_policies[t]
+            six = teacher.action_space.n == 6
+            with torch.no_grad():
+                tp = teacher.get_distribution(old_view(obs) if six else obs).distribution.probs
+            logits = self.policy.get_distribution(obs).distribution.logits
+            logp = torch.log_softmax(logits[:, :6] if six else logits, dim=1)
+            kl = (tp * (tp.clamp_min(1e-8).log() - logp)).sum(1).mean()
+            loss = loss + kl * (k / BC_BATCH)
+            kls[t] = kl.item()
+        return loss, kls
+
     def bc2_coef(self) -> float:
         plan = getattr(self, "bc2_plan", None)
         if not plan:
@@ -186,8 +255,10 @@ class PPOWithDemos(PPO):
         anchor = self._load_anchor()
         kls = []
         coef_t = self.teacher_coef()
-        teacher_idx = self._teacher_states() if coef_t > 0 else None
-        tkls = []
+        multi = bool(getattr(self, "teachers", None))
+        teacher_idx = (self._teacher_states() if not multi else None) if coef_t > 0 else None
+        pools = self._multi_teacher_states() if (multi and coef_t > 0) else None
+        tkls, mkls = [], {}
         for _ in range(batches):
             idx = np.random.randint(0, n, BC_BATCH)
             loss, acc = bc_loss(self.policy, _obs_tensors(demos, idx), self._demo_allowed[idx])
@@ -212,6 +283,16 @@ class PPOWithDemos(PPO):
             self.policy.optimizer.step()
             losses.append(loss.item())
             accs.append(acc.item())
+        # phase 12: the teachers in own optimizer steps with their own gradient clip (Neustart: in one step with
+        # BC1/BC2 the large KL gradient shrinks the BC steps through the shared clip)
+        for _ in range(batches if pools is not None else 0):
+            mloss, per = self._multi_teacher_loss(pools)
+            self.policy.optimizer.zero_grad()
+            (coef_t * mloss).backward()
+            torch.nn.utils.clip_grad_norm_(self.policy.parameters(), self.max_grad_norm)
+            self.policy.optimizer.step()
+            for t, v in per.items():
+                mkls.setdefault(t, []).append(v)
         self.logger.record("vorbild/gewicht", coef)
         self.logger.record("vorbild/verlust", float(np.mean(losses)))
         self.logger.record("vorbild/uebereinstimmung", float(np.mean(accs)))
@@ -227,6 +308,12 @@ class PPOWithDemos(PPO):
             self.logger.record("lehrer/kl", float(np.mean(tkls)))
             self.logger.record("lehrer/gewicht", coef_t)
             self.logger.record("lehrer/anteil_p8", len(teacher_idx) / (self.n_steps * self.n_envs))
+        if mkls:
+            n_all = self.n_steps * self.n_envs
+            self.logger.record("lehrer/gewicht", coef_t)
+            for t, v in mkls.items():
+                self.logger.record(f"lehrer/kl_{t}", float(np.mean(v)))
+                self.logger.record(f"lehrer/anteil_{t}", len(pools[t]) / n_all)
         if losses2:
             self.logger.record("vorbild2/gewicht", coef2)
             self.logger.record("vorbild2/verlust", float(np.mean(losses2)))

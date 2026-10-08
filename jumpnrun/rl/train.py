@@ -21,6 +21,7 @@ from __future__ import annotations
 import argparse
 import glob
 import json
+import math
 import os
 import subprocess
 import sys
@@ -49,6 +50,8 @@ def make_env(rank: int, seed: int, min_tier: int, max_tier: int, handmade_paths,
         extra = dict(source_extra or {})
         mix = extra.pop("mix", None)
         p11 = extra.pop("phase11", None)
+        gates = extra.pop("mix_gates", None)
+        routing = extra.pop("routing", None)
         source = CurriculumSource(min_tier, max_tier, handmade, handmade_prob, pool_dir=pool_dir,
                                   start_prob=start_prob, start_dirs=start_dirs, pool_share=pool_share,
                                   augment_prob=augment_prob, plr=plr, **extra)
@@ -70,14 +73,33 @@ def make_env(rank: int, seed: int, min_tier: int, max_tier: int, handmade_paths,
 
                 sources["spiegel"] = MirrorSource(long_share=(p11 or {}).get("mirror_long_share", 0.0))
             if any("lang" in shares for _, shares in mix):  # phase 11: two generator levels in a row
-                from jumpnrun.levelgen.skills import LongSource
+                if (p11 or {}).get("hard"):  # phase 12: half of them long v11 levels
+                    from jumpnrun.levelgen.hard import LongMixSource
 
-                sources["lang"] = LongSource()
-            source = MixSource(sources, mix)
+                    sources["lang"] = LongMixSource()
+                else:
+                    from jumpnrun.levelgen.skills import LongSource
+
+                    sources["lang"] = LongSource()
+            if any("hart" in shares for _, shares in mix):  # phase 12: generator v11 (hard jumps, new structures)
+                from jumpnrun.levelgen.hard import HardSource
+
+                sources["hart"] = HardSource()
+            source = MixSource(sources, mix, gates=gates, routing=routing)
         return JumpNRunEnv(source, seed=seed * 1000 + rank, action_repeat=action_repeat, overview=overview,
                            rewind_prob=rewind_prob, obs_v2=obs_v2, stuck_death=stuck_death, **(env_extra or {}))
 
     return _init
+
+
+def _zip_ok(path: Path) -> bool:
+    import zipfile
+
+    try:
+        with zipfile.ZipFile(path) as z:
+            return z.testzip() is None
+    except (zipfile.BadZipFile, OSError):
+        return False
 
 
 def cosine_schedule(start: float, decay_steps: int, target: int, phase_start: int, end_fraction: float = 0.1):
@@ -104,7 +126,9 @@ def staged_schedule(plan: dict, target: int, phase_start: int, run_dir: Path):
     the rate by writing runs/<arm>/lr_scale.json ({"scale": 0.5}); it is re-read every 50 updates.
     """
 
-    stages = sorted((int(a), float(b)) for a, b in plan["stages"])
+    stages = sorted((int(a), float(b)) for a, b in plan.get("stages", [[0, 0.0]]))
+    # phase 12 (from the Neustart branch): {"cosine": [start, end, decay_steps]} - one cosine over the whole run
+    cosine = plan.get("cosine")
     warm = int(plan.get("critic_warmup", 0))
     ramp = int(plan.get("ramp", 0))
     scale_path = run_dir / "lr_scale.json"
@@ -122,6 +146,10 @@ def staged_schedule(plan: dict, target: int, phase_start: int, run_dir: Path):
         for start, value in stages:
             if rel >= start:
                 lr = value
+        if cosine:
+            lr0, lr1, span = float(cosine[0]), float(cosine[1]), float(cosine[2])
+            x = min(1.0, max(0.0, rel / span))
+            lr = lr1 + (lr0 - lr1) * 0.5 * (1 + math.cos(math.pi * x))
         if ramp and rel >= warm:
             lr *= min(1.0, max(0.02, (rel - warm) / ramp))
         return lr * state["scale"]
@@ -210,6 +238,14 @@ def main() -> None:
                              "training process (saved in curriculum.json), tier curriculum from phase-8 episodes only")
     parser.add_argument("--mirror-long-share", type=float, default=1 / 3,
                         help="phase 11: share of mirrored long levels within the 'spiegel' source")
+    parser.add_argument("--phase12", action="store_true",
+                        help="phase 12: v11 sources (hart, lang with v11), fresh-net recipe")
+    parser.add_argument("--mix-gates", help="phase 12: JSON {source: tier} - a mix source only plays once the tier "
+                                            "curriculum has unlocked that tier")
+    parser.add_argument("--teachers", nargs="*", default=[], help="phase 12: teacher models (index = routing value)")
+    parser.add_argument("--routing", help="phase 12: JSON (or file) {level family: teacher index}")
+    parser.add_argument("--demo-progress", choices=("x", "path"), default="x",
+                        help="phase 12: BC1/BC2 demos replayed with the training bookkeeping (own caches)")
     parser.add_argument("--channels-last", action="store_true",
                         help="phase 11: conv weights in channels_last memory format (faster update, same outputs)")
     parser.add_argument("--anchor", action="store_true",
@@ -255,7 +291,9 @@ def main() -> None:
                  args.rewind_prob, args.pool_share, args.augment, args.obs_v2, args.stuck_death, args.plr,
                  env_extra=dict(obs_v3=args.obs_v3, path_reward=args.path_reward, path_delta=args.path_delta),
                  source_extra=dict(gen_variant=args.generator, augment_v2=args.augment_v2, mix=mix_schedule,
-                                  phase11=dict(mirror_long_share=args.mirror_long_share) if args.phase11 else None))
+                                  phase11=(dict(mirror_long_share=args.mirror_long_share, hard=args.phase12)
+                                           if (args.phase11 or args.phase12) else None),
+                                  mix_gates=_json_arg(args.mix_gates), routing=_json_arg(args.routing)))
         for i in range(args.envs)
     ]
     # the game is so fast that the network update dominates; one process is usually best
@@ -267,13 +305,18 @@ def main() -> None:
     if args.phase11:
         from jumpnrun.levelgen.skills import KINDS, SkillTracker
 
-        tracker.skill = SkillTracker(start_levels={k: 2 for k in KINDS})
+        # phase 11 continued a trained net: the seven phase-10 kinds at d2; phase 12 starts a fresh net at d0
+        tracker.skill = SkillTracker(start_levels=None if args.phase12 else {k: 2 for k in KINDS})
     if args.unlock_all:
         tracker.unlocked = args.max_tier
     config_path = run_dir / "config.json"
     old_config = json.loads(config_path.read_text()) if config_path.exists() else {}
     if args.target:
         checkpoints = sorted((run_dir / "checkpoints").glob("step_*.zip"))
+        while checkpoints and not _zip_ok(checkpoints[-1]):  # a kill while saving leaves a broken zip
+            print(f"Skipping broken checkpoint {checkpoints[-1].name}")
+            checkpoints[-1].rename(checkpoints[-1].with_suffix(".broken"))
+            checkpoints.pop()
         if checkpoints:
             args.resume = str(checkpoints[-1])
             done = int(checkpoints[-1].stem.split("_")[1])
@@ -286,9 +329,12 @@ def main() -> None:
                 tracker.unlocked = max(args.min_tier, min(state["unlocked"], args.max_tier))
                 if getattr(tracker, "skill", None) is not None and "skill" in state:
                     tracker.skill.load(state["skill"])
-                    for k in KINDS_START_D2:  # phase 11: never below the start difficulty
+                    for k in (() if args.phase12 else KINDS_START_D2):  # phase 11: never below the start difficulty
                         tracker.skill.level[k] = max(tracker.skill.level[k], 2)
         else:
+            if (run_dir / "curriculum.json").exists():  # progress existed, but no usable checkpoint is left
+                raise SystemExit(f"{run_dir}: curriculum.json but no valid checkpoint - refusing to start again at "
+                                 f"{args.resume or 'scratch'} (restore a checkpoint first)")
             done = int(PPO.load(args.resume, device="cpu").num_timesteps) if args.resume else 0
         args.steps = args.target - done
         # the step count at which this run (phase) began, kept across restarts for the LR schedule
@@ -320,7 +366,11 @@ def main() -> None:
         from jumpnrun.rl.ppo_demos import PPOWithDemos
 
         algo = PPOWithDemos
-        extra = dict(demo_path=args.demos, bc_coef=args.bc_coef, bc_decay=args.bc_decay, bc_min=args.bc_min)
+        extra = dict(demo_path=args.demos, bc_coef=args.bc_coef, bc_decay=args.bc_decay, bc_min=args.bc_min,
+                     demo_progress=args.demo_progress)
+        if args.teachers:
+            extra.update(teachers=list(args.teachers), teacher_plan=_json_arg(args.teacher_plan),
+                         phase10_start=phase_start)
         if args.teacher:
             extra.update(teacher_path=args.teacher, teacher_plan=_json_arg(args.teacher_plan))
         if args.anchor:
@@ -389,7 +439,7 @@ def main() -> None:
     ]
     if args.time_limit_hours:
         callbacks.append(TimeLimit(run_dir, args.time_limit_hours))
-    if args.teacher:
+    if args.teacher or args.teachers:
         from jumpnrun.rl.callbacks import TeacherMask
 
         callbacks.append(TeacherMask())
@@ -407,12 +457,22 @@ def main() -> None:
             callbacks.append(EmaWeights(run_dir, args.ema_every, decay=args.ema2_decay, prefix="ema2"))
     print(f"Training {args.steps:,} steps, tiers {args.min_tier}-{args.max_tier}, "
           f"{args.envs} envs, {len(handmade_paths)} hand-made levels -> {run_dir}")
+    import signal
+
+    def _terminate(signum, frame):  # the autopilot stops a run with SIGTERM: save like Ctrl+C
+        raise KeyboardInterrupt
+
+    signal.signal(signal.SIGTERM, _terminate)
     try:
         model.learn(total_timesteps=args.steps, callback=callbacks, progress_bar=False,
                     reset_num_timesteps=not args.resume, tb_log_name="ppo")
     except KeyboardInterrupt:
+        signal.signal(signal.SIGTERM, signal.SIG_IGN)
         print("Interrupted - saving checkpoint.")
         callbacks[1].save()
+        for cb in callbacks:  # EMA state too, else a restart continues from the last whole million
+            if isinstance(cb, EmaWeights) and cb.ema is not None:
+                torch.save(cb.ema, cb.path)
     finally:
         model.save(str(run_dir / "final_model.zip"))
         vec_env.close()

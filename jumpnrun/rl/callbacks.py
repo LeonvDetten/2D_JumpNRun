@@ -335,9 +335,13 @@ class TeacherMask(BaseCallback):
 
     def _on_rollout_start(self) -> None:
         self.model._p8_mask = np.zeros((self.model.n_steps, self.model.n_envs), dtype=bool)
+        self.model._teacher_ids = np.full((self.model.n_steps, self.model.n_envs), -1, dtype=np.int8)
 
     def _on_step(self) -> bool:
         pos = self.model.rollout_buffer.pos  # called after env.step, before the buffer adds this step
         if pos < self.model.n_steps:
-            self.model._p8_mask[pos] = [bool(i.get("p8_level", False)) for i in self.locals["infos"]]
+            infos = self.locals["infos"]
+            self.model._p8_mask[pos] = [bool(i.get("p8_level", False)) for i in infos]
+            # phase 12: the teacher of the level family the observed state came from (-1 = none)
+            self.model._teacher_ids[pos] = [int(i.get("teacher", -1)) for i in infos]
         return True
