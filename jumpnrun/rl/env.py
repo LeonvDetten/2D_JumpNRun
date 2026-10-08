@@ -263,7 +263,8 @@ class JumpNRunEnv(gym.Env):
                 back = min(len(self._snapshots), self.rng.randint(2, 4))
                 self._pending = (self._snapshots[-back], self.origin_tier, self.rewind_depth + 1)
 
-        info = {"p8_level": (getattr(sim.level, "mix_source", None) or "p8") == "p8"}  # phase 10 D: teacher mask
+        info = {"p8_level": (getattr(sim.level, "mix_source", None) or "p8") == "p8",  # phase 10 D: teacher mask
+                "teacher": getattr(sim.level, "teacher_id", -1)}  # phase 12: teacher of the level's family
         if terminated or truncated:
             feedback = getattr(self.level_source, "feedback", None)
             if feedback is not None:
