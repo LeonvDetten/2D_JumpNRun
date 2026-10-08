@@ -1,0 +1,136 @@
+{
+ "kategorien": [
+  0.894,
+  0.6328,
+  0.5974,
+  0.6556,
+  0.7167,
+  0.3229,
+  0.5208,
+  0.1875
+ ],
+ "generalist": 0.566,
+ "komponenten": {
+  "dev_klassisch": {
+   "kat": 0,
+   "won": 59,
+   "of": 72,
+   "fortschritt": 0.888
+  },
+  "val_v9_t8-12": {
+   "kat": 0,
+   "won": 29,
+   "of": 30,
+   "fortschritt": 0.991
+  },
+  "proben_klassisch": {
+   "kat": 0,
+   "won": 86,
+   "of": 96,
+   "fortschritt": 0.961
+  },
+  "pruefung": {
+   "kat": 1,
+   "won": 162,
+   "of": 256,
+   "fortschritt": 0.824
+  },
+  "waechter_plus": {
+   "kat": 2,
+   "won": 79,
+   "of": 96,
+   "fortschritt": 0.906
+  },
+  "val_lang": {
+   "kat": 2,
+   "won": 8,
+   "of": 12,
+   "fortschritt": 0.857
+  },
+  "probe_lang": {
+   "kat": 2,
+   "won": 18,
+   "of": 20,
+   "fortschritt": 0.987
+  },
+  "v13_lang": {
+   "kat": 2,
+   "won": 0,
+   "of": 9,
+   "fortschritt": 0.237
+  },
+  "uebung_gabeln": {
+   "kat": 3,
+   "won": 22,
+   "of": 24,
+   "fortschritt": 0.955
+  },
+  "probe_koeder": {
+   "kat": 3,
+   "won": 16,
+   "of": 20,
+   "fortschritt": 0.96
+  },
+  "dev_gabeln": {
+   "kat": 3,
+   "won": 6,
+   "of": 24,
+   "fortschritt": 0.442
+  },
+  "probe_kanal_umkehren": {
+   "kat": 4,
+   "won": 36,
+   "of": 40,
+   "fortschritt": 0.974
+  },
+  "uebung_kanal": {
+   "kat": 4,
+   "won": 18,
+   "of": 18,
+   "fortschritt": 1.0
+  },
+  "dev_serpentine": {
+   "kat": 4,
+   "won": 2,
+   "of": 8,
+   "fortschritt": 0.725
+  },
+  "probe_truhe_links": {
+   "kat": 5,
+   "won": 5,
+   "of": 20,
+   "fortschritt": 0.532
+  },
+  "uebung_truhe_links": {
+   "kat": 5,
+   "won": 5,
+   "of": 12,
+   "fortschritt": 0.634
+  },
+  "val_gespiegelt": {
+   "kat": 5,
+   "won": 6,
+   "of": 12,
+   "fortschritt": 0.551
+  },
+  "dev_spiegelweg": {
+   "kat": 5,
+   "won": 1,
+   "of": 8,
+   "fortschritt": 0.37
+  },
+  "v13_spruenge": {
+   "kat": 6,
+   "won": 25,
+   "of": 48,
+   "fortschritt": 0.759
+  },
+  "v13_strukturen": {
+   "kat": 7,
+   "won": 9,
+   "of": 48,
+   "fortschritt": 0.552
+  }
+ },
+ "modell": "models/phase11_kandidat.zip"
+}
