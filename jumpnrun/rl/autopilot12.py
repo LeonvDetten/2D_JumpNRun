@@ -34,7 +34,7 @@ PPO_FLAGS = ["--overview", "--obs-v3", "--path-delta", "--pool", "runs/demos4", 
              "--bc-min", "0.02", "--checkpoint-every", "100000", "--keep-every", "250000",
              "--eval-every", "1000000000", "--handmade", "levels/phase1/*.txt", "levels/phase2/*.txt",
              "--handmade-prob", "0.05", "--max-tier", "12", "--pool-share", "0.4", "--augment", "0.7",
-             "--plr", "0.3", "--seed", "12", "--phase11", "--phase12", "--channels-last", "--mirror-long-share", "0.25"]
+             "--plr", "0.3", "--seed", "12", "--phase11", "--phase12", "--channels-last", "--mirror-long-share", "0.0"]
 
 
 def prereg() -> dict:
