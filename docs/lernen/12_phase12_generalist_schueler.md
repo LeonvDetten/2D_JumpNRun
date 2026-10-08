@@ -102,6 +102,7 @@ Leon gab den Generator am 8.10. frei („mit Löser-Pool“).
 | 8 | 39,2 | 55,4 (51,9) | 46,8 (42,7) | 57 | 19 | 29 | 45 | 82 | 25 | 8 | 48 |
 | 10 | 41,7 | 59,1 (53,3) | 42,6 (39,5) | 57 | 19 | 29 | 52 | 86 | 23 | 19 | 48 |
 | 12 | 51,1 | 56,2 (57,1) | 48,3 (39,4) | 63 | 30 | 41 | 56 | 93 | 38 | 31 | 56 |
+| 14 | 49,3 | 60,8 | 47,9 | 67 | 21 | 44 | 58 | 96 | 22 | 23 | 62 |
 
 **Entscheidungspunkte**
 - **E1 (2 Mio.): formal verfehlt.**
@@ -131,3 +132,9 @@ Leon gab den Generator am 8.10. frei („mit Löser-Pool“).
   - Klassisch rechts (63 % gegen 89 %),
   - die Prüfung (30 % gegen 74 % bei P8),
   - dev_alt, das leicht unter die Neustart-Kurve fällt, während die Lehrer ausklingen.
+
+**14 Mio.: der Sprung bei 12 Mio. war zum Teil Glück**
+- Links/Spiegel fällt von 38 auf 22 %, Prüfung von 30 auf 21 %, Sprünge von 31 auf 23 %.
+- Kategorie 6 beruht auf nur 52 Versuchen. Die gespiegelten Validierungslevel standen bei 7/12 und jetzt bei 2/12.
+- Im Training sind die kurzen gespiegelten Level seit 12 Mio. flach bei 22 %. Spiegeln ist der Engpass.
+- Alte und strukturelle Fähigkeiten wachsen weiter: Klassisch 67 %, dev_alt 61 % (wieder über der Neustart-Kurve), Strukturen 62 %.
