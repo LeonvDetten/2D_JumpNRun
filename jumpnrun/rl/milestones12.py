@@ -19,6 +19,7 @@ import torch
 from jumpnrun.rl import milestones10 as m10
 from jumpnrun.rl import scorecard12 as S
 from jumpnrun.rl.modelinfo import load_model
+from jumpnrun.rl.train import _zip_ok
 
 WINDOW = (40, 42, 44)
 
@@ -43,7 +44,9 @@ def pending(run: Path, done: dict):
             if m == 0 or abs(steps - m * 1_000_000) > 60_000:
                 continue
             want = (m == 1 or m % 2 == 0) if prefix == "ema" else m in WINDOW
-            if want and f"{steps}:{prefix}" not in done:
+            if want and time.time() - c.stat().st_mtime < 60:  # may still be written
+                continue
+            if want and f"{steps}:{prefix}" not in done and _zip_ok(c):
                 todo.append((steps, prefix, c))
     return todo
 
