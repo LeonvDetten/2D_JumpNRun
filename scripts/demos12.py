@@ -30,7 +30,7 @@ def demo(i: int):
         lv = make_hard_level(fam, f"demo12:{fam}:{i}")
     except RuntimeError:
         return None
-    r = solve_path_legs(lv, action_repeat=2, leg_budget=30_000, total_budget=250_000)
+    r = solve_path_legs(lv, action_repeat=2, leg_budget=20_000, total_budget=120_000)
     if not r.solved:
         return None
     actions = list(r.actions)

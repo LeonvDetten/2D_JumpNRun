@@ -78,12 +78,13 @@ def neustart_at(m: float):
 def train_cmd() -> list:
     p = prereg()
     routing = json.loads((STATE_DIR / "lehrer_routing.json").read_text())
+    (STATE_DIR / "lehrer_routing_nur.json").write_text(json.dumps(routing["routing"]))
     return [PY, "-m", "jumpnrun.rl.train", "--run", run_dir(), "--target", str(p["ziel_schritte"]),
             "--resume", p["start"], "--threads", "3", *PPO_FLAGS,
             "--lr-plan", json.dumps(p["lernrate"]), "--mix-schedule", json.dumps([[0, p["mischung"]]]),
             "--mix-gates", json.dumps(p["mischung_sperre"]), "--demos2", *p["bc2_dirs"],
             "--bc2-plan", json.dumps(p["bc2_plan"]), "--teachers", *routing["teachers"],
-            "--routing", json.dumps(routing["routing"]), "--teacher-plan", json.dumps(p["lehrer_plan"]),
+            "--routing", str(STATE_DIR / "lehrer_routing_nur.json"), "--teacher-plan", json.dumps(p["lehrer_plan"]),
             "--time-limit-hours", str(p["zeit_stunden"])]
 
 
