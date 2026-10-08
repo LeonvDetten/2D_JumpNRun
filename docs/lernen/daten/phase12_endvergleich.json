@@ -1,0 +1,1898 @@
+{
+ "mess": {
+  "p8": {
+   "1": {
+    "dev_alt": 0.6733,
+    "dev_neu": 0.0078,
+    "F": 0.083,
+    "alt": 0.7272,
+    "spiegel_rate": 0.0,
+    "spiegel_alt_rate": 0.0,
+    "spiegel_lang_rate": 0.0,
+    "waechter_plus_rate": 0.8151,
+    "sackgasse_rate": 0.1,
+    "doppelgabel_rate": 0.0,
+    "G": 0.237,
+    "pruefung": {
+     "won": 52,
+     "of": 64
+    },
+    "schutz": {
+     "won": 76,
+     "of": 80
+    },
+    "test_summen": {
+     "h8": {
+      "won": 48,
+      "of": 64
+     },
+     "h9": {
+      "won": 28,
+      "of": 64
+     },
+     "h10": {
+      "won": 59,
+      "of": 64
+     }
+    }
+   },
+   "2": {
+    "dev_alt": 0.6747,
+    "dev_neu": 0.0,
+    "F": 0.0833,
+    "alt": 0.6928,
+    "spiegel_rate": 0.0,
+    "spiegel_alt_rate": 0.0,
+    "spiegel_lang_rate": 0.0,
+    "waechter_plus_rate": 0.7891,
+    "sackgasse_rate": 0.1125,
+    "doppelgabel_rate": 0.0,
+    "G": 0.2322,
+    "pruefung": {
+     "won": 47,
+     "of": 64
+    },
+    "schutz": {
+     "won": 76,
+     "of": 80
+    },
+    "test_summen": {
+     "h8": {
+      "won": 46,
+      "of": 64
+     },
+     "h9": {
+      "won": 31,
+      "of": 64
+     },
+     "h10": {
+      "won": 55,
+      "of": 64
+     }
+    }
+   }
+  },
+  "lehrer10": {
+   "1": {
+    "dev_alt": 0.6435,
+    "dev_neu": 0.1953,
+    "F": 0.4352,
+    "alt": 0.7085,
+    "spiegel_rate": 0.0,
+    "spiegel_alt_rate": 0.0,
+    "spiegel_lang_rate": 0.0,
+    "waechter_plus_rate": 0.7786,
+    "sackgasse_rate": 0.6375,
+    "doppelgabel_rate": 0.0,
+    "G": 0.3831,
+    "pruefung": {
+     "won": 47,
+     "of": 64
+    },
+    "schutz": {
+     "won": 79,
+     "of": 80
+    },
+    "test_summen": {
+     "h8": {
+      "won": 29,
+      "of": 64
+     },
+     "h9": {
+      "won": 32,
+      "of": 64
+     },
+     "h10": {
+      "won": 58,
+      "of": 64
+     }
+    }
+   },
+   "2": {
+    "dev_alt": 0.6477,
+    "dev_neu": 0.1797,
+    "F": 0.4232,
+    "alt": 0.7106,
+    "spiegel_rate": 0.0,
+    "spiegel_alt_rate": 0.0,
+    "spiegel_lang_rate": 0.0,
+    "waechter_plus_rate": 0.8125,
+    "sackgasse_rate": 0.675,
+    "doppelgabel_rate": 0.0,
+    "G": 0.3933,
+    "pruefung": {
+     "won": 46,
+     "of": 64
+    },
+    "schutz": {
+     "won": 79,
+     "of": 80
+    },
+    "test_summen": {
+     "h8": {
+      "won": 32,
+      "of": 64
+     },
+     "h9": {
+      "won": 26,
+      "of": 64
+     },
+     "h10": {
+      "won": 55,
+      "of": 64
+     }
+    }
+   }
+  },
+  "kandidat11": {
+   "1": {
+    "dev_alt": 0.7599,
+    "dev_neu": 0.0625,
+    "F": 0.3937,
+    "alt": 0.7667,
+    "spiegel_rate": 0.0326,
+    "spiegel_alt_rate": 0.0682,
+    "spiegel_lang_rate": 0.0,
+    "waechter_plus_rate": 0.8151,
+    "sackgasse_rate": 0.8875,
+    "doppelgabel_rate": 0.8125,
+    "G": 0.5229,
+    "pruefung": {
+     "won": 41,
+     "of": 64
+    },
+    "schutz": {
+     "won": 80,
+     "of": 80
+    },
+    "test_summen": {
+     "h8": {
+      "won": 26,
+      "of": 64
+     },
+     "h9": {
+      "won": 30,
+      "of": 64
+     },
+     "h10": {
+      "won": 50,
+      "of": 64
+     }
+    }
+   },
+   "2": {
+    "dev_alt": 0.8281,
+    "dev_neu": 0.0391,
+    "F": 0.3695,
+    "alt": 0.7773,
+    "spiegel_rate": 0.038,
+    "spiegel_alt_rate": 0.0795,
+    "spiegel_lang_rate": 0.0,
+    "waechter_plus_rate": 0.7812,
+    "sackgasse_rate": 0.9,
+    "doppelgabel_rate": 0.5,
+    "G": 0.4722,
+    "pruefung": {
+     "won": 49,
+     "of": 64
+    },
+    "schutz": {
+     "won": 80,
+     "of": 80
+    },
+    "test_summen": {
+     "h8": {
+      "won": 30,
+      "of": 64
+     },
+     "h9": {
+      "won": 31,
+      "of": 64
+     },
+     "h10": {
+      "won": 55,
+      "of": 64
+     }
+    }
+   }
+  },
+  "neustart_f": {
+   "2": {
+    "dev_alt": 0.6719,
+    "dev_neu": 0.1797,
+    "F": 0.4565,
+    "alt": 0.6289,
+    "spiegel_rate": 0.0054,
+    "spiegel_alt_rate": 0.0114,
+    "spiegel_lang_rate": 0.0,
+    "waechter_plus_rate": 0.6589,
+    "sackgasse_rate": 0.725,
+    "doppelgabel_rate": 0.0625,
+    "G": 0.3786,
+    "pruefung": {
+     "won": 31,
+     "of": 64
+    },
+    "schutz": {
+     "won": 75,
+     "of": 80
+    },
+    "test_summen": {
+     "h8": {
+      "won": 37,
+      "of": 64
+     },
+     "h9": {
+      "won": 30,
+      "of": 64
+     },
+     "h10": {
+      "won": 48,
+      "of": 64
+     }
+    },
+    "dev": {
+     "pruefung": {
+      "won": 31,
+      "of": 64
+     },
+     "serie_berg": {
+      "won": 31,
+      "of": 32
+     },
+     "serie_festung": {
+      "won": 27,
+      "of": 32
+     },
+     "serie_hoehle": {
+      "won": 22,
+      "of": 32
+     },
+     "serie_lange_reise": {
+      "won": 14,
+      "of": 32
+     },
+     "serie_parcours": {
+      "won": 31,
+      "of": 32
+     },
+     "serie_zwei_wege": {
+      "won": 31,
+      "of": 32
+     },
+     "hand_abgrund": {
+      "won": 32,
+      "of": 32
+     },
+     "hand_doppelgabel": {
+      "won": 0,
+      "of": 32
+     },
+     "hand_hoehlendach": {
+      "won": 32,
+      "of": 32
+     },
+     "hand_lange_tour": {
+      "won": 1,
+      "of": 32
+     },
+     "hand9_gabel_drei": {
+      "won": 0,
+      "of": 32
+     },
+     "hand9_kreuzung": {
+      "won": 0,
+      "of": 32
+     },
+     "hand9_serpentine": {
+      "won": 22,
+      "of": 32
+     },
+     "hand9_spiegelweg": {
+      "won": 1,
+      "of": 32
+     }
+    },
+    "waechter_plus": {
+     "hand10_g0": {
+      "won": 23,
+      "of": 32
+     },
+     "hand10_g2": {
+      "won": 23,
+      "of": 32
+     },
+     "hand10_g3": {
+      "won": 14,
+      "of": 32
+     },
+     "hand10_g7": {
+      "won": 19,
+      "of": 32
+     },
+     "hand10_g8": {
+      "won": 28,
+      "of": 32
+     },
+     "hand10_g9": {
+      "won": 25,
+      "of": 32
+     },
+     "hand10_g10": {
+      "won": 18,
+      "of": 32
+     },
+     "hand10_g11": {
+      "won": 10,
+      "of": 32
+     },
+     "hand10_g12": {
+      "won": 16,
+      "of": 32
+     },
+     "hand10_g13": {
+      "won": 26,
+      "of": 32
+     },
+     "hand10_g14": {
+      "won": 25,
+      "of": 32
+     },
+     "hand10_g15": {
+      "won": 26,
+      "of": 32
+     }
+    }
+   },
+   "1": {
+    "dev_alt": 0.6534,
+    "dev_neu": 0.2266,
+    "F": 0.4508,
+    "alt": 0.6314,
+    "spiegel_rate": 0.0109,
+    "spiegel_alt_rate": 0.0227,
+    "spiegel_lang_rate": 0.0,
+    "waechter_plus_rate": 0.6927,
+    "sackgasse_rate": 0.725,
+    "doppelgabel_rate": 0.0,
+    "G": 0.3792,
+    "pruefung": {
+     "won": 30,
+     "of": 64
+    },
+    "schutz": {
+     "won": 75,
+     "of": 80
+    },
+    "test_summen": {
+     "h8": {
+      "won": 35,
+      "of": 64
+     },
+     "h9": {
+      "won": 30,
+      "of": 64
+     },
+     "h10": {
+      "won": 47,
+      "of": 64
+     }
+    },
+    "dev": {
+     "pruefung": {
+      "won": 30,
+      "of": 64
+     },
+     "serie_berg": {
+      "won": 32,
+      "of": 32
+     },
+     "serie_festung": {
+      "won": 25,
+      "of": 32
+     },
+     "serie_hoehle": {
+      "won": 23,
+      "of": 32
+     },
+     "serie_lange_reise": {
+      "won": 10,
+      "of": 32
+     },
+     "serie_parcours": {
+      "won": 31,
+      "of": 32
+     },
+     "serie_zwei_wege": {
+      "won": 30,
+      "of": 32
+     },
+     "hand_abgrund": {
+      "won": 32,
+      "of": 32
+     },
+     "hand_doppelgabel": {
+      "won": 0,
+      "of": 32
+     },
+     "hand_hoehlendach": {
+      "won": 32,
+      "of": 32
+     },
+     "hand_lange_tour": {
+      "won": 0,
+      "of": 32
+     },
+     "hand9_gabel_drei": {
+      "won": 0,
+      "of": 32
+     },
+     "hand9_kreuzung": {
+      "won": 0,
+      "of": 32
+     },
+     "hand9_serpentine": {
+      "won": 28,
+      "of": 32
+     },
+     "hand9_spiegelweg": {
+      "won": 1,
+      "of": 32
+     }
+    },
+    "waechter_plus": {
+     "hand10_g0": {
+      "won": 19,
+      "of": 32
+     },
+     "hand10_g2": {
+      "won": 25,
+      "of": 32
+     },
+     "hand10_g3": {
+      "won": 15,
+      "of": 32
+     },
+     "hand10_g7": {
+      "won": 22,
+      "of": 32
+     },
+     "hand10_g8": {
+      "won": 27,
+      "of": 32
+     },
+     "hand10_g9": {
+      "won": 26,
+      "of": 32
+     },
+     "hand10_g10": {
+      "won": 19,
+      "of": 32
+     },
+     "hand10_g11": {
+      "won": 15,
+      "of": 32
+     },
+     "hand10_g12": {
+      "won": 18,
+      "of": 32
+     },
+     "hand10_g13": {
+      "won": 27,
+      "of": 32
+     },
+     "hand10_g14": {
+      "won": 28,
+      "of": 32
+     },
+     "hand10_g15": {
+      "won": 25,
+      "of": 32
+     }
+    }
+   }
+  },
+  "neustart_waechter": {
+   "1": {
+    "dev_alt": 0.679,
+    "dev_neu": 0.1562,
+    "F": 0.4406,
+    "alt": 0.6755,
+    "spiegel_rate": 0.038,
+    "spiegel_alt_rate": 0.0795,
+    "spiegel_lang_rate": 0.0,
+    "waechter_plus_rate": 0.6901,
+    "sackgasse_rate": 0.7,
+    "doppelgabel_rate": 0.0,
+    "G": 0.3797,
+    "pruefung": {
+     "won": 30,
+     "of": 64
+    },
+    "schutz": {
+     "won": 72,
+     "of": 80
+    },
+    "test_summen": {
+     "h8": {
+      "won": 38,
+      "of": 64
+     },
+     "h9": {
+      "won": 30,
+      "of": 64
+     },
+     "h10": {
+      "won": 51,
+      "of": 64
+     }
+    },
+    "dev": {
+     "pruefung": {
+      "won": 30,
+      "of": 64
+     },
+     "serie_berg": {
+      "won": 31,
+      "of": 32
+     },
+     "serie_festung": {
+      "won": 30,
+      "of": 32
+     },
+     "serie_hoehle": {
+      "won": 20,
+      "of": 32
+     },
+     "serie_lange_reise": {
+      "won": 17,
+      "of": 32
+     },
+     "serie_parcours": {
+      "won": 32,
+      "of": 32
+     },
+     "serie_zwei_wege": {
+      "won": 30,
+      "of": 32
+     },
+     "hand_abgrund": {
+      "won": 32,
+      "of": 32
+     },
+     "hand_doppelgabel": {
+      "won": 0,
+      "of": 32
+     },
+     "hand_hoehlendach": {
+      "won": 32,
+      "of": 32
+     },
+     "hand_lange_tour": {
+      "won": 0,
+      "of": 32
+     },
+     "hand9_gabel_drei": {
+      "won": 0,
+      "of": 32
+     },
+     "hand9_kreuzung": {
+      "won": 0,
+      "of": 32
+     },
+     "hand9_serpentine": {
+      "won": 20,
+      "of": 32
+     },
+     "hand9_spiegelweg": {
+      "won": 0,
+      "of": 32
+     }
+    },
+    "waechter_plus": {
+     "hand10_g0": {
+      "won": 22,
+      "of": 32
+     },
+     "hand10_g2": {
+      "won": 25,
+      "of": 32
+     },
+     "hand10_g3": {
+      "won": 18,
+      "of": 32
+     },
+     "hand10_g7": {
+      "won": 19,
+      "of": 32
+     },
+     "hand10_g8": {
+      "won": 27,
+      "of": 32
+     },
+     "hand10_g9": {
+      "won": 25,
+      "of": 32
+     },
+     "hand10_g10": {
+      "won": 21,
+      "of": 32
+     },
+     "hand10_g11": {
+      "won": 22,
+      "of": 32
+     },
+     "hand10_g12": {
+      "won": 16,
+      "of": 32
+     },
+     "hand10_g13": {
+      "won": 22,
+      "of": 32
+     },
+     "hand10_g14": {
+      "won": 26,
+      "of": 32
+     },
+     "hand10_g15": {
+      "won": 22,
+      "of": 32
+     }
+    }
+   },
+   "2": {
+    "dev_alt": 0.6989,
+    "dev_neu": 0.2109,
+    "F": 0.4804,
+    "alt": 0.7049,
+    "spiegel_rate": 0.038,
+    "spiegel_alt_rate": 0.0795,
+    "spiegel_lang_rate": 0.0,
+    "waechter_plus_rate": 0.7031,
+    "sackgasse_rate": 0.7125,
+    "doppelgabel_rate": 0.0625,
+    "G": 0.4022,
+    "pruefung": {
+     "won": 36,
+     "of": 64
+    },
+    "schutz": {
+     "won": 72,
+     "of": 80
+    },
+    "test_summen": {
+     "h8": {
+      "won": 36,
+      "of": 64
+     },
+     "h9": {
+      "won": 32,
+      "of": 64
+     },
+     "h10": {
+      "won": 44,
+      "of": 64
+     }
+    },
+    "dev": {
+     "pruefung": {
+      "won": 36,
+      "of": 64
+     },
+     "serie_berg": {
+      "won": 32,
+      "of": 32
+     },
+     "serie_festung": {
+      "won": 30,
+      "of": 32
+     },
+     "serie_hoehle": {
+      "won": 23,
+      "of": 32
+     },
+     "serie_lange_reise": {
+      "won": 16,
+      "of": 32
+     },
+     "serie_parcours": {
+      "won": 32,
+      "of": 32
+     },
+     "serie_zwei_wege": {
+      "won": 31,
+      "of": 32
+     },
+     "hand_abgrund": {
+      "won": 32,
+      "of": 32
+     },
+     "hand_doppelgabel": {
+      "won": 0,
+      "of": 32
+     },
+     "hand_hoehlendach": {
+      "won": 32,
+      "of": 32
+     },
+     "hand_lange_tour": {
+      "won": 0,
+      "of": 32
+     },
+     "hand9_gabel_drei": {
+      "won": 0,
+      "of": 32
+     },
+     "hand9_kreuzung": {
+      "won": 0,
+      "of": 32
+     },
+     "hand9_serpentine": {
+      "won": 24,
+      "of": 32
+     },
+     "hand9_spiegelweg": {
+      "won": 3,
+      "of": 32
+     }
+    },
+    "waechter_plus": {
+     "hand10_g0": {
+      "won": 18,
+      "of": 32
+     },
+     "hand10_g2": {
+      "won": 29,
+      "of": 32
+     },
+     "hand10_g3": {
+      "won": 23,
+      "of": 32
+     },
+     "hand10_g7": {
+      "won": 22,
+      "of": 32
+     },
+     "hand10_g8": {
+      "won": 26,
+      "of": 32
+     },
+     "hand10_g9": {
+      "won": 25,
+      "of": 32
+     },
+     "hand10_g10": {
+      "won": 23,
+      "of": 32
+     },
+     "hand10_g11": {
+      "won": 13,
+      "of": 32
+     },
+     "hand10_g12": {
+      "won": 15,
+      "of": 32
+     },
+     "hand10_g13": {
+      "won": 25,
+      "of": 32
+     },
+     "hand10_g14": {
+      "won": 25,
+      "of": 32
+     },
+     "hand10_g15": {
+      "won": 26,
+      "of": 32
+     }
+    }
+   }
+  },
+  "neustart_pruefung": {
+   "1": {
+    "dev_alt": 0.6861,
+    "dev_neu": 0.2344,
+    "F": 0.4756,
+    "alt": 0.6829,
+    "spiegel_rate": 0.0326,
+    "spiegel_alt_rate": 0.0682,
+    "spiegel_lang_rate": 0.0,
+    "waechter_plus_rate": 0.6458,
+    "sackgasse_rate": 0.7,
+    "doppelgabel_rate": 0.0,
+    "G": 0.376,
+    "pruefung": {
+     "won": 39,
+     "of": 64
+    },
+    "schutz": {
+     "won": 73,
+     "of": 80
+    },
+    "test_summen": {
+     "h8": {
+      "won": 39,
+      "of": 64
+     },
+     "h9": {
+      "won": 32,
+      "of": 64
+     },
+     "h10": {
+      "won": 41,
+      "of": 64
+     }
+    },
+    "dev": {
+     "pruefung": {
+      "won": 39,
+      "of": 64
+     },
+     "serie_berg": {
+      "won": 31,
+      "of": 32
+     },
+     "serie_festung": {
+      "won": 28,
+      "of": 32
+     },
+     "serie_hoehle": {
+      "won": 22,
+      "of": 32
+     },
+     "serie_lange_reise": {
+      "won": 17,
+      "of": 32
+     },
+     "serie_parcours": {
+      "won": 30,
+      "of": 32
+     },
+     "serie_zwei_wege": {
+      "won": 31,
+      "of": 32
+     },
+     "hand_abgrund": {
+      "won": 31,
+      "of": 32
+     },
+     "hand_doppelgabel": {
+      "won": 0,
+      "of": 32
+     },
+     "hand_hoehlendach": {
+      "won": 32,
+      "of": 32
+     },
+     "hand_lange_tour": {
+      "won": 0,
+      "of": 32
+     },
+     "hand9_gabel_drei": {
+      "won": 0,
+      "of": 32
+     },
+     "hand9_kreuzung": {
+      "won": 0,
+      "of": 32
+     },
+     "hand9_serpentine": {
+      "won": 30,
+      "of": 32
+     },
+     "hand9_spiegelweg": {
+      "won": 0,
+      "of": 32
+     }
+    },
+    "waechter_plus": {
+     "hand10_g0": {
+      "won": 25,
+      "of": 32
+     },
+     "hand10_g2": {
+      "won": 26,
+      "of": 32
+     },
+     "hand10_g3": {
+      "won": 10,
+      "of": 32
+     },
+     "hand10_g7": {
+      "won": 14,
+      "of": 32
+     },
+     "hand10_g8": {
+      "won": 27,
+      "of": 32
+     },
+     "hand10_g9": {
+      "won": 29,
+      "of": 32
+     },
+     "hand10_g10": {
+      "won": 13,
+      "of": 32
+     },
+     "hand10_g11": {
+      "won": 17,
+      "of": 32
+     },
+     "hand10_g12": {
+      "won": 15,
+      "of": 32
+     },
+     "hand10_g13": {
+      "won": 21,
+      "of": 32
+     },
+     "hand10_g14": {
+      "won": 25,
+      "of": 32
+     },
+     "hand10_g15": {
+      "won": 26,
+      "of": 32
+     }
+    }
+   },
+   "2": {
+    "dev_alt": 0.6974,
+    "dev_neu": 0.2109,
+    "F": 0.4596,
+    "alt": 0.6495,
+    "spiegel_rate": 0.0543,
+    "spiegel_alt_rate": 0.1136,
+    "spiegel_lang_rate": 0.0,
+    "waechter_plus_rate": 0.6562,
+    "sackgasse_rate": 0.7,
+    "doppelgabel_rate": 0.0,
+    "G": 0.38,
+    "pruefung": {
+     "won": 37,
+     "of": 64
+    },
+    "schutz": {
+     "won": 73,
+     "of": 80
+    },
+    "test_summen": {
+     "h8": {
+      "won": 41,
+      "of": 64
+     },
+     "h9": {
+      "won": 32,
+      "of": 64
+     },
+     "h10": {
+      "won": 41,
+      "of": 64
+     }
+    },
+    "dev": {
+     "pruefung": {
+      "won": 37,
+      "of": 64
+     },
+     "serie_berg": {
+      "won": 32,
+      "of": 32
+     },
+     "serie_festung": {
+      "won": 27,
+      "of": 32
+     },
+     "serie_hoehle": {
+      "won": 24,
+      "of": 32
+     },
+     "serie_lange_reise": {
+      "won": 19,
+      "of": 32
+     },
+     "serie_parcours": {
+      "won": 31,
+      "of": 32
+     },
+     "serie_zwei_wege": {
+      "won": 30,
+      "of": 32
+     },
+     "hand_abgrund": {
+      "won": 32,
+      "of": 32
+     },
+     "hand_doppelgabel": {
+      "won": 0,
+      "of": 32
+     },
+     "hand_hoehlendach": {
+      "won": 32,
+      "of": 32
+     },
+     "hand_lange_tour": {
+      "won": 0,
+      "of": 32
+     },
+     "hand9_gabel_drei": {
+      "won": 0,
+      "of": 32
+     },
+     "hand9_kreuzung": {
+      "won": 0,
+      "of": 32
+     },
+     "hand9_serpentine": {
+      "won": 27,
+      "of": 32
+     },
+     "hand9_spiegelweg": {
+      "won": 0,
+      "of": 32
+     }
+    },
+    "waechter_plus": {
+     "hand10_g0": {
+      "won": 27,
+      "of": 32
+     },
+     "hand10_g2": {
+      "won": 26,
+      "of": 32
+     },
+     "hand10_g3": {
+      "won": 10,
+      "of": 32
+     },
+     "hand10_g7": {
+      "won": 16,
+      "of": 32
+     },
+     "hand10_g8": {
+      "won": 24,
+      "of": 32
+     },
+     "hand10_g9": {
+      "won": 27,
+      "of": 32
+     },
+     "hand10_g10": {
+      "won": 16,
+      "of": 32
+     },
+     "hand10_g11": {
+      "won": 22,
+      "of": 32
+     },
+     "hand10_g12": {
+      "won": 17,
+      "of": 32
+     },
+     "hand10_g13": {
+      "won": 19,
+      "of": 32
+     },
+     "hand10_g14": {
+      "won": 24,
+      "of": 32
+     },
+     "hand10_g15": {
+      "won": 24,
+      "of": 32
+     }
+    }
+   }
+  }
+ },
+ "pruefung128": {
+  "p8": {
+   "won": 98,
+   "of": 128
+  },
+  "lehrer10": {
+   "won": 78,
+   "of": 128
+  },
+  "kandidat11": {
+   "won": 89,
+   "of": 128
+  },
+  "neustart_f": {
+   "won": 55,
+   "of": 128
+  },
+  "neustart_waechter": {
+   "won": 60,
+   "of": 128
+  },
+  "neustart_pruefung": {
+   "won": 78,
+   "of": 128
+  }
+ },
+ "familien": {
+  "p8": {
+   "v9_t4": {
+    "won": 24,
+    "of": 24,
+    "fortschritt": 1.0
+   },
+   "v9_t5": {
+    "won": 24,
+    "of": 24,
+    "fortschritt": 1.0
+   },
+   "v9_t6": {
+    "won": 24,
+    "of": 24,
+    "fortschritt": 1.0
+   },
+   "v9_t7": {
+    "won": 24,
+    "of": 24,
+    "fortschritt": 1.0
+   },
+   "v9_t8": {
+    "won": 21,
+    "of": 24,
+    "fortschritt": 0.958
+   },
+   "v9_t9": {
+    "won": 24,
+    "of": 24,
+    "fortschritt": 1.0
+   },
+   "v9_t10": {
+    "won": 20,
+    "of": 24,
+    "fortschritt": 0.917
+   },
+   "v9_t11": {
+    "won": 23,
+    "of": 24,
+    "fortschritt": 0.979
+   },
+   "v9_t12": {
+    "won": 23,
+    "of": 24,
+    "fortschritt": 0.996
+   },
+   "v10_t10": {
+    "won": 17,
+    "of": 24,
+    "fortschritt": 0.848
+   },
+   "v10_t11": {
+    "won": 15,
+    "of": 24,
+    "fortschritt": 0.788
+   },
+   "v10_t12": {
+    "won": 18,
+    "of": 24,
+    "fortschritt": 0.889
+   },
+   "v10_t13": {
+    "won": 5,
+    "of": 24,
+    "fortschritt": 0.507
+   },
+   "uebung_kanal_ende": {
+    "won": 0,
+    "of": 24,
+    "fortschritt": 0.751
+   },
+   "uebung_kanal2": {
+    "won": 0,
+    "of": 24,
+    "fortschritt": 0.57
+   },
+   "uebung_kanal3": {
+    "won": 0,
+    "of": 24,
+    "fortschritt": 0.578
+   },
+   "uebung_sackgasse_runter": {
+    "won": 0,
+    "of": 24,
+    "fortschritt": 0.0
+   },
+   "uebung_gabel_umkehren": {
+    "won": 0,
+    "of": 24,
+    "fortschritt": 0.458
+   },
+   "uebung_gabel_oben": {
+    "won": 22,
+    "of": 24,
+    "fortschritt": 0.965
+   },
+   "uebung_truhe_links_kurz": {
+    "won": 0,
+    "of": 24,
+    "fortschritt": 0.017
+   },
+   "uebung_lange_sackgasse": {
+    "won": 4,
+    "of": 24,
+    "fortschritt": 0.491
+   },
+   "spiegel_t4-7": {
+    "won": 0,
+    "of": 24,
+    "fortschritt": 0.01
+   },
+   "spiegel_t8-12": {
+    "won": 0,
+    "of": 24,
+    "fortschritt": 0.005
+   },
+   "lang": {
+    "won": 15,
+    "of": 16,
+    "fortschritt": 0.997
+   },
+   "spiegel_lang": {
+    "won": 0,
+    "of": 16,
+    "fortschritt": 0.002
+   }
+  },
+  "neustart_f": {
+   "v9_t4": {
+    "won": 24,
+    "of": 24,
+    "fortschritt": 1.0
+   },
+   "v9_t5": {
+    "won": 24,
+    "of": 24,
+    "fortschritt": 1.0
+   },
+   "v9_t6": {
+    "won": 23,
+    "of": 24,
+    "fortschritt": 0.997
+   },
+   "v9_t7": {
+    "won": 24,
+    "of": 24,
+    "fortschritt": 1.0
+   },
+   "v9_t8": {
+    "won": 24,
+    "of": 24,
+    "fortschritt": 1.0
+   },
+   "v9_t9": {
+    "won": 22,
+    "of": 24,
+    "fortschritt": 0.959
+   },
+   "v9_t10": {
+    "won": 19,
+    "of": 24,
+    "fortschritt": 0.937
+   },
+   "v9_t11": {
+    "won": 20,
+    "of": 24,
+    "fortschritt": 0.981
+   },
+   "v9_t12": {
+    "won": 18,
+    "of": 24,
+    "fortschritt": 0.874
+   },
+   "v10_t10": {
+    "won": 20,
+    "of": 24,
+    "fortschritt": 0.947
+   },
+   "v10_t11": {
+    "won": 17,
+    "of": 24,
+    "fortschritt": 0.86
+   },
+   "v10_t12": {
+    "won": 20,
+    "of": 24,
+    "fortschritt": 0.953
+   },
+   "v10_t13": {
+    "won": 23,
+    "of": 24,
+    "fortschritt": 0.971
+   },
+   "uebung_kanal_ende": {
+    "won": 22,
+    "of": 24,
+    "fortschritt": 0.939
+   },
+   "uebung_kanal2": {
+    "won": 22,
+    "of": 24,
+    "fortschritt": 0.943
+   },
+   "uebung_kanal3": {
+    "won": 23,
+    "of": 24,
+    "fortschritt": 0.971
+   },
+   "uebung_sackgasse_runter": {
+    "won": 23,
+    "of": 24,
+    "fortschritt": 0.978
+   },
+   "uebung_gabel_umkehren": {
+    "won": 24,
+    "of": 24,
+    "fortschritt": 1.0
+   },
+   "uebung_gabel_oben": {
+    "won": 22,
+    "of": 24,
+    "fortschritt": 0.961
+   },
+   "uebung_truhe_links_kurz": {
+    "won": 16,
+    "of": 24,
+    "fortschritt": 0.753
+   },
+   "uebung_lange_sackgasse": {
+    "won": 15,
+    "of": 24,
+    "fortschritt": 0.771
+   },
+   "spiegel_t4-7": {
+    "won": 11,
+    "of": 24,
+    "fortschritt": 0.681
+   },
+   "spiegel_t8-12": {
+    "won": 0,
+    "of": 24,
+    "fortschritt": 0.2
+   },
+   "lang": {
+    "won": 12,
+    "of": 16,
+    "fortschritt": 0.886
+   },
+   "spiegel_lang": {
+    "won": 0,
+    "of": 16,
+    "fortschritt": 0.119
+   }
+  },
+  "lehrer10": {
+   "v9_t4": {
+    "won": 24,
+    "of": 24,
+    "fortschritt": 1.0
+   },
+   "v9_t5": {
+    "won": 24,
+    "of": 24,
+    "fortschritt": 1.0
+   },
+   "v9_t6": {
+    "won": 24,
+    "of": 24,
+    "fortschritt": 1.0
+   },
+   "v9_t7": {
+    "won": 24,
+    "of": 24,
+    "fortschritt": 1.0
+   },
+   "v9_t8": {
+    "won": 24,
+    "of": 24,
+    "fortschritt": 1.0
+   },
+   "v9_t9": {
+    "won": 23,
+    "of": 24,
+    "fortschritt": 0.981
+   },
+   "v9_t10": {
+    "won": 20,
+    "of": 24,
+    "fortschritt": 0.921
+   },
+   "v9_t11": {
+    "won": 20,
+    "of": 24,
+    "fortschritt": 0.926
+   },
+   "v9_t12": {
+    "won": 22,
+    "of": 24,
+    "fortschritt": 0.96
+   },
+   "v10_t10": {
+    "won": 20,
+    "of": 24,
+    "fortschritt": 0.928
+   },
+   "v10_t11": {
+    "won": 23,
+    "of": 24,
+    "fortschritt": 0.961
+   },
+   "v10_t12": {
+    "won": 23,
+    "of": 24,
+    "fortschritt": 0.99
+   },
+   "v10_t13": {
+    "won": 20,
+    "of": 24,
+    "fortschritt": 0.929
+   },
+   "uebung_kanal_ende": {
+    "won": 23,
+    "of": 24,
+    "fortschritt": 0.987
+   },
+   "uebung_kanal2": {
+    "won": 23,
+    "of": 24,
+    "fortschritt": 0.975
+   },
+   "uebung_kanal3": {
+    "won": 20,
+    "of": 24,
+    "fortschritt": 0.945
+   },
+   "uebung_sackgasse_runter": {
+    "won": 23,
+    "of": 24,
+    "fortschritt": 0.978
+   },
+   "uebung_gabel_umkehren": {
+    "won": 22,
+    "of": 24,
+    "fortschritt": 0.99
+   },
+   "uebung_gabel_oben": {
+    "won": 22,
+    "of": 24,
+    "fortschritt": 0.966
+   },
+   "uebung_truhe_links_kurz": {
+    "won": 4,
+    "of": 24,
+    "fortschritt": 0.425
+   },
+   "uebung_lange_sackgasse": {
+    "won": 12,
+    "of": 24,
+    "fortschritt": 0.713
+   },
+   "spiegel_t4-7": {
+    "won": 1,
+    "of": 24,
+    "fortschritt": 0.331
+   },
+   "spiegel_t8-12": {
+    "won": 0,
+    "of": 24,
+    "fortschritt": 0.114
+   },
+   "lang": {
+    "won": 14,
+    "of": 16,
+    "fortschritt": 0.943
+   },
+   "spiegel_lang": {
+    "won": 0,
+    "of": 16,
+    "fortschritt": 0.041
+   }
+  },
+  "kandidat11": {
+   "v9_t4": {
+    "won": 24,
+    "of": 24,
+    "fortschritt": 1.0
+   },
+   "v9_t5": {
+    "won": 24,
+    "of": 24,
+    "fortschritt": 1.0
+   },
+   "v9_t6": {
+    "won": 24,
+    "of": 24,
+    "fortschritt": 1.0
+   },
+   "v9_t7": {
+    "won": 24,
+    "of": 24,
+    "fortschritt": 1.0
+   },
+   "v9_t8": {
+    "won": 21,
+    "of": 24,
+    "fortschritt": 0.976
+   },
+   "v9_t9": {
+    "won": 23,
+    "of": 24,
+    "fortschritt": 0.988
+   },
+   "v9_t10": {
+    "won": 24,
+    "of": 24,
+    "fortschritt": 1.0
+   },
+   "v9_t11": {
+    "won": 21,
+    "of": 24,
+    "fortschritt": 0.966
+   },
+   "v9_t12": {
+    "won": 20,
+    "of": 24,
+    "fortschritt": 0.957
+   },
+   "v10_t10": {
+    "won": 23,
+    "of": 24,
+    "fortschritt": 0.963
+   },
+   "v10_t11": {
+    "won": 22,
+    "of": 24,
+    "fortschritt": 0.943
+   },
+   "v10_t12": {
+    "won": 23,
+    "of": 24,
+    "fortschritt": 0.998
+   },
+   "v10_t13": {
+    "won": 23,
+    "of": 24,
+    "fortschritt": 0.972
+   },
+   "uebung_kanal_ende": {
+    "won": 22,
+    "of": 24,
+    "fortschritt": 0.954
+   },
+   "uebung_kanal2": {
+    "won": 23,
+    "of": 24,
+    "fortschritt": 0.975
+   },
+   "uebung_kanal3": {
+    "won": 21,
+    "of": 24,
+    "fortschritt": 0.932
+   },
+   "uebung_sackgasse_runter": {
+    "won": 24,
+    "of": 24,
+    "fortschritt": 1.0
+   },
+   "uebung_gabel_umkehren": {
+    "won": 23,
+    "of": 24,
+    "fortschritt": 0.996
+   },
+   "uebung_gabel_oben": {
+    "won": 23,
+    "of": 24,
+    "fortschritt": 0.982
+   },
+   "uebung_truhe_links_kurz": {
+    "won": 7,
+    "of": 24,
+    "fortschritt": 0.554
+   },
+   "uebung_lange_sackgasse": {
+    "won": 20,
+    "of": 24,
+    "fortschritt": 0.896
+   },
+   "spiegel_t4-7": {
+    "won": 8,
+    "of": 24,
+    "fortschritt": 0.633
+   },
+   "spiegel_t8-12": {
+    "won": 0,
+    "of": 24,
+    "fortschritt": 0.199
+   },
+   "lang": {
+    "won": 14,
+    "of": 16,
+    "fortschritt": 0.945
+   },
+   "spiegel_lang": {
+    "won": 0,
+    "of": 16,
+    "fortschritt": 0.1
+   }
+  },
+  "neustart_waechter": {
+   "v9_t4": {
+    "won": 24,
+    "of": 24,
+    "fortschritt": 1.0
+   },
+   "v9_t5": {
+    "won": 23,
+    "of": 24,
+    "fortschritt": 0.993
+   },
+   "v9_t6": {
+    "won": 23,
+    "of": 24,
+    "fortschritt": 0.973
+   },
+   "v9_t7": {
+    "won": 24,
+    "of": 24,
+    "fortschritt": 1.0
+   },
+   "v9_t8": {
+    "won": 22,
+    "of": 24,
+    "fortschritt": 0.952
+   },
+   "v9_t9": {
+    "won": 22,
+    "of": 24,
+    "fortschritt": 0.959
+   },
+   "v9_t10": {
+    "won": 20,
+    "of": 24,
+    "fortschritt": 0.943
+   },
+   "v9_t11": {
+    "won": 23,
+    "of": 24,
+    "fortschritt": 0.993
+   },
+   "v9_t12": {
+    "won": 20,
+    "of": 24,
+    "fortschritt": 0.921
+   },
+   "v10_t10": {
+    "won": 21,
+    "of": 24,
+    "fortschritt": 0.962
+   },
+   "v10_t11": {
+    "won": 17,
+    "of": 24,
+    "fortschritt": 0.813
+   },
+   "v10_t12": {
+    "won": 21,
+    "of": 24,
+    "fortschritt": 0.936
+   },
+   "v10_t13": {
+    "won": 17,
+    "of": 24,
+    "fortschritt": 0.846
+   },
+   "uebung_kanal_ende": {
+    "won": 22,
+    "of": 24,
+    "fortschritt": 0.939
+   },
+   "uebung_kanal2": {
+    "won": 20,
+    "of": 24,
+    "fortschritt": 0.868
+   },
+   "uebung_kanal3": {
+    "won": 23,
+    "of": 24,
+    "fortschritt": 0.971
+   },
+   "uebung_sackgasse_runter": {
+    "won": 22,
+    "of": 24,
+    "fortschritt": 0.974
+   },
+   "uebung_gabel_umkehren": {
+    "won": 23,
+    "of": 24,
+    "fortschritt": 0.997
+   },
+   "uebung_gabel_oben": {
+    "won": 22,
+    "of": 24,
+    "fortschritt": 0.965
+   },
+   "uebung_truhe_links_kurz": {
+    "won": 13,
+    "of": 24,
+    "fortschritt": 0.73
+   },
+   "uebung_lange_sackgasse": {
+    "won": 17,
+    "of": 24,
+    "fortschritt": 0.837
+   },
+   "spiegel_t4-7": {
+    "won": 10,
+    "of": 24,
+    "fortschritt": 0.667
+   },
+   "spiegel_t8-12": {
+    "won": 2,
+    "of": 24,
+    "fortschritt": 0.266
+   },
+   "lang": {
+    "won": 15,
+    "of": 16,
+    "fortschritt": 0.984
+   },
+   "spiegel_lang": {
+    "won": 0,
+    "of": 16,
+    "fortschritt": 0.089
+   }
+  },
+  "neustart_pruefung": {
+   "v9_t4": {
+    "won": 24,
+    "of": 24,
+    "fortschritt": 1.0
+   },
+   "v9_t5": {
+    "won": 24,
+    "of": 24,
+    "fortschritt": 1.0
+   },
+   "v9_t6": {
+    "won": 24,
+    "of": 24,
+    "fortschritt": 1.0
+   },
+   "v9_t7": {
+    "won": 23,
+    "of": 24,
+    "fortschritt": 0.997
+   },
+   "v9_t8": {
+    "won": 22,
+    "of": 24,
+    "fortschritt": 0.952
+   },
+   "v9_t9": {
+    "won": 24,
+    "of": 24,
+    "fortschritt": 1.0
+   },
+   "v9_t10": {
+    "won": 21,
+    "of": 24,
+    "fortschritt": 0.933
+   },
+   "v9_t11": {
+    "won": 20,
+    "of": 24,
+    "fortschritt": 0.904
+   },
+   "v9_t12": {
+    "won": 21,
+    "of": 24,
+    "fortschritt": 0.96
+   },
+   "v10_t10": {
+    "won": 20,
+    "of": 24,
+    "fortschritt": 0.938
+   },
+   "v10_t11": {
+    "won": 17,
+    "of": 24,
+    "fortschritt": 0.887
+   },
+   "v10_t12": {
+    "won": 23,
+    "of": 24,
+    "fortschritt": 0.997
+   },
+   "v10_t13": {
+    "won": 21,
+    "of": 24,
+    "fortschritt": 0.954
+   },
+   "uebung_kanal_ende": {
+    "won": 22,
+    "of": 24,
+    "fortschritt": 0.943
+   },
+   "uebung_kanal2": {
+    "won": 22,
+    "of": 24,
+    "fortschritt": 0.943
+   },
+   "uebung_kanal3": {
+    "won": 24,
+    "of": 24,
+    "fortschritt": 1.0
+   },
+   "uebung_sackgasse_runter": {
+    "won": 23,
+    "of": 24,
+    "fortschritt": 0.978
+   },
+   "uebung_gabel_umkehren": {
+    "won": 23,
+    "of": 24,
+    "fortschritt": 0.966
+   },
+   "uebung_gabel_oben": {
+    "won": 22,
+    "of": 24,
+    "fortschritt": 0.961
+   },
+   "uebung_truhe_links_kurz": {
+    "won": 16,
+    "of": 24,
+    "fortschritt": 0.763
+   },
+   "uebung_lange_sackgasse": {
+    "won": 14,
+    "of": 24,
+    "fortschritt": 0.772
+   },
+   "spiegel_t4-7": {
+    "won": 12,
+    "of": 24,
+    "fortschritt": 0.718
+   },
+   "spiegel_t8-12": {
+    "won": 0,
+    "of": 24,
+    "fortschritt": 0.244
+   },
+   "lang": {
+    "won": 13,
+    "of": 16,
+    "fortschritt": 0.899
+   },
+   "spiegel_lang": {
+    "won": 0,
+    "of": 16,
+    "fortschritt": 0.092
+   }
+  }
+ }
+}
