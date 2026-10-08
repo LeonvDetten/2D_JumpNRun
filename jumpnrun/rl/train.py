@@ -84,7 +84,8 @@ def make_env(rank: int, seed: int, min_tier: int, max_tier: int, handmade_paths,
             if any("hart" in shares for _, shares in mix):  # phase 12: generator v11 (hard jumps, new structures)
                 from jumpnrun.levelgen.hard import HardSource
 
-                sources["hart"] = HardSource()
+                pool = Path(__file__).resolve().parent.parent.parent / "runs/demos12/demos.jsonl"
+                sources["hart"] = HardSource(pool=pool if (p11 or {}).get("hard") else None)
             source = MixSource(sources, mix, gates=gates, routing=routing)
         return JumpNRunEnv(source, seed=seed * 1000 + rank, action_repeat=action_repeat, overview=overview,
                            rewind_prob=rewind_prob, obs_v2=obs_v2, stuck_death=stuck_death, **(env_extra or {}))
@@ -281,7 +282,11 @@ def main() -> None:
     torch.set_num_threads(args.threads or os.cpu_count() or 1)
 
     def _json_arg(value):
-        return json.loads(Path(value).read_text() if Path(value).exists() else value) if value else None
+        if not value:
+            return None
+        if value.lstrip()[:1] in "[{":  # inline JSON (long values are no valid file names)
+            return json.loads(value)
+        return json.loads(Path(value).read_text())
 
     mix_schedule = _json_arg(args.mix_schedule)
     handmade_paths = sorted(p for pattern in args.handmade for p in glob.glob(pattern))

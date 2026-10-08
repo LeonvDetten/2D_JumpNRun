@@ -315,11 +315,38 @@ class HardSource:
 
     HARD_TIER = -7
 
-    def __init__(self, weights=None, seed_space: str = "hard12"):
+    def __init__(self, weights=None, seed_space: str = "hard12", pool=None, pool_share: float = 0.5):
         self.weights = dict(weights or {"spruenge": 0.4, "strukturen": 0.4, "gemischt": 0.2})
         self.seed_space = seed_space
+        # phase 12 (Leon, E0): half of the levels from a pool the solver proved (runs/demos12), half fresh -
+        # fresh hard levels are only distance-map checked, and ~1/3 of the sharpened jump levels resist the solver
+        self.pool_path, self.pool_share, self._pool = pool, pool_share, None
+
+    def _pool_level(self, rng: random.Random):
+        if self._pool is None:
+            import json
+            from pathlib import Path
+
+            path = Path(self.pool_path) if self.pool_path else None
+            self._pool = [json.loads(l) for l in path.read_text().splitlines() if l.strip()] \
+                if path and path.exists() else []
+        if not self._pool:
+            return None
+        d = rng.choice(self._pool)
+        level = Level.from_text(d["level"], name=f"hard_pool_{d['seed']}")
+        level.needs_path = True
+        level.family = f"v11_{d.get('family', 'gemischt')}"
+        level.blocks = []
+        level.building_blocks = {"v11_pool": 1}
+        return level
 
     def __call__(self, rng: random.Random):
+        if self.pool_path and rng.random() < self.pool_share:
+            level = self._pool_level(rng)
+            if level is not None:
+                level.source = "hart"
+                level.augmentations = ["pool"]
+                return level, self.HARD_TIER
         fam = rng.choices(list(self.weights), weights=list(self.weights.values()))[0]
         for _ in range(5):
             try:
