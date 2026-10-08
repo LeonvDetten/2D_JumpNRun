@@ -38,17 +38,25 @@ CFG = replace(G.TIERS[12], hard=3, hard_jumps=8.0, platform_enemies=True, free_e
 
 # ----------------------------------------------------------------------------------------------- new jump blocks
 def _precise_chain(b: G._Builder) -> None:
-    """5-10 jumps, each the widest (or one shorter) robust jump for its height change, landings as small as the
-    catalogue allows; sometimes an enemy on a wider landing."""
+    """10-18 jumps, each the widest (or one shorter) jump for its height change - with share 0.3 also the "tight"
+    widest jumps that only work from some sub-tile positions -, landings as small as the catalogue allows; enemies on
+    half of the wider landings, sometimes enemies dropping onto the chain from above."""
 
     rng = b.rng
     widest = G._widest_gaps()
     row, width = b.surface, 2
     b.flat(2)
-    for _ in range(rng.randint(5, 10)):
+    first_col = len(b.columns)
+    for _ in range(rng.randint(10, 18)):
+        tight = rng.random() < 0.3
         options = [e for e in G._jump_catalog()
                    if e["takeoff"] <= width and TOP <= row + e["drop"] <= GROUND - 1 and -1 <= e["drop"] <= 3
-                   and (e["gap"], e["drop"]) not in G._TIGHT and e["gap"] >= widest[e["drop"]] - 1]
+                   and ((e["gap"], e["drop"]) in G._TIGHT if tight else
+                        ((e["gap"], e["drop"]) not in G._TIGHT and e["gap"] >= widest[e["drop"]] - 1))]
+        if not options:
+            options = [e for e in G._jump_catalog()
+                       if e["takeoff"] <= width and TOP <= row + e["drop"] <= GROUND - 1 and -1 <= e["drop"] <= 3
+                       and (e["gap"], e["drop"]) not in G._TIGHT and e["gap"] >= widest[e["drop"]] - 1]
         if row >= GROUND - 2:  # low: prefer rising
             options = [e for e in options if e["drop"] <= 0] or options
         e = rng.choice(options)
@@ -59,8 +67,12 @@ def _precise_chain(b: G._Builder) -> None:
         first = len(b.columns)
         for _ in range(width):
             b.column(None, {row: "B"})
-        if width >= 2 and rng.random() < 0.3:
+        if width >= 2 and rng.random() < 0.5:
             b.columns[first + width - 1][row - 1] = "E"
+    for c in range(first_col, len(b.columns)):  # enemies waiting above some stones drop onto the chain
+        top = next((r for r in range(ROWS) if b.columns[c][r] == "B"), None)
+        if top is not None and top >= 5 and rng.random() < 0.12 and all(b.columns[c][r] == " " for r in range(top)):
+            b.columns[c][rng.randint(0, 1)] = "E"
     b.gap(rng.randint(1, 2))
     b.surface = max(row, min(GROUND, row + rng.randint(0, 2)))
     b.flat(rng.randint(2, 4))
@@ -71,15 +83,18 @@ def _enemy_landings(b: G._Builder) -> None:
 
     rng = b.rng
     b.flat(2)
-    for _ in range(rng.randint(2, 3)):
-        drop = rng.randint(0, 2) if b.surface < GROUND else 0
-        gap = 3 if drop >= 1 or rng.random() < 0.5 else 2
+    for _ in range(rng.randint(3, 5)):
+        if b.surface >= GROUND - 1 and rng.random() < 0.6:
+            b.rise()
+            b.flat(1)
+        drop = rng.randint(1, 2) if b.surface < GROUND - 1 else 0
+        gap = 3
         b.gap(gap)
         b.drop(drop)
         start = len(b.columns)
-        width = rng.randint(4, 6)
+        width = rng.randint(3, 5)
         b.flat(width)
-        for off in rng.sample(range(1, width), k=rng.randint(1, 2)):
+        for off in rng.sample(range(1, width), k=min(width - 1, rng.randint(1, 3))):
             b.columns[start + off][b.surface - 1] = "E"
     b.flat(2)
 
@@ -231,6 +246,9 @@ STRUCT_BLOCKS = {
 }
 
 
+CORE_JUMPS = ("praezise_kette", "landung_gegner", "regen_kette")
+
+
 def _pool(family: str) -> dict:
     if family == "spruenge":
         return dict(JUMP_BLOCKS)
@@ -245,6 +263,9 @@ def _build(family: str, rng: random.Random):
     b.style = {}
     pool = _pool(family)
     weights = {k: rng.gammavariate(0.7, 1.0) + 0.05 for k in pool}  # a different recipe in every level
+    for k in CORE_JUMPS:  # the sharpened jump blocks carry the "spruenge" family
+        if k in weights and family == "spruenge":
+            weights[k] += 1.0
     b.flat(5)
     b.columns[1][b.surface - 1] = "P"
     if rng.random() < 0.3:
@@ -258,7 +279,7 @@ def _build(family: str, rng: random.Random):
         kind = rng.choices(options, weights=[weights[k] for k in options])[0]
         pool[kind][0](b)
         used.append(kind)
-        if rng.random() < 0.4:  # a short breather with an enemy now and then
+        if rng.random() < (0.15 if family == "spruenge" else 0.4):  # a short breather with an enemy now and then
             b.flat(rng.randint(2, 3), enemy=rng.random() < 0.5)
     if b.surface != GROUND and rng.random() < 0.5:
         b.drop(GROUND - b.surface)
