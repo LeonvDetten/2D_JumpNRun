@@ -28,12 +28,13 @@
   "critic_warmup": 150000
  },
  "mischung": {
-  "p8": 0.35,
-  "skill": 0.15,
+  "p8": 0.3,
+  "skill": 0.1,
   "v10": 0.1,
   "hart": 0.2,
   "lang": 0.1,
-  "spiegel": 0.1
+  "spiegel": 0.1,
+  "pruefung": 0.1
  },
  "mischung_sperre": {
   "v10": 10,
@@ -109,6 +110,12 @@
    "bei_mio": 10.6,
    "aenderung": "kein automatischer Stopp mehr an E3/E4 (stopp true -> false); das Training läuft bis Ziel oder Zeitlimit durch",
    "grund": "Leon: 'Das Training soll weiterlaufen ohne Unterbrechung. Fragen können gestellt werden, aber wenn keine Antwort kommt, mach nach bestem Gewissen weiter. Keine Fragen bis 6:00 Uhr.'"
+  },
+  {
+   "zeit": "2026-10-09 06:36",
+   "bei_mio": 26.0,
+   "aenderung": "Option C: Entropie-Bonus 0,003 -> 0,001; neue Quelle 'pruefung' 10 % (v9 Stufen 8-12, Steine/Ketten/Regen-Treppen/Sprungfolgen/Gegner-Rampen x3, Gegner fallen gleich nach dem Start); p8 35 -> 30 %, Übung 15 -> 10 %",
+   "grund": "Prüfung zufällig gezogen 15-25 % (P8 74 %): Versuche enden am Gegnerregen beim Start und auf den Trittsteinen; deterministisch ist der Schüler bester Generalist -> Aktionen zu unsicher. Nie aus Prüfungsgeometrie abgeleitet."
   }
  ]
 }
