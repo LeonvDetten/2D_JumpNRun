@@ -1,7 +1,9 @@
 {
  "p12_22_det": {
+  "name": "Phase 12 bei 22 Mio.",
   "modell": "runs/phase12_schueler/checkpoints/ema_step_0022000000.zip",
   "generalist": 0.7171,
+  "ohne_pruefung": 0.6767,
   "kategorien": [
    0.838,
    1.0,
@@ -13,23 +15,27 @@
    0.75
   ]
  },
- "p8_det": {
-  "modell": "models/phase8_final.zip",
-  "generalist": 0.4568,
+ "p12_24_det": {
+  "name": "Phase 12 bei 24 Mio.",
+  "modell": "runs/phase12_schueler/checkpoints/ema_step_0024000000.zip",
+  "generalist": 0.6196,
+  "ohne_pruefung": 0.7081,
   "kategorien": [
-   0.9032,
-   1.0,
-   0.6875,
-   0.3972,
-   0.0833,
+   0.8611,
    0.0,
+   0.6944,
+   0.7028,
+   0.9481,
+   0.4167,
    0.5417,
-   0.0417
+   0.7917
   ]
  },
  "neustart_det": {
+  "name": "Neustart F",
   "modell": "models/neustart_kandidat_f.zip",
   "generalist": 0.648,
+  "ohne_pruefung": 0.5977,
   "kategorien": [
    0.844,
    1.0,
@@ -41,5 +47,53 @@
    0.2083
   ]
  },
- "hinweis": "Diagnose: deterministisch (immer die wahrscheinlichste Aktion). Die Scorecard-Regel bleibt zufällig gezogen. neustart_det = models/neustart_kandidat_f.zip."
+ "neustart_pruefung_det": {
+  "name": "Neustart Prüfung",
+  "modell": "models/neustart_kandidat_pruefung.zip",
+  "generalist": 0.6499,
+  "ohne_pruefung": 0.5999,
+  "kategorien": [
+   0.8208,
+   1.0,
+   0.7361,
+   0.5861,
+   0.9398,
+   0.325,
+   0.5417,
+   0.25
+  ]
+ },
+ "phase11_det": {
+  "name": "Phase 11",
+  "modell": "models/phase11_kandidat.zip",
+  "generalist": 0.5711,
+  "ohne_pruefung": 0.5098,
+  "kategorien": [
+   0.8731,
+   1.0,
+   0.6875,
+   0.7472,
+   0.5361,
+   0.1417,
+   0.5833,
+   0.0
+  ]
+ },
+ "p8_det": {
+  "name": "P8",
+  "modell": "models/phase8_final.zip",
+  "generalist": 0.4568,
+  "ohne_pruefung": 0.3792,
+  "kategorien": [
+   0.9032,
+   1.0,
+   0.6875,
+   0.3972,
+   0.0833,
+   0.0,
+   0.5417,
+   0.0417
+  ]
+ },
+ "hinweis": "Diagnose: deterministisch (immer die wahrscheinlichste Aktion). Die Prüfung ist so ein einziger Ablauf (alles oder nichts) - darum Mittel ohne Prüfung. Die Scorecard-Regel bleibt zufällig gezogen."
 }
