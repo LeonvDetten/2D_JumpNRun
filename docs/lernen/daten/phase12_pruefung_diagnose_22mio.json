@@ -1,0 +1,31 @@
+{
+ "P8": {
+  "won": 99,
+  "of": 128,
+  "mean": 0.872,
+  "ends": {
+   "diagonalen / died_enemy": 8,
+   "gabelung_oben / stuck": 7,
+   "start_gegnerregen / stuck": 5,
+   "diagonalen / died_pit": 5,
+   "ziel / died_pit": 2,
+   "trittsteine / died_pit": 2
+  }
+ },
+ "P12_22": {
+  "won": 29,
+  "of": 128,
+  "mean": 0.461,
+  "ends": {
+   "trittsteine / died_pit": 23,
+   "start_gegnerregen / stuck": 20,
+   "start_gegnerregen / died_enemy": 18,
+   "gabelung_oben / stuck": 11,
+   "ziel / died_pit": 8,
+   "diagonalen / died_pit": 6,
+   "diagonalen / died_enemy": 6,
+   "gabelung_oben / died_pit": 4,
+   "gabelung_oben / died_enemy": 3
+  }
+ }
+}
