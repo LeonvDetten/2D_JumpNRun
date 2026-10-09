@@ -1,6 +1,8 @@
 """Paired comparison of all models on allowed levels + a profile per level type (basis for teacher routing).
 
-    OMP_NUM_THREADS=1 python3 scripts/endvergleich12.py [procs]     # -> runs/phase12/endvergleich.json
+    OMP_NUM_THREADS=1 python3 scripts/endvergleich12.py [procs] [tag=path ...]  # -> runs/phase12/endvergleich.json
+
+Extra models (e.g. the phase-12 candidate) are added as tag=path; results already stored are kept.
 
 Models: P8, phase-10 teacher candidate, phase-11 candidate, the three Neustart candidates.
 1. milestones11 full measurement at seeds 1 and 2 (P8 / phase 10 / phase 11 reused from runs/phase11/vergleich.json,
@@ -59,6 +61,10 @@ def families():
     return fam
 
 
+def _register(models: dict) -> None:
+    MODELS.update(models)  # extra models reach the worker processes
+
+
 def job(args):
     import numpy as np
     import torch
@@ -101,6 +107,11 @@ def job(args):
 
 
 def main():
+    args = sys.argv[1:]
+    procs = int(args.pop(0)) if args and "=" not in args[0] else 4
+    for spec in args:
+        tag, path = spec.split("=", 1)
+        MODELS[tag] = path
     OUT.parent.mkdir(parents=True, exist_ok=True)
     out = json.loads(OUT.read_text()) if OUT.exists() else {"mess": {}, "pruefung128": {}, "familien": {}}
     old = json.loads((ROOT / "runs/phase11/vergleich.json").read_text())["ergebnisse"]
@@ -117,7 +128,7 @@ def main():
         if tag not in out["familien"]:
             jobs.append(("familien", tag, 0))
     jobs.sort(key=lambda j: j[0] != "familien")  # the long jobs first
-    with Pool(int(sys.argv[1]) if len(sys.argv) > 1 else 4) as pool:
+    with Pool(procs, initializer=_register, initargs=(dict(MODELS),)) as pool:
         for kind, tag, seed, r in pool.imap_unordered(job, jobs):
             if kind == "mess":
                 out["mess"].setdefault(tag, {})[str(seed)] = r
