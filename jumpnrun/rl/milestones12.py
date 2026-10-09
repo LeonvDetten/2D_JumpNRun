@@ -21,7 +21,7 @@ from jumpnrun.rl import scorecard12 as S
 from jumpnrun.rl.modelinfo import load_model
 from jumpnrun.rl.train import _zip_ok
 
-WINDOW = (40, 42, 44)
+WINDOW = (40, 42, 44, 50, 52, 54)  # 50/52/54: window after Leon's extension to 55 M
 
 
 def evaluate(ckpt: Path, seed: int = 0) -> dict:
