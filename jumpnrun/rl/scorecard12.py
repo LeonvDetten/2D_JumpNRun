@@ -126,12 +126,12 @@ def _eval_component(args):
     from jumpnrun.rl.evaluate import evaluate_levels
     from jumpnrun.rl.modelinfo import load_model
 
-    path, name, seed = args
+    path, name, seed, *det = args
     torch.set_num_threads(1)
     cat, levels, n = components()[name]
     np.random.seed(seed)
     torch.manual_seed(seed)
-    res = evaluate_levels(load_model(path), levels * n, deterministic=False) if levels else []
+    res = evaluate_levels(load_model(path), levels * n, deterministic=bool(det and det[0])) if levels else []
     return name, {"kat": cat, "won": sum(int(r["won"]) for r in res), "of": len(res),
                   "fortschritt": round(float(np.mean([r["progress"] for r in res])), 3) if res else 0.0}
 
@@ -144,9 +144,11 @@ def summarize(comp: dict) -> dict:
     return {"kategorien": cats, "generalist": round(float(np.mean(cats)), 4), "komponenten": comp}
 
 
-def evaluate(path, seed: int = 0, procs: int = 1) -> dict:
+def evaluate(path, seed: int = 0, procs: int = 1, deterministic: bool = False) -> dict:
+    """Stochastic (sampled actions) by default - the scorecard rule; deterministic=True only for diagnosis."""
+
     names = list(components())
-    jobs = [(str(path), n, seed) for n in names]
+    jobs = [(str(path), n, seed, deterministic) for n in names]
     if procs > 1:
         from multiprocessing import Pool
 
@@ -247,11 +249,12 @@ def main() -> None:
     e.add_argument("--tag", required=True)
     e.add_argument("--procs", type=int, default=1)
     e.add_argument("--seed", type=int, default=0)
+    e.add_argument("--det", action="store_true", help="diagnosis only: always the most likely action")
     b = sub.add_parser("bild")
     b.add_argument("--tag", help="a stored score_<tag>.json")
     args = parser.parse_args()
     if args.cmd == "eval":
-        res = evaluate(ROOT / args.model, args.seed, args.procs)
+        res = evaluate(ROOT / args.model, args.seed, args.procs, deterministic=args.det)
         res["modell"] = args.model
         OUT.mkdir(parents=True, exist_ok=True)
         (OUT / f"score_{args.tag}.json").write_text(json.dumps(res, indent=1))

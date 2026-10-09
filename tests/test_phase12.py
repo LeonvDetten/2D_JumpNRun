@@ -157,3 +157,18 @@ def test_mirror_adaptive_frontier():
     assert src.frontier() == 7  # 7 won, 8 below 50 %
     assert level.mirror_tier in src.tiers
     assert MirrorSource()._tier(rng) in range(4, 13)
+
+
+def test_exam_skill_variant():
+    from jumpnrun.levelgen.distmap import DistanceMap
+    from jumpnrun.levelgen.generator import generate
+
+    assert generate(11, 3).to_text() == generate(11, 3, "v9").to_text()  # v9 unchanged
+    boosted = plain = 0
+    for s in range(20):
+        lv = generate(8 + s % 5, s, "pruefung")
+        assert lv.variant == "pruefung" and DistanceMap(lv).reachable
+        boosted += lv.building_blocks.get("stones", 0) + lv.building_blocks.get("chain", 0)
+        b = generate(8 + s % 5, s).building_blocks
+        plain += b.get("stones", 0) + b.get("chain", 0)
+    assert boosted > plain
