@@ -16,8 +16,8 @@
   2
  ],
  "kern_messung": 3,
- "ziel_schritte": 45000000,
- "zeit_stunden": 40,
+ "ziel_schritte": 55000000,
+ "zeit_stunden": 52,
  "lernrate": {
   "cosine": [
    0.0002,
@@ -25,16 +25,23 @@
    45000000
   ],
   "ramp": 200000,
-  "critic_warmup": 150000
+  "critic_warmup": 150000,
+  "rewarm": [
+   45000000,
+   5e-05,
+   1e-05,
+   55000000,
+   500000
+  ]
  },
  "mischung": {
   "p8": 0.3,
-  "skill": 0.1,
+  "skill": 0.05,
   "v10": 0.1,
   "hart": 0.2,
   "lang": 0.1,
   "spiegel": 0.1,
-  "pruefung": 0.1
+  "pruefung": 0.15
  },
  "mischung_sperre": {
   "v10": 10,
@@ -116,6 +123,18 @@
    "bei_mio": 26.0,
    "aenderung": "Option C: Entropie-Bonus 0,003 -> 0,001; neue Quelle 'pruefung' 10 % (v9 Stufen 8-12, Steine/Ketten/Regen-Treppen/Sprungfolgen/Gegner-Rampen x3, Gegner fallen gleich nach dem Start); p8 35 -> 30 %, Übung 15 -> 10 %",
    "grund": "Prüfung zufällig gezogen 15-25 % (P8 74 %): Versuche enden am Gegnerregen beim Start und auf den Trittsteinen; deterministisch ist der Schüler bester Generalist -> Aktionen zu unsicher. Nie aus Prüfungsgeometrie abgeleitet."
+  },
+  {
+   "zeit": "2026-10-09 16:10",
+   "bei_mio": 39.5,
+   "aenderung": "Option C (Verlängerung): Ziel 45 -> 55 Mio., Zeitlimit 40 -> 52 h; Prüfungs-Fähigkeiten 10 -> 15 % (Übung 10 -> 5 %); Lernrate ab 45 Mio. in 0,5 Mio. auf 5e-5, dann Kosinus auf 1e-5 bei 55 Mio.; Urteilsfenster 50/52/54 Mio.; geplant: Quelle 'mario' (umgewandelte VGLC-Level, geprüft lösbar) ~10 % zulasten p8, sobald getestet",
+   "grund": "Prüfung stagniert bei 40-44 % (P8 74 %), Halte-Tor unerreichbar; Leon will die Prüfung stärken, ohne den Generalisten zu opfern, und mehr Vielfalt",
+   "schutz": "Fällt der Generalist-Wert zweimal in Folge > 3 Pp unter den Bestwert (69,8 %), wird der Prüfungsschwerpunkt zurückgenommen; Stände bis 44 Mio. bleiben Rückfallkandidaten"
   }
+ ],
+ "urteil_fenster_mio": [
+  50,
+  52,
+  54
  ]
 }

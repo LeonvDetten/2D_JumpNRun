@@ -136,6 +136,7 @@ def staged_schedule(plan: dict, target: int, phase_start: int, run_dir: Path):
     stages = sorted((int(a), float(b)) for a, b in plan.get("stages", [[0, 0.0]]))
     # phase 12 (from the Neustart branch): {"cosine": [start, end, decay_steps]} - one cosine over the whole run
     cosine = plan.get("cosine")
+    rewarm = plan.get("rewarm")
     warm = int(plan.get("critic_warmup", 0))
     ramp = int(plan.get("ramp", 0))
     scale_path = run_dir / "lr_scale.json"
@@ -159,6 +160,15 @@ def staged_schedule(plan: dict, target: int, phase_start: int, run_dir: Path):
             lr = lr1 + (lr0 - lr1) * 0.5 * (1 + math.cos(math.pi * x))
         if ramp and rel >= warm:
             lr *= min(1.0, max(0.02, (rel - warm) / ramp))
+        # phase 12 extension: {"rewarm": [start, lr_peak, lr_end, end, ramp]} - from `start` the rate rises linearly
+        # to lr_peak over `ramp` steps, then a second cosine down to lr_end at `end`
+        if rewarm and rel >= rewarm[0]:
+            s, peak, low, end, rr = (float(v) for v in rewarm)
+            if rel < s + rr:
+                lr = lr + (peak - lr) * (rel - s) / rr
+            else:
+                x = min(1.0, max(0.0, (rel - s - rr) / max(1.0, end - s - rr)))
+                lr = low + (peak - low) * 0.5 * (1 + math.cos(math.pi * x))
         return lr * state["scale"]
 
     return schedule
