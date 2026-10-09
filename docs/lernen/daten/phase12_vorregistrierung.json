@@ -39,9 +39,9 @@
   "skill": 0.05,
   "v10": 0.1,
   "hart": 0.2,
-  "lang": 0.1,
-  "spiegel": 0.1,
-  "pruefung": 0.15,
+  "lang": 0.125,
+  "spiegel": 0.125,
+  "pruefung": 0.1,
   "mario": 0.1
  },
  "mischung_sperre": {
@@ -144,6 +144,12 @@
    "bei_mio": 44.1,
    "aenderung": "Anhebung der Lernrate ab 45 Mio. halbiert: Spitze 5e-5 -> 3e-5 (dann Kosinus auf 1e-5 bei 55 Mio.)",
    "grund": "Der Sprung bei 40 Mio. (Generalist 73,8 %, Prüfung 52 %) kam mit der sehr niedrigen Lernrate; 42 Mio. bestätigt die Prüfung (52 %). Angekündigt um 17:25, ohne Gegenrede nach bestem Gewissen umgesetzt."
+  },
+  {
+   "zeit": "2026-10-09 19:32",
+   "bei_mio": 44.3,
+   "aenderung": "Schutzregel gegriffen: Prüfungs-Fähigkeiten 15 -> 10 %; die 5 % je zur Hälfte an lange Level (10 -> 12,5 %) und gespiegelte Level (10 -> 12,5 %)",
+   "grund": "Generalist 42 Mio. 70,4 % und 44 Mio. 70,5 % - zweimal in Folge > 3 Pp unter dem Bestwert 73,8 % (40 Mio.); gefallen sind lange Level (72 -> 58/60 %) und Links/Spiegel (56 -> 46/45 %), die Prüfung stieg mit 15 % nicht weiter (52/52/49 %)"
   }
  ],
  "urteil_fenster_mio": [
