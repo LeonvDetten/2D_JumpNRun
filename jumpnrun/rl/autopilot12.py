@@ -136,6 +136,9 @@ def picture(state: dict):
     steps, cur = emas[-1]
     lines = [f"Stand {steps / 1e6:.0f} Mio. Schritte (EMA)", f"dev_alt {cur['dev_alt']:.1%}  ·  F {cur['F']:.1%}  ·  "
              f"Prüfung (32) {cur['pruefung32']}"]
+    if cur.get("mario"):
+        m = cur["mario"]
+        lines.append(f"Mario (zurückgehalten, nie trainiert): {m['won']}/{m['of']} gewonnen, Fortschritt {m['fortschritt']:.0%}")
     for name, d in state.get("entscheidungen", {}).items():
         lines.append(f"{name} ({d['mio']} Mio.): {'erreicht' if d['ok'] else 'verfehlt'}")
     lines += [""] + [l[:80] for l in state.get("log", [])[-5:]]

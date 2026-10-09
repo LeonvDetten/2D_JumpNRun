@@ -167,3 +167,16 @@ Leon gab den Generator am 8.10. frei („mit Löser-Pool“).
 - Bei 20 Mio. kamen beide zurück: Prüfung 24 %, Sprünge 14/48. Der Generalist-Wert erreichte mit 53,4 % einen neuen Bestwert, Klassisch rechts 71 %.
 - Im Training stiegen die kurzen gespiegelten Level ab 18 Mio. von 22 auf 33 % gewonnen, ohne weiteren Eingriff.
 - Ab 20 Mio. sind die Lehrer ganz aus.
+
+## Verlängerung (Leon, 9.10.)
+
+- **Option C (6:36, 26,4 Mio.):** Entropie-Bonus 0,003 → 0,001 und neue Quelle „Prüfungs-Fähigkeiten“ (10 %).
+  - Grund: Die Prüfung stand zufällig gezogen bei 15–25 %. Deterministisch war der Schüler schon bester Generalist; er spielte nur zu unsicher.
+  - Wirkung: Die Prüfung stieg von 9 % (26 Mio.) auf 40–44 % (34–38 Mio.), der Generalist-Wert auf 69,8 % (36 Mio.).
+- **Verlängerung (16:07, 39,5 Mio.):** Ziel 55 Mio. und 52 h; Prüfungs-Fähigkeiten 15 %; die Lernrate steigt ab 45 Mio. kurz auf 5e-5 und fällt dann auf 1e-5; das Urteilsfenster liegt bei 50/52/54 Mio.
+- **Mario-Level (16:38, 40,2 Mio.):** echte Level aus dem VGLC-Korpus (Super Mario Bros., SMB 2 Japan, Super Mario Land), 10 % Anteil.
+  - Der Umwandler `jumpnrun/levelgen/mario.py` repariert die Level für unsere Physik: Unser Spieler springt gut eine Kachel hoch, Mario vier. Zu hohe Hindernisse werden zu Stufen gekürzt, zu breite Abgründe verengt.
+  - Vorrat: 701 Abschnitte aus 37 Leveln, 30 % davon gespiegelt. 9 ganze Level sind zurückgehalten (Messung „Mario“, nie trainiert).
+  - Der Löser beweist 10 von 12 Stichproben als lösbar.
+  - Ausgangswerte auf den zurückgehaltenen Leveln: P8 7/50, Schüler (38 Mio.) 11/50.
+- **Schutz:** Fällt der Generalist-Wert zweimal in Folge > 3 Pp unter den Bestwert, wird der Prüfungsschwerpunkt zurückgenommen.
