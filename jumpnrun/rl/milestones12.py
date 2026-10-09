@@ -29,9 +29,35 @@ def evaluate(ckpt: Path, seed: int = 0) -> dict:
     small = m10.evaluate(model, full=False, seed=seed)
     card = S.evaluate(ckpt, seed=seed, procs=1)
     p = small["dev"]["pruefung"]
-    return {"dev_alt": small["dev_alt"], "dev_neu": small["dev_neu"], "F": small["F"],
-            "pruefung32": f"{p['won']}/{p['of']}", "kategorien": card["kategorien"], "generalist": card["generalist"],
-            "komponenten": card["komponenten"]}
+    out = {"dev_alt": small["dev_alt"], "dev_neu": small["dev_neu"], "F": small["F"],
+           "pruefung32": f"{p['won']}/{p['of']}", "kategorien": card["kategorien"], "generalist": card["generalist"],
+           "komponenten": card["komponenten"]}
+    mario = mario_holdout(model, seed)
+    if mario:
+        out["mario"] = mario
+    return out
+
+
+def mario_holdout(model, seed: int = 0):
+    """Extension: held-out VGLC levels (never trained, both directions) - reported apart from the generalist value
+    so the scorecard stays comparable with all earlier measurements."""
+
+    from jumpnrun.levelgen.mario import OUT, holdout_levels
+
+    if not (OUT / "holdout.jsonl").exists():
+        return None
+    import numpy as np
+
+    from jumpnrun.rl.evaluate import evaluate_levels
+
+    levels = holdout_levels()
+    if not levels:
+        return None
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    res = evaluate_levels(model, levels * 2, deterministic=False)
+    return {"won": sum(int(r["won"]) for r in res), "of": len(res),
+            "fortschritt": round(float(np.mean([r["progress"] for r in res])), 3)}
 
 
 def pending(run: Path, done: dict):

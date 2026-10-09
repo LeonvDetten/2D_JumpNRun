@@ -35,13 +35,14 @@
   ]
  },
  "mischung": {
-  "p8": 0.3,
+  "p8": 0.2,
   "skill": 0.05,
   "v10": 0.1,
   "hart": 0.2,
   "lang": 0.1,
   "spiegel": 0.1,
-  "pruefung": 0.15
+  "pruefung": 0.15,
+  "mario": 0.1
  },
  "mischung_sperre": {
   "v10": 10,
@@ -130,6 +131,13 @@
    "aenderung": "Option C (Verlängerung): Ziel 45 -> 55 Mio., Zeitlimit 40 -> 52 h; Prüfungs-Fähigkeiten 10 -> 15 % (Übung 10 -> 5 %); Lernrate ab 45 Mio. in 0,5 Mio. auf 5e-5, dann Kosinus auf 1e-5 bei 55 Mio.; Urteilsfenster 50/52/54 Mio.; geplant: Quelle 'mario' (umgewandelte VGLC-Level, geprüft lösbar) ~10 % zulasten p8, sobald getestet",
    "grund": "Prüfung stagniert bei 40-44 % (P8 74 %), Halte-Tor unerreichbar; Leon will die Prüfung stärken, ohne den Generalisten zu opfern, und mehr Vielfalt",
    "schutz": "Fällt der Generalist-Wert zweimal in Folge > 3 Pp unter den Bestwert (69,8 %), wird der Prüfungsschwerpunkt zurückgenommen; Stände bis 44 Mio. bleiben Rückfallkandidaten"
+  },
+  {
+   "zeit": "2026-10-09 16:37",
+   "bei_mio": 40.0,
+   "aenderung": "Quelle 'mario' 10 % (p8 30 -> 20 %): 701 reparierte VGLC-Abschnitte (Super Mario Bros., SMB 2 Japan, Super Mario Land; 37 Level), 30 % gespiegelt; 9 ganze Level zurückgehalten (25 Abschnitte, beide Richtungen) als eigene Messung 'mario' - nicht im Generalist-Wert",
+   "grund": "Leon: mehr Vielfalt durch echte, von Menschen entworfene Level. Löser-Stichprobe 10/12 lösbar; Ausgangswerte Mario-Holdout: P8 7/50, Schüler 38 Mio. 11/50",
+   "hinweis": "Umgewandelte Level werden nicht committet (Rechte am Layout), nur der Umwandler jumpnrun/levelgen/mario.py"
   }
  ],
  "urteil_fenster_mio": [

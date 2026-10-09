@@ -87,6 +87,10 @@ def make_env(rank: int, seed: int, min_tier: int, max_tier: int, handmade_paths,
                                         gen_variant="pruefung")
                 exam.weights = [1.0 if 8 <= t <= 12 else 0.0 for t in range(NUM_TIERS)]
                 sources["pruefung"] = exam
+            if any("mario" in shares for _, shares in mix):  # phase 12 extension: repaired VGLC level segments
+                from jumpnrun.levelgen.mario import MarioSource
+
+                sources["mario"] = MarioSource()
             if any("hart" in shares for _, shares in mix):  # phase 12: generator v11 (hard jumps, new structures)
                 from jumpnrun.levelgen.hard import HardSource
 
