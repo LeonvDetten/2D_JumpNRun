@@ -82,6 +82,11 @@ def make_env(rank: int, seed: int, min_tier: int, max_tier: int, handmade_paths,
                     from jumpnrun.levelgen.skills import LongSource
 
                     sources["lang"] = LongSource()
+            if any("pruefung" in shares for _, shares in mix):  # phase 12: v9 tiers 8-12 with the exam skills x3
+                exam = CurriculumSource(8, 12, pool_share=0.0, augment_prob=augment_prob, plr=plr,
+                                        gen_variant="pruefung")
+                exam.weights = [1.0 if 8 <= t <= 12 else 0.0 for t in range(NUM_TIERS)]
+                sources["pruefung"] = exam
             if any("hart" in shares for _, shares in mix):  # phase 12: generator v11 (hard jumps, new structures)
                 from jumpnrun.levelgen.hard import HardSource
 

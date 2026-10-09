@@ -960,14 +960,23 @@ def _jump_sequence(b: _Builder, cfg: TierConfig) -> None:
     b.waypoints.append((len(b.columns) - 1, b.surface))
 
 
+EXAM_SKILL_BLOCKS = ("stones", "chain", "rain_stairs", "jump_seq", "enemy_ramp")
+EXAM_SKILL_BOOST = 3.0
+
+
 def generate(tier: int, seed: int, variant: str = "v9") -> Level:
     """Build a level of the given difficulty tier (0 .. NUM_TIERS-1).
 
     variant (phase 9): "v9" = the phase-8 generator (default, unchanged); "gabel" = v9 with the repaired fork;
+    "pruefung" (phase 12) = v9 with stones, chains, rain stairs, jump sequences and enemy ramps x3 and enemies
+    dropping right after the start (never built from exam geometry);
     "v10" = repaired fork + channels + Mario-inspired blocks in tiers 10-12. Tier 13 is always v10.
     Tiers 0-9 are the same in every variant.
     """
 
+    exam_skills = variant == "pruefung"  # phase 12: v9 with the exam skills (stones, chains, rain) weighted up
+    if exam_skills:
+        variant = "v9"
     cfg = TIERS[max(0, min(tier, NUM_TIERS - 1))]
     if tier >= 13:
         variant = "v10"
@@ -981,8 +990,17 @@ def generate(tier: int, seed: int, variant: str = "v9") -> Level:
     b = _Builder(rng)
     b.variant = variant
     b.style = _style(rng, cfg, variant)
+    if exam_skills:
+        for kind in EXAM_SKILL_BLOCKS:
+            if kind in b.style:
+                b.style[kind] *= EXAM_SKILL_BOOST
     b.flat(5)
     b.columns[1][b.surface - 1] = "P"
+    if exam_skills and rng.random() < 0.6:
+        # enemies dropping from the sky right after the start; the player has to time the first steps
+        for _ in range(rng.randint(2, 3)):
+            b.flat(rng.randint(2, 4))
+            b.columns[-1][rng.choice((0, 1, 2))] = "E"
     if cfg.start_enemies and rng.random() < 0.4:
         # an enemy right at the start: walking towards the player, or dropping from the sky
         b.flat(3)
@@ -1015,7 +1033,7 @@ def generate(tier: int, seed: int, variant: str = "v9") -> Level:
     level.building_blocks = dict(b.stats)  # which blocks this level contains (for statistics)
     level.waypoints = sorted(set(b.waypoints))
     level.tier = tier
-    level.variant = variant
+    level.variant = "pruefung" if exam_skills else variant
     level.needs_path = b.needs_path
     return level
 

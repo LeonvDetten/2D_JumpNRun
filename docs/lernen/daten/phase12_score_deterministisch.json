@@ -1,0 +1,45 @@
+{
+ "p12_22_det": {
+  "modell": "runs/phase12_schueler/checkpoints/ema_step_0022000000.zip",
+  "generalist": 0.7171,
+  "kategorien": [
+   0.838,
+   1.0,
+   0.5931,
+   0.6806,
+   0.9046,
+   0.4292,
+   0.5417,
+   0.75
+  ]
+ },
+ "p8_det": {
+  "modell": "models/phase8_final.zip",
+  "generalist": 0.4568,
+  "kategorien": [
+   0.9032,
+   1.0,
+   0.6875,
+   0.3972,
+   0.0833,
+   0.0,
+   0.5417,
+   0.0417
+  ]
+ },
+ "neustart_det": {
+  "modell": "models/neustart_kandidat_f.zip",
+  "generalist": 0.648,
+  "kategorien": [
+   0.844,
+   1.0,
+   0.6736,
+   0.6083,
+   0.9667,
+   0.3,
+   0.5833,
+   0.2083
+  ]
+ },
+ "hinweis": "Diagnose: deterministisch (immer die wahrscheinlichste Aktion). Die Scorecard-Regel bleibt zufällig gezogen. neustart_det = models/neustart_kandidat_f.zip."
+}
