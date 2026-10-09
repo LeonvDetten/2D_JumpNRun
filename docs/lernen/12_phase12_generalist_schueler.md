@@ -104,6 +104,8 @@ Leon gab den Generator am 8.10. frei („mit Löser-Pool“).
 | 12 | 51,1 | 56,2 (57,1) | 48,3 (39,4) | 63 | 30 | 41 | 56 | 93 | 38 | 31 | 56 |
 | 14 | 49,3 | 60,8 (≈59) | 47,9 | 67 | 21 | 44 | 58 | 96 | 22 | 23 | 62 |
 | 16 | 51,2 | 65,1 (61,8) | 49,2 (44,3) | 68 | 25 | 33 | 59 | 99 | 36 | 29 | 60 |
+| 18 | 49,7 | 67,3 | 48,8 | 70 | 16 | 55 | 58 | 88 | 34 | 12 | 65 |
+| 20 | 53,4 | 61,4 | 52,9 | 71 | 24 | 55 | 54 | 91 | 37 | 29 | 67 |
 
 **Entscheidungspunkte**
 - **E1 (2 Mio.): formal verfehlt.**
@@ -150,3 +152,9 @@ Leon gab den Generator am 8.10. frei („mit Löser-Pool“).
 - dev_alt 65,1 % (Ziel ≥ 55 %, Neustart-Kurve 61,8 %) und F 49,2 % (Neustart 44,3 %) liegen klar über dem Neustart.
 - Aber nur 3 von 8 Kategorien liegen über dem fertigen Neustart-Modell (Ziel 5): Kanäle, Links/Spiegel, Strukturen.
 - Seit 12 Mio. pendelt der Generalist-Wert zwischen 49 und 51 %. Prüfung, lange Level und Sprünge schwanken stark (Rauschen ±5 Pp), ein Fortschritt ist dort nicht erkennbar.
+
+**18–20 Mio.: ein Tief und die Erholung**
+- Bei 18 Mio. fielen die Prüfung auf 16 % (Fortschritt 54 → 41 %, 256 Versuche) und die Sprünge auf 6/48. Das Lehrer-Gewicht lag da nur noch bei 0,1.
+- Bei 20 Mio. kamen beide zurück: Prüfung 24 %, Sprünge 14/48. Der Generalist-Wert erreichte mit 53,4 % einen neuen Bestwert, Klassisch rechts 71 %.
+- Im Training stiegen die kurzen gespiegelten Level ab 18 Mio. von 22 auf 33 % gewonnen, ohne weiteren Eingriff.
+- Ab 20 Mio. sind die Lehrer ganz aus.
