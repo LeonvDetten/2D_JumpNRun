@@ -172,3 +172,22 @@ def test_exam_skill_variant():
         b = generate(8 + s % 5, s).building_blocks
         plain += b.get("stones", 0) + b.get("chain", 0)
     assert boosted > plain
+
+
+def test_mario_repair_makes_levels_reachable():
+    import pytest
+
+    from jumpnrun.levelgen import mario as M
+
+    # a made-up Mario-style strip: 3-high pipe and a 5-wide pit (too high / too wide for our player)
+    rows = ["-" * 40] * 9 + ["--------<>------------------------------",
+                             "--------[]------------------------------",
+                             "--------[]------------------------------",
+                             "XXXXXXXXXXXXXXXXXX-----XXXXXXXXXXXXXXXXX"]
+    lines = ["".join("B" if ch in M.SOLID else " " for ch in l) for l in rows]
+    res = M.repair(lines, "test")
+    if res is None:
+        pytest.fail("repair failed")
+    level, fixes = res
+    assert fixes > 0 and M._reach(level)[0]
+    assert level.chests and level.spawn
