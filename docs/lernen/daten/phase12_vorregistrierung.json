@@ -28,7 +28,7 @@
   "critic_warmup": 150000,
   "rewarm": [
    45000000,
-   5e-05,
+   3e-05,
    1e-05,
    55000000,
    500000
@@ -138,6 +138,12 @@
    "aenderung": "Quelle 'mario' 10 % (p8 30 -> 20 %): 701 reparierte VGLC-Abschnitte (Super Mario Bros., SMB 2 Japan, Super Mario Land; 37 Level), 30 % gespiegelt; 9 ganze Level zurückgehalten (25 Abschnitte, beide Richtungen) als eigene Messung 'mario' - nicht im Generalist-Wert",
    "grund": "Leon: mehr Vielfalt durch echte, von Menschen entworfene Level. Löser-Stichprobe 10/12 lösbar; Ausgangswerte Mario-Holdout: P8 7/50, Schüler 38 Mio. 11/50",
    "hinweis": "Umgewandelte Level werden nicht committet (Rechte am Layout), nur der Umwandler jumpnrun/levelgen/mario.py"
+  },
+  {
+   "zeit": "2026-10-09 19:23",
+   "bei_mio": 44.1,
+   "aenderung": "Anhebung der Lernrate ab 45 Mio. halbiert: Spitze 5e-5 -> 3e-5 (dann Kosinus auf 1e-5 bei 55 Mio.)",
+   "grund": "Der Sprung bei 40 Mio. (Generalist 73,8 %, Prüfung 52 %) kam mit der sehr niedrigen Lernrate; 42 Mio. bestätigt die Prüfung (52 %). Angekündigt um 17:25, ohne Gegenrede nach bestem Gewissen umgesetzt."
   }
  ],
  "urteil_fenster_mio": [
