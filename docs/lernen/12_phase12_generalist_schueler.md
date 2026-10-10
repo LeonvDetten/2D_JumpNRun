@@ -240,3 +240,31 @@ Leon gab den Generator am 8.10. frei („mit Löser-Pool“).
 | Neustart | 32/128 (25 %) | 123/128 (96 %) | 31/128 (24 %) | 186/384 = 48,4 % (43–53 %) |
 
 **Phase 12 ist auf den nie gesehenen Leveln klar am besten.** Die Intervalle überlappen sich nicht mit P8. Auf der geheimen zweiten Prüfung schlägt Phase 12 sogar P8 (84 % zu 70 %), obwohl P8 die offene Prüfung besser kann. Die Prüfungs-Lücke ist also eher eine Spezialisierung von P8 auf genau dieses eine Level als eine echte Schwäche des Generalisten.
+
+## Diagnose des Kandidaten (zufällig vs. deterministisch, Seed 1)
+
+Werkzeug: `jumpnrun/rl/diagnose12.py`. Bild: `medien/phase12/diagnose_endstand.png`. Daten: `daten/phase12_diagnose/`.
+
+| Kategorie | zufällig | determ. | häufigste Ursache der Niederlagen | unsichere Schritte |
+|---|---|---|---|---|
+| Klassisch rechts | 86 | 88 | Abgrund 55 % | 2 % |
+| Prüfung | 57 | 100* | Abgrund 57 % | **7 %** (P8 1 %) |
+| Lange Level | 74 | 80 | Gegner 57 % | 2 % |
+| Gabeln/Sackgassen | 62 | **83** | **hängen geblieben 77 %** | 3 % |
+| Kanäle | 97 | 92 | Gegner | 1 % |
+| Links/Spiegel | **43** | **50** | **Abgrund 70 %** | 7 % |
+| Schwere Sprünge | 77 | 79 | Abgrund 82 % | 2 % |
+| Neue Strukturen | 94 | 92 | hängen geblieben 67 % | 3 % |
+
+\* deterministisch ist die Prüfung ein einziger fester Ablauf.
+
+Generalist-Wert zufällig/deterministisch: Phase 12 73,7/82,9; Neustart 55,3/65,0; Phase 11 57,1/57,1; P8 41,1/45,7.
+
+**Befunde**
+1. **Prüfung und Gabeln: kein Können-, sondern ein Sicherheitsproblem.**
+   - Deterministisch löst der Bot beide deutlich besser (+43 bzw. +21 Pp).
+   - Auf der Prüfung ist er in 7 % der Schritte unsicher, P8 nur in 1 %.
+   - In Gabeln führt das zufällige Ziehen dazu, dass er in Sackgassen herumirrt (77 % der Niederlagen: hängen geblieben).
+2. **Links/Spiegel: ein echtes Können-Problem.** Auch deterministisch schafft der Bot nur 50 %, und 70 % der Niederlagen sind Stürze. Präzise Sprünge nach links sitzen noch nicht.
+3. **Schwere Sprünge und Klassisch** scheitern fast nur an Abgründen. Das ist die Präzisionsgrenze.
+4. **Lange Level** scheitern vor allem an Gegnern (57 %).

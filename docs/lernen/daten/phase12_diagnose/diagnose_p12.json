@@ -1,0 +1,705 @@
+{
+ "zufaellig": {
+  "val_v9_t8-12": {
+   "kat": 0,
+   "won": 26,
+   "of": 30,
+   "fortschritt": 0.9476102853480247,
+   "ursachen": {
+    "died_enemy": 1,
+    "died_pit": 3
+   },
+   "sicherheit": 0.7842632419034745,
+   "unsicher": 0.01447826934160596,
+   "entropie": 0.4285372201258254
+  },
+  "dev_klassisch": {
+   "kat": 0,
+   "won": 64,
+   "of": 72,
+   "fortschritt": 0.9235877618817949,
+   "ursachen": {
+    "stuck": 2,
+    "died_pit": 5,
+    "died_enemy": 1
+   },
+   "sicherheit": 0.8160927198459644,
+   "unsicher": 0.015222879204233538,
+   "entropie": 0.38117619412776715
+  },
+  "proben_klassisch": {
+   "kat": 0,
+   "won": 79,
+   "of": 96,
+   "fortschritt": 0.9105248381053007,
+   "ursachen": {
+    "died_enemy": 7,
+    "died_pit": 8,
+    "stuck": 2
+   },
+   "sicherheit": 0.7772049347757969,
+   "unsicher": 0.01954478489665527,
+   "entropie": 0.4448513019829276
+  },
+  "pruefung": {
+   "kat": 1,
+   "won": 145,
+   "of": 256,
+   "fortschritt": 0.7128423764837986,
+   "ursachen": {
+    "died_pit": 63,
+    "stuck": 25,
+    "died_enemy": 23
+   },
+   "sicherheit": 0.7390381693792533,
+   "unsicher": 0.06772579522100358,
+   "entropie": 0.5776616699257018
+  },
+  "waechter_plus": {
+   "kat": 2,
+   "won": 61,
+   "of": 96,
+   "fortschritt": 0.8679992485402158,
+   "ursachen": {
+    "died_enemy": 22,
+    "died_pit": 13
+   },
+   "sicherheit": 0.775804479797371,
+   "unsicher": 0.015784775809681587,
+   "entropie": 0.4438740162301982
+  },
+  "val_lang": {
+   "kat": 2,
+   "won": 9,
+   "of": 12,
+   "fortschritt": 0.8718864837702895,
+   "ursachen": {
+    "died_enemy": 2,
+    "died_pit": 1
+   },
+   "sicherheit": 0.7765168081560514,
+   "unsicher": 0.01489981242826849,
+   "entropie": 0.4418681320330808
+  },
+  "probe_lang": {
+   "kat": 2,
+   "won": 20,
+   "of": 20,
+   "fortschritt": 1.0,
+   "ursachen": {},
+   "sicherheit": 0.7895018786663683,
+   "unsicher": 0.013368770889830729,
+   "entropie": 0.4158114546668509
+  },
+  "uebung_gabeln": {
+   "kat": 3,
+   "won": 24,
+   "of": 24,
+   "fortschritt": 1.0,
+   "ursachen": {},
+   "sicherheit": 0.865042189418919,
+   "unsicher": 0.012233229215636568,
+   "entropie": 0.27916994559982866
+  },
+  "v13_lang": {
+   "kat": 2,
+   "won": 5,
+   "of": 9,
+   "fortschritt": 0.7581258007152302,
+   "ursachen": {
+    "died_pit": 4
+   },
+   "sicherheit": 0.8316890308819707,
+   "unsicher": 0.016105518113947028,
+   "entropie": 0.35547047998496395
+  },
+  "probe_koeder": {
+   "kat": 3,
+   "won": 14,
+   "of": 20,
+   "fortschritt": 0.8689774944147357,
+   "ursachen": {
+    "died_enemy": 3,
+    "died_pit": 3
+   },
+   "sicherheit": 0.7901145868000763,
+   "unsicher": 0.01735338924273459,
+   "entropie": 0.41899905721598696
+  },
+  "dev_gabeln": {
+   "kat": 3,
+   "won": 4,
+   "of": 24,
+   "fortschritt": 0.6145828839577205,
+   "ursachen": {
+    "stuck": 20
+   },
+   "sicherheit": 0.8379105823739903,
+   "unsicher": 0.06360405468127688,
+   "entropie": 0.4398580476057776
+  },
+  "uebung_kanal": {
+   "kat": 4,
+   "won": 17,
+   "of": 18,
+   "fortschritt": 0.9646860986547084,
+   "ursachen": {
+    "died_enemy": 1
+   },
+   "sicherheit": 0.8780177531969127,
+   "unsicher": 0.013138114551926537,
+   "entropie": 0.25921668270364767
+  },
+  "probe_kanal_umkehren": {
+   "kat": 4,
+   "won": 39,
+   "of": 40,
+   "fortschritt": 1.0,
+   "ursachen": {
+    "died_enemy": 1
+   },
+   "sicherheit": 0.8418315507111747,
+   "unsicher": 0.01960270263964462,
+   "entropie": 0.32747242424107775
+  },
+  "dev_serpentine": {
+   "kat": 4,
+   "won": 8,
+   "of": 8,
+   "fortschritt": 1.0,
+   "ursachen": {},
+   "sicherheit": 0.9347694201659744,
+   "unsicher": 0.010721817786625808,
+   "entropie": 0.1509727629512188
+  },
+  "probe_truhe_links": {
+   "kat": 5,
+   "won": 11,
+   "of": 20,
+   "fortschritt": 0.771533414358198,
+   "ursachen": {
+    "died_pit": 6,
+    "stuck": 2,
+    "died_enemy": 1
+   },
+   "sicherheit": 0.7874966026662534,
+   "unsicher": 0.09606675765420364,
+   "entropie": 0.5023048415593991
+  },
+  "uebung_truhe_links": {
+   "kat": 5,
+   "won": 9,
+   "of": 12,
+   "fortschritt": 0.9133951348827063,
+   "ursachen": {
+    "died_pit": 3
+   },
+   "sicherheit": 0.833844389775304,
+   "unsicher": 0.03804522674778708,
+   "entropie": 0.3827052081890709
+  },
+  "val_gespiegelt": {
+   "kat": 5,
+   "won": 5,
+   "of": 12,
+   "fortschritt": 0.6535457872728642,
+   "ursachen": {
+    "died_pit": 3,
+    "died_enemy": 3,
+    "stuck": 1
+   },
+   "sicherheit": 0.8206442889480767,
+   "unsicher": 0.05595392364977391,
+   "entropie": 0.41371253546849923
+  },
+  "dev_spiegelweg": {
+   "kat": 5,
+   "won": 0,
+   "of": 8,
+   "fortschritt": 0.3102896341463415,
+   "ursachen": {
+    "died_pit": 7,
+    "stuck": 1
+   },
+   "sicherheit": 0.8336692660307712,
+   "unsicher": 0.08209485665308704,
+   "entropie": 0.3865844495734238
+  },
+  "v13_spruenge": {
+   "kat": 6,
+   "won": 37,
+   "of": 48,
+   "fortschritt": 0.9178366111766229,
+   "ursachen": {
+    "died_pit": 9,
+    "died_enemy": 2
+   },
+   "sicherheit": 0.7746690602933933,
+   "unsicher": 0.019498581838846934,
+   "entropie": 0.4510472605718387
+  },
+  "v13_strukturen": {
+   "kat": 7,
+   "won": 45,
+   "of": 48,
+   "fortschritt": 0.9693025362107885,
+   "ursachen": {
+    "died_enemy": 1,
+    "stuck": 2
+   },
+   "sicherheit": 0.8549514766178357,
+   "unsicher": 0.027777163633412854,
+   "entropie": 0.3211888853590136
+  }
+ },
+ "deterministisch": {
+  "val_v9_t8-12": {
+   "kat": 0,
+   "won": 27,
+   "of": 30,
+   "fortschritt": 0.9512715633344068,
+   "ursachen": {
+    "died_pit": 2,
+    "died_enemy": 1
+   },
+   "sicherheit": 0.7870310818074095,
+   "unsicher": 0.016248516317891603,
+   "entropie": 0.4280365912971596
+  },
+  "dev_klassisch": {
+   "kat": 0,
+   "won": 64,
+   "of": 72,
+   "fortschritt": 0.9248750480584391,
+   "ursachen": {
+    "stuck": 8
+   },
+   "sicherheit": 0.8295329824287465,
+   "unsicher": 0.02400958120951283,
+   "entropie": 0.3750455823346637
+  },
+  "proben_klassisch": {
+   "kat": 0,
+   "won": 81,
+   "of": 96,
+   "fortschritt": 0.9274331241692507,
+   "ursachen": {
+    "stuck": 3,
+    "died_pit": 7,
+    "died_enemy": 5
+   },
+   "sicherheit": 0.7838556198867951,
+   "unsicher": 0.017239602340849796,
+   "entropie": 0.43948952767567917
+  },
+  "waechter_plus": {
+   "kat": 2,
+   "won": 64,
+   "of": 96,
+   "fortschritt": 0.9063852061680273,
+   "ursachen": {
+    "died_enemy": 24,
+    "died_pit": 8
+   },
+   "sicherheit": 0.7793208347432238,
+   "unsicher": 0.01463184130050009,
+   "entropie": 0.440518874493315
+  },
+  "pruefung": {
+   "kat": 1,
+   "won": 256,
+   "of": 256,
+   "fortschritt": 1.0,
+   "ursachen": {},
+   "sicherheit": 0.7712750076632612,
+   "unsicher": 0.02579535683576956,
+   "entropie": 0.47463331189773234
+  },
+  "val_lang": {
+   "kat": 2,
+   "won": 9,
+   "of": 12,
+   "fortschritt": 0.9187287464678408,
+   "ursachen": {
+    "died_pit": 3
+   },
+   "sicherheit": 0.7906387740552033,
+   "unsicher": 0.01164338291318181,
+   "entropie": 0.42093365649690995
+  },
+  "probe_lang": {
+   "kat": 2,
+   "won": 20,
+   "of": 20,
+   "fortschritt": 1.0,
+   "ursachen": {},
+   "sicherheit": 0.7919692163623651,
+   "unsicher": 0.012499917046471952,
+   "entropie": 0.4129811278576524
+  },
+  "uebung_gabeln": {
+   "kat": 3,
+   "won": 22,
+   "of": 24,
+   "fortschritt": 0.9605410257560619,
+   "ursachen": {
+    "died_enemy": 2
+   },
+   "sicherheit": 0.8600146481359188,
+   "unsicher": 0.016786324405280762,
+   "entropie": 0.2938579052650314
+  },
+  "v13_lang": {
+   "kat": 2,
+   "won": 7,
+   "of": 9,
+   "fortschritt": 0.8086518240339229,
+   "ursachen": {
+    "died_pit": 1,
+    "stuck": 1
+   },
+   "sicherheit": 0.8302326060550498,
+   "unsicher": 0.029854565164990386,
+   "entropie": 0.37605437556598253
+  },
+  "dev_gabeln": {
+   "kat": 3,
+   "won": 16,
+   "of": 24,
+   "fortschritt": 0.7334896443923409,
+   "ursachen": {
+    "stuck": 8
+   },
+   "sicherheit": 0.8831923491426731,
+   "unsicher": 0.019811009817955954,
+   "entropie": 0.3189458656640268
+  },
+  "probe_koeder": {
+   "kat": 3,
+   "won": 18,
+   "of": 20,
+   "fortschritt": 0.9435213297010868,
+   "ursachen": {
+    "died_enemy": 1,
+    "died_pit": 1
+   },
+   "sicherheit": 0.7911680354653341,
+   "unsicher": 0.01730555993269706,
+   "entropie": 0.42180290130023934
+  },
+  "uebung_kanal": {
+   "kat": 4,
+   "won": 16,
+   "of": 18,
+   "fortschritt": 0.939688157793165,
+   "ursachen": {
+    "died_enemy": 2
+   },
+   "sicherheit": 0.8696446662963686,
+   "unsicher": 0.014777396854337725,
+   "entropie": 0.2780491887320543
+  },
+  "probe_kanal_umkehren": {
+   "kat": 4,
+   "won": 35,
+   "of": 40,
+   "fortschritt": 0.9782644428844562,
+   "ursachen": {
+    "died_enemy": 3,
+    "died_pit": 2
+   },
+   "sicherheit": 0.8407722702960211,
+   "unsicher": 0.021380248209625582,
+   "entropie": 0.3324430544851702
+  },
+  "dev_serpentine": {
+   "kat": 4,
+   "won": 8,
+   "of": 8,
+   "fortschritt": 1.0,
+   "ursachen": {},
+   "sicherheit": 0.9310832081579953,
+   "unsicher": 0.011292346298619825,
+   "entropie": 0.15807909959954505
+  },
+  "probe_truhe_links": {
+   "kat": 5,
+   "won": 13,
+   "of": 20,
+   "fortschritt": 0.8421682321126024,
+   "ursachen": {
+    "stuck": 2,
+    "died_pit": 4,
+    "died_enemy": 1
+   },
+   "sicherheit": 0.7926236565671155,
+   "unsicher": 0.09186458296217433,
+   "entropie": 0.4848314430994528
+  },
+  "uebung_truhe_links": {
+   "kat": 5,
+   "won": 9,
+   "of": 12,
+   "fortschritt": 0.8026164739326113,
+   "ursachen": {
+    "died_enemy": 2,
+    "died_pit": 1
+   },
+   "sicherheit": 0.8229640329804645,
+   "unsicher": 0.06523183870155656,
+   "entropie": 0.42256423977326624
+  },
+  "val_gespiegelt": {
+   "kat": 5,
+   "won": 7,
+   "of": 12,
+   "fortschritt": 0.7577565003046182,
+   "ursachen": {
+    "died_enemy": 3,
+    "died_pit": 1,
+    "stuck": 1
+   },
+   "sicherheit": 0.8367099066722897,
+   "unsicher": 0.04768596467397468,
+   "entropie": 0.38025016179950927
+  },
+  "dev_spiegelweg": {
+   "kat": 5,
+   "won": 0,
+   "of": 8,
+   "fortschritt": 0.2859756097560976,
+   "ursachen": {
+    "died_pit": 8
+   },
+   "sicherheit": 0.8689607848035227,
+   "unsicher": 0.0297029702970297,
+   "entropie": 0.29745995822549326
+  },
+  "v13_spruenge": {
+   "kat": 6,
+   "won": 38,
+   "of": 48,
+   "fortschritt": 0.9308471664955243,
+   "ursachen": {
+    "died_pit": 8,
+    "died_enemy": 2
+   },
+   "sicherheit": 0.7765639756108337,
+   "unsicher": 0.020375324679801347,
+   "entropie": 0.44797164849561133
+  },
+  "v13_strukturen": {
+   "kat": 7,
+   "won": 44,
+   "of": 48,
+   "fortschritt": 0.9808300874576065,
+   "ursachen": {
+    "died_enemy": 4
+   },
+   "sicherheit": 0.8620236166625919,
+   "unsicher": 0.020529680816729422,
+   "entropie": 0.306824895000035
+  }
+ },
+ "kategorien": {
+  "zufaellig": [
+   {
+    "rate": 0.8594907407407407,
+    "fortschritt": 0.9272409617783736,
+    "sicherheit": 0.7925202988417452,
+    "unsicher": 0.016415311147498255,
+    "ursachen": {
+     "died_pit": 0.5517241379310345,
+     "died_enemy": 0.3103448275862069,
+     "stuck": 0.13793103448275862,
+     "timeout": 0.0
+    }
+   },
+   {
+    "rate": 0.56640625,
+    "fortschritt": 0.7128423764837986,
+    "sicherheit": 0.7390381693792533,
+    "unsicher": 0.06772579522100358,
+    "ursachen": {
+     "died_pit": 0.5675675675675675,
+     "died_enemy": 0.2072072072072072,
+     "stuck": 0.22522522522522523,
+     "timeout": 0.0
+    }
+   },
+   {
+    "rate": 0.7352430555555556,
+    "fortschritt": 0.8745028832564339,
+    "sicherheit": 0.7933780493754403,
+    "unsicher": 0.015039719310431958,
+    "ursachen": {
+     "died_pit": 0.42857142857142855,
+     "died_enemy": 0.5714285714285714,
+     "stuck": 0.0,
+     "timeout": 0.0
+    }
+   },
+   {
+    "rate": 0.6222222222222222,
+    "fortschritt": 0.8278534594574855,
+    "sicherheit": 0.8310224528643285,
+    "unsicher": 0.03106355771321601,
+    "ursachen": {
+     "died_pit": 0.11538461538461539,
+     "died_enemy": 0.11538461538461539,
+     "stuck": 0.7692307692307693,
+     "timeout": 0.0
+    }
+   },
+   {
+    "rate": 0.9731481481481481,
+    "fortschritt": 0.9882286995515694,
+    "sicherheit": 0.8848729080246872,
+    "unsicher": 0.014487544992732323,
+    "ursachen": {
+     "died_pit": 0.0,
+     "died_enemy": 1.0,
+     "stuck": 0.0,
+     "timeout": 0.0
+    }
+   },
+   {
+    "rate": 0.4291666666666667,
+    "fortschritt": 0.6621909926650276,
+    "sicherheit": 0.8189136368551013,
+    "unsicher": 0.06804019117621292,
+    "ursachen": {
+     "died_pit": 0.7037037037037037,
+     "died_enemy": 0.14814814814814814,
+     "stuck": 0.14814814814814814,
+     "timeout": 0.0
+    }
+   },
+   {
+    "rate": 0.7708333333333334,
+    "fortschritt": 0.9178366111766229,
+    "sicherheit": 0.7746690602933933,
+    "unsicher": 0.019498581838846934,
+    "ursachen": {
+     "died_pit": 0.8181818181818182,
+     "died_enemy": 0.18181818181818182,
+     "stuck": 0.0,
+     "timeout": 0.0
+    }
+   },
+   {
+    "rate": 0.9375,
+    "fortschritt": 0.9693025362107885,
+    "sicherheit": 0.8549514766178357,
+    "unsicher": 0.027777163633412854,
+    "ursachen": {
+     "died_pit": 0.0,
+     "died_enemy": 0.3333333333333333,
+     "stuck": 0.6666666666666666,
+     "timeout": 0.0
+    }
+   }
+  ],
+  "deterministisch": [
+   {
+    "rate": 0.8775462962962962,
+    "fortschritt": 0.9345265785206989,
+    "sicherheit": 0.8001398947076503,
+    "unsicher": 0.019165899956084743,
+    "ursachen": {
+     "died_pit": 0.34615384615384615,
+     "died_enemy": 0.23076923076923078,
+     "stuck": 0.4230769230769231,
+     "timeout": 0.0
+    }
+   },
+   {
+    "rate": 1.0,
+    "fortschritt": 1.0,
+    "sicherheit": 0.7712750076632612,
+    "unsicher": 0.02579535683576956,
+    "ursachen": {
+     "died_pit": 0.0,
+     "died_enemy": 0.0,
+     "stuck": 0.0,
+     "timeout": 0.0
+    }
+   },
+   {
+    "rate": 0.798611111111111,
+    "fortschritt": 0.9084414441674478,
+    "sicherheit": 0.7980403578039604,
+    "unsicher": 0.01715742660628606,
+    "ursachen": {
+     "died_pit": 0.32432432432432434,
+     "died_enemy": 0.6486486486486487,
+     "stuck": 0.02702702702702703,
+     "timeout": 0.0
+    }
+   },
+   {
+    "rate": 0.8277777777777778,
+    "fortschritt": 0.8791839999498299,
+    "sicherheit": 0.8447916775813087,
+    "unsicher": 0.017967631385311256,
+    "ursachen": {
+     "died_pit": 0.08333333333333333,
+     "died_enemy": 0.25,
+     "stuck": 0.6666666666666666,
+     "timeout": 0.0
+    }
+   },
+   {
+    "rate": 0.9212962962962963,
+    "fortschritt": 0.9726508668925403,
+    "sicherheit": 0.8805000482501284,
+    "unsicher": 0.01581666378752771,
+    "ursachen": {
+     "died_pit": 0.2857142857142857,
+     "died_enemy": 0.7142857142857143,
+     "stuck": 0.0,
+     "timeout": 0.0
+    }
+   },
+   {
+    "rate": 0.49583333333333335,
+    "fortschritt": 0.6721292040264824,
+    "sicherheit": 0.830314595255848,
+    "unsicher": 0.05862133915868382,
+    "ursachen": {
+     "died_pit": 0.6086956521739131,
+     "died_enemy": 0.2608695652173913,
+     "stuck": 0.13043478260869565,
+     "timeout": 0.0
+    }
+   },
+   {
+    "rate": 0.7916666666666666,
+    "fortschritt": 0.9308471664955243,
+    "sicherheit": 0.7765639756108337,
+    "unsicher": 0.020375324679801347,
+    "ursachen": {
+     "died_pit": 0.8,
+     "died_enemy": 0.2,
+     "stuck": 0.0,
+     "timeout": 0.0
+    }
+   },
+   {
+    "rate": 0.9166666666666666,
+    "fortschritt": 0.9808300874576065,
+    "sicherheit": 0.8620236166625919,
+    "unsicher": 0.020529680816729422,
+    "ursachen": {
+     "died_pit": 0.0,
+     "died_enemy": 1.0,
+     "stuck": 0.0,
+     "timeout": 0.0
+    }
+   }
+  ]
+ },
+ "generalist_zufaellig": 0.7367513020833334,
+ "generalist_deterministisch": 0.8286747685185185,
+ "modell": "models/phase12_kandidat.zip"
+}

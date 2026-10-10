@@ -156,11 +156,11 @@ def picture(tags, names, out: Path, title: str) -> Path:
         ax.text(x[i] - w / 2, z[i] + 1.5, f"{z[i]:.0f}", ha="center", fontsize=9, color=INK)
         ax.text(x[i] + w / 2, d[i] + 1.5, f"{d[i]:.0f}", ha="center", fontsize=9, color=INK)
     ax.set_xticks(x, labels, fontsize=10, color=INK)
-    ax.set_ylim(0, 112)
-    ax.legend(loc="upper left", frameon=False, fontsize=10, ncol=2)
+    ax.set_ylim(0, 108)
+    ax.legend(loc="lower left", bbox_to_anchor=(0, 1.0), frameon=False, fontsize=10, ncol=2)
     ax.set_title(f"{names[0]}: Generalist zufällig {100 * main['generalist_zufaellig']:.1f} %  ·  "
                  f"deterministisch {100 * main['generalist_deterministisch']:.1f} %  (Prüfung deterministisch = ein "
-                 f"einziger fester Ablauf)", loc="left", fontsize=12, color=INK)
+                 f"einziger fester Ablauf)", loc="left", fontsize=12, color=INK, pad=30)
 
     # B: causes of the lost attempts (sampled)
     ax = fig.add_subplot(gs[1, 0])
@@ -187,8 +187,8 @@ def picture(tags, names, out: Path, title: str) -> Path:
     ax.bar(x + w / 2 + 0.01, pd, w, color=ORANGE, label="deterministisch")
     ax.set_xticks(x, labels, rotation=30, ha="right", fontsize=9, color=INK)
     ax.set_ylim(0, 105)
-    ax.legend(loc="upper left", frameon=False, fontsize=9, ncol=2)
-    ax.set_title("Wie weit kommt der Bot im Mittel?", loc="left", fontsize=11, color=INK)
+    ax.legend(loc="lower left", bbox_to_anchor=(0, 1.0), frameon=False, fontsize=9, ncol=2)
+    ax.set_title("Wie weit kommt der Bot im Mittel?", loc="left", fontsize=11, color=INK, pad=24)
 
     # D: decision certainty per category (sampled), all models
     ax = fig.add_subplot(gs[2, 0])
@@ -199,9 +199,9 @@ def picture(tags, names, out: Path, title: str) -> Path:
         vals = [100 * c["unsicher"] for c in data[t]["kategorien"]["zufaellig"]]
         ax.bar(x - 0.4 + ww * (j + 0.5), vals, ww * 0.92, color=colors[j % 4], label=names[j])
     ax.set_xticks(x, labels, rotation=30, ha="right", fontsize=9, color=INK)
-    ax.legend(loc="upper left", frameon=False, fontsize=9, ncol=len(tags))
+    ax.legend(loc="lower left", bbox_to_anchor=(0, 1.0), frameon=False, fontsize=9, ncol=len(tags))
     ax.set_title(f"Anteil der Schritte, in denen die beste Aktion < {int(100 * UNSURE)} % Wahrscheinlichkeit hat",
-                 loc="left", fontsize=11, color=INK)
+                 loc="left", fontsize=11, color=INK, pad=24)
 
     # E: generalist sampled vs deterministic for all models
     ax = fig.add_subplot(gs[2, 1])
