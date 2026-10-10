@@ -30,7 +30,7 @@ CAUSES = (("died_pit", "Abgrund"), ("died_enemy", "Gegner"), ("stuck", "hängen 
 UNSURE = 0.5
 
 
-def rollout(model, levels, deterministic: bool):
+def rollout(model, levels, deterministic: bool, temperature: float = 1.0):
     """Like evaluate.evaluate_levels, but also records the policy's action probabilities."""
 
     import torch
@@ -48,7 +48,11 @@ def rollout(model, levels, deterministic: bool):
         with torch.no_grad():
             t, _ = model.policy.obs_to_tensor(batch)
             probs = model.policy.get_distribution(t).distribution.probs
-            acts = probs.argmax(1) if deterministic else torch.multinomial(probs, 1).squeeze(1)
+            if deterministic:
+                acts = probs.argmax(1)
+            else:  # temperature < 1 sharpens the sampled choice (1 = the policy as trained)
+                p = probs if temperature == 1.0 else probs.clamp_min(1e-12) ** (1.0 / temperature)
+                acts = torch.multinomial(p / p.sum(1, keepdim=True), 1).squeeze(1)
             top = probs.max(1).values
             ent = -(probs * probs.clamp_min(1e-9).log()).sum(1)
         still = []
@@ -73,13 +77,14 @@ def _job(args):
 
     from jumpnrun.rl.modelinfo import load_model
 
-    path, name, seed, det = args
+    path, name, seed, det, *rest = args
+    temperature = rest[0] if rest else 1.0
     torch.set_num_threads(1)
     cat, levels, n = S.components()[name]
     model = load_model(path)
     np.random.seed(seed)
     torch.manual_seed(seed)
-    res = rollout(model, levels * n, det) if levels else []
+    res = rollout(model, levels * n, det, temperature) if levels else []
     causes = collections.Counter(r.get("outcome", "?") for r in res if not r["won"])
     return name, det, {"kat": cat, "won": sum(int(r["won"]) for r in res), "of": len(res),
                        "fortschritt": float(np.mean([r["progress"] for r in res])) if res else 0.0,
@@ -89,8 +94,10 @@ def _job(args):
                        "entropie": float(np.mean([r["entropy"] for r in res])) if res else 0.0}
 
 
-def evaluate(path, seed: int = 1, procs: int = 4) -> dict:
-    jobs = [(str(path), n, seed, det) for n in S.components() for det in (False, True)]
+def evaluate(path, seed: int = 1, procs: int = 4, temperature: float = 1.0) -> dict:
+    """temperature != 1: the sampled mode plays with sharpened probabilities (deterministic mode unchanged)."""
+
+    jobs = [(str(path), n, seed, det, temperature) for n in S.components() for det in (False, True)]
     out = {"zufaellig": {}, "deterministisch": {}}
     with Pool(procs) as pool:
         for name, det, r in pool.imap_unordered(_job, jobs):
@@ -234,6 +241,7 @@ def main() -> None:
     e.add_argument("--tag", required=True)
     e.add_argument("--seed", type=int, default=1)
     e.add_argument("--procs", type=int, default=4)
+    e.add_argument("--temperature", type=float, default=1.0)
     b = sub.add_parser("bild")
     b.add_argument("--tags", nargs="+", required=True)
     b.add_argument("--names", nargs="+")
@@ -241,7 +249,8 @@ def main() -> None:
     b.add_argument("--title", default="Phase 12 · Diagnose")
     args = parser.parse_args()
     if args.cmd == "eval":
-        res = evaluate(ROOT / args.model, args.seed, args.procs)
+        res = evaluate(ROOT / args.model, args.seed, args.procs, args.temperature)
+        res["temperatur"] = args.temperature
         res["modell"] = args.model
         (OUT / f"diagnose_{args.tag}.json").write_text(json.dumps(res, indent=1))
         print(args.tag, f"zufällig {res['generalist_zufaellig']:.1%}, deterministisch "
