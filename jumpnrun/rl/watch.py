@@ -26,7 +26,7 @@ from jumpnrun.core.sim import Status
 from jumpnrun.levelgen.generator import generate
 from jumpnrun.rl.curriculum import EVAL_SEED_OFFSET
 from jumpnrun.rl.env import JumpNRunEnv, fixed_levels
-from jumpnrun.rl.modelinfo import env_kwargs
+from jumpnrun.rl.modelinfo import PLAY_TEMPERATURE, choose_actions, env_kwargs
 
 
 class GhostRun:
@@ -49,14 +49,14 @@ class GhostRun:
     def done(self) -> bool:
         return not any(self.running)
 
-    def play_step(self, model, deterministic: bool = False):
+    def play_step(self, model, deterministic: bool = False, temperature: float = 1.0):
         """One bot decision for every running ghost; yields after each of its frames."""
 
         active = [i for i, r in enumerate(self.running) if r]
         if not active:
             return
         batch = {key: np.stack([self.obs[i][key] for i in active]) for key in self.obs[active[0]]}
-        actions, _ = model.predict(batch, deterministic=deterministic)
+        actions = choose_actions(model, batch, deterministic, temperature)
         before = {i: self.envs[i].sim.max_x for i in active}
         for _ in range(self.action_repeat):
             for i, action in zip(active, actions):
@@ -99,14 +99,15 @@ def pick_timelapse(checkpoints: List[Path], count: int) -> List[Path]:
 
 
 def run_episode(model, level: Level, ghosts: int, view, surface, title: str, subtitle: str,
-                on_frame, speed: int = 2, max_seconds: float = 60.0, deterministic: bool = False):
+                on_frame, speed: int = 2, max_seconds: float = 60.0, deterministic: bool = False,
+                temperature: float = PLAY_TEMPERATURE):
     """Play one ghost episode, calling on_frame(surface) for every rendered frame."""
 
     run = GhostRun(level, ghosts, **env_kwargs(model))
     frame = 0
     max_frames = int(max_seconds * 30)
     while not run.done() and frame < max_frames:
-        for _ in run.play_step(model, deterministic):
+        for _ in run.play_step(model, deterministic, temperature):
             frame += 1
             if frame % speed == 0:
                 view.draw(surface, run.sims, run.running, run.deaths, title, subtitle)
@@ -138,6 +139,8 @@ def main() -> None:
     parser.add_argument("--timelapse", help="write a clip per checkpoint to this mp4")
     parser.add_argument("--clips", type=int, default=8, help="number of checkpoints in the timelapse")
     parser.add_argument("--deterministic", action="store_true")
+    parser.add_argument("--temperature", type=float, default=PLAY_TEMPERATURE,
+                        help="sharpened sampling p^(1/T); 1 = the policy as trained (phase 12 default 0.3)")
     parser.add_argument("--max-seconds", type=float, default=180.0,
                         help="game time limit for --video (the exam level needs ~90 s)")
     parser.add_argument("--follow", action="store_true", help=argparse.SUPPRESS)
@@ -180,7 +183,8 @@ def main() -> None:
             model = load_model(path)
             steps = checkpoint_steps(path) if path.stem.startswith("step_") else 0
             run_episode(model, level, args.ghosts, view, surface,
-                        f"Nach {steps:,} Trainingsschritten".replace(",", "."), level_label, show, args.speed)
+                        f"Nach {steps:,} Trainingsschritten".replace(",", "."), level_label, show, args.speed,
+                        temperature=args.temperature)
         return
 
     surface = init_headless()
@@ -190,7 +194,7 @@ def main() -> None:
         model = load_model(model_path)
         with VideoWriter(args.video) as video:
             run = run_episode(model, level, args.ghosts, view, surface, Path(model_path).stem, level_label,
-                              video.add, args.speed, deterministic=args.deterministic,
+                              video.add, args.speed, deterministic=args.deterministic, temperature=args.temperature,
                               max_seconds=args.max_seconds)
         wins = sum(1 for r in run.results if r and r["won"])
         print(f"{args.video}: {wins}/{args.ghosts} im Ziel")
@@ -203,7 +207,7 @@ def main() -> None:
                 steps = checkpoint_steps(path)
                 title = "Untrainiert" if steps < 1000 else f"Nach {steps:,} Trainingsschritten".replace(",", ".")
                 run = run_episode(model, level, args.ghosts, view, surface, title, level_label,
-                                  video.add, args.speed, max_seconds=30)
+                                  video.add, args.speed, max_seconds=30, temperature=args.temperature)
                 wins = sum(1 for r in run.results if r and r["won"])
                 print(f"  {path.name}: {wins}/{args.ghosts} im Ziel")
         print(f"timelapse: {args.timelapse}")

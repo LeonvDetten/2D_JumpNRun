@@ -286,3 +286,8 @@ Gleiche Level, Seed 1. Die Wahrscheinlichkeiten werden beim Spielen geschärft: 
 - Bei T = 0,3 steigt der Generalist-Wert auf 84,7 %, mehr als ganz deterministisch: Ein Rest Zufall hilft gegen das Festfahren.
 - Die Schwäche von Phase 12 war also zum großen Teil zu unsicheres Spielen, nicht fehlendes Können.
 - **Echte Lücke bleibt Links/Spiegel (52 %).** Dort hilft Schärfen kaum.
+
+**Leons Entscheidung (10.10.): Der Bot spielt ab jetzt mit Temperatur 0,3.**
+- Umgesetzt in `jumpnrun/rl/modelinfo.py` (`PLAY_TEMPERATURE`, `choose_actions`); die Bot-Anzeige `watch.py` nutzt sie standardmäßig.
+- Messwerkzeuge (`evaluate_levels`, `scorecard12 --temperature`, `diagnose12 --temperature`) können beides. Künftig werden beide Werte gezeigt: T = 1 (vergleichbar mit allen früheren Messungen) und T = 0,3 (Spielweise).
+- Der versiegelte Test bleibt, wie er gemessen wurde (T = 1, einmalig).
