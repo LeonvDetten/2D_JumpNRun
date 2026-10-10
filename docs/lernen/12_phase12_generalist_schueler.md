@@ -268,3 +268,21 @@ Generalist-Wert zufällig/deterministisch: Phase 12 73,7/82,9; Neustart 55,3/65,
 2. **Links/Spiegel: ein echtes Können-Problem.** Auch deterministisch schafft der Bot nur 50 %, und 70 % der Niederlagen sind Stürze. Präzise Sprünge nach links sitzen noch nicht.
 3. **Schwere Sprünge und Klassisch** scheitern fast nur an Abgründen. Das ist die Präzisionsgrenze.
 4. **Lange Level** scheitern vor allem an Gegnern (57 %).
+
+## Geschärfte Wahl beim Spielen (Temperatur)
+
+Gleiche Level, Seed 1. Die Wahrscheinlichkeiten werden beim Spielen geschärft: p^(1/T), neu normiert. T = 1 ist das Netz wie trainiert. Bild: `medien/phase12/temperatur.png`.
+
+| Temperatur | Phase 12 Generalist | Phase 12 Prüfung | P8 Generalist | P8 Prüfung |
+|---|---|---|---|---|
+| 1,0 | 73,7 | 57 | 41,1 | 77 |
+| 0,7 | 79,1 | 80 | 43,5 | 91 |
+| 0,5 | 82,3 | 90 | 45,0 | 95 |
+| **0,3** | **84,7** | **98** | 45,1 | 98 |
+| 0 (determ.) | 82,9 | (ein Ablauf) | 45,7 | (ein Ablauf) |
+
+**Befunde**
+- Bei T = 0,3 schließt sich die Prüfungs-Lücke vollständig (98 % gegenüber 98 % bei P8, je 256 Versuche).
+- Bei T = 0,3 steigt der Generalist-Wert auf 84,7 %, mehr als ganz deterministisch: Ein Rest Zufall hilft gegen das Festfahren.
+- Die Schwäche von Phase 12 war also zum großen Teil zu unsicheres Spielen, nicht fehlendes Können.
+- **Echte Lücke bleibt Links/Spiegel (52 %).** Dort hilft Schärfen kaum.
