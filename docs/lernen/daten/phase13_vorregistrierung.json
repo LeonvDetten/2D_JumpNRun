@@ -43,7 +43,6 @@
   "runs/demos10",
   "runs/demos9",
   "runs/demos_spiegel",
-  "runs/demos12",
   "runs/demos13"
  ],
  "bc2_plan": [
@@ -103,5 +102,12 @@
   "gespiegelt": 610,
   "frisch": 5,
   "links_sprung_schritte": 21338
- }
+ },
+ "aenderungen_autopilot": [
+  {
+   "zeit": "2026-10-10 16:05",
+   "grund": "Speichermangel beim Aufbau des BC2-Datensatzes (demos12 + demos13 zusammen ~1 Mio. Schritte, Prozess bei 13 GB beendet)",
+   "aenderung": "BC2 ohne demos12 (rechts), mit demos13 (gespiegelt) - gleiche Größe wie in Phase 12; die Rechts-Sprünge sichert das PPO-Training auf den v11-Leveln (15 %)"
+  }
+ ]
 }
