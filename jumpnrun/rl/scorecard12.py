@@ -129,9 +129,10 @@ def _eval_component(args):
     path, name, seed, *det = args
     torch.set_num_threads(1)
     cat, levels, n = components()[name]
+    model = load_model(path)  # PPO.load re-seeds torch with the training seed - so seed after loading
     np.random.seed(seed)
     torch.manual_seed(seed)
-    res = evaluate_levels(load_model(path), levels * n, deterministic=bool(det and det[0])) if levels else []
+    res = evaluate_levels(model, levels * n, deterministic=bool(det and det[0])) if levels else []
     return name, {"kat": cat, "won": sum(int(r["won"]) for r in res), "of": len(res),
                   "fortschritt": round(float(np.mean([r["progress"] for r in res])), 3) if res else 0.0}
 
