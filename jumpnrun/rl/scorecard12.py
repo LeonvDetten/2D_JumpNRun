@@ -175,7 +175,8 @@ def references() -> dict:
     return out
 
 
-def picture(current: dict, label: str, history=None, shadow=None, out=OUT / "scorecard.png", note: str = ""):
+def picture(current: dict, label: str, history=None, shadow=None, out=OUT / "scorecard.png", note: str = "",
+            line_labels=("Generalist-Wert (Phase 12)", "alte Dev-Level dev_alt (Phase 12)")):
     """current: summarize() result; history: [(Mio. steps, generalist, klassisch)]; shadow: Neustart dev_alt curve
     [(Mio. steps, value)] as the comparison line at the same step count."""
 
@@ -224,9 +225,9 @@ def picture(current: dict, label: str, history=None, shadow=None, out=OUT / "sco
     if history:
         h = sorted(history)
         ax2.plot([a for a, _, _ in h], [100 * g for _, g, _ in h], "o-", color="#2a78d6", linewidth=2.5,
-                 label="Generalist-Wert (Phase 12)")
+                 label=line_labels[0])
         ax2.plot([a for a, _, _ in h], [100 * k for _, _, k in h], "s--", color="#2a78d6", linewidth=1.2,
-                 label="alte Dev-Level dev_alt (Phase 12)")
+                 label=line_labels[1])
     if shadow:
         ax2.plot([a for a, _ in shadow], [100 * v for _, v in shadow], color="#9a9a9a", linewidth=4, alpha=0.5,
                  label="Neustart: alte Dev-Level beim gleichen Schrittstand")

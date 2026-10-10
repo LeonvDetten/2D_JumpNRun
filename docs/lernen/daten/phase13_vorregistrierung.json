@@ -1,0 +1,107 @@
+{
+ "phase": 13,
+ "stand": "2026-10-10, vor dem ersten PPO-Schritt (Leons Antworten: 15 Mio./~15 h, Start vom Phase-12-Kandidaten, 30 % links)",
+ "ziel": "Links-Präzision (Kategorie Links/Spiegel, spiegelweg) verbessern, ohne den Generalisten zu verlieren; Nachschärfen",
+ "run": "runs/phase13_links",
+ "start": "models/phase12_kandidat.zip",
+ "start_schritte": 44000000,
+ "ziel_schritte": 15000000,
+ "zeit_stunden": 16,
+ "kerne_training": [
+  0,
+  1,
+  2
+ ],
+ "kern_messung": 3,
+ "lernrate": {
+  "cosine": [
+   2e-05,
+   5e-06,
+   15000000
+  ],
+  "ramp": 100000,
+  "critic_warmup": 50000
+ },
+ "entropie": 0.001,
+ "mischung": {
+  "p8": 0.25,
+  "skill": 0.05,
+  "v10": 0.05,
+  "hart": 0.15,
+  "lang": 0.1,
+  "pruefung": 0.1,
+  "links": 0.2,
+  "spiegel": 0.1
+ },
+ "mischung_sperre": {
+  "v10": 10,
+  "hart": 10,
+  "lang": 12,
+  "spiegel": 8
+ },
+ "bc2_dirs": [
+  "runs/demos10",
+  "runs/demos9",
+  "runs/demos_spiegel",
+  "runs/demos12",
+  "runs/demos13"
+ ],
+ "bc2_plan": [
+  [
+   0,
+   0.03
+  ],
+  [
+   5000000,
+   0.02
+  ]
+ ],
+ "links_quelle": "jumpnrun/levelgen/links.py: links_spruenge 40 % (v11-Sprungfamilien, halb Löser-Pool demos12), links_trittsteine 45 % (v9 Stufen 8-12 Variante 'pruefung', adaptives Curriculum), links_lang 15 % (zwei solche Level, <= 480 Kacheln); alle gespiegelt, halb mit nach links laufenden Gegnern",
+ "spiegel_quelle": "MirrorSource mit --mirror-adaptive (eigene Stufe ab 6)",
+ "demos13": "gespiegelte demos12 (Aktionen links<->rechts, Gegner nach links, beim Nachspielen gewonnen) + frische Löser-Demos auf links_trittsteine",
+ "messung": "jumpnrun/rl/milestones13.py: jede 1 Mio. (EMA; EMA2 alle 3 Mio.) Scorecard bei T = 1 und T = 0,3 (Seed 7), Links-Sprünge (v13-Sprung-Proben gespiegelt, nie trainiert), spiegelweg (16 Versuche, T = 0,3, nie trainiert); Stand 0 = Kandidat vorab",
+ "schutz": "Generalist T = 0,3 ohne Links-Kategorie zweimal in Folge > 3 Pp unter Stand 0 -> Links-Anteil 30 -> 10 % (Rest an p8); danach erneut zweimal -> Stopp",
+ "entscheidungspunkte": {
+  "E1": {
+   "mio": 2,
+   "regel": "Links-Sprünge oder Links/Spiegel (T0,3) über Stand 0 - sonst nur notiert"
+  },
+  "E2": {
+   "mio": 5,
+   "regel": "Links/Spiegel (T0,3) >= Stand 0 + 5 Pp - sonst Links-Anteil 30 -> 15 %"
+  }
+ },
+ "urteil": "bester Messpunkt (inkl. Stand 0) nach Generalist T = 0,3, keine Kategorie > 5 Pp unter Stand 0; danach gepaarter Vergleich (Seeds 1+2, T = 1 und T = 0,3, Diagnose) gegen Phase-12-Kandidat und P8. Der versiegelte Test ist verbraucht.",
+ "nie": "spiegelweg, Prüfung, Proben, Validierung, Test- und versiegelte Level werden nie trainiert; exam2/versiegelt nicht angefasst",
+ "stand0": {
+  "generalist_t03": 0.8366,
+  "generalist_t1": 0.7382,
+  "ohne_links_t03": 0.8814142857142856,
+  "kategorien_t03": [
+   0.9188,
+   0.9648,
+   0.7743,
+   0.7722,
+   0.9481,
+   0.5229,
+   0.875,
+   0.9167
+  ],
+  "links_spruenge": {
+   "won": 1,
+   "of": 24,
+   "fortschritt": 0.281
+  },
+  "spiegelweg": {
+   "won": 0,
+   "of": 16,
+   "fortschritt": 0.298
+  },
+  "schutzgrenze_ohne_links_t03": 0.8514
+ },
+ "demos13_ist": {
+  "gespiegelt": 610,
+  "frisch": 5,
+  "links_sprung_schritte": 21338
+ }
+}

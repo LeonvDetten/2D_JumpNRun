@@ -91,6 +91,10 @@ def make_env(rank: int, seed: int, min_tier: int, max_tier: int, handmade_paths,
                 from jumpnrun.levelgen.mario import MarioSource
 
                 sources["mario"] = MarioSource()
+            if any("links" in shares for _, shares in mix):  # phase 13: hard jump levels going left
+                from jumpnrun.levelgen.links import LeftSource
+
+                sources["links"] = LeftSource()
             if any("hart" in shares for _, shares in mix):  # phase 12: generator v11 (hard jumps, new structures)
                 from jumpnrun.levelgen.hard import HardSource
 
