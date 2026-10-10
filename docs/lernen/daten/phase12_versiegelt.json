@@ -1,0 +1,132 @@
+{
+ "freigabe": "Leon, 10.10.: 'Versiegelter Test: ja' (nach Entscheidung B: Kandidat 44 Mio. EMA2 mit offener Prüfungs-Lücke)",
+ "seed": 20261010,
+ "modelle": {
+  "p8": "models/phase8_final.zip",
+  "phase11": "models/phase11_kandidat.zip",
+  "neustart": "models/neustart_kandidat_pruefung.zip",
+  "phase12": "models/phase12_kandidat.zip"
+ },
+ "ergebnisse": {
+  "neustart": {
+   "exam2": {
+    "won": 32,
+    "of": 128,
+    "rate": 0.25,
+    "low95": 0.183,
+    "high95": 0.3316
+   },
+   "handmade8_versiegelt": {
+    "won": 123,
+    "of": 128,
+    "rate": 0.9609,
+    "low95": 0.9118,
+    "high95": 0.9832
+   },
+   "handmade9_versiegelt": {
+    "won": 31,
+    "of": 128,
+    "rate": 0.2422,
+    "low95": 0.1762,
+    "high95": 0.3232
+   },
+   "gesamt": {
+    "won": 186,
+    "of": 384,
+    "rate": 0.4844,
+    "low95": 0.4348,
+    "high95": 0.5343
+   }
+  },
+  "p8": {
+   "exam2": {
+    "won": 89,
+    "of": 128,
+    "rate": 0.6953,
+    "low95": 0.6108,
+    "high95": 0.7684
+   },
+   "handmade8_versiegelt": {
+    "won": 119,
+    "of": 128,
+    "rate": 0.9297,
+    "low95": 0.8718,
+    "high95": 0.9626
+   },
+   "handmade9_versiegelt": {
+    "won": 32,
+    "of": 128,
+    "rate": 0.25,
+    "low95": 0.183,
+    "high95": 0.3316
+   },
+   "gesamt": {
+    "won": 240,
+    "of": 384,
+    "rate": 0.625,
+    "low95": 0.5756,
+    "high95": 0.672
+   }
+  },
+  "phase11": {
+   "exam2": {
+    "won": 58,
+    "of": 128,
+    "rate": 0.4531,
+    "low95": 0.3695,
+    "high95": 0.5395
+   },
+   "handmade8_versiegelt": {
+    "won": 123,
+    "of": 128,
+    "rate": 0.9609,
+    "low95": 0.9118,
+    "high95": 0.9832
+   },
+   "handmade9_versiegelt": {
+    "won": 48,
+    "of": 128,
+    "rate": 0.375,
+    "low95": 0.2959,
+    "high95": 0.4614
+   },
+   "gesamt": {
+    "won": 229,
+    "of": 384,
+    "rate": 0.5964,
+    "low95": 0.5466,
+    "high95": 0.6442
+   }
+  },
+  "phase12": {
+   "exam2": {
+    "won": 107,
+    "of": 128,
+    "rate": 0.8359,
+    "low95": 0.7622,
+    "high95": 0.8901
+   },
+   "handmade8_versiegelt": {
+    "won": 119,
+    "of": 128,
+    "rate": 0.9297,
+    "low95": 0.8718,
+    "high95": 0.9626
+   },
+   "handmade9_versiegelt": {
+    "won": 62,
+    "of": 128,
+    "rate": 0.4844,
+    "low95": 0.3995,
+    "high95": 0.5701
+   },
+   "gesamt": {
+    "won": 288,
+    "of": 384,
+    "rate": 0.75,
+    "low95": 0.7044,
+    "high95": 0.7907
+   }
+  }
+ }
+}

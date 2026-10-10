@@ -7,7 +7,7 @@ Rohdaten und Regeln:
 - `docs/lernen/daten/phase12_score_*.json` (Scorecards)
 - `runs/phase12/state.json` (Autopilot)
 
-*Stand 10.10., 2:50 – Training abgeschlossen; offen: Leons Entscheidung zum Halte-Tor und zum versiegelten Test.*
+*Stand 10.10. – abgeschlossen: Leon wählte B (Kandidat 44 Mio. EMA2) und gab den versiegelten Test frei.*
 
 ## Ausgangslage: der gepaarte Endvergleich (8.10.)
 
@@ -226,3 +226,17 @@ Leon gab den Generator am 8.10. frei („mit Löser-Pool“).
 - Der größte Hebel war, dass der Schüler zu unsicher spielte: Der deterministische Generalist lag 15 Pp über dem zufällig gezogenen. Ein kleinerer Entropie-Bonus und eine fallende Lernrate halfen mehr als jede neue Quelle.
 - Echte Mario-Level ließen sich umwandeln, verbesserten aber nichts messbar. Unsere Physik (1 Kachel Sprunghöhe) macht sie nach der Reparatur zu Abgrund-Präzisionsprüfungen ohne Übertrag.
 - Eine Verlängerung mit wieder angehobener Lernrate kostet Präzision. Die Prüfung reagiert darauf als Erstes.
+
+## Leons Entscheidung und der versiegelte Test (10.10.)
+
+- **Entscheidung B:** Der 44-Mio.-Stand (EMA2) wird Kandidat, die Prüfungs-Lücke wird offen ausgewiesen. P8 bleibt als Prüfungs-Spezialist erhalten.
+- **Versiegelter Test:** einmalig gespielt (`scripts/versiegelt12.py`), gepaart (gleicher Seed), zufällig gezogen, nur Gruppensummen.
+
+| Modell | exam2 (geheime 2. Prüfung) | handmade8 versiegelt | handmade9 versiegelt | **gesamt** (95 %-Intervall) |
+|---|---|---|---|---|
+| **Phase 12** | **107/128 (84 %)** | 119/128 (93 %) | **62/128 (48 %)** | **288/384 = 75,0 %** (70–79 %) |
+| P8 | 89/128 (70 %) | 119/128 (93 %) | 32/128 (25 %) | 240/384 = 62,5 % (58–67 %) |
+| Phase 11 | 58/128 (45 %) | 123/128 (96 %) | 48/128 (38 %) | 229/384 = 59,6 % (55–64 %) |
+| Neustart | 32/128 (25 %) | 123/128 (96 %) | 31/128 (24 %) | 186/384 = 48,4 % (43–53 %) |
+
+**Phase 12 ist auf den nie gesehenen Leveln klar am besten.** Die Intervalle überlappen sich nicht mit P8. Auf der geheimen zweiten Prüfung schlägt Phase 12 sogar P8 (84 % zu 70 %), obwohl P8 die offene Prüfung besser kann. Die Prüfungs-Lücke ist also eher eine Spezialisierung von P8 auf genau dieses eine Level als eine echte Schwäche des Generalisten.
