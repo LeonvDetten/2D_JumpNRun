@@ -7,7 +7,7 @@ Rohdaten und Regeln:
 - `docs/lernen/daten/phase12_score_*.json` (Scorecards)
 - `runs/phase12/state.json` (Autopilot)
 
-*Entwurf – wird während der Phase ergänzt.*
+*Stand 10.10., 2:50 – Training abgeschlossen; offen: Leons Entscheidung zum Halte-Tor und zum versiegelten Test.*
 
 ## Ausgangslage: der gepaarte Endvergleich (8.10.)
 
@@ -188,3 +188,41 @@ Leon gab den Generator am 8.10. frei („mit Löser-Pool“).
   - Der Löser beweist 10 von 12 Stichproben als lösbar.
   - Ausgangswerte auf den zurückgehaltenen Leveln: P8 7/50, Schüler (38 Mio.) 11/50.
 - **Schutz:** Fällt der Generalist-Wert zweimal in Folge > 3 Pp unter den Bestwert, wird der Prüfungsschwerpunkt zurückgenommen.
+
+**Ende der Verlängerung (48–55 Mio.)**
+- 22:14 (48,4 Mio.): Mario-Quelle wieder heraus. Die zurückgehaltenen Mario-Level blieben bei 20–28 von 100, ein Übertrag war nicht zu sehen. Die Phase-8-Level gingen zurück auf 30 %.
+- Die Prüfung fiel in der Verlängerung von 52 % (40 Mio.) auf 20 % (50 Mio.).
+  - Diagnose: Auf den Trittsteinen stürzten jetzt 36/64 Versuche ab, bei 40 Mio. waren es 17/64.
+  - Wahrscheinliche Ursachen: die angehobene Lernrate und zeitweise nur 20 % Phase-8-Level.
+- Dafür wuchsen Sprünge (83 %), lange Level (77 %) und Spiegel (59 %, 52 Mio. EMA2).
+- Training fertig um 2:10 (55 Mio.).
+
+**Zwei Messfehler gefunden und behoben**
+- Gesicherte Kandidaten-Kopien hatten keine Einstellungsdatei. Damit liefen sie mit falscher Aktionsrate (0/64 statt 29/64). Die Kopien haben jetzt eine `.json`.
+- `scorecard12`: `PPO.load` setzt den Zufallsgenerator auf den Trainings-Seed zurück, deshalb hatte `--seed` keine Wirkung. Jede Scorecard war also eine einzige, je Modell feste Stichprobe.
+  - Behoben: Der Seed wird jetzt nach dem Laden gesetzt.
+  - Das Endurteil nutzt die frischen Seeds 1 und 2 für alle Modelle (gepaart).
+
+## Endurteil (gepaart, frische Seeds 1 + 2)
+
+| Modell | Generalist | Klassisch | Prüfung | Lang | Gabeln | Kanäle | Spiegel | Sprünge | Strukturen |
+|---|---|---|---|---|---|---|---|---|---|
+| **Phase 12 · 44 Mio. EMA2** | **74,5** | 87 | 58 | 71 | 64 | 98 | 45 | 80 | 93 |
+| Phase 12 · 52 Mio. EMA2 | 73,1 | 87 | 37 | 75 | 66 | 96 | 45 | 82 | 97 |
+| Phase 12 · 40 Mio. EMA | 72,8 | 88 | 51 | 71 | 68 | 95 | 46 | 76 | 89 |
+| Phase 12 · 54 Mio. EMA | 71,2 | 83 | 36 | 68 | 64 | 96 | 51 | 79 | 92 |
+| Neustart (Prüfung) | 56,6 | 82 | 62 | 56 | 59 | 95 | 34 | 46 | 19 |
+| Phase 11 | 55,6 | 85 | 66 | 63 | 67 | 73 | 26 | 48 | 17 |
+| P8 | 40,8 | 84 | 75 | 69 | 37 | 8 | 0 | 51 | 4 |
+
+**Kandidat: Phase 12 bei 44 Mio. (EMA2) → `models/phase12_kandidat.zip`.**
+- Er liegt +18 Pp über dem besten Altmodell.
+- In 7 von 8 Kategorien ist er gleichauf oder besser.
+- Er hat die beste Prüfung aller Phase-12-Stände.
+
+**Halte-Tor verfehlt:** Prüfung 58 % gegenüber P8 75 %; das Tor verlangt ≥ P8 − 5 Pp. Leon entscheidet: Tor streng (kein Kandidat) oder Kandidat mit offen ausgewiesener Prüfungs-Lücke.
+
+**Lehren**
+- Der größte Hebel war, dass der Schüler zu unsicher spielte: Der deterministische Generalist lag 15 Pp über dem zufällig gezogenen. Ein kleinerer Entropie-Bonus und eine fallende Lernrate halfen mehr als jede neue Quelle.
+- Echte Mario-Level ließen sich umwandeln, verbesserten aber nichts messbar. Unsere Physik (1 Kachel Sprunghöhe) macht sie nach der Reparatur zu Abgrund-Präzisionsprüfungen ohne Übertrag.
+- Eine Verlängerung mit wieder angehobener Lernrate kostet Präzision. Die Prüfung reagiert darauf als Erstes.

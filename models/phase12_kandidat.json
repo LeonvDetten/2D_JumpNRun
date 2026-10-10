@@ -1,0 +1,15 @@
+{
+  "action_repeat": 2,
+  "overview": true,
+  "arch": "grid",
+  "phase_start": 0,
+  "obs_v2": false,
+  "obs_v3": true,
+  "path_reward": false,
+  "path_delta": true,
+  "generator": "v9",
+  "augment_v2": false,
+  "quelle": "runs/phase12_schueler/checkpoints/ema2_step_0044000000.zip",
+  "phase": 12,
+  "auswahl": "bester Generalist-Wert gepaart (Seeds 1+2) im Fenster 40-54 Mio."
+}
