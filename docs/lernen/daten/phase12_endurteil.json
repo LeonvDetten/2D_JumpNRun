@@ -1,0 +1,138 @@
+{
+ "hinweis": "gepaart, frische Seeds 1 und 2 (Scorecard-Regel: zufällig gezogen), Mittel; nach der Seed-Korrektur in scorecard12",
+ "modelle": {
+  "p12_44e2": {
+   "name": "Phase 12 · 44 Mio. EMA2",
+   "modell": "runs/phase12/kandidaten/p12_44_ema2.zip",
+   "generalist": 0.7449,
+   "kategorien": [
+    0.8651,
+    0.582,
+    0.7114,
+    0.6431,
+    0.9782,
+    0.45,
+    0.8021,
+    0.9271
+   ],
+   "seeds": {
+    "s1": 0.7367,
+    "s2": 0.753
+   }
+  },
+  "p12_52e2": {
+   "name": "Phase 12 · 52 Mio. EMA2",
+   "modell": "runs/phase12/kandidaten/p12_52_ema2.zip",
+   "generalist": 0.7312,
+   "kategorien": [
+    0.8733,
+    0.3653,
+    0.753,
+    0.657,
+    0.9638,
+    0.4459,
+    0.8229,
+    0.9688
+   ],
+   "seeds": {
+    "s1": 0.7342,
+    "s2": 0.7283
+   }
+  },
+  "p12_40": {
+   "name": "Phase 12 · 40 Mio. EMA",
+   "modell": "runs/phase12/kandidaten/p12_40_ema.zip",
+   "generalist": 0.7285,
+   "kategorien": [
+    0.8755,
+    0.5137,
+    0.7103,
+    0.6764,
+    0.9472,
+    0.4594,
+    0.7604,
+    0.8854
+   ],
+   "seeds": {
+    "s1": 0.738,
+    "s2": 0.719
+   }
+  },
+  "p12_54": {
+   "name": "Phase 12 · 54 Mio. EMA",
+   "modell": "runs/phase12/kandidaten/p12_54_ema.zip",
+   "generalist": 0.7115,
+   "kategorien": [
+    0.8314,
+    0.3633,
+    0.6782,
+    0.6389,
+    0.9648,
+    0.5073,
+    0.7916,
+    0.9166
+   ],
+   "seeds": {
+    "s1": 0.7061,
+    "s2": 0.7169
+   }
+  },
+  "neustart": {
+   "name": "Neustart (Prüfung)",
+   "modell": "models/neustart_kandidat_pruefung.zip",
+   "generalist": 0.566,
+   "kategorien": [
+    0.8176,
+    0.6211,
+    0.5604,
+    0.5875,
+    0.9513,
+    0.3448,
+    0.4584,
+    0.1875
+   ],
+   "seeds": {
+    "s1": 0.5532,
+    "s2": 0.5789
+   }
+  },
+  "phase11": {
+   "name": "Phase 11",
+   "modell": "models/phase11_kandidat.zip",
+   "generalist": 0.5565,
+   "kategorien": [
+    0.8483,
+    0.6582,
+    0.6322,
+    0.6723,
+    0.7324,
+    0.2625,
+    0.4792,
+    0.1667
+   ],
+   "seeds": {
+    "s1": 0.5708,
+    "s2": 0.5422
+   }
+  },
+  "p8": {
+   "name": "P8",
+   "modell": "models/phase8_final.zip",
+   "generalist": 0.4082,
+   "kategorien": [
+    0.8386,
+    0.7461,
+    0.688,
+    0.3653,
+    0.075,
+    0.0,
+    0.5104,
+    0.0417
+   ],
+   "seeds": {
+    "s1": 0.4112,
+    "s2": 0.4051
+   }
+  }
+ }
+}
