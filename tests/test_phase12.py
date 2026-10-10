@@ -191,3 +191,25 @@ def test_mario_repair_makes_levels_reachable():
     level, fixes = res
     assert fixes > 0 and M._reach(level)[0]
     assert level.chests and level.spawn
+
+
+def test_choose_actions_temperature():
+    from pathlib import Path
+
+    import numpy as np
+    import torch
+
+    from jumpnrun.levelgen import generator as G
+    from jumpnrun.rl.env import JumpNRunEnv, fixed_levels
+    from jumpnrun.rl.modelinfo import PLAY_TEMPERATURE, choose_actions, env_kwargs, load_model
+
+    model = load_model(Path(__file__).resolve().parent.parent / "models/phase12_kandidat.zip")
+    env = JumpNRunEnv(fixed_levels([G.generate(5, 1)]), **env_kwargs(model))
+    obs, _ = env.reset(seed=0)
+    batch = {k: np.stack([obs[k]] * 64) for k in obs}
+    det = choose_actions(model, batch, deterministic=True)
+    torch.manual_seed(0)
+    sharp = choose_actions(model, batch, temperature=0.05)
+    assert PLAY_TEMPERATURE == 0.3
+    assert (sharp == det).mean() > 0.95  # near zero temperature = the most likely action
+    assert choose_actions(model, batch, temperature=1.0).shape == (64,)

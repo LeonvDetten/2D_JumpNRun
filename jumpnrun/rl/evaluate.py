@@ -23,10 +23,13 @@ def eval_level_set(tiers: Sequence[int], per_tier: int) -> List[tuple]:
     return [(f"stufe_{t}", generate(t, EVAL_SEED_OFFSET + i)) for t in tiers for i in range(per_tier)]
 
 
-def evaluate_levels(model, levels: Sequence[Level], deterministic: bool = True) -> List[Dict]:
-    """Play every level once; all levels run in lock-step so the network sees one batch."""
+def evaluate_levels(model, levels: Sequence[Level], deterministic: bool = True, temperature: float = 1.0) -> List[Dict]:
+    """Play every level once; all levels run in lock-step so the network sees one batch.
 
-    from jumpnrun.rl.modelinfo import env_kwargs
+    temperature (phase 12): sampled play with sharpened probabilities (only used when deterministic=False).
+    """
+
+    from jumpnrun.rl.modelinfo import choose_actions, env_kwargs
 
     envs = [JumpNRunEnv(fixed_levels([level]), **env_kwargs(model)) for level in levels]
     obs = [env.reset(seed=i)[0] for i, env in enumerate(envs)]
@@ -34,7 +37,7 @@ def evaluate_levels(model, levels: Sequence[Level], deterministic: bool = True) 
     active = list(range(len(envs)))
     while active:
         batch = {key: np.stack([obs[i][key] for i in active]) for key in obs[active[0]]}
-        actions, _ = model.predict(batch, deterministic=deterministic)
+        actions = choose_actions(model, batch, deterministic, temperature)
         still_active = []
         for i, action in zip(active, actions):
             obs[i], _, terminated, truncated, info = envs[i].step(int(action))

@@ -39,6 +39,27 @@ def env_kwargs(model) -> dict:
                 progress="path")  # phase 10: measurement counts "stuck" along the way, not along x
 
 
+# Phase 12 (Leon, 10.10.): the bot plays with sharpened action probabilities p^(1/T), T = 0.3 - the trained policy
+# is often unsure between near-equal actions; sampling at T = 1 then costs single precise jumps (exam 57 % -> 98 %).
+PLAY_TEMPERATURE = 0.3
+
+
+def choose_actions(model, batch: dict, deterministic: bool = False, temperature: float = 1.0):
+    """Actions for a batch of observations: deterministic, sampled (T = 1, = model.predict) or sharpened (T < 1)."""
+
+    if deterministic or temperature <= 0:
+        return model.predict(batch, deterministic=True)[0]
+    if temperature == 1.0:
+        return model.predict(batch, deterministic=False)[0]
+    import torch
+
+    with torch.no_grad():
+        obs, _ = model.policy.obs_to_tensor(batch)
+        probs = model.policy.get_distribution(obs).distribution.probs
+        p = probs.clamp_min(1e-12) ** (1.0 / temperature)
+        return torch.multinomial(p / p.sum(1, keepdim=True), 1).squeeze(1).cpu().numpy()
+
+
 def load_model(model_path):
     """Load a PPO model and attach its `action_repeat` (used by evaluation and ghost view)."""
 

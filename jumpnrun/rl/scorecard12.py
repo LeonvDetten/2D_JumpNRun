@@ -127,12 +127,14 @@ def _eval_component(args):
     from jumpnrun.rl.modelinfo import load_model
 
     path, name, seed, *det = args
+    temperature = det[1] if len(det) > 1 else 1.0
     torch.set_num_threads(1)
     cat, levels, n = components()[name]
     model = load_model(path)  # PPO.load re-seeds torch with the training seed - so seed after loading
     np.random.seed(seed)
     torch.manual_seed(seed)
-    res = evaluate_levels(model, levels * n, deterministic=bool(det and det[0])) if levels else []
+    res = evaluate_levels(model, levels * n, deterministic=bool(det and det[0]),
+                          temperature=temperature) if levels else []
     return name, {"kat": cat, "won": sum(int(r["won"]) for r in res), "of": len(res),
                   "fortschritt": round(float(np.mean([r["progress"] for r in res])), 3) if res else 0.0}
 
@@ -145,11 +147,11 @@ def summarize(comp: dict) -> dict:
     return {"kategorien": cats, "generalist": round(float(np.mean(cats)), 4), "komponenten": comp}
 
 
-def evaluate(path, seed: int = 0, procs: int = 1, deterministic: bool = False) -> dict:
+def evaluate(path, seed: int = 0, procs: int = 1, deterministic: bool = False, temperature: float = 1.0) -> dict:
     """Stochastic (sampled actions) by default - the scorecard rule; deterministic=True only for diagnosis."""
 
     names = list(components())
-    jobs = [(str(path), n, seed, deterministic) for n in names]
+    jobs = [(str(path), n, seed, deterministic, temperature) for n in names]
     if procs > 1:
         from multiprocessing import Pool
 
@@ -251,11 +253,15 @@ def main() -> None:
     e.add_argument("--procs", type=int, default=1)
     e.add_argument("--seed", type=int, default=0)
     e.add_argument("--det", action="store_true", help="diagnosis only: always the most likely action")
+    e.add_argument("--temperature", type=float, default=1.0,
+                   help="sharpened sampling p^(1/T) - phase 12 play mode 0.3; 1 = scorecard rule until phase 12")
     b = sub.add_parser("bild")
     b.add_argument("--tag", help="a stored score_<tag>.json")
     args = parser.parse_args()
     if args.cmd == "eval":
-        res = evaluate(ROOT / args.model, args.seed, args.procs, deterministic=args.det)
+        res = evaluate(ROOT / args.model, args.seed, args.procs, deterministic=args.det,
+                       temperature=args.temperature)
+        res["temperatur"] = args.temperature
         res["modell"] = args.model
         OUT.mkdir(parents=True, exist_ok=True)
         (OUT / f"score_{args.tag}.json").write_text(json.dumps(res, indent=1))
