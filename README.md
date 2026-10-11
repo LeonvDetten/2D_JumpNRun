@@ -52,6 +52,29 @@ python -m jumpnrun.levelgen.solver mein_level.txt --map    # wo kann man überal
 python -m jumpnrun.levelgen.generator --tier 4 --seed 7 --out mein_level.txt   # Level erzeugen
 ```
 
+## Der Bot
+
+Das repräsentative Modell des Projekts ist **`models/space_pirate_bot.zip`** (Stand 11.10.2026, Phase 13).
+Der Bot spielt mit leicht geschärfter Aktionswahl (Temperatur 0,3).
+
+| Messung | Ergebnis |
+|---|---|
+| Generalist-Wert (8 Kategorien, gepaart, frische Seeds) | 87,0 % |
+| Prüfungslevel (256 Versuche) | 98 % |
+| Klassisch rechts / schwere Sprünge / neue Strukturen | 93 % / 93 % / 95 % |
+| Gabeln und Sackgassen / Kanäle / lange Level | 90 % / 95 % / 82 % |
+| Links / gespiegelte Level (die größte offene Lücke) | 52 % |
+
+Zum Vergleich: Das älteste brauchbare Modell P8 (`models/phase8_final.zip`) kommt auf 45 %.
+Auf den versiegelten, nie gesehenen Leveln gewann die direkte Vorstufe (Phase 12) 75 % gegenüber 62,5 % bei P8.
+Wie es dazu kam, steht im Lerntagebuch ([Phase 12](docs/lernen/12_phase12_generalist_schueler.md),
+[Phase 13](docs/lernen/13_phase13_links.md)).
+
+```
+python -m jumpnrun.rl.watch --level levels/exam/level.txt --live              # dem Bot zuschauen
+python -m jumpnrun.rl.watch --level levels/exam/level.txt --video pruefung.mp4 # als Video
+```
+
 ## Bot trainieren und zuschauen
 
 ```
@@ -75,7 +98,7 @@ python -m jumpnrun.imitation.demos --out runs/demos3 --tiers 10 11 --counts 500 
 python -m jumpnrun.imitation.bc --demos runs/demos3 --init models/phase5.zip --grow --only-overview \
     --dagger-rounds 0 --out models/phase6_start.zip
 scripts/train_phase6.sh                                      # max. 16 h, danach oder bei bestandener Prüfung Schluss
-# bester Prüfungs-Bot bisher: models/phase6_durchbruch.zip (37 von 128 Versuchen auf dem Original-Level)
+# Prüfungs-Bot aus Phase 6: models/phase6_durchbruch.zip (37 von 128 Versuchen) - aktuell: models/space_pirate_bot.zip
 python -m jumpnrun.rl.watch --model models/phase6_durchbruch.zip --level levels/exam/level.txt --video pruefung.mp4
 python -m jumpnrun.rl.milestones --run runs/phase6           # Meilensteine: Validierung, Test-Serie, Prüfung
 

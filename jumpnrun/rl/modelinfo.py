@@ -39,6 +39,9 @@ def env_kwargs(model) -> dict:
                 progress="path")  # phase 10: measurement counts "stuck" along the way, not along x
 
 
+# The representative model of the project (Leon, 11.10.): phase 13 candidate (+2 M) - see README "Der Bot".
+BEST_MODEL = Path(__file__).resolve().parent.parent.parent / "models/space_pirate_bot.zip"
+
 # Phase 12 (Leon, 10.10.): the bot plays with sharpened action probabilities p^(1/T), T = 0.3 - the trained policy
 # is often unsure between near-equal actions; sampling at T = 1 then costs single precise jumps (exam 57 % -> 98 %).
 PLAY_TEMPERATURE = 0.3

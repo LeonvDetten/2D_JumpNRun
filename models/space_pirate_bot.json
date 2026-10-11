@@ -1,0 +1,25 @@
+{
+  "action_repeat": 2,
+  "overview": true,
+  "arch": "grid",
+  "phase_start": 44000000,
+  "obs_v2": false,
+  "obs_v3": true,
+  "path_reward": false,
+  "path_delta": true,
+  "generator": "v9",
+  "augment_v2": false,
+  "quelle": "runs/phase13_links/checkpoints/ema_step_0046000000.zip",
+  "phase": 13,
+  "auswahl": "bester Generalist T=0,3 gepaart (Seeds 1+2), keine Kategorie > 5 Pp unter Stand 0",
+  "name": "Space Pirate Bot",
+  "stand": "2026-10-11",
+  "herkunft": "Phase 13, +2 Mio. Schritte (EMA), = models/phase13_kandidat.zip",
+  "spielweise": "Temperatur 0,3 (jumpnrun.rl.modelinfo.PLAY_TEMPERATURE)",
+  "kennzahlen": {
+    "generalist_t03": 0.87,
+    "generalist_t1": 0.752,
+    "pruefung_t03": 0.98,
+    "versiegelter_test_phase12_basis": "75,0 % (Phase-12-Kandidat, T=1)"
+  }
+}

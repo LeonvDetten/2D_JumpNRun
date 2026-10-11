@@ -26,7 +26,7 @@ from jumpnrun.core.sim import Status
 from jumpnrun.levelgen.generator import generate
 from jumpnrun.rl.curriculum import EVAL_SEED_OFFSET
 from jumpnrun.rl.env import JumpNRunEnv, fixed_levels
-from jumpnrun.rl.modelinfo import PLAY_TEMPERATURE, choose_actions, env_kwargs
+from jumpnrun.rl.modelinfo import BEST_MODEL, PLAY_TEMPERATURE, choose_actions, env_kwargs
 
 
 class GhostRun:
@@ -128,7 +128,7 @@ def resolve_level(args) -> Level:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Ghost view of the bot.")
     parser.add_argument("--run", help="training run directory (uses its checkpoints)")
-    parser.add_argument("--model", help="a single model .zip")
+    parser.add_argument("--model", help="a single model .zip (default without --run: models/space_pirate_bot.zip)")
     parser.add_argument("--level", help="level file (default: generated level of --tier/--seed)")
     parser.add_argument("--tier", type=int, default=2)
     parser.add_argument("--seed", type=int, default=0)
@@ -145,6 +145,8 @@ def main() -> None:
                         help="game time limit for --video (the exam level needs ~90 s)")
     parser.add_argument("--follow", action="store_true", help=argparse.SUPPRESS)
     args = parser.parse_args()
+    if not args.model and not args.run:
+        args.model = str(BEST_MODEL)
 
     os.environ.setdefault("PYGAME_HIDE_SUPPORT_PROMPT", "hide")
     import pygame
