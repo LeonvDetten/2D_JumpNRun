@@ -1,0 +1,15 @@
+{
+  "action_repeat": 2,
+  "overview": true,
+  "arch": "grid",
+  "phase_start": 44000000,
+  "obs_v2": false,
+  "obs_v3": true,
+  "path_reward": false,
+  "path_delta": true,
+  "generator": "v9",
+  "augment_v2": false,
+  "quelle": "runs/phase13_links/checkpoints/ema_step_0046000000.zip",
+  "phase": 13,
+  "auswahl": "bester Generalist T=0,3 gepaart (Seeds 1+2), keine Kategorie > 5 Pp unter Stand 0"
+}

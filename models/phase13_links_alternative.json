@@ -1,0 +1,15 @@
+{
+  "action_repeat": 2,
+  "overview": true,
+  "arch": "grid",
+  "phase_start": 44000000,
+  "obs_v2": false,
+  "obs_v3": true,
+  "path_reward": false,
+  "path_delta": true,
+  "generator": "v9",
+  "augment_v2": false,
+  "quelle": "runs/phase13_links/checkpoints/ema2_step_0054000000.zip",
+  "phase": 13,
+  "auswahl": "Alternative mit starkem Links-Wert (Links/Spiegel 70 %, spiegelweg 27/32), Generalist T=0,3 86,98 %"
+}
