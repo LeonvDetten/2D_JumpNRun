@@ -1,5 +1,7 @@
 # Lerntagebuch 0 – Überblick: Was ist Reinforcement Learning?
 
+> Interaktiv zum Ausführen: [`projekt_interaktiv.ipynb`](projekt_interaktiv.ipynb) – alle Phasen und Ansätze mit echtem Projektcode und dem trainierten Bot.
+
 ## Die Grundidee in einem Satz
 
 Ein **Agent** (unser Bot) probiert in einer **Umgebung** (dem Spiel) **Aktionen** aus, bekommt dafür
