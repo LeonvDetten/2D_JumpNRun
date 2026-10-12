@@ -9,3 +9,4 @@ runs/
 artifacts/
 .venv/
 *.DS_Store
+!docs/medien/*.mp4

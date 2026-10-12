@@ -1,0 +1,212 @@
+{
+ "level": "levels/exam/level.txt",
+ "temperatures": [
+  1.0,
+  0.3
+ ],
+ "attempts_per_model": 64,
+ "measured": "2026-10-12",
+ "note": "seeds 0..attempts-1 per temperature, jumpnrun.rl.watch.GhostRun; rate/won = the better of both temperatures",
+ "results": [
+  {
+   "model": "models/phase1.zip",
+   "stage": "Phase 1",
+   "description": "laufen und springen",
+   "attempts": 64,
+   "t10": {
+    "won": 0,
+    "rate": 0.0,
+    "mean_progress": 0.08759820426487093,
+    "median_win_seconds": null
+   },
+   "t03": {
+    "won": 0,
+    "rate": 0.0,
+    "mean_progress": 0.07532617845117845,
+    "median_win_seconds": null
+   },
+   "won": 0,
+   "rate": 0.0
+  },
+  {
+   "model": "models/phase2.zip",
+   "stage": "Phase 2",
+   "description": "Gegner und Plattformen",
+   "attempts": 64,
+   "t10": {
+    "won": 0,
+    "rate": 0.0,
+    "mean_progress": 0.18921156004489337,
+    "median_win_seconds": null
+   },
+   "t03": {
+    "won": 0,
+    "rate": 0.0,
+    "mean_progress": 0.17887906846240179,
+    "median_win_seconds": null
+   },
+   "won": 0,
+   "rate": 0.0
+  },
+  {
+   "model": "models/phase3.zip",
+   "stage": "Phase 3",
+   "description": "erster Generalist",
+   "attempts": 64,
+   "t10": {
+    "won": 0,
+    "rate": 0.0,
+    "mean_progress": 0.23141133557800225,
+    "median_win_seconds": null
+   },
+   "t03": {
+    "won": 0,
+    "rate": 0.0,
+    "mean_progress": 0.16688061167227833,
+    "median_win_seconds": null
+   },
+   "won": 0,
+   "rate": 0.0
+  },
+  {
+   "model": "models/phase5.zip",
+   "stage": "Phase 5",
+   "description": "vom Löser abgeschaut",
+   "attempts": 64,
+   "t10": {
+    "won": 0,
+    "rate": 0.0,
+    "mean_progress": 0.16119177890011224,
+    "median_win_seconds": null
+   },
+   "t03": {
+    "won": 0,
+    "rate": 0.0,
+    "mean_progress": 0.1893658810325477,
+    "median_win_seconds": null
+   },
+   "won": 0,
+   "rate": 0.0
+  },
+  {
+   "model": "models/phase6_durchbruch.zip",
+   "stage": "Phase 6",
+   "description": "Übersichtskarte, lange Level",
+   "attempts": 64,
+   "t10": {
+    "won": 17,
+    "rate": 0.265625,
+    "mean_progress": 0.7879804994388327,
+    "median_win_seconds": 78.46666666666667
+   },
+   "t03": {
+    "won": 0,
+    "rate": 0.0,
+    "mean_progress": 0.38641975308641974,
+    "median_win_seconds": null
+   },
+   "won": 17,
+   "rate": 0.265625
+  },
+  {
+   "model": "models/phase7_final.zip",
+   "stage": "Phase 7",
+   "description": "zwei Netze, Abzweige",
+   "attempts": 64,
+   "t10": {
+    "won": 46,
+    "rate": 0.71875,
+    "mean_progress": 0.884557379349046,
+    "median_win_seconds": 79.66666666666667
+   },
+   "t03": {
+    "won": 1,
+    "rate": 0.015625,
+    "mean_progress": 0.3298611111111111,
+    "median_win_seconds": 78.3
+   },
+   "won": 46,
+   "rate": 0.71875
+  },
+  {
+   "model": "models/phase8_final.zip",
+   "stage": "Phase 8",
+   "description": "ehrlich gemessen",
+   "attempts": 64,
+   "t10": {
+    "won": 46,
+    "rate": 0.71875,
+    "mean_progress": 0.8588068181818181,
+    "median_win_seconds": 78.33333333333333
+   },
+   "t03": {
+    "won": 64,
+    "rate": 1.0,
+    "mean_progress": 1.0,
+    "median_win_seconds": 77.56666666666666
+   },
+   "won": 64,
+   "rate": 1.0
+  },
+  {
+   "model": "models/phase11_kandidat.zip",
+   "stage": "Phase 11",
+   "description": "Generalist",
+   "attempts": 64,
+   "t10": {
+    "won": 45,
+    "rate": 0.703125,
+    "mean_progress": 0.8760907687991021,
+    "median_win_seconds": 78.5
+   },
+   "t03": {
+    "won": 63,
+    "rate": 0.984375,
+    "mean_progress": 0.9936517957351291,
+    "median_win_seconds": 77.96666666666667
+   },
+   "won": 63,
+   "rate": 0.984375
+  },
+  {
+   "model": "models/phase12_kandidat.zip",
+   "stage": "Phase 12",
+   "description": "Generalist-Schüler",
+   "attempts": 64,
+   "t10": {
+    "won": 29,
+    "rate": 0.453125,
+    "mean_progress": 0.6921191077441078,
+    "median_win_seconds": 79.96666666666667
+   },
+   "t03": {
+    "won": 64,
+    "rate": 1.0,
+    "mean_progress": 0.9980148709315376,
+    "median_win_seconds": 77.73333333333333
+   },
+   "won": 64,
+   "rate": 1.0
+  },
+  {
+   "model": "models/space_pirate_bot.zip",
+   "stage": "Phase 13",
+   "description": "aktueller Bot (Links-Training)",
+   "attempts": 64,
+   "t10": {
+    "won": 30,
+    "rate": 0.46875,
+    "mean_progress": 0.6592522446689113,
+    "median_win_seconds": 80.36666666666666
+   },
+   "t03": {
+    "won": 60,
+    "rate": 0.9375,
+    "mean_progress": 0.9389520202020202,
+    "median_win_seconds": 77.13333333333334
+   },
+   "won": 60,
+   "rate": 0.9375
+  }
+ ]
+}
