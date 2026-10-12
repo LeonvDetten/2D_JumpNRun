@@ -63,12 +63,62 @@ def choose_actions(model, batch: dict, deterministic: bool = False, temperature:
         return torch.multinomial(p / p.sum(1, keepdim=True), 1).squeeze(1).cpu().numpy()
 
 
-def load_model(model_path):
-    """Load a PPO model and attach its `action_repeat` (used by evaluation and ghost view)."""
+def _placeholder_schedule(_progress_remaining: float) -> float:
+    return 0.0
+
+
+# The training schedules (learning rate, clip range) are pickled as lambdas whose bytecode belongs to the Python
+# version the model was trained with; running them under another version (models from 3.11 on 3.13) crashes the
+# interpreter. With these custom objects SB3 does not unpickle them at all.
+SCHEDULE_PLACEHOLDERS = {"learning_rate": 0.0, "lr_schedule": _placeholder_schedule,
+                         "clip_range": _placeholder_schedule}
+
+
+def saved_python(model_path) -> str | None:
+    """Python version ("3.11") a model was saved with, from the system_info.txt in its zip."""
+
+    import re
+    import zipfile
+
+    try:
+        with zipfile.ZipFile(model_path) as z:
+            match = re.search(r"Python: (\d+\.\d+)", z.read("system_info.txt").decode())
+    except (KeyError, OSError, zipfile.BadZipFile):
+        return None
+    return match.group(1) if match else None
+
+
+def load_ppo(model_path, algo=None, keep_schedules: bool = False, **kwargs):
+    """`algo.load` (PPO by default, device cpu) that survives a Python version change.
+
+    By default the pickled schedules are replaced by placeholders: inference, evaluation, peeks at num_timesteps or
+    the observation space, and loads that pass their own `learning_rate`/`clip_range` as kwargs (train.py --resume,
+    the network surgeries) never use them. Everything else - weights, optimizer state, seeding - loads as before.
+
+    keep_schedules=True (a model that is trained on and saved again with its own schedules, e.g. the BC student)
+    keeps them when the model was saved with this Python version; otherwise they cannot be restored and become
+    placeholders (learning rate 0) with a warning - pass `learning_rate`/`clip_range` before training such a model.
+    """
+
+    import sys
+    import warnings
 
     from stable_baselines3 import PPO
 
-    model = PPO.load(str(model_path), device="cpu")
+    here = f"{sys.version_info.major}.{sys.version_info.minor}"
+    if keep_schedules:
+        saved = saved_python(model_path)
+        if saved == here:
+            return (algo or PPO).load(str(model_path), device="cpu", **kwargs)
+        warnings.warn(f"{model_path}: saved with Python {saved}, running {here} - its learning-rate and clip-range "
+                      f"schedules cannot be unpickled and are replaced by placeholders (learning rate 0)")
+    return (algo or PPO).load(str(model_path), device="cpu", custom_objects=SCHEDULE_PLACEHOLDERS, **kwargs)
+
+
+def load_model(model_path):
+    """Load a PPO model and attach its `action_repeat` (used by evaluation and ghost view)."""
+
+    model = load_ppo(model_path)
     model.action_repeat = action_repeat_for(model_path)
     return model
 
@@ -98,7 +148,7 @@ def grow_overview(old_model_path, env, algo=None, **kwargs):
 
     from stable_baselines3 import PPO
 
-    old = PPO.load(str(old_model_path), device="cpu")
+    old = load_ppo(old_model_path)
     algo = algo or PPO
     params = dict(policy_kwargs=old.policy_kwargs, n_steps=old.n_steps, batch_size=old.batch_size,
                   n_epochs=old.n_epochs, gamma=old.gamma, gae_lambda=old.gae_lambda, vf_coef=old.vf_coef,
@@ -124,7 +174,7 @@ def grow_vec(old_model_path, env, algo=None, **kwargs):
     import torch
     from stable_baselines3 import PPO
 
-    old = (algo or PPO).load(str(old_model_path), device="cpu")
+    old = load_ppo(old_model_path, algo)
     params = dict(policy_kwargs=old.policy_kwargs, n_steps=old.n_steps, batch_size=old.batch_size,
                   n_epochs=old.n_epochs, gamma=old.gamma, gae_lambda=old.gae_lambda, vf_coef=old.vf_coef,
                   ent_coef=old.ent_coef, device="cpu", verbose=0)
@@ -164,7 +214,7 @@ def grow_v3(old_model_path, env, algo=None, a6_bias_offset: float = -4.0, **kwar
     import torch
     from stable_baselines3 import PPO
 
-    old = (algo or PPO).load(str(old_model_path), device="cpu")
+    old = load_ppo(old_model_path, algo)
     params = dict(policy_kwargs=old.policy_kwargs, n_steps=old.n_steps, batch_size=old.batch_size,
                   n_epochs=old.n_epochs, gamma=old.gamma, gae_lambda=old.gae_lambda, vf_coef=old.vf_coef,
                   ent_coef=old.ent_coef, device="cpu", verbose=0)

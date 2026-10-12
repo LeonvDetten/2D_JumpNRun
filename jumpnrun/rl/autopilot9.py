@@ -126,9 +126,9 @@ def start_steps(path: str) -> int:
     stem = Path(path).stem.split("_")[-1]
     if stem.isdigit():
         return int(stem)
-    from stable_baselines3 import PPO
+    from jumpnrun.rl.modelinfo import load_ppo
 
-    return int(PPO.load(str(ROOT / path), device="cpu").num_timesteps)
+    return int(load_ppo(ROOT / path).num_timesteps)
 
 
 def turning_back_stalled(limit: int = 10) -> bool:

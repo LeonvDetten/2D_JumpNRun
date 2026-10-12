@@ -38,6 +38,7 @@ from jumpnrun.rl.callbacks import CheckpointSaver, EmaWeights, Evaluator, TimeLi
 from jumpnrun.rl.curriculum import CurriculumSource, CurriculumTracker
 from jumpnrun.rl.env import JumpNRunEnv
 from jumpnrun.rl.evaluate import eval_level_set
+from jumpnrun.rl.modelinfo import load_ppo
 from jumpnrun.rl.policy import GridFeatures, ImpalaFeatures
 
 
@@ -367,7 +368,7 @@ def main() -> None:
             if (run_dir / "curriculum.json").exists():  # progress existed, but no usable checkpoint is left
                 raise SystemExit(f"{run_dir}: curriculum.json but no valid checkpoint - refusing to start again at "
                                  f"{args.resume or 'scratch'} (restore a checkpoint first)")
-            done = int(PPO.load(args.resume, device="cpu").num_timesteps) if args.resume else 0
+            done = int(load_ppo(args.resume).num_timesteps) if args.resume else 0
         args.steps = args.target - done
         # the step count at which this run (phase) began, kept across restarts for the LR schedule
         phase_start = old_config.get("phase_start", done)
@@ -422,19 +423,19 @@ def main() -> None:
         ent_coef=args.ent,
         target_kl=args.target_kl,
     )
-    if args.resume and args.obs_v3 and PPO.load(args.resume, device="cpu").observation_space["vec"].shape[0] < 23:
+    if args.resume and args.obs_v3 and load_ppo(args.resume).observation_space["vec"].shape[0] < 23:
         from jumpnrun.rl.modelinfo import grow_v3
 
         model = grow_v3(args.resume, vec_env, algo, tensorboard_log=str(run_dir / "tb"), **hyper, **extra)
         print(f"Network surgery v3: wider view behind, compass, 7th action, from {args.resume}")
-    elif args.resume and args.obs_v2 and PPO.load(args.resume, device="cpu").observation_space["vec"].shape[0] < 21:
+    elif args.resume and args.obs_v2 and load_ppo(args.resume).observation_space["vec"].shape[0] < 21:
         from jumpnrun.rl.modelinfo import grow_vec
 
         model = grow_vec(args.resume, vec_env, algo, tensorboard_log=str(run_dir / "tb"), **hyper, **extra)
         print(f"Network surgery: vector input 15 -> 21 (new inputs start at zero), from {args.resume}")
     elif args.resume:
-        model = algo.load(args.resume, env=vec_env, device="cpu", tensorboard_log=str(run_dir / "tb"),
-                          **hyper, **extra)
+        # the pickled schedules are replaced, hyper brings the run's own learning rate and clip range
+        model = load_ppo(args.resume, algo, env=vec_env, tensorboard_log=str(run_dir / "tb"), **hyper, **extra)
     else:
         model = algo(
             "MultiInputPolicy",
