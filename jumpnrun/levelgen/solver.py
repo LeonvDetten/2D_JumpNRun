@@ -328,9 +328,15 @@ def way_cells(dm, start_cell) -> List[Tuple[int, int]]:
 
 
 def solve_path_legs(level: Level, leg_tiles: float = 18, leg_budget: int = 40_000, total_budget: int = 800_000,
-                    action_repeat: int = ACTION_REPEAT, weight: float = 1.2) -> SolveResult:
+                    action_repeat: int = ACTION_REPEAT, weight: float = 1.2, start: Optional[Simulation] = None,
+                    on_leg=None) -> SolveResult:
     """Phase 12: long / winding levels leg by leg - goals are cells on the distance-map way, every `leg_tiles`
-    tiles of way; each leg is an A* guided by the way left to that goal. Awkward goals are skipped."""
+    tiles of way; each leg is an A* guided by the way left to that goal. Awkward goals are skipped.
+
+    Level editor: `start` continues from a mid-level state (the returned actions are only the new ones),
+    `on_leg(actions)` is called with all new actions so far after every solved leg. On failure, `max_x` is the
+    furthest x the last search reached.
+    """
 
     from jumpnrun.levelgen.distmap import DistanceMap
 
@@ -338,12 +344,16 @@ def solve_path_legs(level: Level, leg_tiles: float = 18, leg_budget: int = 40_00
     t0 = time.time()
     if not dm.reachable:
         return SolveResult(False, None, 0, 0, 0.0)
-    sim = Simulation(level)
+    sim = start.clone() if start is not None else Simulation(level)
     p = sim.player
+    here_dist = dm.start or 0.0
+    if start is not None:
+        d = dm.at_player(p) if p.on_ground else dm.below(p.x, p.y, p.w, p.h)
+        here_dist = d if d is not None else here_dist
     here = min((c for c in dm.dist if abs(c[0] * TILE + TILE // 2 - (p.x + p.w // 2)) <= TILE),
-               key=lambda c: abs(dm.dist[c] - (dm.start or 0)), default=None)
+               key=lambda c: abs(dm.dist[c] - here_dist), default=None)
     cells = way_cells(dm, here) if here is not None else []
-    goals, last = [], dm.start or 0.0
+    goals, last = [], here_dist
     for c in cells[1:]:
         if last - dm.dist[c] >= leg_tiles:
             goals.append(c)
@@ -363,10 +373,12 @@ def solve_path_legs(level: Level, leg_tiles: float = 18, leg_budget: int = 40_00
         expanded += leg.expanded
         if not leg.solved:
             if goal is None:
-                return SolveResult(False, None, expanded, sim.player.x, time.time() - t0)
+                return SolveResult(False, None, expanded, max(sim.player.x, leg.max_x), time.time() - t0)
             continue
         for a in leg.actions:
             sim.step(BOT_ACTIONS_V3[a], frames=action_repeat)
         actions += leg.actions
+        if on_leg is not None:
+            on_leg(list(actions))
     won = sim.status == Status.WON
     return SolveResult(won, actions if won else None, expanded, sim.player.x, time.time() - t0)

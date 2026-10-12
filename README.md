@@ -43,6 +43,7 @@ Mehrere Kisten sind erlaubt, jede ist ein Ziel.
 | `levels/showcase/` | feste Level für Videos / Geister-Ansicht |
 | `levels/test_serie/` | 6 handgebaute schwere Test-Level (nie trainiert, mit geprüfter Lösung) |
 | `levels/validierung/` | eingefrorene Validierungs-Level (v2: Stufen 4–9, v3: Stufen 10–11) |
+| `levels/eigene/` | im Editor gebaute Level (kein Trainingsordner) |
 
 Werkzeuge:
 
@@ -51,6 +52,33 @@ python -m jumpnrun.levelgen.solver mein_level.txt          # ist das Level für 
 python -m jumpnrun.levelgen.solver mein_level.txt --map    # wo kann man überall stehen?
 python -m jumpnrun.levelgen.generator --tier 4 --seed 7 --out mein_level.txt   # Level erzeugen
 ```
+
+## Level bauen (Editor)
+
+```
+python leveleditor.py                          # neues Level
+python leveleditor.py levels/phase1/p1_luecken_01.txt   # vorhandenes Level umbauen
+```
+
+- **Malen mit der Maus:** Werkzeug oben anklicken (oder Taste 1–8): Block, Gegner, Kiste, Start, Radierer,
+  Rechteck, Spalte einfügen, Spalte löschen. Links malen (gedrückt ziehen), rechts radieren,
+  Umschalt+Ziehen = Rechteck. Mausrad scrollt, Strg+Mausrad zoomt, Klick in die Übersicht unten springt.
+  Rechts über das Level-Ende hinaus malen verlängert das Level. Strg+Z/Strg+Y, F1 zeigt alle Tasten.
+- **Prüfen (P):** sucht im Hintergrund einen echten Weg mit den Bot-Aktionen. Weiterbauen geht währenddessen.
+  - Grün = Weg bis zur Kiste bewiesen, die Spur ist eingezeichnet.
+  - Gelb = bewiesen bis Spalte X, danach wurde etwas geändert, das den Weg betrifft. „Weiterprüfen“ setzt dort
+    an, statt von vorn zu suchen. Änderungen, die der Weg nicht berührt, kürzen ihn nicht.
+  - Rot = ab der markierten Stelle wurde kein Weg gefunden. Ehrlicherweise kann das auch am Suchbudget liegen
+    (lange, verschlungene Level findet der Löser von Grund auf nicht immer). Nochmal prüfen ohne Änderung sucht
+    mit doppeltem Budget.
+- **Testspielen (T)** und **bewiesenen Weg abspielen (L)**, Esc führt zurück in den Editor.
+- **Speichern:**
+  - Strg+S aktualisiert die geöffnete `.txt`. Unveränderte Zeilen bleiben Byte für Byte gleich.
+  - Strg+Umschalt+S speichert als neues Level, standardmäßig in `levels/eigene/`.
+  - Ist der Weg bewiesen, wird die Lösung als `<name>.loesung.json` mitgespeichert. Eine veraltete Lösung
+    bietet der Editor zum Entfernen an.
+  - Mess-Level (`levels/exam*`, `validierung`, `test_serie`) lassen sich öffnen und umbauen, aber nur als neues
+    Level speichern.
 
 ## Der Bot
 
@@ -113,6 +141,8 @@ python -m jumpnrun.rl.watch --run runs/phase1 --timelapse zeitraffer.mp4 --level
 
 ```
 game.py              selbst spielen
+leveleditor.py       Level bauen und auf Lösbarkeit prüfen
+jumpnrun/editor/     Level-Editor (Raster, bewiesener Weg, Oberfläche)
 jumpnrun/core/       deterministische Spielsimulation (ohne Grafik, ohne Uhr)
 jumpnrun/render/     Grafik: Spiel, Geister-Ansicht, Video-Export
 jumpnrun/levelgen/   Level-Generator und Löser
