@@ -17,12 +17,33 @@ pip install -r requirements.txt
 Für das Training reicht die CPU-Version von PyTorch (kleiner Download):
 `pip install torch --index-url https://download.pytorch.org/whl/cpu`
 
-## Selbst spielen
+## Spielen
 
 ```
-python game.py                                   # Prüfungslevel (das Original-Level)
-python game.py levels/phase1/p1_luecken_01.txt   # beliebiges anderes Level
+python spacepirate.py                            # die App: Ladescreen, Menü, alle Modi
+python game.py                                   # dasselbe
+python game.py levels/phase1/p1_luecken_01.txt   # ein Level direkt, ohne Menü (wie früher)
 ```
+
+Im Hauptmenü gibt es vier Wege:
+
+- **Einzelspieler:** Alle Level nach Reitern sortiert (Einstieg, Handgebaut, Test-Serie, Prüfung, Eigene) plus
+  **Zufallslevel** aus dem Generator, mit dem der Bot trainiert hat (14 Stufen, Seed wiederholbar).
+  - Pro Level werden Bestzeit und 1–3 Sterne gespeichert. Die Messlatte ist der bewiesene Bot-Weg
+    (`.loesung.json`): 3 Sterne gibt es bis 15 % langsamer, 2 Sterne bis 50 %. Ohne gespeicherten Weg gilt eine
+    geschätzte „Richtzeit“.
+  - Ab dem ersten Sieg läuft dein Bestlauf als **Geist** mit, exakt nachgespielt, weil das Spiel deterministisch
+    ist.
+- **Gegen den Bot:** Wettrennen gegen den trainierten Bot (`models/space_pirate_bot.zip`), der als
+  halbtransparenter Pirat im selben Level läuft.
+  - Der Bot läuft immer Vollgas, der einstellbare Vorsprung (0/2/5/10 s) ist der Schwierigkeitsregler.
+  - Wer stirbt, fängt am Start wieder an; wer zuerst an der Kiste ist, gewinnt.
+  - Braucht PyTorch und stable-baselines3; ohne sie ist der Modus ausgegraut.
+- **Level-Editor:** siehe unten.
+- **Einstellungen:** Vollbild, Musik, Effekte, Geist an/aus, Standard-Vorsprung. Musik und Effekte werden beim
+  Start per Code synthetisiert, es gibt keine Audiodateien.
+
+Der Spielstand liegt in `~/.space_pirate/save.json`, nicht im Repo.
 
 | Taste | Aktion |
 |---|---|
@@ -30,7 +51,8 @@ python game.py levels/phase1/p1_luecken_01.txt   # beliebiges anderes Level
 | `W`, Leertaste oder Pfeil hoch | springen |
 | Enter | schießen |
 | `R` | Neustart |
-| Esc | beenden |
+| Esc / `P` | Pause (im Menü: zurück) |
+| F11 | Vollbild |
 
 ## Level
 Level sind Textdateien mit 13 Zeilen: `B` = Block, `E` = Gegner, `C` = Kiste (Ziel), `P` = Startpunkt (optional).
@@ -56,7 +78,7 @@ python -m jumpnrun.levelgen.generator --tier 4 --seed 7 --out mein_level.txt   #
 ## Level bauen (Editor)
 
 ```
-python leveleditor.py                          # neues Level
+python leveleditor.py                          # neues Level (oder im Hauptmenü der App)
 python leveleditor.py levels/phase1/p1_luecken_01.txt   # vorhandenes Level umbauen
 ```
 
@@ -140,7 +162,10 @@ python -m jumpnrun.rl.watch --run runs/phase1 --timelapse zeitraffer.mp4 --level
 ## Projektaufbau
 
 ```
-game.py              selbst spielen
+spacepirate.py       die Spiel-App (game.py ohne Argument startet sie auch)
+game.py              ein Level direkt spielen
+jumpnrun/app/        Spiel-App: Szenen, Spielstand, Bot-Gegner, Klang
+jumpnrun/ui/         gemeinsame Bedienelemente von App und Editor
 leveleditor.py       Level bauen und auf Lösbarkeit prüfen
 jumpnrun/editor/     Level-Editor (Raster, bewiesener Weg, Oberfläche)
 jumpnrun/core/       deterministische Spielsimulation (ohne Grafik, ohne Uhr)

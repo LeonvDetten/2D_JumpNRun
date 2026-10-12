@@ -1,4 +1,4 @@
-"""Small pygame UI kit for the level editor: theme, fonts, buttons, dialogs."""
+"""Small pygame UI kit for the app and the level editor: theme, fonts, buttons, dialogs."""
 
 from __future__ import annotations
 

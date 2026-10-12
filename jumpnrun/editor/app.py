@@ -24,7 +24,7 @@ from jumpnrun.editor.model import (
     BLOCK, CHEST, EMPTY, ENEMY, LEVELS_DIR, OWN_DIR, START, LevelModel, is_protected, load_solution, save_solution,
     solution_path,
 )
-from jumpnrun.editor.widgets import (
+from jumpnrun.ui.widgets import (
     ACCENT, BG, BLUE, GREEN, MUTED, PANEL, PANEL_LINE, RED, TEXT, YELLOW, Button, ConfirmDialog,
     OpenDialog, SaveAsDialog, alpha_rect, font, panel, text, tooltip,
 )
@@ -65,8 +65,10 @@ def keys_to_action(pressed) -> Action:
 
 
 class EditorApp:
-    def __init__(self, path: Optional[str] = None, size: Tuple[int, int] = (SCREEN_W, SCREEN_H)):
+    def __init__(self, path: Optional[str] = None, size: Tuple[int, int] = (SCREEN_W, SCREEN_H), on_exit=None):
         from jumpnrun.render.assets import get_assets
+
+        self.on_exit = on_exit  # inside the game app: back to the menu instead of ending the program
 
         self.assets = get_assets()
         self.size = size
@@ -468,6 +470,8 @@ class EditorApp:
     def quit(self) -> None:
         self.keeper.stop()
         self.running = False
+        if self.on_exit is not None:
+            self.on_exit()
 
     def _handle_key(self, event) -> None:
         ctrl = event.mod & (pygame.KMOD_CTRL | pygame.KMOD_META)

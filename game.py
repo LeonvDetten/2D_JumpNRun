@@ -10,7 +10,8 @@
             exact same simulation, just with actions from the neural network.
 
     Usage:
-            python game.py [path/to/level.txt]
+            python game.py                      the game app (menu, levels, bot race, editor)
+            python game.py path/to/level.txt    play one level directly
 
     Controls:
             A / D or arrow keys   walk
@@ -78,4 +79,9 @@ def main(level_path: str = DEFAULT_LEVEL) -> None:
 
 
 if __name__ == "__main__":
-    main(sys.argv[1] if len(sys.argv) > 1 else DEFAULT_LEVEL)
+    if len(sys.argv) > 1:
+        main(sys.argv[1])  # one level, straight away (as before)
+    else:
+        from jumpnrun.app.main import main as app_main
+
+        app_main([])  # the game app: menu, level select, race against the bot, editor
