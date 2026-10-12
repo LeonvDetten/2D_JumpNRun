@@ -123,22 +123,6 @@ def load_model(model_path):
     return model
 
 
-def load_for_play(model_path):
-    """Like load_model, for playing only: the pickled training schedules (learning rate, clip range) are replaced.
-
-    They are lambdas pickled with the training's Python version; unpickling them under another version (e.g.
-    Python 3.13) crashes the interpreter. Playing never needs them.
-    """
-
-    from stable_baselines3 import PPO
-
-    zero = lambda _: 0.0  # noqa: E731
-    model = PPO.load(str(model_path), device="cpu",
-                     custom_objects={"lr_schedule": zero, "learning_rate": 0.0, "clip_range": zero})
-    model.action_repeat = action_repeat_for(model_path)
-    return model
-
-
 def grow_overview(old_model_path, env, algo=None, **kwargs):
     """Network surgery: a new model for `env` (with overview map) that starts with the old weights.
 

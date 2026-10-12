@@ -41,10 +41,10 @@ class BotBrain:
             self.error = "Für den Bot fehlt PyTorch: pip install torch stable-baselines3 gymnasium"
             return
         try:
-            from jumpnrun.rl.modelinfo import BEST_MODEL, load_for_play
+            from jumpnrun.rl.modelinfo import BEST_MODEL, load_model
 
             torch.set_num_threads(1)  # one small net, no need to fight the game for CPU
-            self.model = load_for_play(BEST_MODEL)
+            self.model = load_model(BEST_MODEL)
         except Exception as exc:  # pragma: no cover - shown in the menu
             self.error = f"Bot konnte nicht geladen werden: {type(exc).__name__}: {exc}"
 
