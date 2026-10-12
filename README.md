@@ -1,197 +1,118 @@
-# 2D_JumpNRun – Space Pirate + lernender Bot
+<p align="center">
+  <img src="docs/medien/banner.png" alt="Space Pirate – ein Jump'n'Run und ein Bot, der es selbst gelernt hat" width="100%">
+</p>
 
-## Spielbeschreibung
-Das Spiel Space Pirate ist ein 2D-Spiel, in welchem ein Pirat gesteuert wird. Der Pirat muss sich durch ein Level kämpfen und dabei Gegner besiegen und Hindernisse überwinden. Gegner können durch einen Sprung auf den Kopf oder durch einen Revolverschuss besiegt werden. Das Ziel ist es, das Level zu beenden, indem die Kiste am Ende des Levels geöffnet wird. Sobald das Level beendet ist, wird die benötigte Zeit ausgegeben.
+<p align="center">
+  <img alt="Python" src="https://img.shields.io/badge/Python-3.9%2B-3776AB?logo=python&logoColor=white">
+  <img alt="pygame" src="https://img.shields.io/badge/pygame-2.x-2ea44f">
+  <img alt="PyTorch" src="https://img.shields.io/badge/PyTorch-CPU-EE4C2C?logo=pytorch&logoColor=white">
+  <img alt="Stable-Baselines3" src="https://img.shields.io/badge/RL-PPO%20(SB3)-6f42c1">
+  <img alt="Tests" src="https://img.shields.io/badge/Tests-pytest-0a7bbb">
+  <img alt="Lizenz" src="https://img.shields.io/badge/Lizenz-MIT-yellow">
+</p>
 
-Neu seit 2026: Ein **Bot lernt das Spiel per Reinforcement Learning (PPO)** – und man kann ihm dabei zusehen
-(Geister-Ansicht: viele Bots gleichzeitig im selben Level). Wie das funktioniert, erklärt das
-**Lerntagebuch** in [`docs/lernen/`](docs/lernen/00_ueberblick.md).
+**Space Pirate** ist ein 2D-Jump'n'Run aus dem Jahr 2023: Ein Weltraumpirat springt über Lücken, stompt oder
+erschießt Gegner und sucht die Schatzkiste. 2026 wurde das Spiel neu aufgebaut, und **ein Bot hat es per
+Reinforcement Learning selbst gelernt**. Heute ist daraus eine fertige Spiel-App geworden, mit Rennen gegen den Bot,
+Bestzeiten und einem Level-Editor, der beweist, ob der Bot ein Level schaffen kann.
 
-## Installation
-Python 3.9 oder neuer.
+<p align="center">
+  <img src="docs/medien/bot_pruefung_2023.gif" alt="Der Bot spielt das Original-Level von 2023" width="85%"><br>
+  <sub>Der trainierte Bot spielt das <b>Original-Level von 2023</b>, auf dem er nie trainiert hat (Zeitraffer 3×).
+  <a href="docs/medien/bot_pruefung_2023.mp4">Ganzer Lauf in Echtzeit (MP4)</a></sub>
+</p>
 
-```
-pip install -r requirements.txt
-```
+## Was drin steckt
 
-Für das Training reicht die CPU-Version von PyTorch (kleiner Download):
-`pip install torch --index-url https://download.pytorch.org/whl/cpu`
-
-## Spielen
-
-```
-python spacepirate.py                            # die App: Ladescreen, Menü, alle Modi
-python game.py                                   # dasselbe
-python game.py levels/phase1/p1_luecken_01.txt   # ein Level direkt, ohne Menü (wie früher)
-```
-
-Im Hauptmenü gibt es vier Wege:
-
-- **Einzelspieler:** Alle Level nach Reitern sortiert (Einstieg, Handgebaut, Test-Serie, Prüfung, Eigene) plus
-  **Zufallslevel** aus dem Generator, mit dem der Bot trainiert hat (14 Stufen, Seed wiederholbar).
-  - Pro Level werden Bestzeit und 1–3 Sterne gespeichert. Die Messlatte ist der bewiesene Bot-Weg
-    (`.loesung.json`): 3 Sterne gibt es bis 15 % langsamer, 2 Sterne bis 50 %. Ohne gespeicherten Weg gilt eine
-    geschätzte „Richtzeit“.
-  - Ab dem ersten Sieg läuft dein Bestlauf als **Geist** mit, exakt nachgespielt, weil das Spiel deterministisch
-    ist.
-- **Gegen den Bot:** Wettrennen gegen den trainierten Bot (`models/space_pirate_bot.zip`), der als
-  halbtransparenter Pirat im selben Level läuft.
-  - Der Bot läuft immer Vollgas, der einstellbare Vorsprung (0/2/5/10 s) ist der Schwierigkeitsregler.
-  - Wer stirbt, fängt am Start wieder an; wer zuerst an der Kiste ist, gewinnt.
-  - Braucht PyTorch und stable-baselines3; ohne sie ist der Modus ausgegraut.
-- **Level-Editor:** siehe unten.
-- **Einstellungen:** Vollbild, Musik, Effekte, Geist an/aus, Standard-Vorsprung. Musik und Effekte werden beim
-  Start per Code synthetisiert, es gibt keine Audiodateien.
-
-Der Spielstand liegt in `~/.space_pirate/save.json`, nicht im Repo.
-
-| Taste | Aktion |
+| Bereich | Was es kann |
 |---|---|
-| `A` / `D` oder Pfeiltasten | laufen |
-| `W`, Leertaste oder Pfeil hoch | springen |
-| Enter | schießen |
-| `R` | Neustart |
-| Esc / `P` | Pause (im Menü: zurück) |
-| F11 | Vollbild |
+| 🎮 **Spiel-App** | Ladescreen, Menü, 57 Level in fünf Reitern plus endlose Zufallslevel, Bestzeiten, 1–3 Sterne, Bestzeit-Geist, synthetisierte Musik → [Spielen](docs/spielen.md) |
+| 🤖 **Gegen den Bot** | Wettrennen gegen das trainierte Netz, das als Geist im selben Level läuft; der Vorsprung ist der Schwierigkeitsregler → [Spielen](docs/spielen.md#gegen-den-bot) |
+| 🧱 **Level-Editor** | mit der Maus bauen, alte Level umbauen; „Prüfen“ sucht im Hintergrund einen echten Bot-Weg und markiert, bis wohin er bewiesen ist → [Editor](docs/level_editor.md) |
+| 🧠 **Lernender Bot** | PPO mit kleinem CNN, Nachahmen des Lösers, Curriculum über 14 Generator-Stufen; 98 % auf dem Prüfungslevel → [Der Bot](docs/bot.md) |
+| 📓 **Lerntagebuch** | 13 Phasen in 14 Kapiteln, mit Fehlschlägen und ehrlichen Messungen, dazu ein interaktives Notebook → [Lerntagebuch](docs/lernen/00_ueberblick.md) |
 
-## Level
-Level sind Textdateien mit 13 Zeilen: `B` = Block, `E` = Gegner, `C` = Kiste (Ziel), `P` = Startpunkt (optional).
-Mehrere Kisten sind erlaubt, jede ist ein Ziel.
+## Schnellstart
 
-| Ordner | Inhalt |
+```bash
+pip install -r requirements.txt     # pygame, numpy, PyTorch (CPU genügt), stable-baselines3, …
+python spacepirate.py               # die App starten
+```
+
+Steuerung: `A`/`D` laufen, `W`/Leertaste springen, Enter schießen, Esc Pause, F11 Vollbild.
+Weitere Startwege, etwa `python game.py <level.txt>` oder `python leveleditor.py`, stehen in [docs/spielen.md](docs/spielen.md).
+
+## Der Bot in Zahlen
+
+| Messung (Level, die er **nie** trainiert hat) | Ergebnis |
 |---|---|
-| `levels/exam/` | Prüfungslevel – der Bot trainiert **nie** darauf |
-| `levels/phase1/`, `phase2/`, … | handgebaute Trainingslevel je Phase |
-| `levels/showcase/` | feste Level für Videos / Geister-Ansicht |
-| `levels/test_serie/` | 6 handgebaute schwere Test-Level (nie trainiert, mit geprüfter Lösung) |
-| `levels/validierung/` | eingefrorene Validierungs-Level (v2: Stufen 4–9, v3: Stufen 10–11) |
-| `levels/eigene/` | im Editor gebaute Level (kein Trainingsordner) |
+| Original-Prüfungslevel von 2023 (256 Versuche) | **98 %** |
+| Generalist-Wert: 8 Level-Kategorien, frische Seeds | **87 %** |
+| Gabeln & Sackgassen · Kanäle · lange Level | 90 % · 95 % · 82 % |
+| Links / gespiegelte Level (größte offene Lücke) | 52 % |
 
-Werkzeuge:
+<p align="center">
+  <img src="docs/medien/lernkurve.png" alt="Erfolgsquote auf dem Prüfungslevel je Lernstand" width="85%">
+</p>
 
-```
-python -m jumpnrun.levelgen.solver mein_level.txt          # ist das Level für den Bot schaffbar?
-python -m jumpnrun.levelgen.solver mein_level.txt --map    # wo kann man überall stehen?
-python -m jumpnrun.levelgen.generator --tier 4 --seed 7 --out mein_level.txt   # Level erzeugen
-```
+<table>
+  <tr>
+    <td width="50%"><img src="docs/medien/bot_lernfortschritt.gif" alt="Lernfortschritt Phase 1 bis 13"><br>
+      <sub><b>So hat er gelernt:</b> je 16 Bots pro Lernstand, Phase 1 bis 13 (<a href="docs/medien/bot_lernfortschritt.mp4">MP4</a>)</sub></td>
+    <td width="50%"><img src="docs/medien/geister_32.gif" alt="32 Bots gleichzeitig"><br>
+      <sub><b>32 Bots gleichzeitig</b> auf dem Prüfungslevel (Geister-Ansicht)</sub></td>
+  </tr>
+</table>
 
-## Level bauen (Editor)
+Wie die Zahlen entstehen und was der Bot sieht, steht in [docs/bot.md](docs/bot.md). Die Lernkurve ist nachmessbar
+mit `scripts/make_readme_media.py measure`.
 
-```
-python leveleditor.py                          # neues Level (oder im Hauptmenü der App)
-python leveleditor.py levels/phase1/p1_luecken_01.txt   # vorhandenes Level umbauen
-```
+## Die App
 
-- **Malen mit der Maus:** Werkzeug oben anklicken (oder Taste 1–8): Block, Gegner, Kiste, Start, Radierer,
-  Rechteck, Spalte einfügen, Spalte löschen. Links malen (gedrückt ziehen), rechts radieren,
-  Umschalt+Ziehen = Rechteck. Mausrad scrollt, Strg+Mausrad zoomt, Klick in die Übersicht unten springt.
-  Rechts über das Level-Ende hinaus malen verlängert das Level. Strg+Z/Strg+Y, F1 zeigt alle Tasten.
-- **Prüfen (P):** sucht im Hintergrund einen echten Weg mit den Bot-Aktionen. Weiterbauen geht währenddessen.
-  - Grün = Weg bis zur Kiste bewiesen, die Spur ist eingezeichnet.
-  - Gelb = bewiesen bis Spalte X, danach wurde etwas geändert, das den Weg betrifft. „Weiterprüfen“ setzt dort
-    an, statt von vorn zu suchen. Änderungen, die der Weg nicht berührt, kürzen ihn nicht.
-  - Rot = ab der markierten Stelle wurde kein Weg gefunden. Ehrlicherweise kann das auch am Suchbudget liegen
-    (lange, verschlungene Level findet der Löser von Grund auf nicht immer). Nochmal prüfen ohne Änderung sucht
-    mit doppeltem Budget.
-- **Testspielen (T)** und **bewiesenen Weg abspielen (L)**, Esc führt zurück in den Editor.
-- **Speichern:**
-  - Strg+S aktualisiert die geöffnete `.txt`. Unveränderte Zeilen bleiben Byte für Byte gleich.
-  - Strg+Umschalt+S speichert als neues Level, standardmäßig in `levels/eigene/`.
-  - Ist der Weg bewiesen, wird die Lösung als `<name>.loesung.json` mitgespeichert. Eine veraltete Lösung
-    bietet der Editor zum Entfernen an.
-  - Mess-Level (`levels/exam*`, `validierung`, `test_serie`) lassen sich öffnen und umbauen, aber nur als neues
-    Level speichern.
+<p align="center">
+  <img src="docs/medien/app_collage.jpg" alt="Hauptmenü, Levelauswahl, Ergebnis, Bestzeit-Geist, Rennen gegen den Bot, Level-Editor" width="100%">
+</p>
 
-## Der Bot
+## Dokumentation
 
-Das repräsentative Modell des Projekts ist **`models/space_pirate_bot.zip`** (Stand 11.10.2026, Phase 13).
-Der Bot spielt mit leicht geschärfter Aktionswahl (Temperatur 0,3).
-
-| Messung | Ergebnis |
+| Seite | Inhalt |
 |---|---|
-| Generalist-Wert (8 Kategorien, gepaart, frische Seeds) | 87,0 % |
-| Prüfungslevel (256 Versuche) | 98 % |
-| Klassisch rechts / schwere Sprünge / neue Strukturen | 93 % / 93 % / 95 % |
-| Gabeln und Sackgassen / Kanäle / lange Level | 90 % / 95 % / 82 % |
-| Links / gespiegelte Level (die größte offene Lücke) | 52 % |
+| [Spielen](docs/spielen.md) | Modi, Steuerung, Sterne, Geist, Bot-Rennen, Einstellungen, Spielstand |
+| [Level & Editor](docs/level_editor.md) | Level-Format, Ordner, Editor, bewiesener Weg, Löser und Generator auf der Kommandozeile |
+| [Der Bot](docs/bot.md) | Beobachtung, Aktionen, Netz, Belohnung, Messwerte, Modelle, Zuschauen |
+| [Training](docs/training.md) | Trainings- und Auswertungsbefehle aller Phasen, Medien neu erzeugen |
+| [Architektur](docs/architektur.md) | Pakete, Diagramm, warum alles deterministisch ist, Tests |
+| [Lerntagebuch](docs/lernen/00_ueberblick.md) | von „Was ist Reinforcement Learning?“ bis Phase 13 |
 
-Zum Vergleich: Das älteste brauchbare Modell P8 (`models/phase8_final.zip`) kommt auf 45 %.
-Auf den versiegelten, nie gesehenen Leveln gewann die direkte Vorstufe (Phase 12) 75 % gegenüber 62,5 % bei P8.
-Wie es dazu kam, steht im Lerntagebuch ([Phase 12](docs/lernen/12_phase12_generalist_schueler.md),
-[Phase 13](docs/lernen/13_phase13_links.md)).
+## Projektstruktur
 
 ```
-python -m jumpnrun.rl.watch --level levels/exam/level.txt --live              # dem Bot zuschauen
-python -m jumpnrun.rl.watch --level levels/exam/level.txt --video pruefung.mp4 # als Video
+spacepirate.py · game.py · leveleditor.py   Startpunkte: App, ein Level direkt, Editor
+jumpnrun/core/        deterministischer Spielkern (ohne Grafik, ohne Uhr)
+jumpnrun/render/      Grafik, Geister-Ansicht, Video-Export
+jumpnrun/levelgen/    Level-Generator, Löser, Weg-Karte
+jumpnrun/rl/          Gymnasium-Umgebung, Netz, Training, Messungen
+jumpnrun/imitation/   Musterlösungen, Behavior Cloning, DAgger
+jumpnrun/editor/      Level-Editor mit bewiesenem Weg
+jumpnrun/app/         Spiel-App: Szenen, Spielstand, Bot-Gegner, Klang
+levels/ · models/     Level-Dateien · trainierte Bots aller Phasen
+docs/ · tests/        Dokumentation, Lerntagebuch · rund 170 Tests
+legacy/               der frühere RL-Versuch (2025/26), unverändert
 ```
 
-## Bot trainieren und zuschauen
+## Geschichte
 
-```
-# Phase 1: laufen und springen lernen
-python -m jumpnrun.rl.train --run runs/phase1 --max-tier 2 --steps 1500000 --handmade "levels/phase1/*.txt"
+- **2023:** Leon schreibt Space Pirate als pygame-Projekt: Pirat, Gegner, Kiste und ein langes Level, das heute
+  das **Prüfungslevel** ist ([UML von damals](UML/UML_Diagramm.png)).
+- **2025/26:** ein erster RL-Versuch mit Checkpoint-Belohnungen (Autor „MararatscherCode“). Er liegt unverändert in [`legacy/`](legacy/README.md).
+- **2026:** Neubau mit deterministischem Spielkern. Ein Löser beweist, dass Level lösbar sind. Der PPO-Bot lernt in
+  13 Phasen vom ersten Sprung bis zum Generalisten. Danach entstehen der Level-Editor und die Spiel-App.
 
-# live zuschauen (zweites Terminal, braucht einen Bildschirm)
-python -m jumpnrun.rl.watch --run runs/phase1 --live --level levels/showcase/luecken.txt
+## Credits & Lizenz
 
-# oder beides in einem: Training mit Live-Fenster
-python -m jumpnrun.rl.train --run runs/phase1 --max-tier 2 --watch --watch-level levels/showcase/luecken.txt
-
-# Phase 5: vom Löser abschauen, dann selbst üben (Entscheidung alle 2 Frames)
-python -m jumpnrun.imitation.demos --out runs/demos          # Musterlösungen + geprüfter Level-Pool
-python -m jumpnrun.imitation.bc --demos runs/demos --init models/phase3.zip --out models/phase5_bc.zip
-scripts/train_phase5.sh main                                 # PPO mit Vorbild-Bremse
-scripts/train_phase5.sh control                              # Vergleich ohne Vorbild
-
-# Phase 6: Übersichtskarte, lange Level (Stufen 10-11), Startpunkte mitten im Level
-python -m jumpnrun.imitation.demos --out runs/demos3 --tiers 10 11 --counts 500 400 --merge-pool runs/demos/pool.json
-python -m jumpnrun.imitation.bc --demos runs/demos3 --init models/phase5.zip --grow --only-overview \
-    --dagger-rounds 0 --out models/phase6_start.zip
-scripts/train_phase6.sh                                      # max. 16 h, danach oder bei bestandener Prüfung Schluss
-# Prüfungs-Bot aus Phase 6: models/phase6_durchbruch.zip (37 von 128 Versuchen) - aktuell: models/space_pirate_bot.zip
-python -m jumpnrun.rl.watch --model models/phase6_durchbruch.zip --level levels/exam/level.txt --video pruefung.mp4
-python -m jumpnrun.rl.milestones --run runs/phase6           # Meilensteine: Validierung, Test-Serie, Prüfung
-
-# Auswertung
-tensorboard --logdir runs                         # Dashboard im Browser
-python -m jumpnrun.rl.report runs/phase1 --png lernkurve.png
-python -m jumpnrun.rl.evaluate --model models/phase1.zip --tiers 0 1 2
-python -m jumpnrun.rl.watch --run runs/phase1 --timelapse zeitraffer.mp4 --level levels/showcase/luecken.txt
-```
-
-## Projektaufbau
-
-```
-spacepirate.py       die Spiel-App (game.py ohne Argument startet sie auch)
-game.py              ein Level direkt spielen
-jumpnrun/app/        Spiel-App: Szenen, Spielstand, Bot-Gegner, Klang
-jumpnrun/ui/         gemeinsame Bedienelemente von App und Editor
-leveleditor.py       Level bauen und auf Lösbarkeit prüfen
-jumpnrun/editor/     Level-Editor (Raster, bewiesener Weg, Oberfläche)
-jumpnrun/core/       deterministische Spielsimulation (ohne Grafik, ohne Uhr)
-jumpnrun/render/     Grafik: Spiel, Geister-Ansicht, Video-Export
-jumpnrun/levelgen/   Level-Generator und Löser
-jumpnrun/rl/         Gymnasium-Umgebung, Netz, Curriculum, Training (PPO, PPO mit Vorbild), Auswertung
-jumpnrun/imitation/  Musterlösungen vom Löser, Behavior Cloning, DAgger
-levels/              Level-Dateien
-models/              trainierte Bots
-tests/               python -m pytest tests
-docs/lernen/         Lerntagebuch
-UML/                 UML-Diagramm des Originalspiels (2023)
-```
-
-## Lizenzen
-Die verwendeten Bilder (Sprites) sind lizenzfrei und dürfen frei verwendet werden. Die Bilder können auf folgenden Seiten heruntergeladen werden:
-- Player Sprites: [Craftpix](https://craftpix.net/freebies/free-2d-pirate-character-sprites/)
-- Enemy Sprites: [Pipoya](https://pipoya.itch.io/pipoya-free-rpg-character-sprites-32x32)
-- Block (Ground) Sprites: [PNG Wing](https://www.pngwing.com/en/free-png-zoola/download)
-- Chest Sprites: [Admurin](https://admurin.itch.io/free-chest-animations)
-
-## Älterer RL-Ansatz (`legacy/`)
-
-Auf `main` gab es vor dem Neubau einen eigenen RL-Versuch (Aug. 2025 – Feb. 2026, Autor „MararatscherCode“):
-`GameSession`, Gym-Umgebung `rl/pirate_game_env.py`, PPO-Training `train_ppo.py` mit Checkpoint-Belohnungen,
-Curriculum easy → medium → full und eigenen Trainingsleveln. Beim Zusammenführen mit dem neuen Spielkern
-(`jumpnrun/`) ist er vollständig erhalten geblieben und liegt jetzt unverändert in `legacy/`
-(inkl. der alten `game.py`, `object.py`, `player.py`, `world.py` und seiner README unter `legacy/README.md`).
-Der aktuelle Bot und sein Lerntagebuch: `jumpnrun/rl/` und `docs/lernen/`.
+Code: [MIT](LICENSE) © 2023–2026 Leon von Detten. Die Grafiken sind freie Assets mit eigenen Lizenzen:
+Pirat von [Craftpix](https://craftpix.net/freebies/free-2d-pirate-character-sprites/),
+Gegner von [Pipoya](https://pipoya.itch.io/pipoya-free-rpg-character-sprites-32x32),
+Blöcke von [PNG Wing](https://www.pngwing.com/en/free-png-zoola/download),
+Kiste von [Admurin](https://admurin.itch.io/free-chest-animations).
+Musik und Effekte werden im Spiel per Code erzeugt.

@@ -2,8 +2,16 @@
 
 Leon ist Beobachter und Entscheider bei der Architektur, er schreibt keinen Code. Doku und Chat auf Deutsch,
 Code und Kommentare auf Englisch. Große Schritte erst im Planmodus planen und Auswahlmöglichkeiten geben.
-Gearbeitet wird auf dem Branch `claude/jumpnrun-cloud-session-65e3po`; nach `main` erst, wenn der Bot das
-Prüfungslevel (`levels/exam/level.txt`, wird nie trainiert) sicher schafft.
+Seit 12.10.2026 wird direkt auf `main` gearbeitet (der Bot schafft das Prüfungslevel `levels/exam/level.txt`,
+das nie trainiert wird, sicher); größere Experimente weiter auf eigenen Branches.
+
+## Doku
+
+- Die README bleibt kompakt (Pitch, Medien, Schnellstart, Wegweiser). Details stehen in `docs/*.md`, das
+  Lerntagebuch in `docs/lernen/`.
+- Jede Änderung zieht die betroffene Doku im selben Commit nach.
+- Bilder und Videos der README erzeugt `scripts/make_readme_media.py` und legt sie in `docs/medien/` ab. GIFs
+  bleiben dabei je unter ~4 MB.
 
 ## Commits
 

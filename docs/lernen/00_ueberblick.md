@@ -1,5 +1,13 @@
 # Lerntagebuch 0 – Überblick: Was ist Reinforcement Learning?
 
+> **Stand 12.10.2026:**
+> - Der aktuelle Bot ist `models/space_pirate_bot.zip` (Phase 13). Er schafft das Prüfungslevel von 2023 in 98 %
+>   der Versuche, mehr in [docs/bot.md](../bot.md).
+> - Interaktiv zum Ausführen: [`projekt_interaktiv.ipynb`](projekt_interaktiv.ipynb), Lesefassung als
+>   [HTML](projekt_interaktiv.html). Es führt mit echtem Projektcode und dem trainierten Bot durch alle Phasen und
+>   Ansätze (Stand 11.10.; alle 24 Code-Zellen laufen mit dem aktuellen Code durch, geprüft am 12.10.).
+> - Zurück zur [README](../../README.md).
+
 ## Die Grundidee in einem Satz
 
 Ein **Agent** (unser Bot) probiert in einer **Umgebung** (dem Spiel) **Aktionen** aus, bekommt dafür
@@ -61,15 +69,17 @@ und jeder Schritt wird sichtbar überprüft.**
 
 ## Aufbau des Projekts
 
+Die heutige Struktur mit App, Editor und UI steht in der [Architektur](../architektur.md). Für das Lernen
+wichtig sind:
+
 ```
-game.py                 selbst spielen (Tastatur)
 jumpnrun/core/          das Spiel als reine Simulation (keine Grafik, keine Uhr)
-jumpnrun/render/        Grafik: Spiel, Geister-Ansicht, Videos
 jumpnrun/levelgen/      Level-Generator + Löser (prüft, ob ein Level schaffbar ist)
 jumpnrun/rl/            Umgebung, Netz, Curriculum, Training, Auswertung, Geister-Ansicht
-levels/                 exam/ (Prüfung), phase1/ phase2/ … (Trainingslevel), showcase/ (für Videos)
-tests/                  automatische Tests
-docs/lernen/            dieses Lerntagebuch
+jumpnrun/imitation/     Musterlösungen vom Löser, Behavior Cloning, DAgger
+levels/                 exam/ (Prüfung), test_serie/, phase1/ … (Trainingslevel), showcase/ (für Videos)
+models/                 die Lernstände aller Phasen
+docs/lernen/            dieses Lerntagebuch, daten/ (Rohdaten), medien/ (Bilder), seiten/ (Lernseiten, Videos)
 ```
 
 ## Die Phasen
@@ -85,3 +95,11 @@ docs/lernen/            dieses Lerntagebuch
 | 7 | Zwei Netze im Vergleich, EMA, Abzweige – Prüfung 85/128 (Ziel erreicht), Test-Serie 138/192 (Ziel 144 verfehlt), geheime exam2 49/128 – **Ziel insgesamt verfehlt** | [07_phase7_zwei_wege.md](07_phase7_zwei_wege.md) |
 | 8 | Ehrlich messen: vier Messgruppen, Fähigkeits-Proben, 12 neue Level, Datenweg + Augmentierung, Runden gegen Kontrolle – versiegelt 208/256 (untere 95-%-Grenze 76 %), exam2 85/128, Test-Serie 153/192 – **Merge-Kriterium erfüllt**; Gabelungen bleiben offen | [08_phase8_ehrlich_messen.md](08_phase8_ehrlich_messen.md) |
 | 9 | Umkehren und Kanäle: Weg-Distanz-Belohnung, 7. Aktion „links+springen“, Sicht nach hinten, Generator v10 (Kanäle, Mario-Bausteine), Augmentierung v2, Lehrer-Beispiele – neue versiegelte Level 32/128 (= Phase 8), Phase-8-versiegelt 156/256 – **Merge-Kriterium nicht erfüllt**; Erkenntnis: ohne Vorbild probiert der Bot „links“ nie | [09_phase9_umkehren.md](09_phase9_umkehren.md) |
+| 10 | Halten, üben, mischen: Messreparatur, kurze Übungslevel, zweiter Vorbild-Strom, Mischung nach Schritten. Neue Fähigkeiten werden lernbar (Kanal-Probe ≈ 90 %), dafür geht auf langen alten Leveln etwas verloren | [10_phase10_halten_ueben_mischen.md](10_phase10_halten_ueben_mischen.md) |
+| 10b | Neustart-Arm: ein frisches Netz mit Kickstarting von P8. Es holt das P8-Niveau in ~30 Mio. Schritten zurück und lernt Alt und Neu gemeinsam; das Alt-Tor (Wächter) bleibt verfehlt | [10b_neustart.md](10b_neustart.md) |
+| 11 | Generalist in beide Richtungen: gezielte Übung löst die Doppelgabel in ~2 Mio. Schritten (0 → 66–81 %); Prüfung 66 % in Arm A | [11_phase11_generalist.md](11_phase11_generalist.md) |
+| 12 | Frischer Schüler mit mehreren Lehrern, schwererer Generator, Temperatur 0,3. Auf den versiegelten, nie gesehenen Leveln **75 % gegenüber 62,5 % bei P8** | [12_phase12_generalist_schueler.md](12_phase12_generalist_schueler.md) |
+| 13 | Links-Präzision und Nachschärfen: Generalist 87,0 %, Gabeln 90 %, **Prüfung 98 %**, wird zum aktuellen Bot `space_pirate_bot.zip`; offen bleiben Links und Spiegel (52 %) | [13_phase13_links.md](13_phase13_links.md) |
+
+Weitere Texte: die [Reflexion nach Phase 7](../reflexion/phase7_reflexion.md) und ihre
+[Gegenprüfung](../reflexion/phase7_gegenpruefung.md). Lernseiten mit Videos liegen in [`seiten/`](seiten/).
