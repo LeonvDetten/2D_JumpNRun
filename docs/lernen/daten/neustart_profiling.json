@@ -1,0 +1,42 @@
+{
+ "stand": "2026-10-06 09:00-09:20 UTC, vor dem Plan, 4 Kerne, 15 GB",
+ "umgebung": {
+  "befund": "System-Python 3.13 segfaultet beim Laden der Modelle (gepickelte Lernraten-Lambdas aus Python 3.11)",
+  "loesung": "scripts/setup_neustart.sh: .venv mit Python 3.11.17, torch 2.14.0+cpu, SB3 2.9.0, gymnasium 1.3.0, numpy 2.4.6",
+  "tests": "117 passed"
+ },
+ "lauf": {
+  "netz": "frisch, GridFeatures obs v3, pi/vf [128], Tanh (train.py-Standard)",
+  "flags": "Phase-10-P8-Flags ohne --unlock-all, --demos runs/demos4 (BC1), Mix p8 0.6 / skill 0.2 / v10 0.2, lr 3e-4, 8 Envs, n_steps 512, batch 1024, 122880 Schritte",
+  "ohne": "BC2, Anker, Kickstarting"
+ },
+ "durchsatz_schritte_pro_s": {
+  "1_arm_4_threads": 418,
+  "2_arme_2_threads_je_arm": 273,
+  "2_arme_2_threads_zusammen": 546
+ },
+ "zeitanteile_pyspy": {
+  "1_arm_4_threads": {"ppo_update": 0.681, "rollout_forward_buffer": 0.147, "bc1_schritte": 0.078, "env_simulation": 0.068, "start_sonstiges": 0.026},
+  "2_arme_2_threads": {"ppo_update": 0.749, "rollout_forward_buffer": 0.115, "bc1_schritte": 0.068, "env_simulation": 0.049, "start_sonstiges": 0.019}
+ },
+ "ppo_epochen": "approx_kl 0.0001-0.005, target_kl 0.02 wird nie erreicht -> alle 4 Epochen laufen",
+ "channels_last": {
+  "update_16x1024_s": {"4_threads": [6.71, 4.39], "2_threads": [10.16, 6.86]},
+  "rollout_forward_512x8_s": {"4_threads": [1.23, 0.91], "2_threads": [1.45, 1.27]},
+  "max_abweichung_wahrscheinlichkeit": 7.2e-07,
+  "torch_compile_4_threads": {"update_s": 4.46, "rollout_s": 1.10, "urteil": "nicht besser als channels_last, riskanter"}
+ },
+ "kickstarting_kosten_2_threads": {
+  "p8_forward_4096_zustaende_s": 1.08,
+  "distill_8x256_fwd_bwd_s": 0.84,
+  "ppo_update_16x1024_s": 10.88,
+  "anteil_am_update": "ca. +15 %"
+ },
+ "bc_aktivierung": {
+  "versuch": "frisches Netz, BC auf 150k demos4-Samples (1 Epoche, batch 256), Holdout 20k",
+  "tanh_lr_1e-3": {"holdout": 0.906, "argmax": "100 % rechts (Kollaps auf Basisrate)"},
+  "tanh_lr_3e-4": {"holdout": 0.906, "argmax": "100 % rechts"},
+  "relu_lr_1e-3": {"holdout": 0.944, "argmax": "69 % rechts, 30 % rechts+springen"},
+  "relu_lr_3e-4": {"holdout": 0.938, "argmax": "64 % rechts, 37 % rechts+springen"}
+ }
+}

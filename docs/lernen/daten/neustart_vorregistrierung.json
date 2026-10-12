@@ -1,0 +1,64 @@
+{
+ "phase": "neustart",
+ "stand": "2026-10-06, vor dem ersten Trainingsschritt (Plan von Leon im Planmodus freigegeben)",
+ "entscheidungen_leon": {
+  "arme": "ein Arm: Löser-BC-Start + Online-Kickstarting von P8, alle 4 Kerne",
+  "kickstart_gewicht": "1 -> 0 linear über 15 Mio. Schritte",
+  "lernrate": "2e-4 -> 2e-5 Kosinus über 45 Mio.",
+  "mischung": "P8 60 / Übung 20 / lange v10 20 (v10 ab Curriculum-Stufe 10)",
+  "merge": "kein Merge, kein PR; Endvergleich einmalig und gepaart mit Phase 10, später"
+ },
+ "arme": {"ks": {"kickstart": true}},
+ "ziel_schritte": 45000000,
+ "zeit_stunden": 60,
+ "zeit_bedeutung": "Wanduhr ab dem ersten PPO-Start; zusätzlich --time-limit-hours 60 Trainingszeit je Prozess",
+ "netz": "frisch: GridFeatures obs v3 (Raster 33, Übersicht 40, vec 23), pi/vf [128], geteilter Extraktor, 7 Aktionen, ReLU-Köpfe (Tanh kollabiert beim BC, docs/lernen/daten/neustart_profiling.json)",
+ "bc": {
+  "daten": "Löser-Demos, streng mit der Trainings-Buchführung gerendert (progress=path, Spiegel-Fix): demos4 600k, demos10+demos9 (BC2) 501k mit 4790 links+springen",
+  "anteile_je_batch": {"p8": 0.5, "neu": 0.45, "a6": 0.05},
+  "schritte": 16000, "batch": 256, "lr": 0.001, "lr_ende": 0.0001,
+  "auswahl": "beste Zwischenstufe (alle 4000 Schritte) nach Validierungs-Siegen (72 generierte Level Stufen 4-12) + Holdout ohne rechts",
+  "value_schritte": 300000,
+  "value_warmup": "nur Value-Kopf, eigene Returns mit --path-delta-Belohnung auf Mischung P8 60 / Übung 20 / v10 20 (Stufen 0-12 gleich)",
+  "holdout": "runs/demos10/holdout.jsonl (233 Demos, levelgetrennt, nie trainiert)"
+ },
+ "startpruefung": {
+  "holdout_ueber_basis_min": 0.10,
+  "holdout_ohne_rechts_min": 0.60,
+  "p_a6_auf_a6_min": 0.3,
+  "p_a6_alte_zustaende_max": 0.02,
+  "siege_val_min": 0.05,
+  "bedeutung": "Holdout >= 'immer rechts'-Basis + 10 Pp; Übereinstimmung auf Zuständen ohne 'rechts' >= 0,60; P(links+springen) auf links+springen-Zuständen des Holdouts >= 0,3 und auf runs/phase10/kl_states.npz < 0,02; Validierung >= 5 %",
+  "volle_messung": "milestones10 --once (Tag neustart_bc1/2) nur Bericht, blockiert nicht",
+  "nicht_bestanden": "einmal nachbessern mit doppelten BC-Schritten; danach startet PPO trotzdem und die +5-Mio.-Regel entscheidet"
+ },
+ "ppo": {
+  "flags": "P8-Flags ohne --unlock-all (jumpnrun/rl/autopilot_neustart.py PPO_FLAGS): Curriculum Stufen 0-12, Pool 0,4, Augment 0,7, PLR 0,3, Mitte-Starts 0,2, Rückspulen 0,4, Hand 0,05, clip 0,1, ent 0,003, target_kl 0,02, 8 Envs x 512, batch 1024, BC1 0,3*0,995^Update >= 0,02, --path-delta, --tracker-p8-only, --skill-central, --channels-last",
+  "start": "das BC-Netz (num_timesteps 0, phase_start 0)"
+ },
+ "lernrate": {"cosine": [0.0002, 0.00002, 45000000], "ramp": 200000, "critic_warmup": 150000},
+ "mischung": {"p8": 0.6, "skill": 0.2, "v10": 0.2},
+ "mischung_sperre": {"v10": 10},
+ "bc2_plan": [[0, 0.1], [3000000, 0.05], [6000000, 0.03]],
+ "kickstart_plan": [[0, 1.0], [15000000, 0.0]],
+ "kickstart": "KL(P8 || Netz auf die 6 alten Aktionen renormiert) auf den eigenen Rollout-Zuständen aus P8-Leveln ohne Gabel-/Kanal-Bausteine (bait_fork, channel, gabel_, channel_end); eigene Optimierer-Schritte (8 x 256 je Update) mit eigenem Gradienten-Clip; pausiert im Critic-Warm-up",
+ "abbruchregel": [
+  {"name": "+5M", "millionen": [4, 5], "messungen": ["ema", "raw"], "abbruch_wenn_unter": {"dev_alt": 0.10, "F": 0.10}},
+  {"name": "+15M", "millionen": [14, 15], "messungen": ["ema", "raw"], "abbruch_wenn_unter": {"dev_alt": 0.35, "F": 0.25}},
+  {"name": "+30M", "millionen": [28, 30], "messungen": ["ema", "ema2"], "abbruch_wenn_unter": {"dev_alt": 0.50, "waechter_val": 0.50}}
+ ],
+ "abbruchregel_bedeutung": "Je Regel alle genannten Messungen der Millionen-Blöcke (ema/ema2 genau bei m Mio., roh = erster Roh-Checkpoint des Blocks); dev_alt mit zusammengezählten Versuchen je Level (wie phase 10 pooled_dev_alt), F Mittel, Wächter-Val Summe Siege / Summe Versuche. Geurteilt wird erst, wenn alle Messungen da sind; Regeln der Reihe nach. Schwellen nach dem Tempo der P8-Linie (dev_alt klein, reparierte Messung: phase3 11 Mio. 24 %, phase5 17 Mio. 35 %, phase6 30 Mio. 40 %, phase7 35 Mio. 53 %, P8 50 Mio. 66 %).",
+ "sicherung_millionen": [5, 15, 30],
+ "messung": {
+  "skript": "jumpnrun/rl/milestones10.py unverändert, --run runs/neustart_ks, OMP_NUM_THREADS=1, nice 10, ungepinnt",
+  "takt": "EMA jede 1 Mio. klein, EMA + EMA2 bei geraden Mio. voll, roh je ganze Mio. klein, Seed 0; --ema-every 1000000 --ema2-decay 0.998",
+  "x_achse": "Schritte seit Phasenstart 0",
+  "drift": "KL zu P8 und P(links+springen) auf kl_states alle 0,5 Mio. (nur Beobachtung)"
+ },
+ "erfolg_nur_bericht": {
+  "alt_tor": "unverändert wie select10.candidates: je voll gemessenem EMA/EMA2-Stand Fenster +-2 Mio. (EMA + EMA2 voll): dev_alt (gepoolt) >= P8-Basis (0,6643) - 3 Pp UND Wächter-Val (Mittel) >= 0,7734 - 5 Pp",
+  "f": "F (Fenster-Mittel) >= F des Runde-C-Gewinners (gleiches Fenster) - 3 Pp",
+  "runde_c_daten": "milestones10.json der Runde-C-Arme vom Phase-10-Branch claude/jumpnrun-cloud-session-65e3po (nur lesen)"
+ },
+ "nie": "exam2 und versiegelte/Test-Level nur als Gruppensummen aus milestones10; Prüfung, Proben v9/v10/v11, Wächter-Level nie trainiert; kl_states/a6_states nur für Prüfungen; select10 final / final10 laufen hier nicht"
+}
