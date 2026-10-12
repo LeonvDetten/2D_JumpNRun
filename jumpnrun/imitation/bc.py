@@ -42,16 +42,16 @@ def build_student(init_model: str, repeat: int, grow: bool = False):
     grow=True: network surgery - the old network plus a new, silent overview-map branch.
     """
 
-    from stable_baselines3 import PPO
     from stable_baselines3.common.vec_env import DummyVecEnv
 
     from jumpnrun.rl.curriculum import CurriculumSource
-    from jumpnrun.rl.modelinfo import grow_overview
+    from jumpnrun.rl.modelinfo import grow_overview, load_ppo
 
-    overview = grow or "overview" in PPO.load(init_model, device="cpu").observation_space.spaces
+    overview = grow or "overview" in load_ppo(init_model).observation_space.spaces
     env = DummyVecEnv([lambda: JumpNRunEnv(CurriculumSource(0, NUM_TIERS - 1), action_repeat=repeat,
                                            overview=overview)])
-    model = grow_overview(init_model, env) if grow else PPO.load(init_model, env=env, device="cpu")
+    # the student is saved again: keep the init model's schedules where they can be unpickled
+    model = grow_overview(init_model, env) if grow else load_ppo(init_model, env=env, keep_schedules=True)
     model.action_repeat = repeat
     return model
 
