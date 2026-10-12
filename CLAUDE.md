@@ -5,6 +5,15 @@ Code und Kommentare auf Englisch. Große Schritte erst im Planmodus planen und A
 Gearbeitet wird auf dem Branch `claude/jumpnrun-cloud-session-65e3po`; nach `main` erst, wenn der Bot das
 Prüfungslevel (`levels/exam/level.txt`, wird nie trainiert) sicher schafft.
 
+## Commits
+
+Alle Commits laufen auf Leons Namen – Autor und Committer
+`Leon von Detten <93910040+LeonvDetten@users.noreply.github.com>`, ohne `Co-Authored-By`- oder
+`Claude-Session`-Zeilen und unsigniert. Ein Container-Schlüssel würde die Commits auf GitHub als „Unverified“
+markieren. Zu Beginn jeder Sitzung einmal setzen:
+`git config user.name "Leon von Detten"`, `git config user.email "93910040+LeonvDetten@users.noreply.github.com"`,
+`git config commit.gpgsign false`.
+
 ## Lange Trainingsläufe
 
 - Training per idempotentem Skript starten (`scripts/train_phaseN.sh`, mit `--target` und `--time-limit-hours`),
