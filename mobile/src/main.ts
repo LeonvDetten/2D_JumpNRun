@@ -2,6 +2,7 @@
 
 import { App } from "./app/app";
 import { Progress } from "./app/progress";
+import { EditorScene } from "./app/scenes/editor";
 import { LoadingScene } from "./app/scenes/loading";
 import { requestPersistence } from "./platform/storage";
 import { registerServiceWorker } from "./platform/sw";
@@ -13,7 +14,9 @@ async function main(): Promise<void> {
   const progress = await Progress.load();
   void requestPersistence();
   const app = new App(screen, progress);
-  app.start(new LoadingScene(app));
+  // deep link: ?start=editor opens the level editor right after loading
+  const start = new URLSearchParams(location.search).get("start");
+  app.start(new LoadingScene(app, start === "editor" ? () => new EditorScene(app) : undefined));
   if (import.meta.env.DEV) (window as unknown as { app: App }).app = app; // for debugging in the browser console
   registerServiceWorker();
 }

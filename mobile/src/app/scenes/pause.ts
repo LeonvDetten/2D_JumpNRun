@@ -5,7 +5,6 @@ import type { Screen } from "../../ui/screen";
 import { MenuButton } from "../../ui/widgets";
 import { Scene, type App } from "../app";
 import type { GameScene } from "./game";
-import { LevelSelectScene } from "./levelselect";
 import { MenuScene } from "./menu";
 import { SettingsScene } from "./settings";
 
@@ -22,7 +21,7 @@ export class PauseScene extends Scene {
         this.game.reset();
       }],
       ["Einstellungen", () => this.app.push(new SettingsScene(this.app))],
-      ["Levelauswahl", () => this.app.switch(new LevelSelectScene(this.app, this.game.mode, this.game.tab))],
+      [game.options.returnTo ? "Zum Editor" : "Levelauswahl", () => this.game.toSelect()],
       ["Hauptmenü", () => this.app.switch(new MenuScene(this.app))],
     ];
     this.buttons = items.map(([label, fn]) => this.layer.add(new MenuButton(label, "", rect(0, 0, 0, 0), () => {

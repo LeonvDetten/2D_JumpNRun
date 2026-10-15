@@ -2,8 +2,10 @@
 //   single  time trial with the ghost of the best run
 //   bot     race against the trained bot; deaths send you back to the start
 //   watch   (new on mobile) the bot plays the level alone, again and again
+//   test    editor: test-play the level being built (no records, back to the editor)
+//   replay  editor: play back the proven bot way
 
-import { actionBits, actionFromBits } from "../../core/actions";
+import { BOT_ACTIONS_V3, actionBits, actionFromBits } from "../../core/actions";
 import { FPS, TILE } from "../../core/constants";
 import { Level } from "../../core/level";
 import { Simulation, Status } from "../../core/sim";
@@ -14,13 +16,21 @@ import type { Screen } from "../../ui/screen";
 import { CYAN, GOLD, GREEN, MUTED, RED, TEXT, YELLOW, css } from "../../ui/theme";
 import { Button } from "../../ui/widgets";
 import { Scene, type App } from "../app";
+import type { Scene as AnyScene } from "../app";
 import type { LevelEntry } from "../levelsIndex";
 import { formatTime } from "../progress";
 import { LevelSelectScene } from "./levelselect";
 import { PauseScene } from "./pause";
 import { ResultScene } from "./result";
 
-export type Mode = "single" | "bot" | "watch";
+export type Mode = "single" | "bot" | "watch" | "test" | "replay";
+
+export interface GameOptions {
+  /** Where "back" leads (editor); default: the level select. */
+  returnTo?: () => AnyScene;
+  /** replay mode: bot actions (2 frames each). */
+  replay?: number[];
+}
 const STEP = 1 / FPS;
 const COUNTDOWN = 3 * FPS;
 
@@ -51,7 +61,8 @@ export class GameScene extends Scene {
   private speedButton: Button;
   private deadButtons: Button[];
 
-  constructor(app: App, readonly entry: LevelEntry, readonly mode: Mode = "single", readonly headStart = 0, readonly tab = "") {
+  constructor(app: App, readonly entry: LevelEntry, readonly mode: Mode = "single", readonly headStart = 0, readonly tab = "",
+    readonly options: GameOptions = {}) {
     super(app);
     this.level = Level.fromText(entry.text, entry.title);
     const p = app.progress;
@@ -62,7 +73,7 @@ export class GameScene extends Scene {
     this.speedButton.hidden = mode !== "watch";
     this.deadButtons = [
       this.layer.add(new Button("Nochmal", rect(0, 0, 130, 40), () => this.reset(), true)),
-      this.layer.add(new Button("Levelauswahl", rect(0, 0, 130, 40), () => this.toSelect())),
+      this.layer.add(new Button(options.returnTo ? "Zum Editor" : "Levelauswahl", rect(0, 0, 130, 40), () => this.toSelect())),
     ];
     this.reset();
   }
@@ -90,7 +101,7 @@ export class GameScene extends Scene {
     if ((this.mode === "bot" || this.mode === "watch") && brain?.ready) {
       this.bot = new BotRacer(brain, this.level, this.mode === "bot" ? this.headStart * FPS : 0);
     }
-    this.countdown = this.mode === "watch" ? 0 : COUNTDOWN;
+    this.countdown = this.mode === "watch" || this.mode === "replay" ? 0 : this.mode === "test" ? FPS : COUNTDOWN;
     this.raceFrame = 0;
     this.inputs = [];
     this.acc = 0;
@@ -114,7 +125,8 @@ export class GameScene extends Scene {
   }
 
   toSelect(): void {
-    this.app.switch(new LevelSelectScene(this.app, this.mode, this.tab));
+    if (this.options.returnTo) this.app.switch(this.options.returnTo());
+    else this.app.switch(new LevelSelectScene(this.app, this.mode, this.tab));
   }
 
   private cycleSpeed(): void {
@@ -123,13 +135,13 @@ export class GameScene extends Scene {
   }
 
   hidden(): void {
-    if (this.app.top === this && this.mode !== "watch") this.pause();
+    if (this.app.top === this && this.playerControlled) this.pause();
   }
 
   // ------------------------------------------------------------------ input
   pointerDown(id: number, x: number, y: number): void {
     if (this.layer.pointerDown(id, x, y)) return;
-    if (this.mode !== "watch" && this.deadReason === null) this.app.controls.pointerDown(id, x, y);
+    if (this.playerControlled && this.deadReason === null) this.app.controls.pointerDown(id, x, y);
   }
 
   pointerMove(id: number, x: number, y: number): void {
@@ -211,8 +223,10 @@ export class GameScene extends Scene {
       this.bot?.step();
       if (this.afterEnd === 45 && !this.resultShown) {
         this.resultShown = true;
-        this.app.push(new ResultScene(this.app, this));
+        if (this.mode === "test" || this.mode === "replay") this.banner = [`Geschafft in ${formatTime(this.sim.frame)}!`, 60];
+        else this.app.push(new ResultScene(this.app, this));
       }
+      if (this.afterEnd === 105 && (this.mode === "test" || this.mode === "replay")) this.toSelect();
       return;
     }
     this.raceFrame += 1;
@@ -221,7 +235,10 @@ export class GameScene extends Scene {
       this.respawn -= 1;
       if (this.respawn === 0) this.sim = sim = new Simulation(this.level);
     } else {
-      const action = this.app.controls.action();
+      const replay = this.options.replay;
+      const action = this.mode === "replay"
+        ? BOT_ACTIONS_V3[replay?.[Math.floor((this.raceFrame - 1) / 2)] ?? 0]
+        : this.app.controls.action();
       this.inputs.push(actionBits(action));
       const before = [sim.jumps, sim.killsStomp, sim.killsShot, sim.player.shootCooldown];
       sim.step(action);
@@ -245,6 +262,13 @@ export class GameScene extends Scene {
       }
     }
     if (this.banner[1] > 0) this.banner = [this.banner[0], this.banner[1] - 1];
+    if (this.mode === "replay" && sim.status === Status.RUNNING && this.raceFrame >= 2 * (this.options.replay?.length ?? 0)) {
+      this.banner = ["Ende des bewiesenen Wegs", 60];
+      this.finished = true;
+      this.resultShown = true;
+      this.afterEnd = 45;
+      return;
+    }
     if (sim.status === Status.WON) {
       audio.play("chest");
       audio.play(this.won ? "win" : "lose");
@@ -262,6 +286,11 @@ export class GameScene extends Scene {
         for (const b of this.deadButtons) b.hidden = false;
       }
     }
+  }
+
+  /** The player steers (touch controls shown). */
+  get playerControlled(): boolean {
+    return this.mode === "single" || this.mode === "bot" || this.mode === "test";
   }
 
   get attempts(): number {
@@ -304,7 +333,7 @@ export class GameScene extends Scene {
 
     ctx = screen.ui();
     this.drawHud(ctx, screen);
-    if (!watch && this.deadReason === null && !this.finished) this.app.controls.draw(ctx, this.raceFrame < 4 * FPS);
+    if (this.playerControlled && this.deadReason === null && !this.finished) this.app.controls.draw(ctx, this.raceFrame < 4 * FPS);
     const cx = screen.uiW / 2;
     const cy = screen.uiH / 2;
     if (this.countdown > 0) {
@@ -312,7 +341,7 @@ export class GameScene extends Scene {
       const k = (this.countdown % FPS) / FPS;
       drawFancy(ctx, fancyText(String(n), 90, TITLE_GLOW), cx, cy - 20, "center", 0.8 + 0.35 * k, Math.min(1, k * 2 + 0.3));
       if (this.mode === "bot" && this.headStart) text(ctx, `Du startest ${this.headStart} s vor dem Bot`, cx, cy + 40, 15, CYAN, true, "center");
-    } else if (!watch && this.raceFrame < 20) {
+    } else if (this.playerControlled && this.raceFrame < 20) {
       drawFancy(ctx, fancyText("LOS!", 90, TITLE_GLOW), cx, cy - 20, "center", 1, 1 - this.raceFrame / 20);
     }
     if (this.banner[1] > 0) {
@@ -400,6 +429,9 @@ export class GameScene extends Scene {
     if (watch) {
       const status = !bot ? "Bot nicht geladen" : `Versuch ${this.attempts} · ${this.wins}× im Ziel`;
       text(ctx, status, right - 58, bar.y + bar.h / 2 + 1, 13, CYAN, true, "midright", rightW);
+    } else if (this.mode === "test" || this.mode === "replay") {
+      const label = this.mode === "test" ? "Testspiel – nichts wird gespeichert" : "Bewiesener Bot-Weg";
+      text(ctx, label, right, bar.y + bar.h / 2 + 1, 13, CYAN, true, "midright", rightW);
     } else if (this.mode === "bot") {
       let status: string;
       if (!bot) status = "Bot nicht geladen";

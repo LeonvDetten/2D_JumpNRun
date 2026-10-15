@@ -112,6 +112,11 @@ export class DistanceMap {
     return Number.isNaN(d) ? null : d;
   }
 
+  /** Moves from cell index u (row * cols + col) with their costs. */
+  edgesOf(u: number): readonly { v: number; cost: number }[] {
+    return this.edges[u] ?? [];
+  }
+
   free(c: number, r: number): boolean {
     if (c < 0 || c >= this.cols) return false;
     return r < 0 || (r < ROWS && !this.level.solid[r][c]);

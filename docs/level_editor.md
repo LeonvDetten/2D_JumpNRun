@@ -29,6 +29,8 @@ als Beweis, dass das Level lösbar ist, und liefert die Bot-Zeit für die Sterne
 
 ## Der Editor
 
+Auf dem iPhone gibt es denselben Editor mit Touch-Bedienung, siehe [Auf dem iPhone](mobile.md#der-level-editor-auf-dem-handy).
+
 ```
 python leveleditor.py                                   # neues Level (oder im Hauptmenü der App)
 python leveleditor.py levels/phase1/p1_luecken_01.txt   # vorhandenes Level umbauen

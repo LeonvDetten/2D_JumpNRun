@@ -42,7 +42,27 @@ lassen sich in den Einstellungen anpassen.
 - **Spielstand sichern und laden** (Einstellungen): Die Datei hat das Format der Desktop-`save.json`. Ein Spielstand
   vom Mac (`~/.space_pirate/save.json`) lässt sich also aufs Handy holen und umgekehrt. Beim Laden werden beide
   Stände zusammengeführt, und je Level gilt der bessere.
-- Level-Editor: folgt in Etappe 5.
+- **Level-Editor** mit Prüfen durch den Bot (siehe unten). Eigene Level erscheinen im Reiter „Eigene“.
+
+## Der Level-Editor auf dem Handy
+
+| Bedienung | Was passiert |
+|---|---|
+| Werkzeugleiste links | Block, Gegner, Kiste, Start, Radierer, Rechteck, Spalte +, Spalte −, Verschieben |
+| ein Finger | malt mit dem Werkzeug (wischen malt durchgehend); Rechteck: aufziehen, nochmal aufs Werkzeug tippen schaltet auf „leeren“ |
+| zwei Finger | verschieben und zoomen (ein angefangener Strich wird dabei zurückgenommen) |
+| Übersicht unten | tippen oder ziehen springt an die Stelle |
+| ↶ ↷ | rückgängig, wiederholen |
+| **Prüfen** | sucht im Hintergrund (Web Worker) einen echten Bot-Weg, während du weiterbaust. Grün = bewiesen, gelb = bis Spalte X bewiesen und danach geändert („Weiterprüfen“ setzt dort an), rot = kein Weg gefunden („Nochmal“ sucht mit doppeltem Budget) |
+| Testen ▶ · KI ▶ · Bot-Weg ▶ | selbst spielen · den trainierten Bot spielen lassen · den bewiesenen Weg abspielen; jeweils zurück in den Editor |
+| Datei | neu, öffnen (eigene Level oder ein mitgeliefertes als Vorlage), speichern, speichern unter, als `.txt` teilen, `.txt` importieren, löschen |
+
+Gespeicherte Level landen im Spielstand unter „Eigene“. Ein bewiesener Weg wird mitgespeichert und dient dann als
+Richtzeit für die Sterne. Der aktuelle Entwurf wird laufend gesichert, auch wenn iOS die App im Hintergrund beendet.
+Mit „Als .txt teilen“ und „.txt importieren“ wandern Level zwischen Handy und Desktop-Editor
+(`levels/eigene/`). Die Prüf-Logik ist eine Portierung von `jumpnrun/editor/proof.py` und
+`jumpnrun/levelgen/solver.py`: dasselbe Budget (120.000 Knoten, beim Wiederholen verdoppelt) und dieselben Ergebnisse
+auf den Testleveln. In JavaScript ist sie deutlich schneller als in Python.
 
 ## Wie die Portierung abgesichert ist
 
@@ -60,6 +80,7 @@ Vitest prüfen sie gegen Goldwerte, die aus dem Python-Code erzeugt werden (`mob
 | Bot-Beobachtung (Gitter, Übersichtskarte, Vektor) bei 1.200 Entscheidungen | bitgenau |
 | Bot-Netz (Logits gegenüber PyTorch) | Abweichung < 0,0001 |
 | Bot auf dem Prüfungslevel, 64 Versuche bei T = 0,3 (`npm run test:bot`) | **62/64 = 97 %** (Python: 98 %) |
+| Löser und „Prüfen“: Berg, Parcours, Zickzack werden mit dem Grundbudget bewiesen, Wege spielen sich bis zur Kiste nach | wie in Python |
 
 Eine bekannte Feinheit: `gammavariate` braucht einen Logarithmus. Die Mac-Bibliothek rundet ihn in etwa 0,07 % der
 Fälle anders als mathematisch exakt. Die App rechnet korrekt gerundet, sodass in seltenen Fällen ein Stilgewicht im
@@ -70,8 +91,9 @@ letzten Bit abweicht (10⁻¹⁶). In allen 4.600 verglichenen Leveln hatte das 
 ```
 mobile/
   src/core/       Spielkern (Level, Figuren, Simulation), 1:1 aus jumpnrun/core
-  src/levelgen/   Python-Zufall, Generator, Weg-Karte
+  src/levelgen/   Python-Zufall, Generator, Weg-Karte, Löser
   src/bot/        Beobachtung (aus jumpnrun/rl/env.py), Netz-Vorwärtsrechnung, Bot-Gegner
+  src/editor/     Editor-Modell, bewiesener Weg, Prüf-Worker (aus jumpnrun/editor/)
   src/render/     Sprite-Atlas, Renderer mit weicher Zwischenbild-Berechnung (Spiel 30 Hz, Bild 60/120 Hz)
   src/audio/      Klang-Synthese (aus jumpnrun/app/audio.py) über WebAudio
   src/input/      Touch-Steuerung und Tastatur
@@ -99,6 +121,8 @@ npm test             # Vergleichstests (~10 s)
 npm run test:bot     # Bot-Erfolgsquote auf dem Prüfungslevel (BOT_EPISODES=64, einige Minuten)
 npm run build        # fertige App nach mobile/dist
 ```
+
+`http://localhost:5173/?start=editor` öffnet direkt den Editor.
 
 Daten neu erzeugen, wenn sich Level, Grafiken oder der Bot am Desktop ändern (aus dem Projektordner,
 mit der Python-Umgebung des Projekts):
