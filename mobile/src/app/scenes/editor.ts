@@ -80,8 +80,9 @@ export class EditorScene extends Scene {
   private draftTimer = 0;
   private t = 0;
   private buttons: Record<string, Button> = {};
-  private minimapCache: { key: string; canvas: HTMLCanvasElement | null } = { key: "", canvas: null };
+  private minimapCache: { model: LevelModel | null; version: number; canvas: HTMLCanvasElement | null } = { model: null, version: -1, canvas: null };
   private restored = false;
+  private compact = false;
 
   constructor(app: App) {
     super(app);
@@ -259,8 +260,15 @@ export class EditorScene extends Scene {
     place("undo", left + 72, 38);
     place("redo", left + 114, 38);
     place("file", left + 158, 60);
+    // narrow screens (iPad portrait-like aspect, small phones): shorter labels so the bar fits
+    this.compact = right - left < 640;
+    this.buttons.replay.label = this.compact ? "Weg ▶" : "Bot-Weg ▶";
+    this.buttons.test.label = this.compact ? "Test ▶" : "Testen ▶";
+    const widths: [string, number][] = this.compact
+      ? [["check", 86], ["replay", 64], ["watch", 48], ["test", 58]]
+      : [["check", 100], ["replay", 82], ["watch", 50], ["test", 72]];
     let x = right;
-    for (const [key, w] of [["check", 100], ["replay", 82], ["watch", 50], ["test", 72]] as [string, number][]) {
+    for (const [key, w] of widths) {
       x -= w;
       place(key, x, w);
       x -= 6;
@@ -520,7 +528,8 @@ export class EditorScene extends Scene {
     this.buttons.undo.enabled = this.model.canUndo;
     this.buttons.redo.enabled = this.model.canRedo;
     this.buttons.replay.enabled = this.keeper.proof.length > 0;
-    this.buttons.check.label = this.keeper.state === "running" ? "Prüft …" : this.keeper.state === "changed" ? "Weiterprüfen" : this.keeper.state === "stuck" ? "Nochmal" : "Prüfen";
+    const st = this.keeper.state;
+    this.buttons.check.label = st === "running" ? "Prüft …" : st === "changed" ? (this.compact ? "Weiter" : "Weiterprüfen") : st === "stuck" ? "Nochmal" : "Prüfen";
   }
 
   // ------------------------------------------------------------------ drawing
@@ -750,8 +759,7 @@ export class EditorScene extends Scene {
   private drawMinimap(ctx: Ctx): void {
     const m = this.minimap;
     panel(ctx, m, [20, 22, 34], 6, PANEL_LINE);
-    const key = `${this.model.version}`;
-    if (this.minimapCache.key !== key) {
+    if (this.minimapCache.model !== this.model || this.minimapCache.version !== this.model.version) {
       const cv = document.createElement("canvas");
       cv.width = this.model.width;
       cv.height = ROWS;
@@ -766,7 +774,7 @@ export class EditorScene extends Scene {
           }
         }
       }
-      this.minimapCache = { key, canvas: cv };
+      this.minimapCache = { model: this.model, version: this.model.version, canvas: cv };
     }
     const scale = this.minimapScale;
     ctx.imageSmoothingEnabled = false;

@@ -19,6 +19,8 @@ export interface Settings {
 export interface MobileSettings {
   controls_size: number;
   controls_opacity: number;
+  /** Small fps / bot-time display (Etappe 6 measurements). */
+  show_stats: boolean;
 }
 
 export interface LevelRecord {
@@ -41,7 +43,7 @@ export interface OwnLevel {
 }
 
 export const DEFAULT_SETTINGS: Settings = { fullscreen: false, music: 0.5, sfx: 0.8, ghost: true, head_start: 2 };
-export const DEFAULT_MOBILE: MobileSettings = { controls_size: 1, controls_opacity: 0.35 };
+export const DEFAULT_MOBILE: MobileSettings = { controls_size: 1, controls_opacity: 0.35, show_stats: false };
 
 const KEY = "save.json";
 
@@ -105,7 +107,7 @@ export class Progress {
     }
     const m = data.mobile ?? {};
     for (const k of Object.keys(DEFAULT_MOBILE) as (keyof MobileSettings)[]) {
-      if (typeof m[k] === "number") this.mobile[k] = m[k];
+      if (typeof m[k] === typeof DEFAULT_MOBILE[k]) (this.mobile as unknown as Record<string, unknown>)[k] = m[k];
     }
     if (Array.isArray(data.own_levels)) {
       for (const lvl of data.own_levels as OwnLevel[]) {

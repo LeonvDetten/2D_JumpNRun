@@ -18,7 +18,11 @@ async function main(): Promise<void> {
   const start = new URLSearchParams(location.search).get("start");
   app.start(new LoadingScene(app, start === "editor" ? () => new EditorScene(app) : undefined));
   if (import.meta.env.DEV) (window as unknown as { app: App }).app = app; // for debugging in the browser console
-  registerServiceWorker();
+  registerServiceWorker((apply) => {
+    // apply right away while loading or in the menu, otherwise the next time the menu opens
+    if (app.top.updatePoint || app.top instanceof LoadingScene) apply();
+    else app.updateReady = apply;
+  });
 }
 
 void main();

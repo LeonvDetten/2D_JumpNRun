@@ -93,6 +93,7 @@ export class DemoPlayer {
 }
 
 export class MenuScene extends Scene {
+  updatePoint = true;
   private buttons: MenuButton[];
   private t = 0;
   private demo: DemoPlayer;

@@ -18,6 +18,8 @@ const FADE_SECONDS = 0.18;
 export abstract class Scene {
   /** Draw the scene below first (pause, result, settings). */
   overlay = false;
+  /** A good moment to reload for a downloaded update (main menu). */
+  updatePoint = false;
   readonly layer = new WidgetLayer();
 
   constructor(readonly app: App) {}
@@ -66,6 +68,13 @@ export class App {
   private fade = 0;
   private last = 0;
   private needsLayout = true;
+  /** Smoothed frame time (s) and the longest frame of the last second, for the stats display. */
+  private frameTime = 1 / 60;
+  private worstFrame = 0;
+  private worstShown = 0;
+  private worstSince = 0;
+  /** A new version was downloaded (service worker); applied the next time the menu is shown. */
+  updateReady: (() => void) | null = null;
 
   constructor(
     readonly screen: Screen,
@@ -137,6 +146,11 @@ export class App {
   }
 
   private swap(): void {
+    // a downloaded update is applied between scenes, never in the middle of a run
+    if (this.updateReady && this.pending?.updatePoint) {
+      this.updateReady();
+      this.updateReady = null;
+    }
     for (const s of this.stack) s.close();
     this.controls.reset();
     this.stack = [this.pending!];
@@ -147,8 +161,16 @@ export class App {
 
   // ------------------------------------------------------------------ loop
   private frame(t: number): void {
-    const dt = this.last ? Math.min(0.1, (t - this.last) / 1000) : 1 / 60;
+    const raw = this.last ? (t - this.last) / 1000 : 1 / 60;
+    const dt = Math.min(0.1, raw);
     this.last = t;
+    this.frameTime += (raw - this.frameTime) * 0.05;
+    this.worstFrame = Math.max(this.worstFrame, raw);
+    if (t - this.worstSince > 1000) {
+      this.worstShown = this.worstFrame;
+      this.worstFrame = 0;
+      this.worstSince = t;
+    }
     if (this.needsLayout) {
       this.needsLayout = false;
       this.screen.resize();
@@ -184,7 +206,20 @@ export class App {
       ctx.fillStyle = `rgba(0,0,0,${Math.min(1, a)})`;
       ctx.fillRect(0, 0, screen.uiW, screen.uiH);
     }
+    if (this.progress.mobile.show_stats) this.drawStats(ctx);
     if (screen.portrait) this.drawRotateHint(ctx);
+  }
+
+  private drawStats(ctx: Ctx): void {
+    const s = this.screen;
+    const fps = Math.round(1 / Math.max(1e-3, this.frameTime));
+    const bot = this.bot?.ready ? ` · Bot ${this.bot.lastMs.toFixed(1)} ms` : "";
+    const msg = `${fps} fps · max ${Math.round(this.worstShown * 1000)} ms${bot} · ${Math.round(s.cssW)}×${Math.round(s.cssH)} @${s.dpr}x`;
+    ctx.font = "600 10px ui-monospace, Menlo, monospace";
+    const w = ctx.measureText(msg).width + 12;
+    ctx.fillStyle = "rgba(0,0,0,0.55)";
+    ctx.fillRect(s.uiW / 2 - w / 2, s.uiH - 16 - s.safe.bottom, w, 14);
+    text(ctx, msg, s.uiW / 2, s.uiH - 9 - s.safe.bottom, 10, [180, 255, 180], true, "center");
   }
 
   private drawRotateHint(ctx: Ctx): void {

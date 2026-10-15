@@ -30,6 +30,7 @@ Bestzeiten und einem Level-Editor, der beweist, ob der Bot ein Level schaffen ka
 | 🤖 **Gegen den Bot** | Wettrennen gegen das trainierte Netz, das als Geist im selben Level läuft; der Vorsprung ist der Schwierigkeitsregler → [Spielen](docs/spielen.md#gegen-den-bot) |
 | 🧱 **Level-Editor** | mit der Maus bauen, alte Level umbauen; „Prüfen“ sucht im Hintergrund einen echten Bot-Weg und markiert, bis wohin er bewiesen ist → [Editor](docs/level_editor.md) |
 | 🧠 **Lernender Bot** | PPO mit kleinem CNN, Nachahmen des Lösers, Curriculum über 14 Generator-Stufen; 98 % auf dem Prüfungslevel → [Der Bot](docs/bot.md) |
+| 📱 **iPhone** | dieselbe App als installierbare Web-App, Touch-Steuerung, Editor mit Prüfen, der Bot rechnet auf dem Handy → [Auf dem iPhone](docs/mobile.md) |
 | 📓 **Lerntagebuch** | 13 Phasen in 14 Kapiteln, mit Fehlschlägen und ehrlichen Messungen, dazu ein interaktives Notebook → [Lerntagebuch](docs/lernen/00_ueberblick.md) |
 
 ## Schnellstart

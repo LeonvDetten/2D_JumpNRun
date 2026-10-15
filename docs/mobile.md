@@ -7,6 +7,8 @@ installiert werden. Danach startet sie im Vollbild und funktioniert offline. Der
 Handy**, es gibt keinen Server und keine Internetverbindung während des Spielens. Einen App Store, ein
 Entwicklerkonto oder Xcode braucht es nicht.
 
+![Space Pirate auf dem iPhone: Menü, Levelauswahl, Rennen gegen den Bot, Level-Editor](medien/mobile_collage.jpg)
+
 Der Code liegt vollständig in [`mobile/`](../mobile/). Er ist eine eigenständige TypeScript-Portierung, die
 nichts am Desktop-Paket `jumpnrun/` ändert.
 
@@ -16,7 +18,9 @@ nichts am Desktop-Paket `jumpnrun/` ändert.
 2. Unten auf **Teilen** (Quadrat mit Pfeil) tippen und **„Zum Home-Bildschirm“** wählen.
 3. Space Pirate über das neue Icon starten. Das Handy quer halten.
 
-Updates kommen automatisch: Nach einem neuen Build lädt die App beim nächsten Start die neue Version.
+Updates kommen automatisch. Die App lädt eine neue Version im Hintergrund, solange sie offen ist (alle 30 Minuten
+und bei jedem Start). Sie lädt aber nur im Hauptmenü neu, nie mitten in einem Lauf. Ohne Netz läuft die zuletzt
+geladene Version weiter.
 
 ## Steuerung
 
@@ -29,6 +33,10 @@ Updates kommen automatisch: Nach einem neuen Build lädt die App beim nächsten 
 
 Mit einer Bluetooth-Tastatur gelten die Desktop-Tasten (A/D, W/Leertaste, Enter, Esc). Tastengröße und Deckkraft
 lassen sich in den Einstellungen anpassen.
+
+**Leistungsanzeige** (Einstellungen): Unten erscheinen die Bildrate, der längste Frame der letzten Sekunde, die
+Rechenzeit des Bots pro Entscheidung und die Bildschirmgröße. Damit lässt sich auf dem Handy messen, ob alles
+flüssig läuft. Ziel sind 60 fps (120 auf ProMotion-Displays) und Bot-Zeiten von wenigen Millisekunden.
 
 ## Was die App kann
 
@@ -45,6 +53,8 @@ lassen sich in den Einstellungen anpassen.
 - **Level-Editor** mit Prüfen durch den Bot (siehe unten). Eigene Level erscheinen im Reiter „Eigene“.
 
 ## Der Level-Editor auf dem Handy
+
+![Der Editor auf dem iPhone mit bewiesenem Bot-Weg](medien/mobile_editor.jpg)
 
 | Bedienung | Was passiert |
 |---|---|
@@ -76,6 +86,7 @@ Vitest prüfen sie gegen Goldwerte, die aus dem Python-Code erzeugt werden (`mob
 | Zufällige Eingaben auf 17 Leveln, Frame für Frame | identisch |
 | Pythons `random.Random` (Mersenne Twister mit String-Seed, `randint`, `choice(s)`, `sample`) | bitgenau |
 | Generator: 400 Level als Text plus 4.200 weitere Seeds über den Level-Schlüssel | alle identisch |
+| Offline: Server gestoppt, App neu geladen | startet aus dem Cache bis ins Menü, Bot und Editor-Prüfung verfügbar |
 | Weg-Karte und Richtzeiten auf allen mitgelieferten und 28 erzeugten Leveln | identisch |
 | Bot-Beobachtung (Gitter, Übersichtskarte, Vektor) bei 1.200 Entscheidungen | bitgenau |
 | Bot-Netz (Logits gegenüber PyTorch) | Abweichung < 0,0001 |
@@ -123,6 +134,11 @@ npm run build        # fertige App nach mobile/dist
 ```
 
 `http://localhost:5173/?start=editor` öffnet direkt den Editor.
+
+**Screenshots für die Doku:** Der Entwicklungsserver nimmt per `POST /__screenshot?name=x` ein JPEG an und legt es
+als `docs/medien/mobile_x.jpg` ab, etwa aus der Browser-Konsole mit `canvas.toBlob(...)` und `fetch(...)`. Die
+Collage `mobile_collage.jpg` setzt sich aus Menü, Levelauswahl, Rennen und Editor zusammen, jeweils bei
+844 × 390 Punkten (iPhone 15 quer).
 
 Daten neu erzeugen, wenn sich Level, Grafiken oder der Bot am Desktop ändern (aus dem Projektordner,
 mit der Python-Umgebung des Projekts):

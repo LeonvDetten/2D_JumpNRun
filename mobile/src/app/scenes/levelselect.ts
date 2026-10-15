@@ -360,7 +360,7 @@ export class LevelSelectScene extends Scene {
       text(ctx, value, d.x + 92, y, 12, TEXT, true, "topleft", d.w - 104);
       y += lineH;
     }
-    if (!this.isRandom && this.mode !== "watch") stars(ctx, d.x + 60, y + 9, p.stars(e.key), 9);
+    if (!this.isRandom && this.mode === "single") stars(ctx, d.x + 60, y + 9, p.stars(e.key), 9);
     if (this.mode === "bot") {
       text(ctx, "Dein Vorsprung:", d.x + 14, this.head.rect.y - 6, 11, MUTED, false, "bottomleft");
       const r = p.get(e.key);
