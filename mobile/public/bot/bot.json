@@ -1,0 +1,176 @@
+{
+ "name": "Space Pirate Bot",
+ "source": "space_pirate_bot.zip",
+ "action_repeat": 2,
+ "temperature": 0.3,
+ "actions": 7,
+ "grid": [
+  4,
+  13,
+  33
+ ],
+ "vec": [
+  23
+ ],
+ "overview": [
+  4,
+  13,
+  40
+ ],
+ "floats": 1007063,
+ "layers": {
+  "features_extractor.cnn.0.weight": {
+   "offset": 0,
+   "shape": [
+    32,
+    4,
+    3,
+    3
+   ]
+  },
+  "features_extractor.cnn.0.bias": {
+   "offset": 1152,
+   "shape": [
+    32
+   ]
+  },
+  "features_extractor.cnn.2.weight": {
+   "offset": 1184,
+   "shape": [
+    64,
+    32,
+    3,
+    3
+   ]
+  },
+  "features_extractor.cnn.2.bias": {
+   "offset": 19616,
+   "shape": [
+    64
+   ]
+  },
+  "features_extractor.cnn.4.weight": {
+   "offset": 19680,
+   "shape": [
+    64,
+    64,
+    3,
+    3
+   ]
+  },
+  "features_extractor.cnn.4.bias": {
+   "offset": 56544,
+   "shape": [
+    64
+   ]
+  },
+  "features_extractor.vec_mlp.0.weight": {
+   "offset": 56608,
+   "shape": [
+    64,
+    23
+   ]
+  },
+  "features_extractor.vec_mlp.0.bias": {
+   "offset": 58080,
+   "shape": [
+    64
+   ]
+  },
+  "features_extractor.head.0.weight": {
+   "offset": 58144,
+   "shape": [
+    256,
+    2368
+   ]
+  },
+  "features_extractor.head.0.bias": {
+   "offset": 664352,
+   "shape": [
+    256
+   ]
+  },
+  "features_extractor.ov_cnn.0.weight": {
+   "offset": 664608,
+   "shape": [
+    16,
+    4,
+    3,
+    3
+   ]
+  },
+  "features_extractor.ov_cnn.0.bias": {
+   "offset": 665184,
+   "shape": [
+    16
+   ]
+  },
+  "features_extractor.ov_cnn.2.weight": {
+   "offset": 665200,
+   "shape": [
+    32,
+    16,
+    3,
+    3
+   ]
+  },
+  "features_extractor.ov_cnn.2.bias": {
+   "offset": 669808,
+   "shape": [
+    32
+   ]
+  },
+  "features_extractor.ov_mlp.0.weight": {
+   "offset": 669840,
+   "shape": [
+    64,
+    4480
+   ]
+  },
+  "features_extractor.ov_mlp.0.bias": {
+   "offset": 956560,
+   "shape": [
+    64
+   ]
+  },
+  "features_extractor.ov_head.weight": {
+   "offset": 956624,
+   "shape": [
+    256,
+    64
+   ]
+  },
+  "features_extractor.ov_head.bias": {
+   "offset": 973008,
+   "shape": [
+    256
+   ]
+  },
+  "mlp_extractor.policy_net.0.weight": {
+   "offset": 973264,
+   "shape": [
+    128,
+    256
+   ]
+  },
+  "mlp_extractor.policy_net.0.bias": {
+   "offset": 1006032,
+   "shape": [
+    128
+   ]
+  },
+  "action_net.weight": {
+   "offset": 1006160,
+   "shape": [
+    7,
+    128
+   ]
+  },
+  "action_net.bias": {
+   "offset": 1007056,
+   "shape": [
+    7
+   ]
+  }
+ }
+}

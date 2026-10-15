@@ -8,7 +8,8 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host",
     "test": "vitest run",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:bot": "SLOW=1 vitest run tests-slow --silent=false"
   },
   "devDependencies": {
     "@types/node": "^26.6.5",

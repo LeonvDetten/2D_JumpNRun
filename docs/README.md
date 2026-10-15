@@ -5,6 +5,7 @@
 | Seite | Inhalt |
 |---|---|
 | [Spielen](spielen.md) | App-Modi, Steuerung, Sterne, Geist, Rennen gegen den Bot, Einstellungen |
+| [Auf dem iPhone](mobile.md) | Handy-Version als Web-App: Installieren, Touch-Steuerung, Aufbau, Vergleichstests gegen Python |
 | [Level und Editor](level_editor.md) | Level-Format, Ordner, Editor-Bedienung, Prüfen mit dem bewiesenen Weg, Kommandozeilen-Werkzeuge |
 | [Der Bot](bot.md) | Was er sieht und tut, Messwerte, Lernfortschritt, Modelle, Zuschauen |
 | [Training](training.md) | Trainings- und Auswertungsbefehle aller Phasen, Medien neu erzeugen, Tests |

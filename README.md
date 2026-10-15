@@ -78,6 +78,7 @@ mit `scripts/make_readme_media.py measure`.
 | Seite | Inhalt |
 |---|---|
 | [Spielen](docs/spielen.md) | Modi, Steuerung, Sterne, Geist, Bot-Rennen, Einstellungen, Spielstand |
+| [Auf dem iPhone](docs/mobile.md) | Web-App zum Installieren, Touch-Steuerung, Bot läuft auf dem Handy, Vergleichstests gegen Python |
 | [Level & Editor](docs/level_editor.md) | Level-Format, Ordner, Editor, bewiesener Weg, Löser und Generator auf der Kommandozeile |
 | [Der Bot](docs/bot.md) | Beobachtung, Aktionen, Netz, Belohnung, Messwerte, Modelle, Zuschauen |
 | [Training](docs/training.md) | Trainings- und Auswertungsbefehle aller Phasen, Medien neu erzeugen |
@@ -96,6 +97,7 @@ jumpnrun/imitation/   Musterlösungen, Behavior Cloning, DAgger
 jumpnrun/editor/      Level-Editor mit bewiesenem Weg
 jumpnrun/app/         Spiel-App: Szenen, Spielstand, Bot-Gegner, Klang
 levels/ · models/     Level-Dateien · trainierte Bots aller Phasen
+mobile/               Handy-Version (TypeScript-Web-App, eigenständig, Bot läuft lokal)
 docs/ · tests/        Dokumentation, Lerntagebuch · rund 170 Tests
 legacy/               der frühere RL-Versuch (2025/26), unverändert
 ```

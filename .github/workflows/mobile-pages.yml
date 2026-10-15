@@ -1,0 +1,40 @@
+# Builds the mobile web app (mobile/) and publishes it on the gh-pages branch (GitHub Pages).
+# Desktop code is not touched. Runs for pushes to the mobile development branch and to main.
+name: Mobile app (GitHub Pages)
+
+on:
+  push:
+    branches: [main, mobile]
+    paths: ["mobile/**", ".github/workflows/mobile-pages.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: mobile-pages
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: mobile/dist
+          publish_branch: gh-pages
+          force_orphan: true
+          commit_message: "Mobile app build"
