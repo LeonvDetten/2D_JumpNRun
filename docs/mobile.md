@@ -42,11 +42,13 @@ flüssig läuft. Ziel sind 60 fps (120 auf ProMotion-Displays) und Bot-Zeiten vo
 
 - **Einzelspieler** mit allen 57 Leveln in den Reitern Einstieg, Handgebaut, Test-Serie und Prüfung, dazu eigene
   Level und **Zufallslevel**. Es gibt 14 Stufen, und ein Seed ergibt dasselbe Level wie am Desktop.
-- Bestzeiten, 1–3 Sterne und **Bestzeit-Geist** wie am Desktop.
+- Bestzeiten, 1–3 Sterne (auch für gewonnene Rennen gegen den Bot) und **Bestzeit-Geist** wie am Desktop.
 - **Gegen den Bot**: Wettrennen mit Vorsprung 0, 2, 5 oder 10 s.
 - **Bot zuschauen** (neu): Die KI spielt ein Level deiner Wahl in Dauerschleife, in 1×, 2× oder 4× Tempo, mit
   Zählern für Versuche und Siege.
-- Musik und Effekte, synthetisiert wie am Desktop.
+- Musik und Effekte, synthetisiert wie am Desktop. Der Ton startet mit der ersten Berührung (iOS erlaubt vorher
+  keinen) und spielt ab iOS 17 auch bei eingeschaltetem Stummschalter, weil die App die Audio-Sitzung „playback“
+  anfordert. Nebenwirkung: Musik aus einer anderen App (z. B. Spotify) pausiert, solange das Spiel läuft.
 - **Spielstand sichern und laden** (Einstellungen): Die Datei hat das Format der Desktop-`save.json`. Ein Spielstand
   vom Mac (`~/.space_pirate/save.json`) lässt sich also aufs Handy holen und umgekehrt. Beim Laden werden beide
   Stände zusammengeführt, und je Level gilt der bessere.

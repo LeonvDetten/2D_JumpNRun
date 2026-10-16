@@ -120,12 +120,16 @@ class Progress:
         self.save()
         return {"best": new_best, "stars": stars, "old_best": old}
 
-    def record_race(self, key: str, won: bool, frames: int) -> dict:
+    def record_race(self, key: str, won: bool, frames: int, par_frames: Optional[int] = None) -> dict:
+        """A race against the bot; a win earns the same stars as a single run with that time."""
+
         entry = self.levels.setdefault(key, {})
         entry["races"] = entry.get("races", 0) + 1
+        stars = stars_for(frames, par_frames) if won else 0
         if won:
             entry["race_wins"] = entry.get("race_wins", 0) + 1
             if entry.get("race_best") is None or frames < entry["race_best"]:
                 entry["race_best"] = frames
+            entry["stars"] = max(entry.get("stars", 0), stars)
         self.save()
-        return {"wins": entry.get("race_wins", 0), "races": entry["races"]}
+        return {"wins": entry.get("race_wins", 0), "races": entry["races"], "stars": stars}

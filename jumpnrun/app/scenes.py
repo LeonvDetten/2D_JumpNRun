@@ -15,7 +15,7 @@ import pygame
 from jumpnrun.app import gfx
 from jumpnrun.app.gfx import CYAN, GOLD, MenuButton, glass_panel, level_thumbnail, shade
 from jumpnrun.app.levels_index import RANDOM_TAB, TIER_NAMES, LevelEntry, random_entry
-from jumpnrun.app.progress import HEAD_STARTS, decode_action, encode_action, format_time, stars_for
+from jumpnrun.app.progress import HEAD_STARTS, decode_action, encode_action, format_time
 from jumpnrun.app.widgets import Chips, Slider, SmallButton, Tabs, Toggle
 from jumpnrun.core.actions import Action
 from jumpnrun.core.constants import FPS, SCREEN_H, SCREEN_W, TILE
@@ -911,8 +911,8 @@ class ResultScene(Scene):
             self.info = progress.record_win(entry.key, self.frames, game.inputs, entry.par_frames)
             self.stars = self.info["stars"]
         else:
-            self.info = progress.record_race(entry.key, self.won, self.frames)
-            self.stars = stars_for(self.frames, entry.par_frames) if self.won else 0
+            self.info = progress.record_race(entry.key, self.won, self.frames, entry.par_frames)
+            self.stars = self.info["stars"]
         self.confetti = gfx.Confetti() if self.won else None
         self.shown_stars = 0
         labels = [("again", "Nochmal"), ("next", "Nächstes Level"), ("select", "Levelauswahl")]

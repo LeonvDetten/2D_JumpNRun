@@ -41,6 +41,8 @@ zur Kiste.
 - **Sterne:**
   - Die Messlatte ist die Zeit des bewiesenen Bot-Wegs, gespeichert als `<level>.loesung.json`.
   - 3 Sterne gibt es bis höchstens 15 % langsamer, 2 Sterne bis 50 % langsamer, 1 Stern für geschafft.
+  - Ein gewonnenes Rennen gegen den Bot zählt genauso: Die Zeit im Rennen ergibt die Sterne. Bestzeit und Geist
+    kommen weiter nur aus dem Einzelspieler.
   - Hat ein Level keinen gespeicherten Weg, gilt eine geschätzte **Richtzeit**: die Weglänge laut Weg-Karte bei
     Vollgas.
 - **Bestzeit-Geist:** Ab dem ersten Sieg läuft dein bester Lauf halbtransparent mit. Er wird aus den gespeicherten

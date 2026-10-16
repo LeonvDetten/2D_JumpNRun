@@ -57,6 +57,16 @@ def test_progress_best_times_stars_and_settings(tmp_path):
     assert pg.level_key(open(BERG).read().replace("B", " ", 1)) != key
 
 
+def test_race_win_earns_stars(tmp_path):
+    p = pg.Progress(tmp_path / "save.json")
+    assert p.record_race("k", False, 600, par_frames=700)["stars"] == 0 and p.stars("k") == 0
+    assert p.record_race("k", True, 700, par_frames=700)["stars"] == 3
+    p.record_race("k", True, 1100, par_frames=700)  # a slower win keeps the stars
+    q = pg.Progress(tmp_path / "save.json")
+    assert q.stars("k") == 3 and q.get("k")["race_wins"] == 2 and q.get("k")["races"] == 3
+    assert q.best_frames("k") is None  # races do not set the single-player best time or ghost
+
+
 def test_level_index_tabs_and_par_times():
     tabs = scan()
     assert {"Einstieg", "Handgebaut", "Test-Serie", "Prüfung", "Eigene"} <= set(tabs)

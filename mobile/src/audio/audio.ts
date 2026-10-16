@@ -1,5 +1,7 @@
 // Plays the synthesized sounds with WebAudio. iOS only allows sound after a touch: unlock() is called on
-// the first pointer release. Music and effects have their own volume (settings, 0..1).
+// every touch / pointer release and key press. Music and effects have their own volume (settings, 0..1).
+// iOS mutes WebAudio with the ring/silent switch unless the page asks for the "playback" audio session
+// (Safari 17+), like a video or music app would.
 
 import { effects, music } from "./synth";
 
@@ -20,6 +22,7 @@ export class Audio {
 
   /** Synthesize everything (call during the loading screen). */
   init(): void {
+    usePlaybackSession();
     try {
       const AC = window.AudioContext ?? (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       this.ctx = new AC();
@@ -45,9 +48,26 @@ export class Audio {
 
   /** Must run inside a user gesture on iOS. */
   unlock(): void {
-    if (this.ctx && this.ctx.state !== "running") {
-      void this.ctx.resume().then(() => this.startMusic(this.wanted));
+    const ctx = this.ctx;
+    if (!ctx) return;
+    usePlaybackSession();
+    if (ctx.state === "running") {
+      if (this.current !== this.wanted) this.startMusic(this.wanted); // resumed outside a gesture
+      return;
     }
+    // older iOS versions only unlock when a sound is started inside the gesture: play one silent sample
+    try {
+      const src = ctx.createBufferSource();
+      src.buffer = ctx.createBuffer(1, 1, ctx.sampleRate);
+      src.connect(ctx.destination);
+      src.start();
+    } catch {
+      // not needed elsewhere
+    }
+    ctx.resume().then(
+      () => this.startMusic(this.wanted),
+      () => undefined, // not allowed yet: the next gesture tries again
+    );
   }
 
   /** Pause everything (app in the background). */
@@ -104,5 +124,15 @@ export class Audio {
   updateVolume(): void {
     if (this.sfxGain) this.sfxGain.gain.value = this.volumes.sfx;
     if (this.musicGain) this.musicGain.gain.value = this.volumes.music;
+  }
+}
+
+/** iOS: play even when the ring/silent switch is on (otherwise WebAudio stays silent). */
+function usePlaybackSession(): void {
+  const session = (navigator as unknown as { audioSession?: { type: string } }).audioSession;
+  try {
+    if (session && session.type !== "playback") session.type = "playback";
+  } catch {
+    // not supported
   }
 }

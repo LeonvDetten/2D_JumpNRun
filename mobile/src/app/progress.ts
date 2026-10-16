@@ -162,15 +162,18 @@ export class Progress {
     return { best: newBest, stars, oldBest: old };
   }
 
-  recordRace(key: string, won: boolean, frames: number): { wins: number; races: number } {
+  /** A race against the bot; a win earns the same stars as a single run with that time. */
+  recordRace(key: string, won: boolean, frames: number, par: number | null): { wins: number; races: number; stars: number } {
     const entry = (this.levels[key] ??= {});
     entry.races = (entry.races ?? 0) + 1;
+    const stars = won ? starsFor(frames, par) : 0;
     if (won) {
       entry.race_wins = (entry.race_wins ?? 0) + 1;
       if (entry.race_best === undefined || frames < entry.race_best) entry.race_best = frames;
+      entry.stars = Math.max(entry.stars ?? 0, stars);
     }
     this.save();
-    return { wins: entry.race_wins ?? 0, races: entry.races };
+    return { wins: entry.race_wins ?? 0, races: entry.races, stars };
   }
 
   summary(): { done: number; stars: number } {

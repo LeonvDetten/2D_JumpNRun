@@ -9,7 +9,7 @@ import { CYAN, GOLD, MUTED, RED, TEXT, type RGB } from "../../ui/theme";
 import { Button } from "../../ui/widgets";
 import { Scene, type App } from "../app";
 import { randomEntry, type LevelEntry } from "../levelsIndex";
-import { formatTime, starsFor } from "../progress";
+import { formatTime } from "../progress";
 import { GameScene } from "./game";
 import { LevelSelectScene } from "./levelselect";
 
@@ -35,8 +35,9 @@ export class ResultScene extends Scene {
       this.info = r;
       this.stars = r.stars;
     } else {
-      this.info = progress.recordRace(entry.key, this.won, this.frames);
-      this.stars = this.won ? starsFor(this.frames, entry.par) : 0;
+      const r = progress.recordRace(entry.key, this.won, this.frames, entry.par);
+      this.info = r;
+      this.stars = r.stars;
     }
     if (this.won) this.confetti = new Confetti(app.screen.uiW, app.screen.uiH);
     const mk = (label: string, fn: () => void, accent: boolean) => this.layer.add(new Button(label, rect(0, 0, 0, 0), () => {

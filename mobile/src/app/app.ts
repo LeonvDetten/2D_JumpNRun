@@ -275,6 +275,8 @@ export class App {
     };
     canvas.addEventListener("pointerup", up);
     canvas.addEventListener("pointercancel", up);
+    // touchend is the gesture iOS has always accepted for starting audio
+    canvas.addEventListener("touchend", () => this.audio.unlock(), { passive: true });
     canvas.addEventListener("wheel", (e) => {
       e.preventDefault();
       const [x, y] = this.screen.toUi(e.clientX, e.clientY);
