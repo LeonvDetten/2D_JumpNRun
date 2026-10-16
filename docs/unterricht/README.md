@@ -66,7 +66,7 @@ schummeln können. Höchstens 8 Punkte (der Return aus Level 1 zählt nicht mit)
 |---|---|---|
 | 0–5 | Einstieg | Das GIF oben auf der Seite, das Video [`bot_pruefung_2023.mp4`](../medien/bot_pruefung_2023.mp4) oder live die [Web-App](https://leonvdetten.github.io/2D_JumpNRun/) mit „Bot zuschauen“ zeigen. Frage: „Wie hat der Bot das gelernt, wenn es ihm niemand erklärt hat?“ |
 | 5–14 | Level 1 zu zweit | Eine Person ist der Bot (Agent) und wählt eine Aktion, die andere ist die Umgebung: Sie klappt die Aktion auf und sagt die Punkte an. Punkte des ersten Versuchs notieren, Return ausrechnen. |
-| 14–17 | Plenum | Den Kreislauf Agent → Aktion → Umgebung → Beobachtung + Belohnung an die Tafel. Warum kostet ein Absturz in Zug 2 mehr als 1 Punkt? (Die +2,7 aus Zug 3 gehen mit verloren.) |
+| 14–17 | Plenum | Den Kreislauf Agent → Aktion → Umgebung → Beobachtung + Belohnung an die Tafel. Warum kostet es in Zug 2 mehr als 1 Punkt, vom Gegner erwischt zu werden? (Die +2,7 aus Zug 3 gehen mit verloren.) |
 | 17–35 | Level 2–5 zu zweit | Checkpoints auf dem Punktezettel; wer schneller ist, nimmt den Geheimgang (Abzweig in Level 4). |
 | 35–42 | Schatzkiste | Bossfrage: Steckbrief für Snake oder Flappy Bird. Steckbriefe mit dem Nachbarpaar tauschen: „Wie würdet ihr unsere Belohnung austricksen?“ Das Nachbarpaar vergibt die +2. |
 | 42–45 | Abschluss | Wertung. Frage: „Wo hat euch die Seite belohnt wie den Bot – und wo hättet ihr schummeln können?“ |
