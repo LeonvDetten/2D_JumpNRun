@@ -12,6 +12,7 @@
 | [Architektur](architektur.md) | Aufbau der Pakete, Diagramm, warum alles deterministisch ist |
 | [Lerntagebuch](lernen/00_ueberblick.md) | 14 Kapitel: von „Was ist RL?“ über jede Phase bis zum aktuellen Bot, inkl. Fehlschlägen |
 | [Interaktives Notebook](lernen/projekt_interaktiv.ipynb) ([HTML](lernen/projekt_interaktiv.html)) | alle Phasen und Ansätze zum Ausführen, mit echtem Projektcode |
+| [Unterricht](unterricht/README.md) ([Seite](unterricht/mission_schatzkiste.html)) | „Mission Schatzkiste“: Reinforcement Learning zum Durchspielen für Schulklassen, mit Ablaufplan und Lösungen |
 | [Reflexion Phase 7](reflexion/phase7_reflexion.md) | Rückblick und Gegenprüfung nach Phase 7 |
 | [`medien/`](medien/) | Bilder und Videos der README (erzeugt mit `scripts/make_readme_media.py`) |
 | [`lernen/daten/`](lernen/daten/) | Rohdaten der Messungen und Vorregistrierungen |
