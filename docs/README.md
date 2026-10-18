@@ -13,5 +13,6 @@
 | [Lerntagebuch](lernen/00_ueberblick.md) | 14 Kapitel: von „Was ist RL?“ über jede Phase bis zum aktuellen Bot, inkl. Fehlschlägen |
 | [Interaktives Notebook](lernen/projekt_interaktiv.ipynb) ([HTML](lernen/projekt_interaktiv.html)) | alle Phasen und Ansätze zum Ausführen, mit echtem Projektcode |
 | [Reflexion Phase 7](reflexion/phase7_reflexion.md) | Rückblick und Gegenprüfung nach Phase 7 |
+| [Q-Lernlabor](unterricht/q-lernlabor.html) | Single-File-Webapp für den Unterricht (iPad): Q-Learning auf einem 6×6- bis 10×10-Gitter zum Zusehen, mit Hilfetext |
 | [`medien/`](medien/) | Bilder und Videos der README (erzeugt mit `scripts/make_readme_media.py`) |
 | [`lernen/daten/`](lernen/daten/) | Rohdaten der Messungen und Vorregistrierungen |

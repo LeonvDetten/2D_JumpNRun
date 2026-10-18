@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Q-Lernlabor</title>
+<style>
+/* Layout: the board is the hero (left in landscape, top in portrait); a scrollable control panel sits beside it.
+   Theme tokens: cool neutrals so the red "heat" of learned values stands out; accent is a teal that never
+   competes with the heat scale. */
+:root {
+  --bg: #eef1f5;
+  --surface: #ffffff;
+  --surface-2: #e4e9f0;
+  --fg: #18212c;
+  --muted: #5d6b7c;
+  --line: #c9d2dd;
+  --accent: #0b6e8f;
+  --accent-fg: #ffffff;
+  --heat-rgb: 214, 40, 40;
+  --cold-rgb: 30, 100, 220;
+  --good: #1e8a4c;
+  --bad: #c0392b;
+  --font: "Avenir Next", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono: "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f141b; --surface: #19212b; --surface-2: #222c38; --fg: #e6ebf1; --muted: #9aa7b6;
+    --line: #2f3a48; --accent: #4fc1de; --accent-fg: #0b1218; --heat-rgb: 255, 92, 78; --cold-rgb: 96, 160, 255;
+    --good: #4cc47f; --bad: #ff7b6b; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f141b; --surface: #19212b; --surface-2: #222c38; --fg: #e6ebf1; --muted: #9aa7b6;
+  --line: #2f3a48; --accent: #4fc1de; --accent-fg: #0b1218; --heat-rgb: 255, 92, 78; --cold-rgb: 96, 160, 255;
+  --good: #4cc47f; --bad: #ff7b6b; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 16px; line-height: 1.45;
+  display: flex; flex-direction: column; -webkit-tap-highlight-color: transparent; -webkit-text-size-adjust: 100%;
+}
+button, input, select { font: inherit; color: inherit; }
+button { touch-action: manipulation; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+.topbar {
+  flex: 0 0 auto; display: flex; align-items: center; gap: 12px;
+  padding-block: 10px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  border-bottom: 1px solid var(--line); background: var(--surface);
+}
+.topbar h1 { margin: 0; font-size: 1.25rem; font-weight: 700; letter-spacing: 0.01em; }
+.topbar .sub { color: var(--muted); font-size: 0.9rem; margin: 0; }
+.topbar .spacer { flex: 1; }
+
+.btn {
+  min-height: 44px; padding: 8px 14px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface);
+  color: var(--fg); cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+}
+.btn:active { background: var(--surface-2); }
+.btn.primary { background: var(--accent); color: var(--accent-fg); border-color: transparent; }
+.btn.danger { color: var(--bad); }
+.btn[disabled] { opacity: 0.45; cursor: default; }
+
+.app {
+  flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 14px;
+  padding-block: 12px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  overflow: auto;
+}
+.stage { position: relative; width: 100%; flex: 0 0 auto; }
+.viewport {
+  position: absolute; inset: 0; overflow: hidden; touch-action: none; border-radius: 14px; background: var(--surface-2);
+  display: flex; align-items: center; justify-content: center; user-select: none; -webkit-user-select: none;
+}
+.zoomer { transform-origin: center center; will-change: transform; }
+.board {
+  position: relative; display: grid; gap: 3px; padding: 3px; background: var(--line); border-radius: 10px;
+  font-variant-numeric: tabular-nums;
+}
+.cell {
+  position: relative; width: var(--cell); height: var(--cell); background: var(--surface); border-radius: 6px;
+  display: flex; align-items: center; justify-content: center; overflow: hidden;
+}
+.cell .val { font-weight: 700; font-size: calc(var(--cell) * 0.24); line-height: 1; color: var(--fg); z-index: 1; }
+.cell .val.zero { color: var(--muted); opacity: 0.6; }
+.cell.light .val, .cell.light .q, .cell.light .arrow { color: #ffffff; opacity: 1; }
+.cell .arrow { position: absolute; left: 6%; top: 4%; font-size: calc(var(--cell) * 0.22); line-height: 1; color: var(--fg); opacity: 0.85; }
+.cell .q { position: absolute; font-size: calc(var(--cell) * 0.13); line-height: 1; color: var(--muted); display: none; }
+.cell .q.u { top: 5%; left: 50%; transform: translateX(-50%); }
+.cell .q.r { right: 5%; top: 50%; transform: translateY(-50%); }
+.cell .q.d { bottom: 5%; left: 50%; transform: translateX(-50%); }
+.cell .q.l { left: 5%; top: 50%; transform: translateY(-50%); }
+.board.show-q .cell .q { display: block; }
+.board.hide-val .cell .val { display: none; }
+.cell .icon { position: absolute; font-size: calc(var(--cell) * 0.5); line-height: 1; opacity: 0.95; }
+.cell.goal .icon, .cell.trap .icon { display: block; }
+.cell .tag {
+  position: absolute; bottom: 4%; right: 6%; font-size: calc(var(--cell) * 0.13); font-weight: 600; color: var(--muted); letter-spacing: 0.02em;
+}
+.cell.goal { background: var(--surface); box-shadow: inset 0 0 0 3px var(--good); }
+.cell.trap { box-shadow: inset 0 0 0 3px var(--bad); }
+.cell.start { box-shadow: inset 0 0 0 2px var(--accent); }
+.cell.goal .val, .cell.trap .val { display: none; }
+.agent {
+  position: absolute; left: 3px; top: 3px; width: var(--cell); height: var(--cell); display: flex; align-items: center; justify-content: center;
+  font-size: calc(var(--cell) * 0.55); line-height: 1; pointer-events: none; z-index: 3; transition: transform 0.12s ease;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.35));
+}
+.agent.fast { transition: none; }
+.zoom-reset {
+  position: absolute; right: 10px; bottom: 10px; z-index: 4; min-height: 40px; padding: 6px 12px; font-size: 0.9rem;
+}
+.stage-hint { position: absolute; left: 10px; bottom: 10px; z-index: 4; font-size: 0.8rem; color: var(--muted); pointer-events: none; }
+
+.panel { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
+.card h2 { margin: 0; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 700; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; }
+.row .btn { flex: 1 1 auto; }
+.field { display: flex; flex-direction: column; gap: 2px; }
+.field > span { display: flex; justify-content: space-between; align-items: baseline; font-size: 0.95rem; }
+.field output { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--accent); }
+.field .hint { font-size: 0.8rem; color: var(--muted); }
+input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; height: 44px; background: transparent; margin: 0; }
+input[type="range"]::-webkit-slider-runnable-track { height: 6px; border-radius: 3px; background: var(--line); }
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 28px; height: 28px; border-radius: 50%; background: var(--accent); margin-top: -11px;
+  border: 3px solid var(--surface); box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+input[type="range"]::-moz-range-track { height: 6px; border-radius: 3px; background: var(--line); }
+input[type="range"]::-moz-range-thumb { width: 24px; height: 24px; border-radius: 50%; background: var(--accent); border: 3px solid var(--surface); }
+.check { display: flex; align-items: center; gap: 10px; min-height: 40px; cursor: pointer; }
+.check input { width: 24px; height: 24px; margin: 0; accent-color: var(--accent); }
+.seg { display: flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.seg label { flex: 1; text-align: center; min-height: 42px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: 600; font-size: 0.92rem; }
+.seg input { position: absolute; opacity: 0; width: 0; height: 0; }
+.seg input:checked + span { background: var(--accent); color: var(--accent-fg); }
+.seg span { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; min-height: 42px; }
+.seg input:focus-visible + span { outline: 3px solid var(--accent); outline-offset: -3px; }
+
+.stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; }
+.stat { display: flex; flex-direction: column; min-width: 0; }
+.stat .k { font-size: 0.78rem; color: var(--muted); }
+.stat .v { font-size: 1.15rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.stat .v.good { color: var(--good); }
+.stat .v.bad { color: var(--bad); }
+.formula { font-family: var(--mono); font-size: 0.85rem; background: var(--surface-2); border-radius: 10px; padding: 8px 10px; line-height: 1.5; min-width: 0; overflow-x: auto; }
+.formula .lbl { font-family: var(--font); color: var(--muted); font-size: 0.78rem; }
+.formula .r-pos { color: var(--good); font-weight: 700; }
+.formula .r-neg { color: var(--bad); font-weight: 700; }
+
+/* Help overlay */
+.overlay { position: fixed; inset: 0; background: rgba(10, 14, 20, 0.55); z-index: 50; display: flex; align-items: flex-start; justify-content: center; padding: 16px; overflow: hidden; }
+.help {
+  background: var(--surface); color: var(--fg); border-radius: 16px; max-width: 760px; width: 100%; max-height: calc(100% - 16px);
+  overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 0 22px 28px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4); position: relative;
+}
+.help-head { position: sticky; top: 0; background: var(--surface); padding: 14px 0 10px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--line); z-index: 1; }
+.help-head h2 { margin: 0; font-size: 1.3rem; flex: 1; }
+.help h3 { font-size: 1.1rem; margin: 26px 0 8px; text-wrap: balance; }
+.help p, .help li { max-width: 68ch; }
+.help p { margin: 0 0 10px; }
+.help ul, .help ol { margin: 0 0 10px; padding-left: 22px; }
+.help li { margin-bottom: 4px; }
+.help code { font-family: var(--mono); background: var(--surface-2); padding: 1px 5px; border-radius: 5px; font-size: 0.9em; }
+.help .box { background: var(--surface-2); border-radius: 10px; padding: 10px 14px; margin: 10px 0 12px; font-family: var(--mono); font-size: 0.95rem; overflow-x: auto; }
+.help .term { font-weight: 700; }
+.help .toc { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 4px; }
+.help .toc a { font-size: 0.85rem; padding: 6px 10px; border-radius: 999px; border: 1px solid var(--line); text-decoration: none; color: var(--fg); }
+.help table { border-collapse: collapse; margin: 6px 0 12px; font-size: 0.95rem; }
+.help th, .help td { text-align: left; padding: 4px 10px 4px 0; vertical-align: top; border-bottom: 1px solid var(--line); }
+.swatch { display: inline-block; width: 1.1em; height: 1.1em; border-radius: 4px; vertical-align: -0.2em; margin-right: 4px; border: 1px solid var(--line); }
+
+@media (orientation: landscape) and (min-width: 700px) {
+  .app { flex-direction: row; overflow: hidden; }
+  .stage { flex: 1 1 auto; min-width: 0; align-self: stretch; }
+  .panel { flex: 0 0 340px; width: 340px; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 8px; }
+}
+@media (max-width: 480px) {
+  .topbar h1 { font-size: 1.05rem; }
+  .topbar .sub { display: none; }
+  .stats { grid-template-columns: 1fr 1fr; }
+}
+@media (prefers-reduced-motion: reduce) { .agent { transition: none; } }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div>
+    <h1>Q-Lernlabor</h1>
+    <p class="sub">Eine Figur lernt den Weg zum Ausgang</p>
+  </div>
+  <div class="spacer"></div>
+  <button class="btn" id="btnTheme" aria-label="Hell- oder Dunkelmodus umschalten">Dunkel</button>
+  <button class="btn primary" id="btnHelp" aria-haspopup="dialog">? Hilfe</button>
+</header>
+
+<main class="app">
+  <div class="stage" id="stage">
+    <div class="viewport" id="viewport" aria-label="Spielfeld, mit zwei Fingern zoombar">
+      <div class="zoomer" id="zoomer">
+        <div class="board" id="board" role="grid"></div>
+      </div>
+    </div>
+    <div class="stage-hint" id="stageHint">Zwei Finger: zoomen · Tippen: Ausgang setzen</div>
+    <button class="btn zoom-reset" id="btnZoomReset" hidden>Zoom zurück</button>
+  </div>
+
+  <aside class="panel">
+    <section class="card">
+      <div class="row">
+        <button class="btn primary" id="btnRun">▶ Start</button>
+        <button class="btn" id="btnStep">Ein Schritt</button>
+      </div>
+      <div class="row">
+        <button class="btn" id="btnEp100">+100 Episoden</button>
+        <button class="btn" id="btnEp1000">+1000 Episoden</button>
+      </div>
+      <div class="row">
+        <button class="btn danger" id="btnReset">Lernen zurücksetzen</button>
+      </div>
+      <label class="field">
+        <span>Tempo <output id="outSps">8 Schritte/s</output></span>
+        <input type="range" id="inSps" min="1" max="30" value="8">
+      </label>
+    </section>
+
+    <section class="card">
+      <h2>Lernfortschritt</h2>
+      <div class="stats">
+        <div class="stat"><span class="k">Episode</span><span class="v" id="stEpisode">0</span></div>
+        <div class="stat"><span class="k">Schritte (aktuell)</span><span class="v" id="stSteps">0</span></div>
+        <div class="stat"><span class="k">Letzte Episode</span><span class="v" id="stLast">–</span></div>
+        <div class="stat"><span class="k">Erfolg (letzte 20)</span><span class="v" id="stRate">–</span></div>
+        <div class="stat"><span class="k">Kürzester Weg bisher</span><span class="v" id="stBest">–</span></div>
+        <div class="stat"><span class="k">Kürzester möglicher Weg</span><span class="v" id="stOptimal">–</span></div>
+      </div>
+      <div class="formula" id="formula">
+        <span class="lbl">Letzte Aktualisierung der Q-Tabelle</span><br>
+        Noch kein Schritt gemacht.
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Spielfeld</h2>
+      <label class="field">
+        <span>Größe <output id="outN">6 × 6</output></span>
+        <input type="range" id="inN" min="6" max="10" value="6">
+      </label>
+      <label class="check"><input type="checkbox" id="inTrap"> Strafhindernis platzieren (−1)</label>
+      <div class="field">
+        <span>Antippen eines Feldes verschiebt …</span>
+        <div class="seg" role="radiogroup" aria-label="Antipp-Modus">
+          <label><input type="radio" name="tap" value="goal" checked><span>Ausgang</span></label>
+          <label><input type="radio" name="tap" value="trap"><span>Hindernis</span></label>
+          <label><input type="radio" name="tap" value="start"><span>Start</span></label>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Lernparameter</h2>
+      <label class="field">
+        <span>Lernrate α <output id="outAlpha">0,50</output></span>
+        <input type="range" id="inAlpha" min="0.05" max="1" step="0.05" value="0.5">
+        <span class="hint">Wie stark ein neuer Schritt den alten Wert überschreibt</span>
+      </label>
+      <label class="field">
+        <span>Abzinsung γ <output id="outGamma">0,90</output></span>
+        <input type="range" id="inGamma" min="0.5" max="0.99" step="0.01" value="0.9">
+        <span class="hint">Wie viel eine Belohnung in der Zukunft heute noch wert ist</span>
+      </label>
+      <label class="field">
+        <span>Zufall ε <output id="outEps">0,20</output></span>
+        <input type="range" id="inEps" min="0" max="1" step="0.05" value="0.2">
+        <span class="hint">Anteil der Schritte, die zufällig statt nach Tabelle gewählt werden</span>
+      </label>
+    </section>
+
+    <section class="card">
+      <h2>Anzeige</h2>
+      <label class="check"><input type="checkbox" id="inShowVal" checked> Wert jedes Feldes (Zahl)</label>
+      <label class="check"><input type="checkbox" id="inShowArrows"> Beste Richtung als Pfeil</label>
+      <label class="check"><input type="checkbox" id="inShowQ"> Alle vier Q-Werte je Feld</label>
+    </section>
+  </aside>
+</main>
+
+<div class="overlay" id="overlay" hidden>
+  <div class="help" role="dialog" aria-modal="true" aria-labelledby="helpTitle" id="helpPanel">
+    <div class="help-head">
+      <h2 id="helpTitle">Hilfe: So lernt der Roboter</h2>
+      <button class="btn" id="btnHelpClose">Schließen</button>
+    </div>
+    <div class="toc">
+      <a href="#h-rl">Reinforcement Learning</a><a href="#h-q">Q-Learning</a><a href="#h-alpha">Lernrate</a>
+      <a href="#h-gamma">Abzinsung</a><a href="#h-eps">Zufall</a><a href="#h-trap">Strafhindernis</a>
+      <a href="#h-colors">Farben &amp; Zahlen</a><a href="#h-ctrl">Steuerung</a><a href="#h-exp">Experimente</a><a href="#h-gloss">Glossar</a>
+    </div>
+
+    <h3 id="h-rl">Was ist Reinforcement Learning?</h3>
+    <p>Reinforcement Learning (deutsch: bestärkendes Lernen) ist Lernen durch Ausprobieren. Der Roboter bekommt keine Anleitung und keine Karte. Er probiert Schritte aus und bekommt nur eine Rückmeldung in Form von Punkten, der <span class="term">Belohnung</span>. Erreicht er den Ausgang, gibt es +1. Tritt er auf das Strafhindernis, gibt es −1. Alle anderen Schritte bringen 0.</p>
+    <p>So lernt auch ein Mensch Fahrradfahren oder ein Hund ein Kommando: nicht durch Erklärungen, sondern durch Versuche, Erfolg und Misserfolg. Das Ziel des Roboters ist, auf Dauer möglichst viele Punkte zu sammeln. Weil jeder weitere Schritt die Belohnung „weniger wert“ macht (siehe Abzinsung), findet er dabei von selbst den kürzesten Weg.</p>
+    <p>Ein Durchlauf vom Start bis zum Ausgang, bis zum Hindernis oder bis zum Abbruch heißt <span class="term">Episode</span>. Zu Beginn irrt der Roboter rein zufällig umher. Mit jeder Episode wird er besser.</p>
+
+    <h3 id="h-q">Wie Q-Learning funktioniert</h3>
+    <p>Der Roboter führt eine Tabelle, die <span class="term">Q-Tabelle</span>. Für jedes Feld und jede der vier Richtungen (↑ → ↓ ←) steht darin eine Zahl: der <span class="term">Q-Wert</span>. Er bedeutet: „Wie gut ist es, von diesem Feld aus in diese Richtung zu gehen?“ Am Anfang sind alle Q-Werte 0, denn der Roboter weiß noch nichts.</p>
+    <p>Nach jedem einzelnen Schritt wird genau ein Q-Wert verbessert, nämlich der des Feldes, auf dem der Roboter stand, und der Richtung, in die er gegangen ist. Die Regel dafür ist das Herz des Verfahrens:</p>
+    <div class="box">Q<sub>neu</sub>(s, a) = Q(s, a) + α · ( r + γ · max Q(s′, ·) − Q(s, a) )</div>
+    <ul>
+      <li><code>s</code> ist das Feld vor dem Schritt, <code>a</code> die gewählte Richtung, <code>s′</code> das Feld nach dem Schritt.</li>
+      <li><code>r</code> ist die Belohnung für diesen Schritt (+1, −1 oder 0).</li>
+      <li><code>max Q(s′, ·)</code> ist der beste Q-Wert des neuen Feldes, also das, was der Roboter sich dort noch verspricht. Endet die Episode auf <code>s′</code>, ist dieser Teil 0.</li>
+      <li>Der Ausdruck in der Klammer ist der <span class="term">Lernfehler</span>: Wie viel besser oder schlechter war der Schritt, als die Tabelle bisher behauptet hat?</li>
+      <li><code>α</code> (Lernrate) und <code>γ</code> (Abzinsung) sind Einstellungen, die du mit den Schiebereglern veränderst.</li>
+    </ul>
+    <p>Ein Beispiel mit α = 0,5 und γ = 0,9: Der Roboter steht auf einem Feld mit Q-Wert 0 und geht nach rechts auf ein Feld, dessen bester Q-Wert 0,81 ist. Die Belohnung ist 0. Dann rechnet er:</p>
+    <div class="box">0 + 0,5 · ( 0 + 0,9 · 0,81 − 0 ) = 0,36</div>
+    <p>Beim ersten Erreichen des Ausgangs bekommt nur das Feld direkt davor einen positiven Wert. In der nächsten Episode „erbt“ das Feld davor einen Teil davon, dann das nächste. So breitet sich der Wert Schritt für Schritt vom Ausgang rückwärts über das Spielfeld aus, wie eine Welle. Genau das siehst du an der roten Färbung. Im Kasten „Letzte Aktualisierung“ rechts kannst du jede Rechnung mit den echten Zahlen mitverfolgen.</p>
+    <p>Hat der Roboter genug gelernt, muss er nur noch auf jedem Feld die Richtung mit dem höchsten Q-Wert wählen. Diese Regel „auf jedem Feld die beste Richtung“ heißt <span class="term">Strategie</span> (englisch: policy). Mit dem Häkchen „Beste Richtung als Pfeil“ wird sie sichtbar.</p>
+
+    <h3 id="h-alpha">Lernrate α (Alpha)</h3>
+    <p>Die Lernrate legt fest, wie stark ein einzelner Schritt den alten Q-Wert verändert. Sie liegt zwischen 0 und 1.</p>
+    <ul>
+      <li><strong>α = 1:</strong> Der alte Wert wird komplett durch die neue Erfahrung ersetzt. Der Roboter lernt schnell, aber ein einzelner ungewöhnlicher Schritt wirft alles um.</li>
+      <li><strong>α = 0,1:</strong> Der Roboter glaubt einer neuen Erfahrung nur zu 10 %. Er lernt langsam, aber die Werte werden ruhiger und verlässlicher.</li>
+      <li><strong>α = 0,5</strong> (Voreinstellung) ist ein guter Mittelweg für dieses Spielfeld.</li>
+    </ul>
+    <p>Weil unser Spielfeld immer genau das tut, was der Roboter will (ein Schritt nach rechts führt immer nach rechts), funktioniert hier auch eine hohe Lernrate gut. In Spielen mit Zufall, etwa auf Glatteis, wäre eine kleine Lernrate wichtig.</p>
+
+    <h3 id="h-gamma">Abzinsung γ (Gamma)</h3>
+    <p>Die Abzinsung (auch Diskontierung) legt fest, wie viel eine Belohnung in der Zukunft heute wert ist. Der Faktor liegt zwischen 0 und 1. Bei γ = 0,9 ist eine Belohnung, die erst in einem Schritt kommt, nur noch 90 % wert, in zwei Schritten 81 %, in drei Schritten 73 % und so weiter.</p>
+    <p>Daher werden die Zahlen auf dem Spielfeld mit jedem Schritt Abstand vom Ausgang kleiner: direkt vor dem Ausgang 1,00, dann 0,90, 0,81, 0,73 … Das ist wie Zinsen rückwärts, darum der Name.</p>
+    <ul>
+      <li><strong>γ nahe 1</strong> (z. B. 0,99): Der Roboter plant weit voraus. Auch weit entfernte Felder bekommen deutliche Werte, aber die Unterschiede zwischen Nachbarfeldern werden klein.</li>
+      <li><strong>γ klein</strong> (z. B. 0,5): Die Werte fallen rasch auf fast 0. Weit vom Ausgang „sieht“ der Roboter nichts mehr und findet den Weg nur mühsam.</li>
+    </ul>
+    <p>Die Abzinsung ist auch der Grund, warum der Roboter den <em>kürzesten</em> Weg lernt: Ein Umweg verzögert die Belohnung, und jede Verzögerung macht sie weniger wert.</p>
+
+    <h3 id="h-eps">Zufall ε (Epsilon)</h3>
+    <p>Wenn der Roboter immer nur die Richtung mit dem höchsten Q-Wert wählt, nimmt er den ersten Weg, der zufällig funktioniert hat, und probiert nie etwas anderes. Vielleicht gibt es aber einen besseren Weg. Dieses Problem heißt <span class="term">Erkunden gegen Ausnutzen</span> (englisch: exploration vs. exploitation).</p>
+    <p>Der Zufallsanteil ε löst das: Mit Wahrscheinlichkeit ε wählt der Roboter eine zufällige Richtung, sonst die bisher beste. Bei ε = 0,2 ist also jeder fünfte Schritt ein Zufallsschritt.</p>
+    <ul>
+      <li><strong>ε = 1:</strong> reiner Zufall. Der Roboter lernt zwar weiter, nutzt sein Wissen aber nie. Episoden dauern lange.</li>
+      <li><strong>ε = 0:</strong> nur Ausnutzen. Hat der Roboter noch nichts gelernt, wählt er bei gleichen Q-Werten zufällig unter den besten. Später bleibt er stur bei seinem Weg, auch wenn er nicht der kürzeste ist.</li>
+      <li>Übliche Praxis: Mit hohem ε starten und es mit der Zeit senken. Probiere das mit dem Schieberegler von Hand aus.</li>
+    </ul>
+
+    <h3 id="h-trap">Strafhindernis</h3>
+    <p>Mit dem Häkchen „Strafhindernis platzieren“ erscheint ein Feld mit 🔥. Tritt der Roboter darauf, bekommt er die Belohnung −1 und die Episode endet sofort. Der Roboter startet dann wieder am Startfeld.</p>
+    <p>Das Hindernis bekommt der Roboter nicht gesagt. Er muss es durch schlechte Erfahrung lernen. Die Felder rund um das Hindernis bekommen negative Q-Werte für die Richtung, die hineinführt, und färben sich bläulich, wenn ihr bester Wert negativ ist. Nach einigen Episoden umgeht der Roboter das Hindernis und wählt sogar lieber einen etwas längeren Weg, wenn der Zufallsanteil ihn sonst zu oft ins Feuer treiben würde.</p>
+    <p>Im Modus „Hindernis“ kannst du weitere Hindernisse durch Antippen setzen oder wieder entfernen. Baust du eine Mauer bis zum Ausgang, kann der Roboter ihn nie erreichen. Beobachte, was dann mit den Werten passiert.</p>
+
+    <h3 id="h-colors">Farben und Zahlen</h3>
+    <p>Die Zahl auf jedem Feld ist der <span class="term">Wert des Feldes</span>: der höchste der vier Q-Werte dieses Feldes. Er sagt, wie viel Belohnung der Roboter sich von hier aus noch verspricht, wenn er die beste Richtung wählt.</p>
+    <table>
+      <tr><th>Anzeige</th><th>Bedeutung</th></tr>
+      <tr><td><span class="swatch" style="background: rgba(214,40,40,0.9)"></span>kräftiges Rot</td><td>Wert nahe 1: Der Ausgang ist nah, der Weg ist gut gelernt.</td></tr>
+      <tr><td><span class="swatch" style="background: rgba(214,40,40,0.25)"></span>blasses Rot</td><td>Kleiner positiver Wert: weit vom Ausgang oder noch wenig gelernt.</td></tr>
+      <tr><td><span class="swatch" style="background: rgba(30,100,220,0.5)"></span>Blau</td><td>Negativer Wert: Von hier droht eher die Strafe als der Ausgang.</td></tr>
+      <tr><td>0 (grau)</td><td>Noch keine Erfahrung mit diesem Feld.</td></tr>
+      <tr><td>Pfeil ↑ → ↓ ←</td><td>Richtung mit dem höchsten Q-Wert (nur, wenn eingeschaltet).</td></tr>
+      <tr><td>vier kleine Zahlen</td><td>Die vier Q-Werte des Feldes an den jeweiligen Rändern (nur, wenn eingeschaltet). Zum Lesen das Spielfeld mit zwei Fingern vergrößern.</td></tr>
+      <tr><td>🚪 grüner Rahmen</td><td>Ausgang, Belohnung +1, Episode endet.</td></tr>
+      <tr><td>🔥 roter Rahmen</td><td>Strafhindernis, Belohnung −1, Episode endet.</td></tr>
+      <tr><td>blauer Rahmen</td><td>Startfeld jeder Episode.</td></tr>
+    </table>
+
+    <h3 id="h-ctrl">Steuerung</h3>
+    <ul>
+      <li><strong>▶ Start / ⏸ Pause:</strong> Der Roboter läuft und lernt fortlaufend. Das Tempo stellst du mit dem Regler „Tempo“ in Schritten pro Sekunde ein.</li>
+      <li><strong>Ein Schritt:</strong> genau ein Schritt, ideal um die Rechnung im Kasten „Letzte Aktualisierung“ nachzuvollziehen.</li>
+      <li><strong>+100 / +1000 Episoden:</strong> rechnet viele Episoden auf einmal, ohne sie zu zeigen. So siehst du schnell, wie das fertig gelernte Spielfeld aussieht.</li>
+      <li><strong>Lernen zurücksetzen:</strong> löscht die Q-Tabelle. Das Spielfeld bleibt, wie es ist.</li>
+      <li><strong>Größe:</strong> Spielfeld von 6 × 6 bis 10 × 10 Feldern. Eine Änderung setzt das Lernen zurück.</li>
+      <li><strong>Antippen eines Feldes:</strong> verschiebt je nach Auswahl den Ausgang, das Startfeld oder setzt/entfernt ein Hindernis. Auch das setzt das Lernen zurück, denn die alte Tabelle passt nicht mehr zum neuen Spielfeld.</li>
+      <li><strong>Zoomen:</strong> Spielfeld mit zwei Fingern auseinanderziehen (am Computer: Strg + Mausrad). Im vergrößerten Zustand kannst du es mit einem Finger verschieben. „Zoom zurück“ stellt die Ansicht wieder her.</li>
+      <li><strong>Hell / Dunkel:</strong> Knopf oben rechts. Ohne Auswahl folgt die App der Einstellung des Geräts.</li>
+      <li><strong>Tastatur</strong> (falls vorhanden): Leertaste startet und pausiert, Pfeil rechts macht einen Schritt.</li>
+    </ul>
+
+    <h3 id="h-exp">Experimente für den Unterricht</h3>
+    <ol>
+      <li>Starte mit den Voreinstellungen. Beobachte, wie die erste rote Färbung direkt vor dem Ausgang entsteht und sich dann rückwärts ausbreitet. Zähle die Episoden, bis der Roboter zum ersten Mal den kürzesten Weg nimmt.</li>
+      <li>Setze die Abzinsung γ auf 0,5 und setze das Lernen zurück. Wie weit vom Ausgang sind die Werte noch deutlich sichtbar? Was ändert sich bei 0,99?</li>
+      <li>Setze den Zufall ε auf 0 und setze das Lernen zurück. Findet der Roboter trotzdem einen Weg? Ist es der kürzeste? Vergleiche mit ε = 0,5.</li>
+      <li>Schalte das Strafhindernis ein und lass 100 Episoden laufen. Welche Felder sind blau und warum? Wo läuft der Roboter jetzt entlang?</li>
+      <li>Verschiebe den Ausgang nach dem Lernen auf ein anderes Feld. Warum muss die Tabelle gelöscht werden? Was würde passieren, wenn man die alten Werte behielte?</li>
+      <li>Lernrate α auf 1 und auf 0,1: Wie lange dauert es jeweils, bis die Werte „ruhig“ werden?</li>
+      <li>Vergrößere das Spielfeld auf 10 × 10. Wie viele Episoden braucht der Roboter jetzt? Die Q-Tabelle hat dann 10 · 10 · 4 = 400 Einträge. Überlege, warum echte Spiele wie Schach keine Tabelle mehr nutzen können.</li>
+    </ol>
+
+    <h3 id="h-gloss">Glossar</h3>
+    <table>
+      <tr><td><span class="term">Agent</span></td><td>Der Lernende, hier der Roboter 🤖.</td></tr>
+      <tr><td><span class="term">Umgebung</span></td><td>Alles, worin der Agent handelt: das Spielfeld mit Ausgang und Hindernis.</td></tr>
+      <tr><td><span class="term">Zustand (s)</span></td><td>Die Situation, in der der Agent ist: hier das Feld, auf dem er steht.</td></tr>
+      <tr><td><span class="term">Aktion (a)</span></td><td>Eine Handlung: ein Schritt nach ↑ → ↓ ←. Am Rand bleibt der Roboter stehen.</td></tr>
+      <tr><td><span class="term">Belohnung (r)</span></td><td>Punkte nach einem Schritt: +1 Ausgang, −1 Hindernis, sonst 0.</td></tr>
+      <tr><td><span class="term">Episode</span></td><td>Ein Durchlauf vom Start bis zum Ende (Ausgang, Hindernis oder Abbruch nach zu vielen Schritten).</td></tr>
+      <tr><td><span class="term">Q-Wert</span></td><td>Erwartete abgezinste Belohnung für „auf Feld s in Richtung a gehen und danach optimal weiter“.</td></tr>
+      <tr><td><span class="term">Strategie (Policy)</span></td><td>Die Regel, welche Richtung der Agent auf jedem Feld wählt. Nach dem Lernen: die mit dem höchsten Q-Wert.</td></tr>
+      <tr><td><span class="term">Erkunden / Ausnutzen</span></td><td>Neues ausprobieren oder das Bekannte nutzen. Der Zufall ε regelt das Verhältnis.</td></tr>
+    </table>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+
+  // Actions: up, right, down, left
+  const DIRS = [
+    { dx: 0, dy: -1, sym: '↑', name: 'oben' },
+    { dx: 1, dy: 0, sym: '→', name: 'rechts' },
+    { dx: 0, dy: 1, sym: '↓', name: 'unten' },
+    { dx: -1, dy: 0, sym: '←', name: 'links' },
+  ];
+  const REWARD_GOAL = 1;
+  const REWARD_TRAP = -1;
+  const REWARD_STEP = 0;
+
+  const state = {
+    n: 6,
+    alpha: 0.5,
+    gamma: 0.9,
+    eps: 0.2,
+    sps: 8,
+    start: { x: 0, y: 0 },
+    goal: { x: 5, y: 5 },
+    traps: new Set(),
+    agent: { x: 0, y: 0 },
+    Q: new Float64Array(6 * 6 * 4),
+    running: false,
+    timer: null,
+    episode: 0,
+    stepsInEpisode: 0,
+    pendingReset: false,
+    lastOutcome: null, // { kind: 'goal' | 'trap' | 'timeout', steps }
+    history: [],
+    bestLen: null,
+    lastUpdate: null,
+    tapMode: 'goal',
+    showVal: true,
+    showArrows: false,
+    showQ: false,
+  };
+
+  // ---------- helpers ----------
+  const key = (x, y) => y * state.n + x;
+  const fmt = (v) => {
+    if (Math.abs(v) < 0.005) return '0';
+    return (v < 0 ? '−' : '') + Math.abs(v).toFixed(2).replace('.', ',');
+  };
+  const fmtParam = (v) => v.toFixed(2).replace('.', ',');
+  const isGoal = (x, y) => x === state.goal.x && y === state.goal.y;
+  const isStart = (x, y) => x === state.start.x && y === state.start.y;
+  const isTrap = (x, y) => state.traps.has(key(x, y));
+  const maxSteps = () => 10 * state.n * state.n;
+
+  function maxQ(s) {
+    const Q = state.Q;
+    let m = Q[s * 4];
+    for (let a = 1; a < 4; a++) if (Q[s * 4 + a] > m) m = Q[s * 4 + a];
+    return m;
+  }
+  function bestActions(s) {
+    const Q = state.Q;
+    const m = maxQ(s);
+    const out = [];
+    for (let a = 0; a < 4; a++) if (Q[s * 4 + a] === m) out.push(a);
+    return out;
+  }
+  function chooseAction(s) {
+    if (Math.random() < state.eps) return Math.floor(Math.random() * 4);
+    const best = bestActions(s);
+    return best[Math.floor(Math.random() * best.length)];
+  }
+
+  // ---------- Q-learning ----------
+  function step() {
+    const n = state.n;
+    const ax = state.agent.x, ay = state.agent.y;
+    const s = key(ax, ay);
+    const a = chooseAction(s);
+    let nx = ax + DIRS[a].dx, ny = ay + DIRS[a].dy;
+    if (nx < 0 || ny < 0 || nx >= n || ny >= n) { nx = ax; ny = ay; } // bump into the wall: stay
+    const s2 = key(nx, ny);
+    let r = REWARD_STEP, done = false, kind = null;
+    if (isGoal(nx, ny)) { r = REWARD_GOAL; done = true; kind = 'goal'; }
+    else if (isTrap(nx, ny)) { r = REWARD_TRAP; done = true; kind = 'trap'; }
+    const old = state.Q[s * 4 + a];
+    const next = done ? 0 : maxQ(s2);
+    const target = r + state.gamma * next;
+    const nv = old + state.alpha * (target - old);
+    state.Q[s * 4 + a] = nv;
+    state.lastUpdate = { x: ax, y: ay, a, r, old, next, nv, done };
+    state.agent = { x: nx, y: ny };
+    state.stepsInEpisode++;
+    if (!done && state.stepsInEpisode >= maxSteps()) { done = true; kind = 'timeout'; }
+    if (done) endEpisode(kind);
+  }
+  function endEpisode(kind) {
+    state.episode++;
+    state.lastOutcome = { kind, steps: state.stepsInEpisode };
+    state.history.push(kind === 'goal');
+    if (state.history.length > 20) state.history.shift();
+    if (kind === 'goal' && (state.bestLen === null || state.stepsInEpisode < state.bestLen)) state.bestLen = state.stepsInEpisode;
+    state.pendingReset = true;
+  }
+  function resetAgent() {
+    state.agent = { x: state.start.x, y: state.start.y };
+    state.stepsInEpisode = 0;
+    state.pendingReset = false;
+  }
+  function tick() {
+    if (state.pendingReset) { resetAgent(); render(); return; }
+    step();
+    render();
+  }
+  function runEpisodes(count) {
+    if (state.pendingReset) resetAgent();
+    let target = state.episode + count;
+    // Finish the current partial episode as part of the batch.
+    while (state.episode < target) {
+      step();
+      if (state.pendingReset) resetAgent();
+    }
+    render();
+  }
+  function resetLearning() {
+    state.Q = new Float64Array(state.n * state.n * 4);
+    state.episode = 0;
+    state.history = [];
+    state.bestLen = null;
+    state.lastOutcome = null;
+    state.lastUpdate = null;
+    resetAgent();
+    render();
+  }
+
+  // ---------- layout changes ----------
+  function placeRandomTrap() {
+    const n = state.n, candidates = [];
+    for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) {
+      if (isGoal(x, y) || isStart(x, y) || isTrap(x, y)) continue;
+      const nearGoal = Math.abs(x - state.goal.x) + Math.abs(y - state.goal.y) <= 1;
+      const nearStart = Math.abs(x - state.start.x) + Math.abs(y - state.start.y) <= 1;
+      if (nearGoal || nearStart) continue;
+      candidates.push(key(x, y));
+    }
+    if (candidates.length) state.traps.add(candidates[Math.floor(Math.random() * candidates.length)]);
+  }
+  function setSize(n) {
+    state.n = n;
+    state.start = { x: 0, y: 0 };
+    state.goal = { x: n - 1, y: n - 1 };
+    state.traps = new Set();
+    if ($('inTrap').checked) placeRandomTrap();
+    buildBoard();
+    resetLearning();
+  }
+  function onCellTap(x, y) {
+    const mode = state.tapMode;
+    if (mode === 'goal') {
+      if (isStart(x, y) || isGoal(x, y)) return;
+      state.goal = { x, y };
+      state.traps.delete(key(x, y));
+    } else if (mode === 'start') {
+      if (isGoal(x, y) || isStart(x, y)) return;
+      state.start = { x, y };
+      state.traps.delete(key(x, y));
+    } else {
+      if (isGoal(x, y) || isStart(x, y)) return;
+      const k = key(x, y);
+      if (state.traps.has(k)) state.traps.delete(k); else state.traps.add(k);
+    }
+    $('inTrap').checked = state.traps.size > 0;
+    updateCellRoles();
+    resetLearning();
+  }
+
+  // ---------- board DOM ----------
+  const board = $('board');
+  const stage = $('stage');
+  const viewport = $('viewport');
+  const zoomer = $('zoomer');
+  let cells = [];
+  let agentEl = null;
+
+  function buildBoard() {
+    const n = state.n;
+    board.innerHTML = '';
+    board.style.gridTemplateColumns = `repeat(${n}, var(--cell))`;
+    cells = [];
+    for (let y = 0; y < n; y++) {
+      for (let x = 0; x < n; x++) {
+        const c = document.createElement('div');
+        c.className = 'cell';
+        c.dataset.x = x; c.dataset.y = y;
+        c.setAttribute('role', 'gridcell');
+        c.innerHTML = '<span class="q u"></span><span class="q r"></span><span class="q d"></span><span class="q l"></span>' +
+          '<span class="arrow"></span><span class="val"></span><span class="icon"></span><span class="tag"></span>';
+        board.appendChild(c);
+        cells.push({
+          el: c, val: c.querySelector('.val'), arrow: c.querySelector('.arrow'), icon: c.querySelector('.icon'),
+          tag: c.querySelector('.tag'), q: [c.querySelector('.q.u'), c.querySelector('.q.r'), c.querySelector('.q.d'), c.querySelector('.q.l')],
+        });
+      }
+    }
+    agentEl = document.createElement('div');
+    agentEl.className = 'agent';
+    agentEl.textContent = '🤖';
+    agentEl.setAttribute('aria-label', 'Roboter');
+    board.appendChild(agentEl);
+    updateCellRoles();
+    fitBoard();
+  }
+  function updateCellRoles() {
+    const n = state.n;
+    for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) {
+      const c = cells[key(x, y)];
+      const goal = isGoal(x, y), trap = isTrap(x, y), start = isStart(x, y);
+      c.el.classList.toggle('goal', goal);
+      c.el.classList.toggle('trap', trap);
+      c.el.classList.toggle('start', start);
+      c.icon.textContent = goal ? '🚪' : (trap ? '🔥' : '');
+      c.tag.textContent = goal ? 'Ausgang' : (trap ? '−1' : (start ? 'Start' : ''));
+    }
+    stOptimal();
+  }
+
+  let heatRGB = '214,40,40', coldRGB = '30,100,220';
+  function readThemeColors() {
+    const cs = getComputedStyle(document.documentElement);
+    heatRGB = cs.getPropertyValue('--heat-rgb').trim() || heatRGB;
+    coldRGB = cs.getPropertyValue('--cold-rgb').trim() || coldRGB;
+  }
+
+  function fitBoard() {
+    const landscape = window.matchMedia('(orientation: landscape) and (min-width: 700px)').matches;
+    if (!landscape) {
+      const h = Math.min(stage.clientWidth, Math.round(window.innerHeight * 0.6));
+      stage.style.height = h + 'px';
+    } else {
+      stage.style.height = '';
+    }
+    const size = Math.max(120, Math.min(viewport.clientWidth, viewport.clientHeight) - 12);
+    const cell = Math.floor((size - 3 * (state.n + 1)) / state.n);
+    board.style.setProperty('--cell', cell + 'px');
+    updateAgent();
+  }
+
+  function updateCells() {
+    const n = state.n;
+    board.classList.toggle('show-q', state.showQ);
+    board.classList.toggle('hide-val', !state.showVal);
+    for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) {
+      const s = key(x, y);
+      const c = cells[s];
+      const v = maxQ(s);
+      const terminal = isGoal(x, y) || isTrap(x, y);
+      let light = false;
+      if (terminal || Math.abs(v) < 0.005) {
+        c.el.style.background = '';
+      } else if (v > 0) {
+        const t = Math.pow(Math.min(1, v), 0.8);
+        c.el.style.background = `rgba(${heatRGB}, ${(0.08 + 0.87 * t).toFixed(3)})`;
+        light = t > 0.5;
+      } else {
+        const t = Math.pow(Math.min(1, -v), 0.8);
+        c.el.style.background = `rgba(${coldRGB}, ${(0.08 + 0.75 * t).toFixed(3)})`;
+        light = t > 0.5;
+      }
+      c.el.classList.toggle('light', light);
+      c.val.textContent = fmt(v);
+      c.val.classList.toggle('zero', Math.abs(v) < 0.005);
+      if (state.showArrows && !terminal) {
+        const anyNonZero = [0, 1, 2, 3].some((a) => Math.abs(state.Q[s * 4 + a]) >= 0.005);
+        c.arrow.textContent = anyNonZero ? DIRS[bestActions(s)[0]].sym : '';
+      } else {
+        c.arrow.textContent = '';
+      }
+      if (state.showQ && !terminal) {
+        for (let a = 0; a < 4; a++) c.q[a].textContent = fmt(state.Q[s * 4 + a]);
+      } else if (state.showQ) {
+        for (let a = 0; a < 4; a++) c.q[a].textContent = '';
+      }
+    }
+  }
+  function updateAgent() {
+    if (!agentEl) return;
+    const cell = parseFloat(board.style.getPropertyValue('--cell')) || 60;
+    const px = state.agent.x * (cell + 3), py = state.agent.y * (cell + 3);
+    agentEl.style.transform = `translate(${px}px, ${py}px)`;
+  }
+  function stOptimal() {
+    const el = $('stOptimal');
+    if (state.traps.size === 0) {
+      el.textContent = (Math.abs(state.goal.x - state.start.x) + Math.abs(state.goal.y - state.start.y)) + ' Schritte';
+    } else {
+      const d = bfsDistance();
+      el.textContent = d === null ? 'unerreichbar' : d + ' Schritte';
+    }
+  }
+  function bfsDistance() {
+    const n = state.n, dist = new Int32Array(n * n).fill(-1);
+    const queue = [key(state.start.x, state.start.y)];
+    dist[queue[0]] = 0;
+    while (queue.length) {
+      const s = queue.shift();
+      const x = s % n, y = Math.floor(s / n);
+      if (isGoal(x, y)) return dist[s];
+      for (const d of DIRS) {
+        const nx = x + d.dx, ny = y + d.dy;
+        if (nx < 0 || ny < 0 || nx >= n || ny >= n) continue;
+        const t = key(nx, ny);
+        if (dist[t] !== -1 || isTrap(nx, ny)) continue;
+        dist[t] = dist[s] + 1;
+        queue.push(t);
+      }
+    }
+    return null;
+  }
+  function updateStats() {
+    $('stEpisode').textContent = state.episode;
+    $('stSteps').textContent = state.stepsInEpisode;
+    const last = $('stLast');
+    if (!state.lastOutcome) { last.textContent = '–'; last.className = 'v'; }
+    else if (state.lastOutcome.kind === 'goal') { last.textContent = `Ausgang in ${state.lastOutcome.steps}`; last.className = 'v good'; }
+    else if (state.lastOutcome.kind === 'trap') { last.textContent = `Hindernis (${state.lastOutcome.steps})`; last.className = 'v bad'; }
+    else { last.textContent = 'Abbruch'; last.className = 'v bad'; }
+    const rate = $('stRate');
+    if (state.history.length === 0) { rate.textContent = '–'; rate.className = 'v'; }
+    else {
+      const ok = state.history.filter(Boolean).length;
+      const pct = Math.round(100 * ok / state.history.length);
+      rate.textContent = pct + ' %';
+      rate.className = 'v ' + (pct >= 80 ? 'good' : (pct < 40 ? 'bad' : ''));
+    }
+    $('stBest').textContent = state.bestLen === null ? '–' : state.bestLen + ' Schritte';
+  }
+  function updateFormula() {
+    const f = $('formula');
+    const u = state.lastUpdate;
+    if (!u) {
+      f.innerHTML = '<span class="lbl">Letzte Aktualisierung der Q-Tabelle</span><br>Noch kein Schritt gemacht.';
+      return;
+    }
+    const rCls = u.r > 0 ? 'r-pos' : (u.r < 0 ? 'r-neg' : '');
+    const rTxt = u.r > 0 ? '+1 (Ausgang!)' : (u.r < 0 ? '−1 (Hindernis!)' : '0');
+    const nextTxt = u.done ? '0 (Episode endet)' : fmt(u.next);
+    f.innerHTML =
+      `<span class="lbl">Letzte Aktualisierung der Q-Tabelle</span><br>` +
+      `Feld (${u.x + 1}|${u.y + 1}), Richtung ${DIRS[u.a].sym} ${DIRS[u.a].name}<br>` +
+      `Belohnung r = <span class="${rCls}">${rTxt}</span>, bester Wert nächstes Feld = ${nextTxt}<br>` +
+      `Q = ${fmt(u.old)} + ${fmtParam(state.alpha)} · (${u.r} + ${fmtParam(state.gamma)} · ${u.done ? '0' : fmt(u.next)} − ${fmt(u.old)})<br>` +
+      `<strong>Q<sub>neu</sub> = ${fmt(u.nv)}</strong>`;
+  }
+  function render() {
+    updateCells();
+    updateAgent();
+    updateStats();
+    updateFormula();
+  }
+
+  // ---------- run control ----------
+  function setRunning(on) {
+    state.running = on;
+    if (state.timer) { clearInterval(state.timer); state.timer = null; }
+    if (on) state.timer = setInterval(tick, 1000 / state.sps);
+    $('btnRun').textContent = on ? '⏸ Pause' : '▶ Start';
+    $('btnStep').disabled = on;
+  }
+  $('btnRun').addEventListener('click', () => setRunning(!state.running));
+  $('btnStep').addEventListener('click', () => { if (!state.running) tick(); });
+  $('btnEp100').addEventListener('click', () => runEpisodes(100));
+  $('btnEp1000').addEventListener('click', () => runEpisodes(1000));
+  $('btnReset').addEventListener('click', () => resetLearning());
+  $('inSps').addEventListener('input', (e) => {
+    state.sps = +e.target.value;
+    $('outSps').textContent = `${state.sps} Schritte/s`;
+    agentEl && agentEl.classList.toggle('fast', state.sps > 12);
+    if (state.running) setRunning(true);
+  });
+  $('inN').addEventListener('input', (e) => { $('outN').textContent = `${e.target.value} × ${e.target.value}`; });
+  $('inN').addEventListener('change', (e) => setSize(+e.target.value));
+  $('inTrap').addEventListener('change', (e) => {
+    if (e.target.checked) { if (state.traps.size === 0) placeRandomTrap(); }
+    else state.traps = new Set();
+    updateCellRoles();
+    resetLearning();
+  });
+  document.querySelectorAll('input[name="tap"]').forEach((r) => r.addEventListener('change', (e) => {
+    state.tapMode = e.target.value;
+    const txt = { goal: 'Ausgang setzen', trap: 'Hindernis setzen/entfernen', start: 'Start setzen' }[state.tapMode];
+    $('stageHint').textContent = `Zwei Finger: zoomen · Tippen: ${txt}`;
+  }));
+  const bindParam = (id, outId, prop) => {
+    $(id).addEventListener('input', (e) => { state[prop] = +e.target.value; $(outId).textContent = fmtParam(state[prop]); });
+  };
+  bindParam('inAlpha', 'outAlpha', 'alpha');
+  bindParam('inGamma', 'outGamma', 'gamma');
+  bindParam('inEps', 'outEps', 'eps');
+  $('inShowVal').addEventListener('change', (e) => { state.showVal = e.target.checked; updateCells(); });
+  $('inShowArrows').addEventListener('change', (e) => { state.showArrows = e.target.checked; updateCells(); });
+  $('inShowQ').addEventListener('change', (e) => { state.showQ = e.target.checked; updateCells(); });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return;
+    if (!$('overlay').hidden) { if (e.key === 'Escape') closeHelp(); return; }
+    if (e.key === ' ') { e.preventDefault(); setRunning(!state.running); }
+    else if (e.key === 'ArrowRight' && !state.running) { e.preventDefault(); tick(); }
+  });
+
+  // ---------- pinch zoom, pan and tap ----------
+  const zoom = { s: 1, tx: 0, ty: 0 };
+  const pointers = new Map();
+  let gesture = null;
+  function applyZoom() {
+    zoomer.style.transform = `translate(${zoom.tx}px, ${zoom.ty}px) scale(${zoom.s})`;
+    $('btnZoomReset').hidden = Math.abs(zoom.s - 1) < 0.02 && Math.abs(zoom.tx) < 2 && Math.abs(zoom.ty) < 2;
+  }
+  function resetZoom() { zoom.s = 1; zoom.tx = 0; zoom.ty = 0; applyZoom(); }
+  $('btnZoomReset').addEventListener('click', resetZoom);
+  const vpCenter = () => ({ x: viewport.clientWidth / 2, y: viewport.clientHeight / 2 });
+  const localPt = (e) => { const r = viewport.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
+
+  viewport.addEventListener('pointerdown', (e) => {
+    if (e.button !== undefined && e.button !== 0 && e.pointerType === 'mouse') return;
+    pointers.set(e.pointerId, localPt(e));
+    try { viewport.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+    if (pointers.size === 1) {
+      const p = localPt(e);
+      gesture = { kind: 'tap', x0: p.x, y0: p.y, t0: Date.now(), tx0: zoom.tx, ty0: zoom.ty, moved: false, multi: false };
+    } else if (pointers.size === 2) {
+      const [a, b] = [...pointers.values()];
+      const c = vpCenter();
+      const m = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+      gesture = {
+        kind: 'pinch', multi: true, moved: true,
+        d0: Math.hypot(a.x - b.x, a.y - b.y), s0: zoom.s,
+        q: { x: (m.x - c.x - zoom.tx) / zoom.s, y: (m.y - c.y - zoom.ty) / zoom.s },
+      };
+    }
+  });
+  viewport.addEventListener('pointermove', (e) => {
+    if (!pointers.has(e.pointerId)) return;
+    pointers.set(e.pointerId, localPt(e));
+    if (!gesture) return;
+    if (gesture.kind === 'pinch' && pointers.size >= 2) {
+      const [a, b] = [...pointers.values()];
+      const c = vpCenter();
+      const m = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+      const d = Math.hypot(a.x - b.x, a.y - b.y);
+      zoom.s = Math.min(4, Math.max(0.6, gesture.s0 * d / Math.max(1, gesture.d0)));
+      zoom.tx = m.x - c.x - gesture.q.x * zoom.s;
+      zoom.ty = m.y - c.y - gesture.q.y * zoom.s;
+      applyZoom();
+    } else if (gesture.kind === 'tap' && pointers.size === 1) {
+      const p = localPt(e);
+      const dx = p.x - gesture.x0, dy = p.y - gesture.y0;
+      if (!gesture.moved && Math.hypot(dx, dy) > 8) gesture.moved = true;
+      if (gesture.moved && zoom.s > 1.01) {
+        zoom.tx = gesture.tx0 + dx; zoom.ty = gesture.ty0 + dy; applyZoom();
+      }
+    }
+  });
+  function endPointer(e) {
+    if (!pointers.has(e.pointerId)) return;
+    pointers.delete(e.pointerId);
+    if (gesture && gesture.kind === 'tap' && pointers.size === 0 && !gesture.moved && !gesture.multi && Date.now() - gesture.t0 < 600) {
+      const el = document.elementFromPoint(e.clientX, e.clientY);
+      const cell = el && el.closest ? el.closest('.cell') : null;
+      if (cell) onCellTap(+cell.dataset.x, +cell.dataset.y);
+    }
+    if (pointers.size === 0) gesture = null;
+    else if (pointers.size === 1 && gesture && gesture.kind === 'pinch') {
+      // Second finger lifted: continue as a pan with the remaining finger, never as a tap.
+      const p = [...pointers.values()][0];
+      gesture = { kind: 'tap', x0: p.x, y0: p.y, t0: 0, tx0: zoom.tx, ty0: zoom.ty, moved: true, multi: true };
+    }
+  }
+  viewport.addEventListener('pointerup', endPointer);
+  viewport.addEventListener('pointercancel', endPointer);
+  viewport.addEventListener('wheel', (e) => {
+    if (!e.ctrlKey && !e.metaKey) return;
+    e.preventDefault();
+    const c = vpCenter(), p = localPt(e);
+    const q = { x: (p.x - c.x - zoom.tx) / zoom.s, y: (p.y - c.y - zoom.ty) / zoom.s };
+    zoom.s = Math.min(4, Math.max(0.6, zoom.s * (e.deltaY < 0 ? 1.1 : 0.9)));
+    zoom.tx = p.x - c.x - q.x * zoom.s;
+    zoom.ty = p.y - c.y - q.y * zoom.s;
+    applyZoom();
+  }, { passive: false });
+  // Block Safari's own gesture events on the board so only our pinch handles it.
+  ['gesturestart', 'gesturechange', 'gestureend'].forEach((t) => viewport.addEventListener(t, (e) => e.preventDefault()));
+
+  // ---------- theme ----------
+  const root = document.documentElement;
+  function currentDark() {
+    const t = root.getAttribute('data-theme');
+    if (t === 'dark') return true;
+    if (t === 'light') return false;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  function applyThemeLabel() {
+    $('btnTheme').textContent = currentDark() ? 'Hell' : 'Dunkel';
+    readThemeColors();
+    updateCells();
+  }
+  $('btnTheme').addEventListener('click', () => {
+    const next = currentDark() ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('qlab-theme', next); } catch (err) { /* storage unavailable */ }
+    applyThemeLabel();
+  });
+  try {
+    const saved = localStorage.getItem('qlab-theme');
+    if (saved === 'dark' || saved === 'light') root.setAttribute('data-theme', saved);
+  } catch (err) { /* storage unavailable */ }
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyThemeLabel);
+
+  // ---------- help ----------
+  const overlay = $('overlay');
+  function openHelp() { overlay.hidden = false; $('helpPanel').scrollTop = 0; $('btnHelpClose').focus(); }
+  function closeHelp() { overlay.hidden = true; $('btnHelp').focus(); }
+  $('btnHelp').addEventListener('click', openHelp);
+  $('btnHelpClose').addEventListener('click', closeHelp);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) closeHelp(); });
+  overlay.querySelectorAll('.toc a').forEach((a) => a.addEventListener('click', (e) => {
+    e.preventDefault();
+    const target = overlay.querySelector(a.getAttribute('href'));
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }));
+
+  // ---------- init ----------
+  window.addEventListener('resize', fitBoard);
+  window.addEventListener('orientationchange', () => setTimeout(fitBoard, 150));
+  buildBoard();
+  readThemeColors();
+  applyThemeLabel();
+  render();
+})();
+</script>
+</body>
+</html>
