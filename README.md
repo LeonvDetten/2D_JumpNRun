@@ -85,7 +85,6 @@ mit `scripts/make_readme_media.py measure`.
 | [Training](docs/training.md) | Trainings- und Auswertungsbefehle aller Phasen, Medien neu erzeugen |
 | [Architektur](docs/architektur.md) | Pakete, Diagramm, warum alles deterministisch ist, Tests |
 | [Lerntagebuch](docs/lernen/00_ueberblick.md) | von „Was ist Reinforcement Learning?“ bis Phase 13 |
-| [Unterricht](docs/unterricht/README.md) | „Mission Schatzkiste“: Reinforcement Learning zum Durchspielen für Schulklassen, eine HTML-Datei ohne CSS und JavaScript |
 
 ## Projektstruktur
 
