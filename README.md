@@ -85,6 +85,7 @@ mit `scripts/make_readme_media.py measure`.
 | [Training](docs/training.md) | Trainings- und Auswertungsbefehle aller Phasen, Medien neu erzeugen |
 | [Architektur](docs/architektur.md) | Pakete, Diagramm, warum alles deterministisch ist, Tests |
 | [Lerntagebuch](docs/lernen/00_ueberblick.md) | von „Was ist Reinforcement Learning?“ bis Phase 13 |
+| [Unterricht: STATION Q](docs/unterricht/README.md) | Lern-App für Klasse 12/13 (eine Offline-HTML-Datei, ≈ 8 Wochen), mit dem echten Bot |
 
 ## Projektstruktur
 
